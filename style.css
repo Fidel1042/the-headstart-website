@@ -577,9 +577,30 @@ header {
   box-shadow: 0 10px 24px rgba(255,214,137,0.35);
 }
 
+.nav-cta--gold {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid transparent;
+}
+
+.nav-cta--gold::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  border: 1px solid rgba(199,155,59,0.9);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
 .nav-cta--gold:hover {
   transform: translateY(-1px);
   box-shadow: 0 14px 30px rgba(255,214,137,0.5);
+  color: #fff;
+}
+
+.nav-cta--gold:hover::after {
+  opacity: 1;
 }
 
 .btn-outline-gold {
@@ -760,16 +781,17 @@ main {
 
 .hero-img-wrap img {
   display: block;
-  width: 125%;
+  width: 80%;
   height: auto;
-  transform: translateY(-92px);
+  transform: translateY(0);
 }
 
 .home-page .page-hero .hero-img-wrap img {
-  width: clamp(260px, 45vw, 620px);
-  transform: translateY(-10px);
-  margin: 0 auto;
+  width: clamp(200px, 35vw, 420px);
+  margin-left: auto;
+  margin-right: 0;
   display: block;
+  transform: translateY(0);
 }
 
 .section-block {
