@@ -1,0 +1,12 @@
+{
+  "liveServer.settings.fullReload": true,
+  "liveServer.settings.wait": 1500,
+  "liveServer.settings.useLocalIp": false,
+  "liveServer.settings.CustomBrowser": "default",
+  "liveServer.settings.ignoreFiles": [
+    "**/.vscode/**",
+    "**/*.scss",
+    "**/*.sass",
+    "**/*.ts"
+  ]
+}

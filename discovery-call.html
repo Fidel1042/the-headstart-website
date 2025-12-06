@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Book a Discovery Call – The Headstart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="discovery-page">
+  <header>
+    <div class="nav">
+      <a href="index.html" class="nav-left nav-home">
+        <img src="intro-logo.png" alt="The Headstart logo" class="nav-logo-icon" />
+        <div class="nav-brand-text">
+          <span>The Headstart</span>
+          <span>General uni mentors for winners</span>
+        </div>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="services.html">Services</a>
+        <a href="mentors.html">Our Mentors</a>
+        <a href="careers.html">Careers</a>
+      </nav>
+      <a href="discovery-call.html" class="nav-cta nav-cta--gold">Book a free call</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="section">
+      <div class="section-inner">
+        <div class="page-hero">
+          <div class="page-hero-text">
+            <h1>Fill in this simple form to book your call!</h1>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-alt">
+      <div class="section-inner">
+        <form class="signup-form multi-step" name="mentee-signup" method="POST" data-netlify="true" netlify-honeypot="bot-field" action="/thank-you.html" target="calendlyRedirect" onsubmit="window.open('https://calendly.com/theuniheadstart/30min','calendlyRedirect');">
+          <input type="hidden" name="form-name" value="mentee-signup" />
+          <p class="honeypot">
+            <label>Don’t fill this out if you're human: <input name="bot-field" /></label>
+          </p>
+
+          <div class="form-step is-active" data-step="1">
+            <div class="signup-grid">
+              <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" required />
+              </div>
+              <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required />
+              </div>
+              <div class="form-group">
+                <label for="phone">Phone number</label>
+                <input type="tel" id="phone" name="phone" required />
+              </div>
+            </div>
+            <div class="form-nav align-right">
+              <div class="form-nav-right">
+                <span class="form-page-count">Page 1/3</span>
+                <button type="button" class="btn form-next">Next</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-step" data-step="2">
+            <div class="signup-grid">
+              <div class="form-group search-select" data-search-source="universities">
+                <label for="university">University</label>
+                <div class="search-select-field">
+                  <input
+                    type="text"
+                    id="university"
+                    name="university"
+                    data-search-input
+                    autocomplete="off"
+                    placeholder="Start typing to search"
+                    required
+                  />
+                  <div class="search-select-dropdown" hidden></div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="major">Major</label>
+                <input type="text" id="major" name="major" required />
+              </div>
+              <div class="form-group month-year-field" data-year-start="2015" data-year-end="2035">
+                <label for="start-date">Uni start date</label>
+                <div class="month-year-input">
+                  <input
+                    type="text"
+                    id="start-date"
+                    name="university_start_date"
+                    placeholder="Select month &amp; year"
+                    autocomplete="off"
+                    required
+                    aria-haspopup="listbox"
+                    aria-expanded="false"
+                    aria-controls="start-date-month-year"
+                    data-month-year-input
+                  />
+                  <button class="month-year-toggle" type="button" aria-label="Toggle month and year list">▾</button>
+                </div>
+                <div class="month-year-dropdown" id="start-date-month-year" data-month-year-dropdown>
+                  <div class="month-year-column">
+                    <span>Month</span>
+                    <ul data-month-list role="listbox"></ul>
+                  </div>
+                  <div class="month-year-column">
+                    <span>Year</span>
+                    <ul data-year-list role="listbox"></ul>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group month-year-field" data-year-start="2024" data-year-end="2035">
+                <label for="grad-date">Predicted Graduation Date</label>
+                <div class="month-year-input">
+                  <input
+                    type="text"
+                    id="grad-date"
+                    name="graduation_date"
+                    placeholder="Select month &amp; year"
+                    autocomplete="off"
+                    required
+                    aria-haspopup="listbox"
+                    aria-expanded="false"
+                    aria-controls="grad-date-month-year"
+                    data-month-year-input
+                  />
+                  <button class="month-year-toggle" type="button" aria-label="Toggle month and year list">▾</button>
+                </div>
+                <div class="month-year-dropdown" id="grad-date-month-year" data-month-year-dropdown>
+                  <div class="month-year-column">
+                    <span>Month</span>
+                    <ul data-month-list role="listbox"></ul>
+                  </div>
+                  <div class="month-year-column">
+                    <span>Year</span>
+                    <ul data-year-list role="listbox"></ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="form-nav">
+              <button type="button" class="btn btn-compact form-prev">Back</button>
+              <div class="form-nav-right">
+                <span class="form-page-count">Page 2/3</span>
+                <button type="button" class="btn form-next">Next</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-step" data-step="3">
+            <div class="form-group">
+              <label>Services you're interested in</label>
+              <div class="checkbox-grid">
+                <label><input type="checkbox" name="services[]" value="corporate-job-searching" /> Corporate job searching</label>
+                <label><input type="checkbox" name="services[]" value="starting-a-business" /> Starting a business</label>
+                <label><input type="checkbox" name="services[]" value="settling-in-australia" /> Settling in Australia</label>
+                <label><input type="checkbox" name="services[]" value="side-hustles" /> Side hustles</label>
+                <label><input type="checkbox" name="services[]" value="joining-a-startup" /> Joining a start up</label>
+                <label class="inline-other">
+                  <div class="inline-other-trigger">
+                    <input type="checkbox" name="services[]" value="other" />
+                    <span>Others (please specify)</span>
+                  </div>
+                  <input type="text" name="services_other" placeholder="Tell us more" />
+                </label>
+              </div>
+            </div>
+            <div class="form-nav">
+              <button type="button" class="btn btn-compact form-prev">Back</button>
+              <div class="form-nav-right">
+                <span class="form-page-count">Page 3/3</span>
+                <button type="submit" class="btn btn-dark-solid">Submit</button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>&copy; <span id="year"></span> The Headstart. All rights reserved.</span>
+    <span>Contact: <a href="mailto:theuniheadstart@gmail.com">theuniheadstart@gmail.com</a></span>
+  </footer>
+  <script src="script.js"></script>
+</body>
+</html>
