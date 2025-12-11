@@ -48,16 +48,46 @@
           <div class="form-step is-active" data-step="1">
             <div class="signup-grid">
               <div class="form-group">
-                <label for="name">Name</label>
-                <input type="text" id="name" name="name" required />
+                <label for="contact-name">Name</label>
+                <input type="text" id="contact-name" name="name" required />
               </div>
               <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" required />
+                <label for="contact-email">Email</label>
+                <input type="email" id="contact-email" name="email" required />
+              </div>
+              <div class="form-group phone-field">
+                <label for="contact-phone">Phone number</label>
+                <div class="phone-input-group">
+                  <div class="search-select phone-country-field" data-search-source="country-codes">
+                    <div class="search-select-field">
+                      <input
+                        type="text"
+                        id="phone-country"
+                        name="phone_country"
+                        data-search-input
+                        autocomplete="off"
+                        value="AU +61"
+                        required
+                        aria-label="Country dial code"
+                      />
+                      <div class="search-select-dropdown" hidden></div>
+                    </div>
+                  </div>
+                  <input type="tel" id="contact-phone" name="phone" required placeholder="123 456 789" />
+                </div>
               </div>
               <div class="form-group">
-                <label for="phone">Phone number</label>
-                <input type="tel" id="phone" name="phone" required />
+                <label>Are you an international student?</label>
+                <div class="inline-radio-group">
+                  <label>
+                    <input type="radio" name="international_student" value="yes" required />
+                    <span>Yes</span>
+                  </label>
+                  <label>
+                    <input type="radio" name="international_student" value="no" />
+                    <span>No</span>
+                  </label>
+                </div>
               </div>
             </div>
             <div class="form-nav align-right">
@@ -69,8 +99,93 @@
           </div>
 
           <div class="form-step" data-step="2">
+            <div class="form-group">
+              <label>Services you're interested in</label>
+              <div class="checkbox-grid">
+                <label class="checkbox-trigger" data-service-target="corporate-services"><input type="checkbox" name="services[]" value="corporate-job-searching" /> Corporate job searching</label>
+                <label class="checkbox-trigger" data-description-target="settling"><input type="checkbox" name="services[]" value="settling-in-australia" /> Settling in Australia</label>
+                <div class="service-description" data-description="settling">
+                  <label>Tell us what you need help with</label>
+                  <textarea name="settling_details" placeholder="Tell us more"></textarea>
+                </div>
+                <label class="checkbox-trigger" data-description-target="startup"><input type="checkbox" name="services[]" value="joining-a-startup" /> Joining a start up</label>
+                <div class="service-description" data-description="startup">
+                  <label>Tell us what you need help with</label>
+                  <textarea name="startup_details" placeholder="Tell us more"></textarea>
+                </div>
+                <label class="checkbox-trigger" data-description-target="business"><input type="checkbox" name="services[]" value="starting-a-business" /> Starting a business</label>
+                <div class="service-description" data-description="business">
+                  <label>Tell us what you need help with</label>
+                  <textarea name="business_details" placeholder="Tell us more"></textarea>
+                </div>
+                <label class="checkbox-trigger" data-description-target="side"><input type="checkbox" name="services[]" value="side-hustles" /> Side hustles</label>
+                <div class="service-description" data-description="side">
+                  <label>Tell us what you need help with</label>
+                  <textarea name="side_hustle_details" placeholder="Tell us more"></textarea>
+                </div>
+                <label class="inline-other">
+                  <div class="inline-other-trigger">
+                    <input type="checkbox" name="services[]" value="other" />
+                    <span>Others (please specify)</span>
+                  </div>
+                  <input type="text" name="services_other" placeholder="Tell us more" />
+                </label>
+              </div>
+              <div class="corporate-services" id="corporate-services">
+                <label>Which areas inside corporate job searching?</label>
+                <div class="checkbox-grid">
+                  <label><input type="checkbox" name="corporate_services[]" value="linkedin" /> LinkedIn optimisation</label>
+                  <label><input type="checkbox" name="corporate_services[]" value="networking" /> Networking strategies</label>
+                  <label><input type="checkbox" name="corporate_services[]" value="resume" /> Resume &amp; cover letter optimisation</label>
+                  <label><input type="checkbox" name="corporate_services[]" value="digital-interview" /> Digital interview prep</label>
+                  <label><input type="checkbox" name="corporate_services[]" value="assessment-centre" /> Assessment centre &amp; case study coaching</label>
+                  <label><input type="checkbox" name="corporate_services[]" value="in-person-interview" /> In-person interview</label>
+                  <label><input type="checkbox" name="corporate_services[]" value="level-up" /> Level up after your first job</label>
+                </div>
+              </div>
+            </div>
+            <div class="form-nav">
+              <button type="button" class="btn btn-compact form-prev">Back</button>
+              <div class="form-nav-right">
+                <span class="form-page-count">Page 2/3</span>
+                <button type="button" class="btn form-next">Next</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-step" data-step="3">
             <div class="signup-grid">
-              <div class="form-group search-select" data-search-source="universities">
+              <div class="form-group">
+                <label class="study-level-heading">Current study level</label>
+                <div class="study-level-group" role="radiogroup" aria-label="Current study level">
+                  <label class="study-level-option">
+                    <input type="radio" name="study_level" value="bachelors" required />
+                    <span class="study-level-option-label">Bachelors</span>
+                  </label>
+                  <label class="study-level-option">
+                    <input type="radio" name="study_level" value="masters" />
+                    <span class="study-level-option-label">Masters</span>
+                  </label>
+                  <label class="study-level-option">
+                    <input type="radio" name="study_level" value="university-foundation" />
+                    <span class="study-level-option-label">University Foundation Courses</span>
+                  </label>
+                  <label class="study-level-option">
+                    <input type="radio" name="study_level" value="graduated" />
+                    <span class="study-level-option-label">Graduated</span>
+                  </label>
+                  <label class="study-level-option">
+                    <input type="radio" name="study_level" value="high-school" />
+                    <span class="study-level-option-label">High School</span>
+                  </label>
+                </div>
+              </div>
+              <div
+                class="form-group search-select conditional-field"
+                data-search-source="universities"
+                data-study-level-field="bachelors,masters,graduated"
+                hidden
+              >
                 <label for="university">University</label>
                 <div class="search-select-field">
                   <input
@@ -81,44 +196,48 @@
                     autocomplete="off"
                     placeholder="Start typing to search"
                     required
+                    data-require-when-visible
                   />
                   <div class="search-select-dropdown" hidden></div>
                 </div>
               </div>
-              <div class="form-group">
-                <label for="major">Major</label>
-                <input type="text" id="major" name="major" required />
-              </div>
-              <div class="form-group month-year-field" data-year-start="2015" data-year-end="2035">
-                <label for="start-date">Uni start date</label>
-                <div class="month-year-input">
+              <div class="form-group search-select conditional-field" data-study-level-field="bachelors,masters" data-search-source="uni-years" hidden>
+                <label for="uni-year-select">Which year are you in?</label>
+                <div class="search-select-field">
                   <input
                     type="text"
-                    id="start-date"
-                    name="university_start_date"
-                    placeholder="Select month &amp; year"
+                    id="uni-year-select"
+                    name="study_year"
+                    data-search-input
                     autocomplete="off"
-                    required
-                    aria-haspopup="listbox"
-                    aria-expanded="false"
-                    aria-controls="start-date-month-year"
-                    data-month-year-input
+                    placeholder="Select year"
+                    data-require-when-visible
                   />
-                  <button class="month-year-toggle" type="button" aria-label="Toggle month and year list">▾</button>
-                </div>
-                <div class="month-year-dropdown" id="start-date-month-year" data-month-year-dropdown>
-                  <div class="month-year-column">
-                    <span>Month</span>
-                    <ul data-month-list role="listbox"></ul>
-                  </div>
-                  <div class="month-year-column">
-                    <span>Year</span>
-                    <ul data-year-list role="listbox"></ul>
-                  </div>
+                  <div class="search-select-dropdown" hidden></div>
                 </div>
               </div>
-              <div class="form-group month-year-field" data-year-start="2024" data-year-end="2035">
-                <label for="grad-date">Predicted Graduation Date</label>
+              <div class="form-group search-select conditional-field" data-study-level-field="high-school" data-search-source="highschool-years" hidden>
+                <label for="highschool-year-select">Which year are you in?</label>
+                <div class="search-select-field">
+                  <input
+                    type="text"
+                    id="highschool-year-select"
+                    name="high_school_year"
+                    data-search-input
+                    autocomplete="off"
+                    placeholder="Select year"
+                    data-require-when-visible
+                  />
+                  <div class="search-select-dropdown" hidden></div>
+                </div>
+              </div>
+              <div
+                class="form-group month-year-field conditional-field"
+                data-year-start="2015"
+                data-year-end="2035"
+                data-study-level-field="graduated"
+              >
+                <label for="grad-date">Graduation date</label>
                 <div class="month-year-input">
                   <input
                     type="text"
@@ -126,11 +245,11 @@
                     name="graduation_date"
                     placeholder="Select month &amp; year"
                     autocomplete="off"
-                    required
                     aria-haspopup="listbox"
                     aria-expanded="false"
                     aria-controls="grad-date-month-year"
                     data-month-year-input
+                    data-require-when-visible
                   />
                   <button class="month-year-toggle" type="button" aria-label="Toggle month and year list">▾</button>
                 </div>
@@ -145,32 +264,9 @@
                   </div>
                 </div>
               </div>
-            </div>
-            <div class="form-nav">
-              <button type="button" class="btn btn-compact form-prev">Back</button>
-              <div class="form-nav-right">
-                <span class="form-page-count">Page 2/3</span>
-                <button type="button" class="btn form-next">Next</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-step" data-step="3">
-            <div class="form-group">
-              <label>Services you're interested in</label>
-              <div class="checkbox-grid">
-                <label><input type="checkbox" name="services[]" value="corporate-job-searching" /> Corporate job searching</label>
-                <label><input type="checkbox" name="services[]" value="starting-a-business" /> Starting a business</label>
-                <label><input type="checkbox" name="services[]" value="settling-in-australia" /> Settling in Australia</label>
-                <label><input type="checkbox" name="services[]" value="side-hustles" /> Side hustles</label>
-                <label><input type="checkbox" name="services[]" value="joining-a-startup" /> Joining a start up</label>
-                <label class="inline-other">
-                  <div class="inline-other-trigger">
-                    <input type="checkbox" name="services[]" value="other" />
-                    <span>Others (please specify)</span>
-                  </div>
-                  <input type="text" name="services_other" placeholder="Tell us more" />
-                </label>
+              <div class="form-group">
+                <label for="major">Major</label>
+                <input type="text" id="major" name="major" required />
               </div>
             </div>
             <div class="form-nav">
