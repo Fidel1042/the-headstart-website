@@ -749,6 +749,19 @@ document.addEventListener("DOMContentLoaded", () => {
     buildLists();
   };
 
+  document.querySelectorAll("[data-scroll-to]").forEach((btn) => {
+    btn.addEventListener("click", (event) => {
+      event.preventDefault();
+      const target = btn.getAttribute("data-scroll-to");
+      if (!target) return;
+      const el = document.querySelector(target);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth" });
+      }
+    });
+  });
+
+
   const initPainQuiz = () => {
     const section = document.getElementById("pain-points-quiz");
     if (!section) return;

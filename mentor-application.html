@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mentor Application – The Headstart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Submit your details to become a mentor with The Headstart." />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="careers-mentor-page mentor-application-page">
+
+  <header>
+    <div class="nav">
+      <a href="index.html" class="nav-left nav-home">
+        <img src="intro-logo.png" alt="The Headstart logo" class="nav-logo-icon" />
+        <div class="nav-brand-text">
+          <span>The Headstart</span>
+          <span>General uni mentors for winners</span>
+        </div>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="services.html">Services</a>
+        <a href="mentors.html">Our Mentors</a>
+        <a href="careers.html">Careers</a>
+      </nav>
+      <a href="discovery-call.html" class="nav-cta nav-cta--gold">Book a free call</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="career-hero">
+      <div class="section-inner narrow">
+        <div class="career-hero-inner">
+          <p class="section-label">Mentor application</p>
+          <h1 class="page-hero-title mentors-headline">Apply to mentor with us</h1>
+          <p class="career-hero-copy">
+            Share who you are, how you&apos;ve won, and the type of support you can provide. We review submissions weekly and follow up fast when there&apos;s a match.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="mentor-application" class="mentor-application section">
+      <div class="section-inner narrow">
+        <h2>Submit your details</h2>
+        <form class="mentor-application-form" name="mentor-application" method="POST" data-netlify="true" netlify-honeypot="bot-field" action="/thank-you.html">
+          <input type="hidden" name="form-name" value="mentor-application" />
+          <p class="honeypot">
+            <label>Don’t fill this out if you're human: <input name="bot-field" /></label>
+          </p>
+          <label>
+            Full name
+            <input type="text" name="applicant_name" required />
+          </label>
+          <label>
+            Email
+            <input type="email" name="applicant_email" required />
+          </label>
+          <label>
+            LinkedIn profile
+            <input type="url" name="applicant_linkedin" placeholder="https://..." />
+          </label>
+          <label>
+            Tell us about your mentoring experience
+            <textarea name="applicant_experience" rows="4" required></textarea>
+          </label>
+          <button type="submit" class="btn btn-dark-solid">Submit</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>&copy; <span id="year"></span> The Headstart. All rights reserved.</span>
+    <span>Contact: <a href="mailto:theuniheadstart@gmail.com">theuniheadstart@gmail.com</a></span>
+  </footer>
+  <div class="mobile-sticky-cta">
+    <p>Ready to talk to a mentor?</p>
+    <a class="btn" href="mailto:theuniheadstart@gmail.com">Email us</a>
+  </div>
+  <button class="back-to-top" type="button" aria-label="Back to top">↑</button>
+  <script src="script.js"></script>
+</body>
+</html>
