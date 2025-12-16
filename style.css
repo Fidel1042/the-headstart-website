@@ -2918,6 +2918,31 @@ footer a {
   transform: translateY(-1px);
 }
 
+.mentor-application-form .mentor-phone-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.mentor-application-form .mentor-phone-field label {
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  color: rgba(255,255,255,0.8);
+}
+
+.mentor-application-form .phone-input-group {
+  width: 100%;
+}
+
+.mentor-application-form .phone-country-field {
+  flex: 0 0 120px;
+}
+
+.mentor-application-form .phone-input-group input[type="tel"] {
+  flex: 1;
+  max-width: 100%;
+}
+
 .mentors-headline {
   font-size: 2.2rem;
   font-weight: 650;

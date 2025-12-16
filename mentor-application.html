@@ -57,10 +57,27 @@
             Email
             <input type="email" name="applicant_email" required />
           </label>
-          <label>
-            Phone number
-            <input type="tel" name="applicant_phone" placeholder="+61..." />
-          </label>
+          <div class="mentor-phone-field">
+            <label for="mentor-phone">Phone number</label>
+            <div class="phone-input-group">
+              <div class="search-select phone-country-field" data-search-source="country-codes">
+                <div class="search-select-field">
+                  <input
+                    type="text"
+                    id="mentor-phone-country"
+                    name="phone_country"
+                    data-search-input
+                    autocomplete="off"
+                    value="AU +61"
+                    required
+                    aria-label="Country dial code"
+                  />
+                  <div class="search-select-dropdown" hidden></div>
+                </div>
+              </div>
+              <input type="tel" id="mentor-phone" name="applicant_phone" placeholder="123 456 789" required />
+            </div>
+          </div>
           <label>
             LinkedIn profile
             <input type="url" name="applicant_linkedin" placeholder="https://..." />
