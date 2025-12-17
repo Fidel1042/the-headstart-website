@@ -2088,6 +2088,7 @@ main {
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
+  align-items: center;
 }
 
 .thanks-label {

@@ -44,7 +44,15 @@
     <section id="mentor-application" class="mentor-application section">
       <div class="section-inner narrow">
         <h2>Submit your details</h2>
-        <form class="mentor-application-form" name="mentor-application" method="POST" data-netlify="true" netlify-honeypot="bot-field" action="/thank-you.html">
+        <form
+          class="mentor-application-form"
+          name="mentor-application"
+          method="POST"
+          data-netlify="true"
+          netlify-honeypot="bot-field"
+          action="/thank-you.html"
+          enctype="multipart/form-data"
+        >
           <input type="hidden" name="form-name" value="mentor-application" />
           <p class="honeypot">
             <label>Don’t fill this out if you're human: <input name="bot-field" /></label>
