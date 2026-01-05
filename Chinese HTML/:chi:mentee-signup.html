@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8" />
+  <title>学员报名 – The Headstart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Terminology Glossary / 术语表: mentor = 导师, mentee = 学员, university = 大学, job searching = 求职, career = 职业发展 -->
+  <header>
+    <div class="nav">
+      <a href="index.html" class="nav-left nav-home">
+        <img src="intro-logo.png" alt="The Headstart logo" class="nav-logo-icon" />
+        <div class="nav-brand-text">
+          <span>The Headstart</span>
+          <span>让优秀学子赢在起跑线</span>
+        </div>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html">首页</a>
+        <a href="services.html">服务项目</a>
+        <a href="mentors.html">导师介绍</a>
+        <a href="careers.html">职业发展</a>
+      </nav>
+      <a href="discovery-call.html" class="nav-cta nav-cta--gold">免费咨询</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="section">
+      <div class="section-inner">
+        <div class="page-hero single-column">
+          <div class="page-hero-text">
+            <div class="hero-tagline">学员申请</div>
+            <h1>请填写基本信息，我们将为你匹配合适导师。</h1>
+            <p>
+              完成几个简单问题，我们将安排有相似经历的导师与你交流。
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-alt">
+      <div class="section-inner">
+        <form class="signup-form" name="mentee-signup" method="POST" data-netlify="true" netlify-honeypot="bot-field" action="/thank-you.html" target="calendlyRedirect" onsubmit="window.open('https://calendly.com/theuniheadstart/30min','calendlyRedirect');">
+          <input type="hidden" name="form-name" value="mentee-signup" />
+          <p class="honeypot">
+            <label>如果你是人类，请留空：<input name="bot-field" /></label>
+          </p>
+          <div class="signup-grid">
+            <div class="form-group">
+              <label for="name">姓名</label>
+              <input type="text" id="name" name="name" required />
+            </div>
+            <div class="form-group">
+              <label for="email">电子邮箱</label>
+              <input type="email" id="email" name="email" required />
+            </div>
+            <div class="form-group">
+              <label for="phone">手机号码</label>
+              <input type="tel" id="phone" name="phone" />
+            </div>
+            <div class="form-group search-select" data-search-source="universities">
+              <label for="university">大学</label>
+              <div class="search-select-field">
+                <input
+                  type="text"
+                  id="university"
+                  name="university"
+                  data-search-input
+                  autocomplete="off"
+                  placeholder="输入学校关键字"
+                />
+                <div class="search-select-dropdown" hidden></div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="major">主修</label>
+              <input type="text" id="major" name="major" />
+            </div>
+            <div class="form-group month-year-field" data-year-start="2015" data-year-end="2035">
+              <label for="start-date">大学入学时间</label>
+              <div class="month-year-input">
+                <input
+                  type="text"
+                  id="start-date"
+                  name="university_start_date"
+                  placeholder="选择月份与年份"
+                  autocomplete="off"
+                  aria-haspopup="listbox"
+                  aria-expanded="false"
+                  aria-controls="mentee-start-month-year"
+                  data-month-year-input
+                />
+                <button class="month-year-toggle" type="button" aria-label="展开或收合月份与年份清单">▾</button>
+              </div>
+              <div class="month-year-dropdown" id="mentee-start-month-year" data-month-year-dropdown>
+                <div class="month-year-column">
+                  <span>月份</span>
+                  <ul data-month-list role="listbox"></ul>
+                </div>
+                <div class="month-year-column">
+                  <span>年份</span>
+                  <ul data-year-list role="listbox"></ul>
+                </div>
+              </div>
+            </div>
+            <div class="form-group month-year-field" data-year-start="2024" data-year-end="2035">
+              <label for="grad-date">预计毕业时间</label>
+              <div class="month-year-input">
+                <input
+                  type="text"
+                  id="grad-date"
+                  name="graduation_date"
+                  placeholder="选择月份与年份"
+                  autocomplete="off"
+                  required
+                  aria-haspopup="listbox"
+                  aria-expanded="false"
+                  aria-controls="mentee-grad-month-year"
+                  data-month-year-input
+                />
+                <button class="month-year-toggle" type="button" aria-label="展开或收合月份与年份清单">▾</button>
+              </div>
+              <div class="month-year-dropdown" id="mentee-grad-month-year" data-month-year-dropdown>
+                <div class="month-year-column">
+                  <span>月份</span>
+                  <ul data-month-list role="listbox"></ul>
+                </div>
+                <div class="month-year-column">
+                  <span>年份</span>
+                  <ul data-year-list role="listbox"></ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+              <label>你希望获得哪些支持？</label>
+            <div class="checkbox-grid">
+              <label><input type="checkbox" name="services[]" value="corporate-job-searching" /> 企业求职指导</label>
+              <label><input type="checkbox" name="services[]" value="starting-a-business" /> 创业或副业指导</label>
+              <label><input type="checkbox" name="services[]" value="settling-in-australia" /> 在澳生活适应指导</label>
+              <label><input type="checkbox" name="services[]" value="side-hustles" /> 副业或项目实践</label>
+              <label><input type="checkbox" name="services[]" value="joining-a-startup" /> 加入初创公司</label>
+              <label class="inline-other">
+                <div class="inline-other-trigger">
+                  <input type="checkbox" name="services[]" value="other" />
+                  <span>其他（请说明）</span>
+                </div>
+                <input type="text" name="services_other" placeholder="欢迎描述想讨论的主题" />
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-dark-solid">提交</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>&copy; <span id="year"></span> The Headstart. 版权所有。</span>
+    <span>联系邮箱：<a href="mailto:theuniheadstart@gmail.com">theuniheadstart@gmail.com</a></span>
+  </footer>
+  <script src="script.js"></script>
+</body>
+</html>
