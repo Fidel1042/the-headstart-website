@@ -6,6 +6,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Whether you're job hunting, adapting to Uni life, building a business, or just figuring out life after graduating, we have mentors who've lived it, and can guide you through it." />
   <link rel="stylesheet" href="style.css" />
+  <script>
+    (function redirectByLanguage() {
+      if (sessionStorage.getItem("langRedirected")) return;
+      const lang = (navigator.languages && navigator.languages[0]) || navigator.language || "";
+      if (lang.toLowerCase().startsWith("zh")) {
+        sessionStorage.setItem("langRedirected", "true");
+        window.location.href = "Chinese%20HTML/:chi:index.html";
+      }
+    })();
+  </script>
 </head>
 <body class="home-page">
 
@@ -13,7 +23,7 @@
   <div id="splash">
     <div class="splash-inner">
       <div class="splash-logo-wrap">
-        <img src="intro-logo.png" alt="The Headstart icon" class="splash-logo" />
+        <img src="images/intro-logo.png" alt="The Headstart icon" class="splash-logo" />
         <div class="finish-line"></div>
       </div>
       <div class="splash-tagline">WINNING AT THE STARTING LINE</div>
@@ -25,7 +35,7 @@
   <header>
     <div class="nav">
       <a href="index.html" class="nav-left nav-home">
-        <img src="intro-logo.png" alt="The Headstart logo" class="nav-logo-icon" />
+        <img src="images/intro-logo.png" alt="The Headstart logo" class="nav-logo-icon" />
         <div class="nav-brand-text">
           <span>The Headstart</span>
           <span>General uni mentors for winners</span>
@@ -33,11 +43,11 @@
       </a>
       <nav class="nav-links">
         <a href="index.html">Home</a>
-        <a href="services.html">Services</a>
-        <a href="mentors.html">Our Mentors</a>
-        <a href="careers.html">Careers</a>
+        <a href="English%20HTML/services.html">Services</a>
+        <a href="English%20HTML/mentors.html">Our Mentors</a>
+        <a href="English%20HTML/careers.html">Careers</a>
       </nav>
-      <a href="discovery-call.html" class="nav-cta nav-cta--gold">Book a free call</a>
+      <a href="English%20HTML/discovery-call.html" class="nav-cta nav-cta--gold">Book a free call</a>
     </div>
   </header>
 
@@ -91,7 +101,7 @@
                   <img src="images/Home page/beyond a job.png" alt="Mentor providing support beyond jobs" />
                 </figure>
                 <div class="about-real__text">
-                  <p>While we offer a very comprehensive set of mentoring for your job searching, we know there&apos;s WAY more than just finding a job. Find how we can help by looking at our <a class="gradient-link gold-link" href="services.html">SERVICES</a>.</p>
+                  <p>While we offer a very comprehensive set of mentoring for your job searching, we know there&apos;s WAY more than just finding a job. Find how we can help by looking at our <a class="gradient-link gold-link" href="English%20HTML/services.html">SERVICES</a>.</p>
                 </div>
               </div>
             </section>
@@ -142,7 +152,7 @@
   </div>
   <div class="mobile-sticky-cta">
     <p>Ready to talk to a mentor?</p>
-    <a class="btn" href="mentors.html"><strong>Check them out</strong></a>
+    <a class="btn" href="English%20HTML/mentors.html"><strong>Check them out</strong></a>
   </div>
   <button class="back-to-top" type="button" aria-label="Back to top">↑</button>
   <script src="script.js"></script>
