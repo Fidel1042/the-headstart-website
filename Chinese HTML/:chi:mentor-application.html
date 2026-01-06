@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <title>导师申请 – The Headstart</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
   <meta name="description" content="填写资料成为 The Headstart 导师，分享你的澳洲经历。" />
   <link rel="stylesheet" href="../style.css" />
 </head>
@@ -12,20 +13,20 @@
 
   <header>
     <div class="nav">
-      <a href="index.html" class="nav-left nav-home">
-        <img src="../images/intro-logo.png" alt="The Headstart logo" class="nav-logo-icon" />
+      <a href=":chi:index.html" class="nav-left nav-home">
+        <img src="../images/intro-logo.png" width="500" height="500" decoding="async" alt="The Headstart logo" class="nav-logo-icon" />
         <div class="nav-brand-text">
           <span>The Headstart</span>
           <span>让优秀学子赢在起跑线</span>
         </div>
       </a>
       <nav class="nav-links">
-        <a href="index.html">首页</a>
-        <a href="services.html">服务项目</a>
-        <a href="mentors.html">导师介绍</a>
-        <a href="careers.html">职业发展</a>
+        <a href=":chi:index.html">首页</a>
+        <a href=":chi:services.html">服务项目</a>
+        <a href=":chi:mentors.html">导师介绍</a>
+        <a href=":chi:careers.html">职业发展</a>
       </nav>
-      <a href="discovery-call.html" class="nav-cta nav-cta--gold">免费咨询</a>
+      <a href=":chi:discovery-call.html" class="nav-cta nav-cta--gold">免费咨询</a>
     </div>
   </header>
 
@@ -33,10 +34,10 @@
     <section class="career-hero">
       <div class="section-inner narrow">
         <div class="career-hero-inner">
-          <p class="section-label">导师申请表</p>
-          <h1 class="page-hero-title mentors-headline">加入我们，助力学员成长</h1>
+          <p class="section-label">导师申请</p>
+          <h1 class="page-hero-title mentors-headline">加入我们，一起带学员起飞</h1>
           <p class="career-hero-copy">
-            请分享你的背景、成就以及可提供的指导方向。我们每周审核申请，符合条件将尽快与你联系。
+            说说你的背景、成就，以及能带什么方向。我们每周看申请，合适的会尽快找你。
           </p>
         </div>
       </div>
@@ -44,7 +45,7 @@
 
     <section id="mentor-application" class="mentor-application section">
       <div class="section-inner narrow">
-        <h2>填写申请信息</h2>
+        <h2>填写申请资料</h2>
         <form
           class="mentor-application-form"
           name="mentor-application"
@@ -60,11 +61,11 @@
           </p>
           <label>
             姓名
-            <input type="text" name="applicant_name" required />
+            <input type="text" name="applicant_name" autocomplete="name" required />
           </label>
           <label>
             电子邮箱
-            <input type="email" name="applicant_email" required />
+            <input type="email" autocomplete="email" name="applicant_email" required />
           </label>
           <div class="mentor-phone-field">
             <label for="mentor-phone">手机号码</label>
@@ -84,7 +85,7 @@
                   <div class="search-select-dropdown" hidden></div>
                 </div>
               </div>
-              <input type="tel" id="mentor-phone" name="applicant_phone" placeholder="123 456 789" required />
+              <input type="tel" inputmode="tel" autocomplete="tel" pattern="[0-9+()\s-]*" id="mentor-phone" name="applicant_phone" placeholder="123 456 789" required />
             </div>
           </div>
           <label>
@@ -96,7 +97,7 @@
             <input type="file" name="resume" accept=".pdf,.doc,.docx,.txt" />
           </label>
           <label>
-            请分享你的指导经验
+            说说你的带人经验
             <textarea name="applicant_experience" rows="4" required></textarea>
           </label>
           <button type="submit" class="btn btn-dark-solid">提交</button>
@@ -110,10 +111,10 @@
     <span>联系邮箱：<a href="mailto:theuniheadstart@gmail.com">theuniheadstart@gmail.com</a></span>
   </footer>
   <div class="mobile-sticky-cta">
-    <p>准备好与导师交流了吗？</p>
+    <p>想和导师聊聊吗？</p>
     <a class="btn" href="mailto:theuniheadstart@gmail.com">写信给我们</a>
   </div>
   <button class="back-to-top" type="button" aria-label="回到顶部">↑</button>
-  <script src="../script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>

@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const more = card?.querySelector(".card-more");
       const open = more?.classList.toggle("show");
       if (open !== undefined) {
-        btn.textContent = open ? "Show less" : "Show details";
+        btn.textContent = open ? "收起内容" : "查看详情";
       }
     });
   });
@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       if (resultCount) {
-        resultCount.textContent = `${visible} result${visible === 1 ? "" : "s"}`;
+        resultCount.textContent = `共 ${visible} 条结果`;
       }
     };
 
@@ -407,17 +407,17 @@ document.addEventListener("DOMContentLoaded", () => {
       "ZW +263",
     ],
     "uni-years": [
-      "Year 1",
-      "Year 2",
-      "Year 3",
-      "Year 4",
-      "Year 5",
-      "Year 6+",
+      "大一",
+      "大二",
+      "大三",
+      "大四",
+      "大五",
+      "研究/以上",
     ],
     "highschool-years": [
-      "Year 10",
-      "Year 11",
-      "Year 12",
+      "高一",
+      "高二",
+      "高三",
     ],
   };
 
@@ -456,7 +456,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const isHidden = group.offsetParent === null;
         if (isHidden) continue;
         if (boxes.length && !boxes.some((box) => box.checked)) {
-          showFormMessage("Please select at least one option.");
+          showFormMessage("请至少选一个。");
           return false;
         }
       }
@@ -640,18 +640,18 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
+    "1 月",
+    "2 月",
+    "3 月",
+    "4 月",
+    "5 月",
+    "6 月",
+    "7 月",
+    "8 月",
+    "9 月",
+    "10 月",
+    "11 月",
+    "12 月",
   ];
 
   const initMonthYearField = (field) => {
@@ -835,12 +835,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!card || !cardText || !yesBtn || !skipBtn || !module) return;
 
     const prompts = [
-      "Re-recording digital interviews again and again because they still don't feel right.",
-      "Auto-rejected because of visa status even though the grad role is clearly in reach.",
-      "Being told multiple internships are needed to stand out but you can't even land the first one.",
-      "Feeling like being an introvert means you'll never stand out in assessment centres.",
-      "You have no clue how to impress the professionals even after finally landing a coffee chat.",
-      "Applying for part-time jobs with 600+ applicants and wondering how you're supposed to gain ANY experience for an internship.",
+      "为了视频面试反复录制，却还是觉得效果不自然。",
+      "明明符合职位要求，却因为签证身份被系统直接淘汰。",
+      "大家都说需要多份实习才能出色，可第一份实习机会都拿不到。",
+      "性格偏内向，总觉得自己在评估中心很难被看到。",
+      "好不容易约到 coffee chat，却不知道如何让对方记住你。",
+      "申请兼职动辄几百人竞争，不确定怎样先累积经验再申请实习。",
     ];
 
     let dots = Array.from(module.querySelectorAll("[data-quiz-dot]"));
@@ -859,12 +859,12 @@ document.addEventListener("DOMContentLoaded", () => {
     let yesCount = 0;
     let isAnimating = false;
     const navCta = document.querySelector(".nav-cta--gold");
-    const freeCallHref = navCta?.getAttribute("href") || "discovery-call.html";
+    const freeCallHref = navCta?.getAttribute("href") || ":chi:discovery-call.html";
 
     const updateProgress = () => {
       if (progressText) {
         const safeIndex = Math.min(currentIndex + 1, total);
-        progressText.textContent = `Card ${safeIndex} of ${total}`;
+        progressText.textContent = `第${safeIndex}/${total}项`;
       }
       dots.forEach((dot, index) => {
         dot.classList.toggle("is-active", index === currentIndex);
@@ -920,9 +920,9 @@ document.addEventListener("DOMContentLoaded", () => {
       module.classList.add("pain-quiz__module--complete");
       card.classList.add("pain-quiz__card--result");
       cardText.classList.add("pain-quiz__result");
-      const servicesLink = `<a class="gradient-link gold-link" href="services.html">help</a>`;
-      const callLink = `<a class="gradient-link gold-link" href="${freeCallHref}">booking a free call</a>`;
-      cardText.innerHTML = `You are not alone in this challenge, see how we ${servicesLink} or go straight to ${callLink}.`;
+      const servicesLink = `<a class="gradient-link gold-link" href=":chi:services.html">提供支持</a>`;
+      const callLink = `<a class="gradient-link gold-link" href="${freeCallHref}">预约免费咨询</a>`;
+      cardText.innerHTML = `面对这些挑战，你并不孤单，看看我们如何${servicesLink}，或直接${callLink}。`;
       actions?.setAttribute("hidden", "");
       progress?.setAttribute("hidden", "");
       prevBtn?.setAttribute("hidden", "");

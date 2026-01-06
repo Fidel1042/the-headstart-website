@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <title>The Headstart – 让优秀学子赢在起跑线</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
   <meta name="description" content="无论你正在求职、适应澳洲大学生活、发展副业，还是对毕业方向感到迷茫，Headstart 导师都曾经历相同阶段并以最新经验帮助你突破。" />
   <link rel="stylesheet" href="../style.css" />
 </head>
@@ -14,10 +15,10 @@
   <div id="splash">
     <div class="splash-inner">
       <div class="splash-logo-wrap">
-        <img src="../images/intro-logo.png" alt="The Headstart icon" class="splash-logo" />
+        <img src="../images/intro-logo.png" width="500" height="500" decoding="async" alt="The Headstart icon" class="splash-logo" />
         <div class="finish-line"></div>
       </div>
-      <div class="splash-tagline">起步就领先</div>
+      <div class="splash-tagline">赢在起跑线</div>
     </div>
   </div>
 
@@ -25,20 +26,20 @@
 
   <header>
     <div class="nav">
-      <a href="index.html" class="nav-left nav-home">
-        <img src="../images/intro-logo.png" alt="The Headstart logo" class="nav-logo-icon" />
+      <a href=":chi:index.html" class="nav-left nav-home">
+        <img src="../images/intro-logo.png" width="500" height="500" decoding="async" alt="The Headstart logo" class="nav-logo-icon" />
         <div class="nav-brand-text">
           <span>The Headstart</span>
           <span>让优秀学子赢在起跑线</span>
         </div>
       </a>
       <nav class="nav-links">
-        <a href="index.html">首页</a>
-        <a href="services.html">服务项目</a>
-        <a href="mentors.html">导师介绍</a>
-        <a href="careers.html">职业发展</a>
+        <a href=":chi:index.html">首页</a>
+        <a href=":chi:services.html">服务项目</a>
+        <a href=":chi:mentors.html">导师介绍</a>
+        <a href=":chi:careers.html">职业发展</a>
       </nav>
-      <a href="discovery-call.html" class="nav-cta nav-cta--gold">免费咨询</a>
+      <a href=":chi:discovery-call.html" class="nav-cta nav-cta--gold">免费咨询</a>
     </div>
   </header>
 
@@ -58,7 +59,7 @@
               </div>
             </div>
             <div class="hero-img-wrap reveal">
-              <img src="../images/Home page/Hero Home Image.png" alt="学生庆祝取得成果的画面" />
+              <img src="../images/Home page/Hero Home Image.png" decoding="async" alt="学生庆祝取得成果的画面" />
             </div>
           </div>
         </div>
@@ -80,7 +81,7 @@
                   <p>导师将通过线上会议与你深入交流，针对性解决你当下的具体问题。我们只安排<strong>曾经历类似挑战并成功应对的导师</strong>，确保专业领域和你的需求精准匹配。</p>
                 </div>
                 <figure class="about-real__visual">
-                  <img src="../images/Home page/1 v 1 mentoring.png" alt="导师和学员进行一对一线上交流" />
+                  <img src="../images/Home page/1 v 1 mentoring.png" loading="lazy" decoding="async" alt="导师和学员进行一对一线上交流" />
                 </figure>
               </div>
             </section>
@@ -89,10 +90,10 @@
               <p class="about-real__subhead">二、求职之外的关键阶段支持</p>
               <div class="about-real__split about-real__split--reverse">
                 <figure class="about-real__visual">
-                  <img src="../images/Home page/beyond a job.png" alt="导师在求职之外持续支持学生" />
+                  <img src="../images/Home page/beyond a job.png" loading="lazy" decoding="async" alt="导师在求职之外持续支持学生" />
                 </figure>
                 <div class="about-real__text">
-                  <p>我们提供完整的求职指导，但大学生活的意义远不止拿到录用通知。了解更多服务详情，请探索我们的 <a class="gradient-link gold-link" href="services.html">服务项目</a>。</p>
+                  <p>我们提供完整的求职指导，但大学生活的意义远不止拿到录用通知。了解更多服务详情，请探索我们的 <a class="gradient-link gold-link" href=":chi:services.html">服务项目</a>。</p>
                 </div>
               </div>
             </section>
@@ -143,15 +144,24 @@
   </div>
   <div class="mobile-sticky-cta">
     <p>准备好与导师交流了吗？</p>
-    <a class="btn" href="mentors.html"><strong>查看导师介绍</strong></a>
+    <a class="btn" href=":chi:mentors.html"><strong>查看导师介绍</strong></a>
   </div>
   <button class="back-to-top" type="button" aria-label="回到顶部">↑</button>
-  <script src="../script.js"></script>
+  <script src="script.js"></script>
   <script>
     // Splash timing for home
+    const prefersReducedMotion =
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     window.addEventListener("load", function () {
       const splash = document.getElementById("splash");
       const main = document.getElementById("main");
+      if (!splash || !main) return;
+      if (prefersReducedMotion) {
+        splash.style.display = "none";
+        main.classList.add("ready");
+        return;
+      }
       setTimeout(function () {
         splash.style.animation = "fadeOut 0.6s ease-out forwards";
         main.classList.add("ready");

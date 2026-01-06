@@ -4,13 +4,14 @@
   <meta charset="UTF-8" />
   <title>Mentee Application – The Headstart</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
   <link rel="stylesheet" href="../style.css" />
 </head>
 <body>
   <header>
     <div class="nav">
       <a href="../index.html" class="nav-left nav-home">
-        <img src="../images/intro-logo.png" alt="The Headstart logo" class="nav-logo-icon" />
+        <img src="../images/intro-logo.png" width="500" height="500" decoding="async" alt="The Headstart logo" class="nav-logo-icon" />
         <div class="nav-brand-text">
           <span>The Headstart</span>
           <span>General uni mentors for winners</span>
@@ -51,15 +52,15 @@
           <div class="signup-grid">
             <div class="form-group">
               <label for="name">Name</label>
-              <input type="text" id="name" name="name" required />
+              <input type="text" id="name" name="name" autocomplete="name" required />
             </div>
             <div class="form-group">
               <label for="email">Email</label>
-              <input type="email" id="email" name="email" required />
+              <input type="email" autocomplete="email" id="email" name="email" required />
             </div>
             <div class="form-group">
               <label for="phone">Phone number</label>
-              <input type="tel" id="phone" name="phone" />
+              <input type="tel" inputmode="tel" autocomplete="tel" pattern="[0-9+()\s-]*" id="phone" name="phone" />
             </div>
             <div class="form-group search-select" data-search-source="universities">
               <label for="university">University</label>

@@ -4,26 +4,27 @@
   <meta charset="UTF-8" />
   <title>预约导师咨询 – The Headstart</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
   <link rel="stylesheet" href="../style.css" />
 </head>
 <body class="discovery-page">
   <!-- Terminology Glossary / 术语表: mentor = 导师, mentee = 学员, university = 大学, job searching = 求职, career = 职业发展 -->
   <header>
     <div class="nav">
-      <a href="index.html" class="nav-left nav-home">
-        <img src="../images/intro-logo.png" alt="The Headstart logo" class="nav-logo-icon" />
+      <a href=":chi:index.html" class="nav-left nav-home">
+        <img src="../images/intro-logo.png" width="500" height="500" decoding="async" alt="The Headstart logo" class="nav-logo-icon" />
         <div class="nav-brand-text">
           <span>The Headstart</span>
           <span>让优秀学子赢在起跑线</span>
         </div>
       </a>
       <nav class="nav-links">
-        <a href="index.html">首页</a>
-        <a href="services.html">服务项目</a>
-        <a href="mentors.html">导师介绍</a>
-        <a href="careers.html">职业发展</a>
+        <a href=":chi:index.html">首页</a>
+        <a href=":chi:services.html">服务项目</a>
+        <a href=":chi:mentors.html">导师介绍</a>
+        <a href=":chi:careers.html">职业发展</a>
       </nav>
-      <a href="discovery-call.html" class="nav-cta nav-cta--gold">免费咨询</a>
+      <a href=":chi:discovery-call.html" class="nav-cta nav-cta--gold">免费咨询</a>
     </div>
   </header>
 
@@ -32,7 +33,7 @@
       <div class="section-inner">
         <div class="page-hero">
           <div class="page-hero-text">
-            <h1>30秒填写表格，即可预约导师咨询。</h1>
+            <h1>30秒填表，马上约导师聊聊。</h1>
           </div>
         </div>
       </div>
@@ -50,11 +51,11 @@
             <div class="signup-grid">
               <div class="form-group">
                 <label for="contact-name">姓名</label>
-                <input type="text" id="contact-name" name="name" required />
+                <input type="text" id="contact-name" name="name" autocomplete="name" required />
               </div>
               <div class="form-group">
                 <label for="contact-email">电子邮箱</label>
-                <input type="email" id="contact-email" name="email" required />
+                <input type="email" autocomplete="email" id="contact-email" name="email" required />
               </div>
               <div class="form-group phone-field">
                 <label for="contact-phone">手机号码</label>
@@ -74,11 +75,11 @@
                       <div class="search-select-dropdown" hidden></div>
                     </div>
                   </div>
-                  <input type="tel" id="contact-phone" name="phone" required placeholder="123 456 789" />
+                  <input type="tel" inputmode="tel" autocomplete="tel" pattern="[0-9+()\s-]*" id="contact-phone" name="phone" required placeholder="123 456 789" />
                 </div>
               </div>
               <div class="form-group">
-                <label>你是国际学生吗？</label>
+                <label>你是国际生吗？</label>
                 <div class="inline-radio-group">
                   <label>
                     <input type="radio" name="international_student" value="yes" required />
@@ -101,47 +102,47 @@
 
           <div class="form-step" data-step="2">
             <div class="form-group">
-              <label>你希望讨论的主题</label>
+              <label>你想聊的话题</label>
               <div class="checkbox-grid">
-                <label class="checkbox-trigger" data-service-target="corporate-services"><input type="checkbox" name="services[]" value="corporate-job-searching" /> 企业求职指导</label>
-                <label class="checkbox-trigger" data-description-target="settling"><input type="checkbox" name="services[]" value="settling-in-australia" /> 在澳生活适应指导</label>
+                <label class="checkbox-trigger" data-service-target="corporate-services"><input type="checkbox" name="services[]" value="corporate-job-searching" /> 企业求职</label>
+                <label class="checkbox-trigger" data-description-target="settling"><input type="checkbox" name="services[]" value="settling-in-australia" /> 在澳生活适应</label>
                 <div class="service-description" data-description="settling">
-                  <label>请告诉我们需要的具体支持</label>
+                  <label>需要什么具体支持？</label>
                   <textarea name="settling_details" placeholder="例如住宿、校园生活或实习等"></textarea>
                 </div>
-                <label class="checkbox-trigger" data-description-target="startup"><input type="checkbox" name="services[]" value="joining-a-startup" /> 加入初创公司</label>
+                <label class="checkbox-trigger" data-description-target="startup"><input type="checkbox" name="services[]" value="joining-a-startup" /> 进初创公司</label>
                 <div class="service-description" data-description="startup">
-                  <label>请告诉我们需要的具体支持</label>
+                  <label>需要什么具体支持？</label>
                   <textarea name="startup_details" placeholder="例如想了解岗位类型或申请流程"></textarea>
                 </div>
-                <label class="checkbox-trigger" data-description-target="business"><input type="checkbox" name="services[]" value="starting-a-business" /> 创业或副业指导</label>
+                <label class="checkbox-trigger" data-description-target="business"><input type="checkbox" name="services[]" value="starting-a-business" /> 创业/副业</label>
                 <div class="service-description" data-description="business">
-                  <label>请告诉我们需要的具体支持</label>
+                  <label>需要什么具体支持？</label>
                   <textarea name="business_details" placeholder="例如商业模型或执行问题"></textarea>
                 </div>
-                <label class="checkbox-trigger" data-description-target="side"><input type="checkbox" name="services[]" value="side-hustles" /> 副业或项目实战</label>
+                <label class="checkbox-trigger" data-description-target="side"><input type="checkbox" name="services[]" value="side-hustles" /> 副业/项目</label>
                 <div class="service-description" data-description="side">
-                  <label>请告诉我们需要的具体支持</label>
+                  <label>需要什么具体支持？</label>
                   <textarea name="side_hustle_details" placeholder="例如如何平衡学业与项目"></textarea>
                 </div>
                 <label class="inline-other">
                   <div class="inline-other-trigger">
                     <input type="checkbox" name="services[]" value="other" />
-                    <span>其他主题（请说明）</span>
+                    <span>其他（请说明）</span>
                   </div>
                   <input type="text" name="services_other" placeholder="欢迎描述想讨论的重点" />
                 </label>
               </div>
               <div class="corporate-services" id="corporate-services">
-                <label>企业求职想聚焦哪些部分？</label>
+                <label>企业求职想重点搞哪块？</label>
                 <div class="checkbox-grid">
                   <label><input type="checkbox" name="corporate_services[]" value="linkedin" /> LinkedIn 优化</label>
                   <label><input type="checkbox" name="corporate_services[]" value="networking" /> 人脉拓展策略</label>
                   <label><input type="checkbox" name="corporate_services[]" value="resume" /> 简历与求职信精修</label>
-                  <label><input type="checkbox" name="corporate_services[]" value="digital-interview" /> 视频面试准备</label>
-                  <label><input type="checkbox" name="corporate_services[]" value="assessment-centre" /> 评估中心 &amp; 案例指导</label>
+                  <label><input type="checkbox" name="corporate_services[]" value="digital-interview" /> 视频面试</label>
+                  <label><input type="checkbox" name="corporate_services[]" value="assessment-centre" /> 评估中心/案例</label>
                   <label><input type="checkbox" name="corporate_services[]" value="in-person-interview" /> 现场面试</label>
-                  <label><input type="checkbox" name="corporate_services[]" value="level-up" /> 第一份工作后的发展</label>
+                  <label><input type="checkbox" name="corporate_services[]" value="level-up" /> 入职后发展</label>
                 </div>
               </div>
             </div>
@@ -157,11 +158,11 @@
           <div class="form-step" data-step="3">
             <div class="signup-grid">
               <div class="form-group">
-                <label class="study-level-heading">目前就读阶段</label>
-                <div class="study-level-group" role="radiogroup" aria-label="目前就读阶段">
+                <label class="study-level-heading">目前是？</label>
+                <div class="study-level-group" role="radiogroup" aria-label="目前是？">
                   <label class="study-level-option">
                     <input type="radio" name="study_level" value="bachelors" required />
-                    <span class="study-level-option-label">学士</span>
+                    <span class="study-level-option-label">本科</span>
                   </label>
                   <label class="study-level-option">
                     <input type="radio" name="study_level" value="masters" />
@@ -169,7 +170,7 @@
                   </label>
                   <label class="study-level-option">
                     <input type="radio" name="study_level" value="university-foundation" />
-                    <span class="study-level-option-label">大学预科</span>
+                    <span class="study-level-option-label">预科</span>
                   </label>
                   <label class="study-level-option">
                     <input type="radio" name="study_level" value="graduated" />
@@ -203,7 +204,7 @@
                 </div>
               </div>
               <div class="form-group search-select conditional-field" data-study-level-field="bachelors,masters" data-search-source="uni-years" hidden>
-                <label for="uni-year-select">目前是第几年？</label>
+                <label for="uni-year-select">大几了？</label>
                 <div class="search-select-field">
                   <input
                     type="text"
@@ -218,7 +219,7 @@
                 </div>
               </div>
               <div class="form-group search-select conditional-field" data-study-level-field="high-school" data-search-source="highschool-years" hidden>
-                <label for="highschool-year-select">目前是第几年？</label>
+                <label for="highschool-year-select">大几了？</label>
                 <div class="search-select-field">
                   <input
                     type="text"
@@ -238,13 +239,13 @@
                 data-year-end="2035"
                 data-study-level-field="graduated"
               >
-                <label for="grad-date">毕业时间</label>
+                <label for="grad-date">啥时候毕业的？</label>
                 <div class="month-year-input">
                   <input
                     type="text"
                     id="grad-date"
                     name="graduation_date"
-                    placeholder="选择月份与年份"
+                    placeholder="选月份和年份"
                     autocomplete="off"
                     aria-haspopup="listbox"
                     aria-expanded="false"
@@ -266,7 +267,7 @@
                 </div>
               </div>
               <div class="form-group">
-                <label for="major">主修</label>
+                <label for="major">专业</label>
                 <input type="text" id="major" name="major" required />
               </div>
             </div>
@@ -287,6 +288,6 @@
     <span>&copy; <span id="year"></span> The Headstart. 版权所有。</span>
     <span>联系邮箱：<a href="mailto:theuniheadstart@gmail.com">theuniheadstart@gmail.com</a></span>
   </footer>
-  <script src="../script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>

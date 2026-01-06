@@ -4,26 +4,27 @@
   <meta charset="UTF-8" />
   <title>学员报名 – The Headstart</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
   <link rel="stylesheet" href="../style.css" />
 </head>
 <body>
   <!-- Terminology Glossary / 术语表: mentor = 导师, mentee = 学员, university = 大学, job searching = 求职, career = 职业发展 -->
   <header>
     <div class="nav">
-      <a href="index.html" class="nav-left nav-home">
-        <img src="../images/intro-logo.png" alt="The Headstart logo" class="nav-logo-icon" />
+      <a href=":chi:index.html" class="nav-left nav-home">
+        <img src="../images/intro-logo.png" width="500" height="500" decoding="async" alt="The Headstart logo" class="nav-logo-icon" />
         <div class="nav-brand-text">
           <span>The Headstart</span>
           <span>让优秀学子赢在起跑线</span>
         </div>
       </a>
       <nav class="nav-links">
-        <a href="index.html">首页</a>
-        <a href="services.html">服务项目</a>
-        <a href="mentors.html">导师介绍</a>
-        <a href="careers.html">职业发展</a>
+        <a href=":chi:index.html">首页</a>
+        <a href=":chi:services.html">服务项目</a>
+        <a href=":chi:mentors.html">导师介绍</a>
+        <a href=":chi:careers.html">职业发展</a>
       </nav>
-      <a href="discovery-call.html" class="nav-cta nav-cta--gold">免费咨询</a>
+      <a href=":chi:discovery-call.html" class="nav-cta nav-cta--gold">免费咨询</a>
     </div>
   </header>
 
@@ -32,10 +33,10 @@
       <div class="section-inner">
         <div class="page-hero single-column">
           <div class="page-hero-text">
-            <div class="hero-tagline">学员申请</div>
-            <h1>请填写基本信息，我们将为你匹配合适导师。</h1>
+            <div class="hero-tagline">学员报名</div>
+            <h1>填个基本信息，我们给你匹配合适导师。</h1>
             <p>
-              完成几个简单问题，我们将安排有相似经历的导师与你交流。
+              回答几个问题，我们安排有类似经历的导师和你聊。
             </p>
           </div>
         </div>
@@ -52,15 +53,15 @@
           <div class="signup-grid">
             <div class="form-group">
               <label for="name">姓名</label>
-              <input type="text" id="name" name="name" required />
+              <input type="text" id="name" name="name" autocomplete="name" required />
             </div>
             <div class="form-group">
               <label for="email">电子邮箱</label>
-              <input type="email" id="email" name="email" required />
+              <input type="email" autocomplete="email" id="email" name="email" required />
             </div>
             <div class="form-group">
               <label for="phone">手机号码</label>
-              <input type="tel" id="phone" name="phone" />
+              <input type="tel" inputmode="tel" autocomplete="tel" pattern="[0-9+()\s-]*" id="phone" name="phone" />
             </div>
             <div class="form-group search-select" data-search-source="universities">
               <label for="university">大学</label>
@@ -138,19 +139,19 @@
           </div>
 
           <div class="form-group">
-              <label>你希望获得哪些支持？</label>
+              <label>你需要哪些支持？</label>
             <div class="checkbox-grid">
-              <label><input type="checkbox" name="services[]" value="corporate-job-searching" /> 企业求职指导</label>
-              <label><input type="checkbox" name="services[]" value="starting-a-business" /> 创业或副业指导</label>
-              <label><input type="checkbox" name="services[]" value="settling-in-australia" /> 在澳生活适应指导</label>
-              <label><input type="checkbox" name="services[]" value="side-hustles" /> 副业或项目实践</label>
-              <label><input type="checkbox" name="services[]" value="joining-a-startup" /> 加入初创公司</label>
+              <label><input type="checkbox" name="services[]" value="corporate-job-searching" /> 企业求职</label>
+              <label><input type="checkbox" name="services[]" value="starting-a-business" /> 创业/副业</label>
+              <label><input type="checkbox" name="services[]" value="settling-in-australia" /> 在澳生活适应</label>
+              <label><input type="checkbox" name="services[]" value="side-hustles" /> 副业/项目</label>
+              <label><input type="checkbox" name="services[]" value="joining-a-startup" /> 进初创公司</label>
               <label class="inline-other">
                 <div class="inline-other-trigger">
                   <input type="checkbox" name="services[]" value="other" />
-                  <span>其他（请说明）</span>
+                  <span>其他（说说看）</span>
                 </div>
-                <input type="text" name="services_other" placeholder="欢迎描述想讨论的主题" />
+                <input type="text" name="services_other" placeholder="想聊什么？" />
               </label>
             </div>
           </div>
@@ -165,6 +166,6 @@
     <span>&copy; <span id="year"></span> The Headstart. 版权所有。</span>
     <span>联系邮箱：<a href="mailto:theuniheadstart@gmail.com">theuniheadstart@gmail.com</a></span>
   </footer>
-  <script src="../script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>

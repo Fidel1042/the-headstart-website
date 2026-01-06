@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <title>The Headstart – Uni Mentors for Winners</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
   <meta name="description" content="Whether you're job hunting, adapting to Uni life, building a business, or just figuring out life after graduating, we have mentors who've lived it, and can guide you through it." />
   <link rel="stylesheet" href="style.css" />
   <script>
@@ -23,7 +24,7 @@
   <div id="splash">
     <div class="splash-inner">
       <div class="splash-logo-wrap">
-        <img src="images/intro-logo.png" alt="The Headstart icon" class="splash-logo" />
+        <img src="images/intro-logo.png" width="500" height="500" decoding="async" alt="The Headstart icon" class="splash-logo" />
         <div class="finish-line"></div>
       </div>
       <div class="splash-tagline">WINNING AT THE STARTING LINE</div>
@@ -35,7 +36,7 @@
   <header>
     <div class="nav">
       <a href="index.html" class="nav-left nav-home">
-        <img src="images/intro-logo.png" alt="The Headstart logo" class="nav-logo-icon" />
+        <img src="images/intro-logo.png" width="500" height="500" decoding="async" alt="The Headstart logo" class="nav-logo-icon" />
         <div class="nav-brand-text">
           <span>The Headstart</span>
           <span>General uni mentors for winners</span>
@@ -67,7 +68,7 @@
               </div>
             </div>
             <div class="hero-img-wrap reveal">
-              <img src="images/Home page/Hero Home Image.png" alt="Students celebrating success" />
+              <img src="images/Home page/Hero Home Image.png" decoding="async" alt="Students celebrating success" />
             </div>
           </div>
         </div>
@@ -89,7 +90,7 @@
                   <p>We offer online mentoring sessions where our mentors directly help you with areas that you wish to improve. We make sure mentors have the <strong>exact area of expertise</strong> and have recently gone through a similar journey of yours, <strong>AND SUCCEEDED</strong>.</p>
                 </div>
                 <figure class="about-real__visual">
-                  <img src="images/Home page/1 v 1 mentoring.png" alt="Mentor guiding a student one on one" />
+                  <img src="images/Home page/1 v 1 mentoring.png" loading="lazy" decoding="async" alt="Mentor guiding a student one on one" />
                 </figure>
               </div>
             </section>
@@ -98,7 +99,7 @@
               <p class="about-real__subhead">2. Help beyond just getting a job</p>
               <div class="about-real__split about-real__split--reverse">
                 <figure class="about-real__visual">
-                  <img src="images/Home page/beyond a job.png" alt="Mentor providing support beyond jobs" />
+                  <img src="images/Home page/beyond a job.png" loading="lazy" decoding="async" alt="Mentor providing support beyond jobs" />
                 </figure>
                 <div class="about-real__text">
                   <p>While we offer a very comprehensive set of mentoring for your job searching, we know there&apos;s WAY more than just finding a job. Find how we can help by looking at our <a class="gradient-link gold-link" href="English%20HTML/services.html">SERVICES</a>.</p>
@@ -158,9 +159,18 @@
   <script src="script.js"></script>
   <script>
     // Splash timing for home
+    const prefersReducedMotion =
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     window.addEventListener("load", function () {
       const splash = document.getElementById("splash");
       const main = document.getElementById("main");
+      if (!splash || !main) return;
+      if (prefersReducedMotion) {
+        splash.style.display = "none";
+        main.classList.add("ready");
+        return;
+      }
       setTimeout(function () {
         splash.style.animation = "fadeOut 0.6s ease-out forwards";
         main.classList.add("ready");
