@@ -2119,6 +2119,13 @@ main {
   color: rgba(255,255,255,0.8);
 }
 
+.thanks-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
 .btn.btn-premium {
   align-self: center;
   padding: 0.95rem 2.4rem;
