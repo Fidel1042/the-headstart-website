@@ -1434,6 +1434,7 @@ main {
   inset: 0;
 }
 
+
 .mentor-profile-card__columns {
   flex: 1;
   display: flex;
@@ -1481,6 +1482,20 @@ main {
   margin: 0;
   font-size: 0.92rem;
   color: rgba(255,255,255,0.78);
+}
+
+.mentor-profile-card__facts-highlight {
+  font-size: 1.05rem;
+  color: rgba(255,255,255,0.92);
+}
+
+.mentor-profile-card__facts-label {
+  font-size: inherit;
+  font-weight: 700;
+}
+
+.mentor-profile-card__facts-highlight + .mentor-profile-card__facts-highlight {
+  margin-top: 1rem;
 }
 
 .mentor-profile-card__facts ul {
