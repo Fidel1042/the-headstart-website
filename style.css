@@ -1396,13 +1396,14 @@ main {
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
+  color: #ffffff;
 }
 
 .mentor-profile-card__title {
   margin: 0;
   font-size: 1.15rem;
   font-weight: 500;
-  color: rgba(255,255,255,0.96);
+  color: inherit;
 }
 
 .mentor-profile-card__meta {
@@ -1434,6 +1435,19 @@ main {
   inset: 0;
 }
 
+.mentor-photo-adjust {
+  transform: scale(1.2);
+  transform-origin: center;
+}
+
+.mentor-photo-crop-fix {
+  object-position: center 20%;
+}
+
+.mentor-photo-fidel {
+  object-position: center 0%;
+  transform: scale(1.1);
+}
 
 .mentor-profile-card__columns {
   flex: 1;
@@ -1449,12 +1463,43 @@ main {
   gap: 0.25rem;
 }
 
-.mentor-profile-card__column span {
+.mentor-profile-card__column span,
+.mentor-profile-card__label {
   font-size: 0.8rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #ffffff;
   font-weight: 700;
+}
+
+.mentor-profile-card__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.mentor-profile-card__row--org {
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.75rem;
+}
+
+.mentor-profile-card__org-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.mentor-profile-card__org-logo--dss {
+  transform: scale(1.2);
+}
+
+.mentor-profile-card__value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .mentor-profile-card__badge {
@@ -1478,15 +1523,20 @@ main {
   object-fit: contain;
 }
 
+.mentor-logo-zoom-dss {
+  transform: scale(1.2);
+  transform-origin: center;
+}
+
 .mentor-profile-card__facts p {
   margin: 0;
-  font-size: 0.92rem;
-  color: rgba(255,255,255,0.78);
+  font-size: 1.05rem;
+  color: inherit;
 }
 
 .mentor-profile-card__facts-highlight {
-  font-size: 1.05rem;
-  color: rgba(255,255,255,0.92);
+  font-size: inherit;
+  color: inherit;
 }
 
 .mentor-profile-card__facts-label {
@@ -1502,7 +1552,7 @@ main {
   margin: 0.3rem 0 0;
   padding-left: 1.2rem;
   font-size: 0.88rem;
-  color: rgba(255,255,255,0.75);
+  color: inherit;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
