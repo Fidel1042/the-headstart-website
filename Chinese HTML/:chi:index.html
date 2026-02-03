@@ -45,22 +45,18 @@
 
     <main class="home-page">
       <section class="section">
-        <div class="section-inner">
-          <div class="page-hero">
-            <div class="page-hero-text reveal">
-              <div class="hero-tagline">关于 Headstart 导师服务</div>
-              <h1>不只是职业与学业指导，更是量身打造的一对一导师陪伴</h1>
-              <p>
-                无论你正在求职、适应澳洲大学生活、发展副业，还是对毕业方向感到迷茫，我们的导师都曾身处同样处境并成功跨越，能运用最新经验助你破局。
-              </p>
-              <div class="hero-ctas">
-                <a href="#our-story" class="btn btn-compact">导师服务有哪些内容？</a>
-                <a href="#pain-points-quiz" class="btn btn-compact">这些情况你经历过吗？</a>
-              </div>
-            </div>
-            <div class="hero-img-wrap reveal">
-              <img src="../images/Home page/Home page hero image.jpg" decoding="async" alt="学生庆祝取得成果的画面" />
-            </div>
+        <div class="section-inner headline-standalone">
+          <h1 class="headline-standalone__title">
+            Get a <span class="headline-standalone__highlight">Headstart</span> on your Career
+          </h1>
+          <p class="headline-standalone__subtitle">
+            和你向往行业的过来人直接学，<br />
+            1v1定制带你入行
+          </p>
+          <div class="hero-ctas">
+            <a href="#our-story" class="btn btn-compact" data-scroll-to="#our-story">学员为什么选我们？</a>
+            <a href="#reviews" class="btn btn-compact" data-scroll-to="#reviews">真实学员反馈</a>
+            <a href="#pain-points-quiz" class="btn btn-compact" data-scroll-to="#pain-points-quiz">留学生常见困境</a>
           </div>
         </div>
       </section>
@@ -68,32 +64,35 @@
       <section class="section about-real" id="our-story">
         <div class="section-inner">
           <header class="about-real__header reveal">
-            <p class="about-real__eyebrow">我们的导师服务包含哪些内容？</p>
+            <p class="about-real__eyebrow">学员为什么选我们？</p>
           </header>
 
           <div class="about-real__divider" aria-hidden="true"></div>
 
           <div class="about-real__stack reveal">
-            <section class="about-real__block about-real__block--split">
-              <p class="about-real__subhead">一、在线定制化一对一指导</p>
-              <div class="about-real__split">
+            <section class="about-real__block about-real__block--split about-real__block--text">
+              <p class="about-real__subhead">专为留学生打造</p>
+              <div class="about-real__split about-real__split--text">
                 <div class="about-real__text">
-                  <p>导师将通过线上会议与你深入交流，针对性解决你当下的具体问题。我们只安排<strong>曾经历类似挑战并成功应对的导师</strong>，确保专业领域和你的需求精准匹配。</p>
+                  <p>你的导师也是过来人，曾持500/485签证在澳洲拿到入门职位offer。</p>
                 </div>
-                <figure class="about-real__visual">
-                  <img src="../images/Home page/1 v 1 mentoring.png" loading="lazy" decoding="async" alt="导师和学员进行一对一线上交流" />
-                </figure>
               </div>
             </section>
 
-            <section class="about-real__block about-real__block--split">
-              <p class="about-real__subhead">二、求职之外的关键阶段支持</p>
-              <div class="about-real__split about-real__split--reverse">
-                <figure class="about-real__visual">
-                  <img src="../images/Home page/beyond a job.png" loading="lazy" decoding="async" alt="导师在求职之外持续支持学生" />
-                </figure>
+            <section class="about-real__block about-real__block--split about-real__block--text">
+              <p class="about-real__subhead">导师新鲜入职，信息不滞后</p>
+              <div class="about-real__split about-real__split--text">
                 <div class="about-real__text">
-                  <p>我们提供完整的求职指导，但大学生活的意义远不止拿到录用通知。了解更多服务详情，请探索我们的 <a class="gradient-link gold-link" href=":chi:services.html">服务项目</a>。</p>
+                  <p>导师全员在职，正全职从事澳洲入门岗位。招聘市场最新套路？他们刚亲身走过一遍。</p>
+                </div>
+              </div>
+            </section>
+
+            <section class="about-real__block about-real__block--split about-real__block--text">
+              <p class="about-real__subhead">想约就约，按次付费</p>
+              <div class="about-real__split about-real__split--text">
+                <div class="about-real__text">
+                  <p>不搞捆绑销售，一次只买一节。你需要什么，我们就给你补什么。</p>
                 </div>
               </div>
             </section>
@@ -102,10 +101,56 @@
         </div>
       </section>
 
+      <section class="section" id="reviews">
+        <div class="section-inner review-column">
+          <header class="about-real__header reveal">
+            <p class="about-real__eyebrow">真实学员反馈</p>
+          </header>
+          <div class="review-column__scroller-wrap">
+            <button class="review-column__arrow review-column__arrow--left" type="button" aria-label="Previous reviews" data-review-prev>&larr;</button>
+            <div class="review-column__scroller" aria-label="Student reviews">
+              <div class="review-column__card">
+                <p class="review-column__quote" data-review-zh="“我以前经常花几个小时在 LinkedIn 上发消息，希望有人能给我点建议，但大多数对话其实都不太符合我的情况。用了这个导师服务之后，每一次辅导真的都很‘有料’。我的导师能问到点子上，并且给我的是清晰的下一步，而不是模糊的建议。感觉每个小时都在学真正有用的东西。”">&ldquo;I used to spend hours messaging people on LinkedIn hoping for advice, but most conversations didn&rsquo;t really apply to my situation. With this mentoring, every session was actually productive. My mentor asked the right questions, and gave me clear next steps instead of vague suggestions. It felt like every hour I was learning something useful.&rdquo;</p>
+                <div class="review-column__meta">
+                  <button class="review-column__translate" type="button" data-review-translate>翻译</button>
+                  <span class="review-column__name">Amy, Business Analytics</span>
+                  <span class="review-column__avatar" aria-hidden="true" style="background-image: url('../images/Mentee%20review/Amy.png');"></span>
+                </div>
+              </div>
+              <div class="review-column__card">
+                <p class="review-column__quote" data-review-zh="“导师入职还不满一年，这点特别实用。他给我展示了自己的真实简历、面试回答方式，还分享了招聘方近期的关注点。感觉就像拿到了‘刚刚上岸’的人的一手内推信息。”">&ldquo;What stood out was that my mentor had landed their role less than a year ago. They showed me what their resume looked like, how they answered interview questions, and what recruiters actually cared about recently. It felt like getting insider tips from someone just a step ahead of me.&rdquo;</p>
+                <div class="review-column__meta">
+                  <button class="review-column__translate" type="button" data-review-translate>翻译</button>
+                  <span class="review-column__name">Jordan Lin, Finance</span>
+                  <span class="review-column__avatar" aria-hidden="true" style="background-image: url('../images/Mentee%20review/Jordan%20Lin.png');"></span>
+                </div>
+              </div>
+              <div class="review-column__card">
+                <p class="review-column__quote" data-review-zh="“之前问过几家，都要我花几千刀签长期合约。但这里我可以按需约课，忙学业就停一停。既照顾学生，又保持专业，从没让我觉得钱花在没用的地方。”">&ldquo;Before this, I spoke to a few agencies that wanted me to commit thousands of dollars for ongoing support over several months. Here, I booked sessions only when I need help and paused when uni got busy. It felt student-friendly, but still high quality. I never felt like I was paying for things I didn&rsquo;t need.&rdquo;</p>
+                <div class="review-column__meta">
+                  <button class="review-column__translate" type="button" data-review-translate>翻译</button>
+                  <span class="review-column__name">Shreya, Marketing</span>
+                  <span class="review-column__avatar" aria-hidden="true" style="background-image: url('../images/Mentee%20review/Shreya.png');"></span>
+                </div>
+              </div>
+              <div class="review-column__card">
+                <p class="review-column__quote" data-review-zh="“在此之前，我完全想象不出自己在 consulting 工作的样子。但我的导师向我展示了他日常实际的工作内容。他工作中制作的幻灯片看起来非常专业，这让我也想学会做出那样的东西。现在，我有了强烈的‘为什么’——我清楚地知道自己为什么渴望这个职位了。”">&ldquo;Before this, I couldn&rsquo;t visualise myself working full time. But my mentor showed me the actual work they do day to day. The slides he made for his work looked very professional and it made me want to learn how to do that. Now I have the strong &ldquo;Why&rdquo; I want the role.&rdquo;</p>
+                <div class="review-column__meta">
+                  <button class="review-column__translate" type="button" data-review-translate>翻译</button>
+                  <span class="review-column__name">Daniel, Consulting</span>
+                  <span class="review-column__avatar" aria-hidden="true" style="background-image: url('../images/Mentee%20review/Daniel%20new.png');"></span>
+                </div>
+              </div>
+            </div>
+            <button class="review-column__arrow review-column__arrow--right" type="button" aria-label="Next reviews" data-review-next>&rarr;</button>
+          </div>
+        </div>
+      </section>
+
       <section class="section" id="pain-points-quiz">
         <div class="section-inner pain-quiz">
           <div class="pain-quiz__head">
-            <p class="section-label section-label--muted">常见挑战</p>
+            <p class="section-label">留学生常见困境</p>
             <h2>说实话，这些情况你是否经历过？</h2>
             <p class="section-subtitle section-subtitle--white pain-quiz__intro">浏览卡片，遇到符合你情况的内容请点击。如果你是国际学生且这六项都未曾经历，我们将免费提供第一节导师指导。</p>
           </div>
@@ -147,7 +192,7 @@
     <a class="btn" href=":chi:mentors.html"><strong>查看导师介绍</strong></a>
   </div>
   <button class="back-to-top" type="button" aria-label="回到顶部">↑</button>
-  <script src="script.js"></script>
+  <script src="../script.js"></script>
   <script>
     // Splash timing for home
     const prefersReducedMotion =

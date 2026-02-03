@@ -811,7 +811,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!target) return;
       const el = document.querySelector(target);
       if (el) {
-        el.scrollIntoView({ behavior: "smooth" });
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
       }
     });
   });

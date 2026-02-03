@@ -10,8 +10,18 @@
   <script>
     (function redirectByLanguage() {
       if (sessionStorage.getItem("langRedirected")) return;
-      const lang = (navigator.languages && navigator.languages[0]) || navigator.language || "";
-      if (lang.toLowerCase().startsWith("zh")) {
+      const languages =
+        (navigator.languages && navigator.languages.length && navigator.languages) ||
+        [navigator.language || ""];
+      const isSimplifiedChinese = languages.some((lang) => {
+        const value = (lang || "").toLowerCase();
+        return (
+          value.startsWith("zh-hans") ||
+          value.startsWith("zh-cn") ||
+          value.startsWith("zh-sg")
+        );
+      });
+      if (isSimplifiedChinese) {
         sessionStorage.setItem("langRedirected", "true");
         window.location.href = "Chinese%20HTML/:chi:index.html";
       }
@@ -39,7 +49,7 @@
         <img src="images/intro-logo.png" width="500" height="500" decoding="async" alt="The Headstart logo" class="nav-logo-icon" />
         <div class="nav-brand-text">
           <span>The Headstart</span>
-          <span>General uni mentors for winners</span>
+          <span>Mentors for Entry Level Roles / Internship</span>
         </div>
       </a>
       <nav class="nav-links">
@@ -54,22 +64,18 @@
 
     <main class="home-page">
       <section class="section">
-        <div class="section-inner">
-          <div class="page-hero">
-            <div class="page-hero-text reveal">
-              <div class="hero-tagline">About The Headstart</div>
-              <h1>Early Career Mentorship</h1>
-              <p>
-                Whether you're job hunting, adapting to Uni life, building a business, or just figuring out life after graduating, we have mentors who've lived it, and can guide you through it.
-              </p>
-              <div class="hero-ctas">
-                <a href="#our-story" class="btn btn-compact">What is our mentoring about?</a>
-                <a href="#pain-points-quiz" class="btn btn-compact">Have you faced these challenges before?</a>
-              </div>
-            </div>
-            <div class="hero-img-wrap reveal">
-              <img src="images/Home page/Home page hero image.jpg" decoding="async" alt="Students celebrating success" />
-            </div>
+        <div class="section-inner headline-standalone">
+          <h1 class="headline-standalone__title">
+            Get a <span class="headline-standalone__highlight">Headstart</span> on your Career
+          </h1>
+          <p class="headline-standalone__subtitle">
+            <span class="headline-standalone__line">Learn directly from people already in the industry</span>
+            <span class="headline-standalone__line">you want, through personalised 1:1 mentoring.</span>
+          </p>
+          <div class="hero-ctas">
+            <a href="#our-story" class="btn btn-compact" data-scroll-to="#our-story">Why students come to us</a>
+            <a href="#reviews" class="btn btn-compact" data-scroll-to="#reviews">Read our reviews</a>
+            <a href="#pain-points-quiz" class="btn btn-compact" data-scroll-to="#pain-points-quiz">Common international student struggles</a>
           </div>
         </div>
       </section>
@@ -77,32 +83,35 @@
       <section class="section about-real" id="our-story">
         <div class="section-inner">
           <header class="about-real__header reveal">
-            <p class="about-real__eyebrow">What is our mentoring about?</p>
+            <p class="about-real__eyebrow">Why Students Come To Us?</p>
           </header>
 
           <div class="about-real__divider" aria-hidden="true"></div>
 
           <div class="about-real__stack reveal">
-            <section class="about-real__block about-real__block--split">
-              <p class="about-real__subhead">1. Personalised 1 v 1 Mentoring</p>
-              <div class="about-real__split">
+            <section class="about-real__block about-real__block--split about-real__block--text">
+              <p class="about-real__subhead">Built for International Students</p>
+              <div class="about-real__split about-real__split--text">
                 <div class="about-real__text">
-                  <p>We offer online mentoring sessions where our mentors directly help you with areas that you wish to improve. We make sure mentors have the <strong>exact area of expertise</strong> and have recently gone through a similar journey of yours, <strong>AND SUCCEEDED</strong>.</p>
+                  <p>You are matched with mentors who were an international student and landed an entry-level role in Australia under Visa 500/485. We understand the pain international students face and how to work within it.</p>
                 </div>
-                <figure class="about-real__visual">
-                  <img src="images/Home page/1 v 1 mentoring.png" loading="lazy" decoding="async" alt="Mentor guiding a student one on one" />
-                </figure>
               </div>
             </section>
 
-            <section class="about-real__block about-real__block--split">
-              <p class="about-real__subhead">2. Help beyond just getting a job</p>
-              <div class="about-real__split about-real__split--reverse">
-                <figure class="about-real__visual">
-                  <img src="images/Home page/beyond a job.png" loading="lazy" decoding="async" alt="Mentor providing support beyond jobs" />
-                </figure>
+            <section class="about-real__block about-real__block--split about-real__block--text">
+              <p class="about-real__subhead">The Most Up-to-date Information</p>
+              <div class="about-real__split about-real__split--text">
                 <div class="about-real__text">
-                  <p>While we offer a very comprehensive set of mentoring for your job searching, we know there&apos;s WAY more than just finding a job. Find how we can help by looking at our <a class="gradient-link gold-link" href="English%20HTML/services.html">SERVICES</a>.</p>
+                  <p>Our mentors are currently working full-time in entry-level roles in Australia. They have the most up-todate startegy because they have done it recently.</p>
+                </div>
+              </div>
+            </section>
+
+            <section class="about-real__block about-real__block--split about-real__block--text">
+              <p class="about-real__subhead">Pay Per Session Support</p>
+              <div class="about-real__split about-real__split--text">
+                <div class="about-real__text">
+                  <p>Book sessions one at a time with no long-term commitment. Get help when you need it, for what you need.</p>
                 </div>
               </div>
             </section>
@@ -111,12 +120,54 @@
         </div>
       </section>
 
+      <section class="section" id="reviews">
+        <div class="section-inner review-column">
+          <header class="about-real__header reveal">
+            <p class="about-real__eyebrow">Reviews</p>
+          </header>
+          <div class="review-column__scroller-wrap">
+            <button class="review-column__arrow review-column__arrow--left" type="button" aria-label="Previous reviews" data-review-prev>&larr;</button>
+            <div class="review-column__scroller" aria-label="Student reviews">
+              <div class="review-column__card">
+                <p class="review-column__quote">&ldquo;I used to spend hours messaging people on LinkedIn hoping for advice, but most conversations didn&rsquo;t really apply to my situation. With this mentoring, every session was actually productive. My mentor asked the right questions, and gave me clear next steps instead of vague suggestions. It felt like every hour I was learning something useful.&rdquo;</p>
+                <div class="review-column__meta">
+                  <span class="review-column__name">Amy, Business Analytics</span>
+                  <span class="review-column__avatar" aria-hidden="true" style="background-image: url('images/Mentee%20review/Amy.png');"></span>
+                </div>
+              </div>
+              <div class="review-column__card">
+                <p class="review-column__quote">&ldquo;What stood out was that my mentor had landed their role less than a year ago. They showed me what their resume looked like, how they answered interview questions, and what recruiters actually cared about recently. It felt like getting insider tips from someone just a step ahead of me.&rdquo;</p>
+                <div class="review-column__meta">
+                  <span class="review-column__name">Jordan Lin, Finance</span>
+                  <span class="review-column__avatar" aria-hidden="true" style="background-image: url('images/Mentee%20review/Jordan%20Lin.png');"></span>
+                </div>
+              </div>
+              <div class="review-column__card">
+                <p class="review-column__quote">&ldquo;Before this, I spoke to a few agencies that wanted me to commit thousands of dollars for ongoing support over several months. Here, I booked sessions only when I need help and paused when uni got busy. It felt student-friendly, but still high quality. I never felt like I was paying for things I didn&rsquo;t need.&rdquo;</p>
+                <div class="review-column__meta">
+                  <span class="review-column__name">Shreya, Marketing</span>
+                  <span class="review-column__avatar" aria-hidden="true" style="background-image: url('images/Mentee%20review/Shreya.png');"></span>
+                </div>
+              </div>
+              <div class="review-column__card">
+                <p class="review-column__quote">&ldquo;Before this, I couldn&rsquo;t visualise myself working full time. But my mentor showed me the actual work they do day to day. The slides he made for his work looked very professional and it made me want to learn how to do that. Now I have the strong &ldquo;Why&rdquo; I want the role.&rdquo;</p>
+                <div class="review-column__meta">
+                  <span class="review-column__name">Daniel, Consulting</span>
+                  <span class="review-column__avatar" aria-hidden="true" style="background-image: url('images/Mentee%20review/Daniel%20new.png');"></span>
+                </div>
+              </div>
+            </div>
+            <button class="review-column__arrow review-column__arrow--right" type="button" aria-label="Next reviews" data-review-next>&rarr;</button>
+          </div>
+        </div>
+      </section>
+
       <section class="section" id="pain-points-quiz">
         <div class="section-inner pain-quiz">
           <div class="pain-quiz__head">
-            <p class="section-label section-label--muted">COMMON STRUGGLES</p>
-            <h2>Be honest, is this you?</h2>
-            <p class="section-subtitle section-subtitle--white pain-quiz__intro">Flip through the cards, tap what hits you, and if you&rsquo;re an International student and have 0 out of the 6 struggles, YOUR FIRST SESSION IS ON US!</p>
+            <p class="about-real__eyebrow">COMMON STRUGGLES</p>
+            <h2>Be Honest, Is This You?</h2>
+            <p class="section-subtitle section-subtitle--white pain-quiz__intro">We totally understand your pain trying to find your first ever Internship/Full time role - see which one you can relate down below</p>
           </div>
 
           <div class="pain-quiz__module">
