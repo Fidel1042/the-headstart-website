@@ -2832,6 +2832,115 @@ html[lang="zh-Hans"] .headline-standalone .hero-ctas .btn {
   background: rgba(255,255,255,0.3);
 }
 
+/* Careers hub */
+
+.careers-hub-page main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 4rem;
+}
+
+.careers-hub-page .section .section-inner {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.jobs-hub {
+  padding-top: 1.6rem;
+}
+
+.job-post-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.job-post-card {
+  display: block;
+  border-radius: 24px;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(180deg, #0a0a0a 0%, #050505 100%) padding-box,
+    linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%) border-box;
+  color: #ffffff;
+  padding: 1.8rem 1.8rem 1.45rem;
+  box-shadow: 0 18px 34px rgba(0,0,0,0.55);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.job-post-card:hover,
+.job-post-card:focus-visible {
+  transform: translateY(-3px);
+  background:
+    linear-gradient(180deg, #0e0e0e 0%, #080808 100%) padding-box,
+    linear-gradient(90deg, #fff0a8 0%, #f5c85c 35%, #b7771f 68%, #ffe48a 100%) border-box;
+  box-shadow: 0 24px 38px rgba(0,0,0,0.65), 0 0 24px rgba(199,155,59,0.26);
+}
+
+.job-post-card h2 {
+  font-size: clamp(1.45rem, 2.6vw, 2rem);
+  line-height: 1.25;
+  color: #ffffff;
+}
+
+.job-post-role {
+  color: #f7d37d;
+  background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.job-post-company {
+  margin-top: 0.5rem;
+  font-size: 1.22rem;
+  font-weight: 650;
+  line-height: 1.2;
+  color: rgba(255,255,255,0.92);
+}
+
+.job-post-location {
+  margin-top: 1rem;
+  font-size: 0.97rem;
+  color: rgba(255,255,255,0.9);
+}
+
+.job-post-highlights {
+  margin: 1rem 0 1.2rem;
+  padding-left: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  color: rgba(255,255,255,0.9);
+}
+
+.job-post-summary {
+  color: rgba(255,255,255,0.9);
+  line-height: 1.5;
+}
+
+.job-post-footer {
+  margin-top: 1.2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: rgba(255,255,255,0.85);
+}
+
+.job-post-link {
+  color: #f7d37d;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.job-post-link::after {
+  content: ">";
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
 /* Buttons & links */
 
 button,
@@ -3358,6 +3467,80 @@ footer a {
   color: rgba(255,255,255,0.85);
 }
 
+.career-role-title-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.career-role-title-row .mentors-headline {
+  margin-bottom: 0;
+}
+
+.role-compact-section {
+  padding-top: 1.1rem;
+}
+
+.role-compact-section .section-title-row {
+  margin-bottom: 0.9rem;
+}
+
+.role-compact-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.9rem;
+}
+
+.role-compact-card {
+  border-radius: 16px;
+  border: 1px solid rgba(199,155,59,0.45);
+  background: rgba(0,0,0,0.55);
+  padding: 0.95rem 1rem;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+  --role-content-size: 0.9rem;
+}
+
+.role-compact-card h3 {
+  font-size: calc(var(--role-content-size) + 1rem);
+  margin-bottom: 0.45rem;
+  font-weight: 700;
+  line-height: 1.2;
+  background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.role-compact-card p {
+  color: rgba(255,255,255,0.88);
+  line-height: 1.45;
+  font-size: var(--role-content-size);
+}
+
+.role-compact-card ul {
+  margin: 0;
+  padding-left: 1.15rem;
+  color: rgba(255,255,255,0.88);
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: var(--role-content-size);
+  line-height: 1.4;
+}
+
+.career-back-link {
+  color: rgba(255,255,255,0.7);
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+}
+
+.career-back-link:hover {
+  color: #ffffff;
+}
+
 .careers-mentor-page #mentor-criteria .section-inner,
 .careers-mentor-page #hiring-process .section-inner,
 .careers-mentor-page #mentor-application .section-inner {
@@ -3529,7 +3712,7 @@ footer a {
 .mentor-application-form label {
   font-size: 0.95rem;
   letter-spacing: 0.02em;
-  color: rgba(255,255,255,0.8);
+  color: #ffffff;
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
@@ -3579,7 +3762,7 @@ footer a {
 .mentor-application-form .mentor-phone-field label {
   font-size: 0.95rem;
   letter-spacing: 0.02em;
-  color: rgba(255,255,255,0.8);
+  color: #ffffff;
 }
 
 .mentor-application-form .phone-input-group {
@@ -3599,4 +3782,67 @@ footer a {
   font-size: 2.2rem;
   font-weight: 650;
   margin-bottom: 1rem;
+}
+
+@media (max-width: 700px) {
+  .careers-hub-page main {
+    padding: 2.1rem 1rem 3rem;
+  }
+
+  .job-post-card {
+    border-radius: 20px;
+    padding: 1.3rem 1.05rem 1.15rem;
+  }
+
+  .job-post-card h2 {
+    font-size: clamp(1.22rem, 6.5vw, 1.5rem);
+  }
+
+  .job-post-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.45rem;
+  }
+
+  .career-back-link {
+    font-size: 0.84rem;
+  }
+
+  .career-role-title-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .role-compact-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .role-compact-card {
+    padding: 0.85rem 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .job-post-card {
+    border-radius: 18px;
+    padding: 1.15rem 0.95rem 1rem;
+  }
+
+  .job-post-location,
+  .job-post-summary,
+  .job-post-highlights,
+  .job-post-footer {
+    font-size: 0.92rem;
+  }
+
+  .job-post-company {
+    font-size: 1.2rem;
+  }
+
+  .job-post-highlights {
+    margin: 0.85rem 0 1rem;
+    padding-left: 1.15rem;
+    gap: 0.4rem;
+  }
 }

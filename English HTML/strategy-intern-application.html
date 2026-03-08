@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Mentor Application – Headstart Mentoring</title>
+  <title>Strategy Intern Application – Headstart Mentoring</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
-  <meta name="description" content="Submit your details to become a mentor with Headstart Mentoring." />
+  <meta name="description" content="Submit your details to apply for the Strategy Intern role at Headstart Mentoring." />
   <link rel="stylesheet" href="../style.css" />
 </head>
 <body class="careers-mentor-page mentor-application-page">
@@ -33,11 +33,9 @@
     <section class="career-hero">
       <div class="section-inner narrow">
         <div class="career-hero-inner">
-          <p class="section-label">Mentor application</p>
-          <h1 class="page-hero-title mentors-headline">Apply to mentor with us</h1>
-          <p class="career-hero-copy">
-            Share who you are, how you&apos;ve won, and the type of support you can provide. We review submissions weekly and follow up fast when there&apos;s a match.
-          </p>
+          <a href="strategy-intern-role.html" class="career-back-link">&larr; Back to role details</a>
+          <p class="section-label">Strategy intern application</p>
+          <h1 class="page-hero-title mentors-headline">Apply for the Strategy Intern role</h1>
         </div>
       </div>
     </section>
@@ -47,14 +45,14 @@
         <h2>Submit your details</h2>
         <form
           class="mentor-application-form"
-          name="mentor-application"
+          name="strategy-intern-application"
           method="POST"
           data-netlify="true"
           netlify-honeypot="bot-field"
           action="/thank-you.html"
           enctype="multipart/form-data"
         >
-          <input type="hidden" name="form-name" value="mentor-application" />
+          <input type="hidden" name="form-name" value="strategy-intern-application" />
           <p class="honeypot">
             <label>Don’t fill this out if you're human: <input name="bot-field" /></label>
           </p>
@@ -67,13 +65,13 @@
             <input type="email" autocomplete="email" name="applicant_email" required />
           </label>
           <div class="mentor-phone-field">
-            <label for="mentor-phone">Phone number</label>
+            <label for="strategy-phone">Phone number</label>
             <div class="phone-input-group">
               <div class="search-select phone-country-field" data-search-source="country-codes">
                 <div class="search-select-field">
                   <input
                     type="text"
-                    id="mentor-phone-country"
+                    id="strategy-phone-country"
                     name="phone_country"
                     data-search-input
                     autocomplete="off"
@@ -84,7 +82,7 @@
                   <div class="search-select-dropdown" hidden></div>
                 </div>
               </div>
-              <input type="tel" inputmode="tel" autocomplete="tel" pattern="[0-9+()\s-]*" id="mentor-phone" name="applicant_phone" placeholder="123 456 789" required />
+              <input type="tel" inputmode="tel" autocomplete="tel" pattern="[0-9+()\s-]*" id="strategy-phone" name="applicant_phone" placeholder="123 456 789" required />
             </div>
           </div>
           <label>
@@ -94,10 +92,6 @@
           <label>
             Upload your resume
             <input type="file" name="resume" accept=".pdf,.doc,.docx,.txt" />
-          </label>
-          <label>
-            Tell us about your mentoring experience
-            <textarea name="applicant_experience" rows="4" required></textarea>
           </label>
           <button type="submit" class="btn btn-dark-solid">Submit</button>
         </form>

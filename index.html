@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>University Student Job Search, Internships & Graduate Roles | The Headstart</title>
+  <title>University Student Job Search, Internships & Graduate Roles | Headstart Mentoring</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <meta name="description" content="Whether you're job hunting, adapting to Uni life, building a business, or just figuring out life after graduating, we have mentors who've lived it, and can guide you through it." />
@@ -34,7 +34,7 @@
   <div id="splash">
     <div class="splash-inner">
       <div class="splash-logo-wrap">
-        <img src="images/intro-logo.png" width="500" height="500" decoding="async" alt="The Headstart icon" class="splash-logo" />
+        <img src="images/intro-logo.png" width="500" height="500" decoding="async" alt="Headstart Mentoring icon" class="splash-logo" />
         <div class="finish-line"></div>
       </div>
       <div class="splash-tagline">WINNING AT THE STARTING LINE</div>
@@ -43,12 +43,49 @@
 
   <div id="main">
 
+  <div hidden aria-hidden="true">
+    <form name="mentor-application" method="POST" data-netlify="true" netlify-honeypot="bot-field" enctype="multipart/form-data">
+      <input type="hidden" name="form-name" value="mentor-application" />
+      <input type="text" name="applicant_name" />
+      <input type="email" name="applicant_email" />
+      <input type="text" name="phone_country" />
+      <input type="tel" name="applicant_phone" />
+      <input type="url" name="applicant_linkedin" />
+      <input type="file" name="resume" />
+      <textarea name="applicant_experience"></textarea>
+      <input type="text" name="bot-field" />
+    </form>
+
+    <form name="marketing-intern-application" method="POST" data-netlify="true" netlify-honeypot="bot-field" enctype="multipart/form-data">
+      <input type="hidden" name="form-name" value="marketing-intern-application" />
+      <input type="text" name="applicant_name" />
+      <input type="email" name="applicant_email" />
+      <input type="text" name="phone_country" />
+      <input type="tel" name="applicant_phone" />
+      <input type="url" name="applicant_linkedin" />
+      <input type="url" name="portfolio_link" />
+      <input type="file" name="resume" />
+      <input type="text" name="bot-field" />
+    </form>
+
+    <form name="strategy-intern-application" method="POST" data-netlify="true" netlify-honeypot="bot-field" enctype="multipart/form-data">
+      <input type="hidden" name="form-name" value="strategy-intern-application" />
+      <input type="text" name="applicant_name" />
+      <input type="email" name="applicant_email" />
+      <input type="text" name="phone_country" />
+      <input type="tel" name="applicant_phone" />
+      <input type="url" name="applicant_linkedin" />
+      <input type="file" name="resume" />
+      <input type="text" name="bot-field" />
+    </form>
+  </div>
+
   <header>
     <div class="nav">
       <a href="index.html" class="nav-left nav-home">
-        <img src="images/intro-logo.png" width="500" height="500" decoding="async" alt="The Headstart logo" class="nav-logo-icon" />
+        <img src="images/intro-logo.png" width="500" height="500" decoding="async" alt="Headstart Mentoring logo" class="nav-logo-icon" />
         <div class="nav-brand-text">
-          <span>The Headstart</span>
+          <span>Headstart Mentoring</span>
           <span>Mentors for Entry Level Roles / Internship</span>
         </div>
       </a>
@@ -66,7 +103,7 @@
       <section class="section">
         <div class="section-inner headline-standalone">
           <h1 class="headline-standalone__title">
-            Get a <span class="headline-standalone__highlight">Headstart</span> on your Career
+            Build your career with <span class="headline-standalone__highlight">Headstart Mentoring</span>
           </h1>
           <p class="headline-standalone__subtitle">
             <span class="headline-standalone__line">Learn directly from people already in the industry</span>
@@ -201,7 +238,7 @@
     </main>
 
   <footer>
-    <span>&copy; <span id="year"></span> The Headstart. All rights reserved.</span>
+    <span>&copy; <span id="year"></span> Headstart Mentoring. All rights reserved.</span>
     <span>Contact: <a href="mailto:theuniheadstart@gmail.com">theuniheadstart@gmail.com</a></span>
   </footer>
   </div>
