@@ -7,26 +7,6 @@
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <meta name="description" content="Whether you're job hunting, adapting to Uni life, building a business, or just figuring out life after graduating, we have mentors who've lived it, and can guide you through it." />
   <link rel="stylesheet" href="style.css" />
-  <script>
-    (function redirectByLanguage() {
-      if (sessionStorage.getItem("langRedirected")) return;
-      const languages =
-        (navigator.languages && navigator.languages.length && navigator.languages) ||
-        [navigator.language || ""];
-      const isSimplifiedChinese = languages.some((lang) => {
-        const value = (lang || "").toLowerCase();
-        return (
-          value.startsWith("zh-hans") ||
-          value.startsWith("zh-cn") ||
-          value.startsWith("zh-sg")
-        );
-      });
-      if (isSimplifiedChinese) {
-        sessionStorage.setItem("langRedirected", "true");
-        window.location.href = "Chinese%20HTML/:chi:index.html";
-      }
-    })();
-  </script>
 </head>
 <body class="home-page">
 
