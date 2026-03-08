@@ -47,12 +47,14 @@
           class="mentor-application-form"
           name="strategy-intern-application"
           method="POST"
+          netlify
           data-netlify="true"
           netlify-honeypot="bot-field"
           action="/thank-you.html"
           enctype="multipart/form-data"
         >
           <input type="hidden" name="form-name" value="strategy-intern-application" />
+          <input type="hidden" name="application_role" value="Strategy Intern" />
           <p class="honeypot">
             <label>Don’t fill this out if you're human: <input name="bot-field" /></label>
           </p>
