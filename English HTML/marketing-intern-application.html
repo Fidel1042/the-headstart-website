@@ -69,15 +69,18 @@
           <div class="mentor-phone-field">
             <label for="intern-phone">Phone number</label>
             <div class="phone-input-group">
-              <div class="search-select phone-country-field" data-search-source="country-codes">
+              <div class="search-select phone-country-field" data-search-source="dial-codes">
                 <div class="search-select-field">
                   <input
                     type="text"
                     id="intern-phone-country"
                     name="phone_country"
                     data-search-input
+                    data-country-code-only
+                    inputmode="tel"
+                    pattern="^\+[0-9][0-9-]{0,9}$"
                     autocomplete="off"
-                    value="AU +61"
+                    value="+61"
                     required
                     aria-label="Country dial code"
                   />

@@ -421,6 +421,14 @@ document.addEventListener("DOMContentLoaded", () => {
     ],
   };
 
+  searchSources["dial-codes"] = Array.from(
+    new Set(
+      searchSources["country-codes"]
+        .map((option) => option.match(/\+\d[\d-]*/)?.[0] || "")
+        .filter(Boolean)
+    )
+  );
+
   // Multi-step forms
   document.querySelectorAll(".multi-step").forEach((form) => {
     const steps = Array.from(form.querySelectorAll(".form-step"));
@@ -568,6 +576,37 @@ document.addEventListener("DOMContentLoaded", () => {
     const input = group.querySelector("[data-search-input]") || group.querySelector("input");
     const dropdown = group.querySelector(".search-select-dropdown");
     if (!input || !dropdown || !options.length) return;
+    const countryCodeOnly = input.hasAttribute("data-country-code-only");
+    let committedValue = options.includes((input.value || "").trim())
+      ? (input.value || "").trim()
+      : "";
+
+    const sanitizeCountryCode = (value) => {
+      let cleaned = (value || "").replace(/[^\d+-]/g, "");
+      cleaned = cleaned.replace(/(?!^)\+/g, "");
+      if (cleaned && cleaned[0] !== "+") {
+        cleaned = `+${cleaned.replace(/\+/g, "")}`;
+      }
+      return cleaned;
+    };
+
+    const setCountryCodeValidity = () => {
+      if (!countryCodeOnly) return;
+      const value = (input.value || "").trim();
+      if (!value) {
+        input.setCustomValidity("Please select a country code.");
+      } else if (options.includes(value)) {
+        input.setCustomValidity("");
+        committedValue = value;
+      } else {
+        input.setCustomValidity("Please choose a valid country code from the list.");
+      }
+    };
+
+    if (countryCodeOnly && !committedValue) {
+      committedValue = options.includes("+61") ? "+61" : options[0];
+      input.value = committedValue;
+    }
 
     const hideDropdown = () => {
       dropdown.classList.remove("show");
@@ -605,6 +644,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!option) return;
       event.preventDefault();
       input.value = option.dataset.value || "";
+      setCountryCodeValidity();
       hideDropdown();
     });
 
@@ -613,16 +653,34 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     input.addEventListener("input", () => {
+      if (countryCodeOnly) {
+        const sanitized = sanitizeCountryCode(input.value);
+        if (sanitized !== input.value) {
+          input.value = sanitized;
+        }
+        setCountryCodeValidity();
+      }
       renderOptions();
     });
 
     input.addEventListener("keydown", (event) => {
+      if (countryCodeOnly && event.key.length === 1 && !/[0-9+-]/.test(event.key)) {
+        event.preventDefault();
+        return;
+      }
       if (event.key === "Escape") {
         hideDropdown();
       }
     });
 
     input.addEventListener("blur", () => {
+      if (countryCodeOnly) {
+        input.value = sanitizeCountryCode(input.value);
+        if (!options.includes(input.value)) {
+          input.value = committedValue;
+        }
+        setCountryCodeValidity();
+      }
       setTimeout(() => hideDropdown(), 120);
     });
 

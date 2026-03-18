@@ -32,7 +32,7 @@
       <div class="section-inner">
         <div class="page-hero">
           <div class="page-hero-text">
-            <h1>Book a Complimentary Initial Consultation to Find a Mentor</h1>
+            <h1>Book a Free Initial Consultation to Find a Mentor</h1>
           </div>
         </div>
       </div>
@@ -59,15 +59,18 @@
               <div class="form-group phone-field">
                 <label for="contact-phone">Phone number</label>
                 <div class="phone-input-group">
-                  <div class="search-select phone-country-field" data-search-source="country-codes">
+                  <div class="search-select phone-country-field" data-search-source="dial-codes">
                     <div class="search-select-field">
                       <input
                         type="text"
                         id="phone-country"
                         name="phone_country"
                         data-search-input
+                        data-country-code-only
+                        inputmode="tel"
+                        pattern="^\+[0-9][0-9-]{0,9}$"
                         autocomplete="off"
-                        value="AU +61"
+                        value="+61"
                         required
                         aria-label="Country dial code"
                       />

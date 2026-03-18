@@ -1754,6 +1754,7 @@ html[lang="zh-Hans"] .headline-standalone .hero-ctas .btn {
   flex-direction: column;
   gap: 1.2rem;
   color: #ffffff;
+  height: 100%;
 }
 
 .mentor-profile-card__title {
@@ -1768,12 +1769,12 @@ html[lang="zh-Hans"] .headline-standalone .hero-ctas .btn {
 .mentor-profile-card__meta {
   display: flex;
   gap: 1.2rem;
-  align-items: stretch;
+  align-items: flex-start;
 }
 
 .mentor-profile-card__image {
   flex: 1;
-  min-height: 160px;
+  min-height: 0;
   border-radius: 28px;
   display: block;
   overflow: hidden;
@@ -1783,7 +1784,7 @@ html[lang="zh-Hans"] .headline-standalone .hero-ctas .btn {
 .mentor-profile-card__image::before {
   content: "";
   display: block;
-  padding-bottom: 68%;
+  padding-bottom: 76.923%;
 }
 
 .mentor-profile-card__image img {
@@ -1795,7 +1796,7 @@ html[lang="zh-Hans"] .headline-standalone .hero-ctas .btn {
 }
 
 .mentor-photo-adjust {
-  transform: scale(1.2);
+  transform: scale(1);
   transform-origin: center;
 }
 
@@ -1805,7 +1806,7 @@ html[lang="zh-Hans"] .headline-standalone .hero-ctas .btn {
 
 .mentor-photo-fidel {
   object-position: center 0%;
-  transform: scale(1.1);
+  transform: scale(1);
 }
 
 .mentor-photo-koda {
@@ -1879,6 +1880,15 @@ html[lang="zh-Hans"] .headline-standalone .hero-ctas .btn {
   height: 56px;
 }
 
+.mentor-profile-card__org-logo--kimberly-clark {
+  width: 84px;
+  height: 84px;
+}
+
+.mentor-profile-card__org-logo--visagio {
+  transform: translateY(4px);
+}
+
 .mentor-profile-card__column .mentor-profile-card__value {
   display: none;
 }
@@ -1913,6 +1923,10 @@ html[lang="zh-Hans"] .headline-standalone .hero-ctas .btn {
   margin: 0;
   font-size: 1.05rem;
   color: inherit;
+}
+
+.mentor-profile-card__facts {
+  margin-top: auto;
 }
 
 .mentor-profile-card__facts-highlight {
@@ -1955,6 +1969,7 @@ html[lang="zh-Hans"] .headline-standalone .hero-ctas .btn {
 
   .mentor-profile-card__meta {
     flex-direction: column;
+    align-items: stretch;
   }
 }
 
@@ -2107,25 +2122,34 @@ html[lang="zh-Hans"] .headline-standalone .hero-ctas .btn {
 .inline-radio-group label {
   display: inline-flex;
   align-items: center;
-  gap: 0.2rem;
+  gap: 0.45rem;
   font-weight: 600;
   color: #fff;
   text-transform: none;
   letter-spacing: 0.02em;
+  padding: 0.2rem 0.35rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .inline-radio-group label span {
   color: #fff !important;
   display: inline-block;
-  margin-left: -0.15rem;
-  position: relative;
-  left: -1px;
+  margin-left: 0;
+  position: static;
 }
 
 .inline-radio-group input[type="radio"] {
   accent-color: #fff;
   width: 1rem;
   height: 1rem;
+  margin: 0;
+}
+
+.inline-radio-group label:has(input[type="radio"]:checked) {
+  border-color: rgba(247,211,125,0.82);
+  background: rgba(247,211,125,0.18);
 }
 
 .conditional-field {
@@ -2203,7 +2227,7 @@ html[lang="zh-Hans"] .headline-standalone .hero-ctas .btn {
   margin-bottom: 0.2rem;
 }
 
-.form-group input,
+.form-group input:not([type="radio"]):not([type="checkbox"]),
 .form-group select,
 .form-group textarea {
   background: rgba(0,0,0,0.6);
@@ -2214,7 +2238,7 @@ html[lang="zh-Hans"] .headline-standalone .hero-ctas .btn {
   font-size: 0.95rem;
 }
 
-.multi-step .form-group input,
+.multi-step .form-group input:not([type="radio"]):not([type="checkbox"]),
 .multi-step .form-group select,
 .multi-step .form-group textarea {
   border-radius: 18px;
@@ -2670,7 +2694,7 @@ html[lang="zh-Hans"] .headline-standalone .hero-ctas .btn {
   display: none;
 }
 
-.form-step .form-group label {
+.form-step .form-group > label {
   font-size: 1.08rem;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -2680,7 +2704,7 @@ html[lang="zh-Hans"] .headline-standalone .hero-ctas .btn {
   color: transparent;
 }
 
-.form-step .form-group input,
+.form-step .form-group input:not([type="radio"]):not([type="checkbox"]),
 .form-step .form-group select,
 .form-step .form-group textarea {
   border-radius: 18px;
