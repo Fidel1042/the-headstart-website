@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Marketing Intern Application – Headstart Mentoring</title>
+  <title>Mentor Application – Headstart Mentoring</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
-  <meta name="description" content="Submit your details to apply for the Marketing Intern role at Headstart Mentoring." />
+  <meta name="description" content="Submit your details to become a mentor with Headstart Mentoring." />
   <link rel="stylesheet" href="../style.css" />
 </head>
 <body class="careers-mentor-page mentor-application-page">
@@ -33,9 +33,11 @@
     <section class="career-hero">
       <div class="section-inner narrow">
         <div class="career-hero-inner">
-          <a href="marketing-intern-role.html" class="career-back-link">&larr; Back to role details</a>
-          <p class="section-label">Marketing intern application</p>
-          <h1 class="page-hero-title mentors-headline">Apply for the Marketing Intern role</h1>
+          <p class="section-label">Mentor application</p>
+          <h1 class="page-hero-title mentors-headline">Apply to mentor with us</h1>
+          <p class="career-hero-copy">
+            Share who you are, how you&apos;ve won, and the type of support you can provide. We review submissions weekly and follow up fast when there&apos;s a match.
+          </p>
         </div>
       </div>
     </section>
@@ -45,16 +47,16 @@
         <h2>Submit your details</h2>
         <form
           class="mentor-application-form"
-          name="marketing-intern-application"
+          name="mentor-application"
           method="POST"
           netlify
           data-netlify="true"
           netlify-honeypot="bot-field"
-          action="/English%20HTML/thank-you.html"
+          action="/english-html/thank-you.html"
           enctype="multipart/form-data"
         >
-          <input type="hidden" name="form-name" value="marketing-intern-application" />
-          <input type="hidden" name="application_role" value="Marketing Intern" />
+          <input type="hidden" name="form-name" value="mentor-application" />
+          <input type="hidden" name="application_role" value="Early Career Mentor" />
           <p class="honeypot">
             <label>Don’t fill this out if you're human: <input name="bot-field" /></label>
           </p>
@@ -67,13 +69,13 @@
             <input type="email" autocomplete="email" name="applicant_email" required />
           </label>
           <div class="mentor-phone-field">
-            <label for="intern-phone">Phone number</label>
+            <label for="mentor-phone">Phone number</label>
             <div class="phone-input-group">
               <div class="search-select phone-country-field" data-search-source="dial-codes">
                 <div class="search-select-field">
                   <input
                     type="text"
-                    id="intern-phone-country"
+                    id="mentor-phone-country"
                     name="phone_country"
                     data-search-input
                     data-country-code-only
@@ -87,7 +89,7 @@
                   <div class="search-select-dropdown" hidden></div>
                 </div>
               </div>
-              <input type="tel" inputmode="tel" autocomplete="tel" pattern="[0-9+()\s-]*" id="intern-phone" name="applicant_phone" placeholder="123 456 789" required />
+              <input type="tel" inputmode="tel" autocomplete="tel" pattern="[0-9+()\s-]*" id="mentor-phone" name="applicant_phone" placeholder="123 456 789" required />
             </div>
           </div>
           <label>
@@ -95,12 +97,12 @@
             <input type="url" name="applicant_linkedin" placeholder="https://..." />
           </label>
           <label>
-            Portfolio link (optional)
-            <input type="url" name="portfolio_link" placeholder="https://..." />
-          </label>
-          <label>
             Upload your resume
             <input type="file" name="resume" accept=".pdf,.doc,.docx,.txt" />
+          </label>
+          <label>
+            Tell us about your mentoring experience
+            <textarea name="applicant_experience" rows="4" required></textarea>
           </label>
           <button type="submit" class="btn btn-dark-solid">Submit</button>
         </form>
