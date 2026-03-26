@@ -3536,12 +3536,36 @@ footer a {
   color: #ffffff;
 }
 
+.career-hero-criteria {
+  max-width: 640px;
+  margin: 0;
+  padding-left: 1.25rem;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
 .mentor-role-hero .section-inner.narrow {
   max-width: 760px;
 }
 
 .mentor-role-hero .career-hero-copy {
   max-width: 100%;
+  line-height: 1.8;
+}
+
+.mentor-role-hero .career-hero-who-for {
+  font-size: 1.5em;
+  line-height: 1.35;
+}
+
+.mentor-role-hero .career-hero-criteria {
+  max-width: 100%;
+}
+
+.mentor-role-hero .career-hero-inner {
+  gap: 1.05rem;
 }
 
 .career-role-title-row {
