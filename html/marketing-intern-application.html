@@ -2,17 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Mentor Application – Headstart Mentoring</title>
+  <title>Apply for Marketing Internship | Headstart Mentoring</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
-  <meta name="description" content="Submit your details to become a mentor with Headstart Mentoring." />
+  <meta name="description" content="Submit your details to apply for the Marketing Intern role at Headstart Mentoring." />
   <link rel="stylesheet" href="../style.css" />
 </head>
 <body class="careers-mentor-page mentor-application-page">
 
   <header>
     <div class="nav">
-      <a href="../index.html" class="nav-left nav-home">
+      <a href="/" class="nav-left nav-home">
         <img src="../images/intro-logo.png" width="500" height="500" decoding="async" alt="Headstart Mentoring logo" class="nav-logo-icon" />
         <div class="nav-brand-text">
           <span>Headstart Mentoring</span>
@@ -20,12 +20,12 @@
         </div>
       </a>
       <nav class="nav-links">
-        <a href="../index.html">Home</a>
-        <a href="services.html">Services</a>
-        <a href="mentors.html">Our Mentors</a>
-        <a href="careers.html">Careers</a>
+        <a href="/">Home</a>
+        <a href="/services">Services</a>
+        <a href="/mentors">Our Mentors</a>
+        <a href="/careers">Careers</a>
       </nav>
-      <a href="discovery-call.html" class="nav-cta nav-cta--gold">Book a free call</a>
+      <a href="/discovery-call" class="nav-cta nav-cta--gold">Book a free call</a>
     </div>
   </header>
 
@@ -33,11 +33,9 @@
     <section class="career-hero">
       <div class="section-inner narrow">
         <div class="career-hero-inner">
-          <p class="section-label">Mentor application</p>
-          <h1 class="page-hero-title mentors-headline">Apply to mentor with us</h1>
-          <p class="career-hero-copy">
-            Share who you are, how you&apos;ve won, and the type of support you can provide. We review submissions weekly and follow up fast when there is a match.
-          </p>
+          <a href="/marketing-intern-role" class="career-back-link">&larr; Back to role details</a>
+          <p class="section-label">Marketing intern application</p>
+          <h1 class="page-hero-title mentors-headline">Apply for the Marketing Intern role</h1>
         </div>
       </div>
     </section>
@@ -47,16 +45,16 @@
         <h2>Submit your details</h2>
         <form
           class="mentor-application-form"
-          name="mentor-application"
+          name="marketing-intern-application"
           method="POST"
           netlify
           data-netlify="true"
           netlify-honeypot="bot-field"
-          action="/english-html/thank-you.html"
+          action="/thank-you"
           enctype="multipart/form-data"
         >
-          <input type="hidden" name="form-name" value="mentor-application" />
-          <input type="hidden" name="application_role" value="Early Career Mentor" />
+          <input type="hidden" name="form-name" value="marketing-intern-application" />
+          <input type="hidden" name="application_role" value="Marketing Intern" />
           <p class="honeypot">
             <label>Don’t fill this out if you're human: <input name="bot-field" /></label>
           </p>
@@ -69,13 +67,13 @@
             <input type="email" autocomplete="email" name="applicant_email" required />
           </label>
           <div class="mentor-phone-field">
-            <label for="mentor-phone">Phone number</label>
+            <label for="intern-phone">Phone number</label>
             <div class="phone-input-group">
               <div class="search-select phone-country-field" data-search-source="dial-codes">
                 <div class="search-select-field">
                   <input
                     type="text"
-                    id="mentor-phone-country"
+                    id="intern-phone-country"
                     name="phone_country"
                     data-search-input
                     data-country-code-only
@@ -89,16 +87,20 @@
                   <div class="search-select-dropdown" hidden></div>
                 </div>
               </div>
-              <input type="tel" inputmode="tel" autocomplete="tel" pattern="[0-9+()\s-]*" id="mentor-phone" name="applicant_phone" placeholder="123 456 789" required />
+              <input type="tel" inputmode="tel" autocomplete="tel" pattern="[0-9+()\s-]*" id="intern-phone" name="applicant_phone" placeholder="123 456 789" required />
             </div>
           </div>
           <label>
             LinkedIn profile
-            <input type="url" name="applicant_linkedin" placeholder="https://..." required />
+            <input type="url" name="applicant_linkedin" placeholder="https://..." />
+          </label>
+          <label>
+            Portfolio link (optional)
+            <input type="url" name="portfolio_link" placeholder="https://..." />
           </label>
           <label>
             Upload your resume
-            <input type="file" name="resume" accept=".pdf,.doc,.docx,.txt" required />
+            <input type="file" name="resume" accept=".pdf,.doc,.docx,.txt" />
           </label>
           <button type="submit" class="btn btn-dark-solid">Submit</button>
         </form>
@@ -108,11 +110,11 @@
 
   <footer>
     <span>&copy; <span id="year"></span> Headstart Mentoring. All rights reserved.</span>
-    <span>Contact: <a href="mailto:theuniheadstart@gmail.com">theuniheadstart@gmail.com</a></span>
+    <span>Contact: <a href="mailto:info@headstart.com">info@headstart.com</a></span>
   </footer>
   <div class="mobile-sticky-cta">
     <p>Ready to talk to a mentor?</p>
-    <a class="btn" href="mailto:theuniheadstart@gmail.com">Email us</a>
+    <a class="btn" href="mailto:info@headstart.com">Email us</a>
   </div>
   <button class="back-to-top" type="button" aria-label="Back to top">↑</button>
   <script src="../script.js"></script>

@@ -39,11 +39,14 @@ body {
 }
 
 .services-hero .page-hero {
+  grid-template-columns: minmax(0, 1fr);
   padding: 0;
   margin-bottom: 0.7rem;
 }
 
 .services-hero .page-hero p {
+  max-width: 100%;
+  color: #ffffff;
   margin-bottom: 0;
 }
 
@@ -895,6 +898,11 @@ html[lang="zh-Hans"] .headline-standalone .hero-ctas .btn {
   margin-bottom: 0.2rem;
 }
 
+.discovery-page .discovery-submit-btn {
+  font-size: 0.8rem;
+  padding: 1.05rem 2.7rem;
+}
+
 .page-hero-text p {
   font-size: 1rem;
   color: rgba(255,255,255,0.8);
@@ -1080,6 +1088,13 @@ html[lang="zh-Hans"] .headline-standalone .hero-ctas .btn {
   background-clip: text;
   color: transparent;
   text-shadow: 0 0 24px rgba(255,215,128,0.35);
+}
+
+.services-group-note {
+  color: #ffffff;
+  max-width: 900px;
+  margin: -0.55rem 0 1.4rem;
+  line-height: 1.6;
 }
 
 /* Cards / grids with more breathing room */

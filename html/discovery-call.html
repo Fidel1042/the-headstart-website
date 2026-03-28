@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Book a Free Internship &amp; Career Mentoring Call | Headstart Mentoring</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body class="discovery-page">
+  <header>
+    <div class="nav">
+      <a href="/" class="nav-left nav-home">
+        <img src="../images/intro-logo.png" width="500" height="500" decoding="async" alt="Headstart Mentoring logo" class="nav-logo-icon" />
+        <div class="nav-brand-text">
+          <span>Headstart Mentoring</span>
+          <span>Mentors for Entry Level Roles / Internship</span>
+        </div>
+      </a>
+      <nav class="nav-links">
+        <a href="/">Home</a>
+        <a href="/services">Services</a>
+        <a href="/mentors">Our Mentors</a>
+        <a href="/careers">Careers</a>
+      </nav>
+      <a href="/discovery-call" class="nav-cta nav-cta--gold">Book a free call</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="section">
+      <div class="section-inner">
+        <div class="page-hero">
+          <div class="page-hero-text">
+            <h1>Book a Free Initial Consultation to Find a Mentor</h1>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-alt">
+      <div class="section-inner">
+        <form class="signup-form multi-step" name="mentee-signup" method="POST" data-netlify="true" netlify-honeypot="bot-field" action="/free-call-submitted" target="calendlyRedirect" onsubmit="window.open('https://calendly.com/theuniheadstart/30min','calendlyRedirect');">
+          <input type="hidden" name="form-name" value="mentee-signup" />
+          <p class="honeypot">
+            <label>Don’t fill this out if you're human: <input name="bot-field" /></label>
+          </p>
+
+          <div class="form-step is-active" data-step="1">
+            <div class="signup-grid">
+              <div class="form-group">
+                <label for="contact-name">Name</label>
+                <input type="text" id="contact-name" name="name" autocomplete="name" required />
+              </div>
+              <div class="form-group">
+                <label for="contact-email">Email</label>
+                <input type="email" autocomplete="email" id="contact-email" name="email" required />
+              </div>
+              <div class="form-group phone-field">
+                <label for="contact-phone">Phone number</label>
+                <div class="phone-input-group">
+                  <div class="search-select phone-country-field" data-search-source="dial-codes">
+                    <div class="search-select-field">
+                      <input
+                        type="text"
+                        id="phone-country"
+                        name="phone_country"
+                        data-search-input
+                        data-country-code-only
+                        inputmode="tel"
+                        pattern="^\+[0-9][0-9-]{0,9}$"
+                        autocomplete="off"
+                        value="+61"
+                        required
+                        aria-label="Country dial code"
+                      />
+                      <div class="search-select-dropdown" hidden></div>
+                    </div>
+                  </div>
+                  <input type="tel" inputmode="tel" autocomplete="tel" pattern="[0-9+()\s-]*" id="contact-phone" name="phone" required placeholder="123 456 789" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Are you an international student?</label>
+                <div class="inline-radio-group">
+                  <label>
+                    <input type="radio" name="international_student" value="yes" required />
+                    <span>Yes</span>
+                  </label>
+                  <label>
+                    <input type="radio" name="international_student" value="no" />
+                    <span>No</span>
+                  </label>
+                </div>
+              </div>
+              <div class="form-group search-select" data-search-source="universities">
+                <label for="university">University</label>
+                <div class="search-select-field">
+                  <input
+                    type="text"
+                    id="university"
+                    name="university"
+                    data-search-input
+                    autocomplete="off"
+                    placeholder="Start typing to search"
+                    required
+                  />
+                  <div class="search-select-dropdown" hidden></div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="major">Major</label>
+                <input type="text" id="major" name="major" required />
+              </div>
+            </div>
+            <div class="form-nav align-right">
+              <button type="submit" class="btn btn-gold discovery-submit-btn">Submit</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>&copy; <span id="year"></span> Headstart Mentoring. All rights reserved.</span>
+    <span>Contact: <a href="mailto:info@headstart.com">info@headstart.com</a></span>
+  </footer>
+  <script src="../script.js"></script>
+</body>
+</html>

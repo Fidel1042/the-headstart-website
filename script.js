@@ -5,6 +5,73 @@ document.addEventListener("DOMContentLoaded", () => {
   const yearEl = document.getElementById("year");
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
+  // Keep route-style links working in local previews that do not support rewrites.
+  const routeToFileMap = {
+    "/": "index.html",
+    "/services": "html/services.html",
+    "/mentors": "html/mentors.html",
+    "/careers": "html/careers.html",
+    "/discovery-call": "html/discovery-call.html",
+    "/free-call-submitted": "html/free-call-submitted.html",
+    "/job-application": "html/job-application.html",
+    "/mentor-role": "html/mentor-role.html",
+    "/mentor-application": "html/mentor-application.html",
+    "/mentee-signup": "html/mentee-signup.html",
+    "/mentee-agreement": "html/mentee-agreement.html",
+    "/mentee-agreement-popup": "html/mentee-agreement-popup.html",
+    "/mentee-agreement-submitted": "html/mentee-agreement-submitted.html",
+    "/strategy-intern-role": "html/strategy-intern-role.html",
+    "/strategy-intern-application": "html/strategy-intern-application.html",
+    "/marketing-intern-role": "html/marketing-intern-role.html",
+    "/marketing-intern-application": "html/marketing-intern-application.html",
+    "/netlify-forms": "html/netlify-forms.html",
+    "/thank-you": "thank-you.html",
+  };
+
+  const isLikelyNoRewriteEnv =
+    location.protocol === "file:" ||
+    ["localhost", "127.0.0.1", "[::1]"].includes(location.hostname);
+  const isHtmlSubpage = /\/html\/[^/]+\.html$/.test(location.pathname);
+
+  const normalizeRoutePath = (path) => {
+    if (!path) return "/";
+    const trimmed = path.replace(/\/+$/, "");
+    return trimmed || "/";
+  };
+
+  const resolveLocalRouteHref = (routePath) => {
+    const mappedFile = routeToFileMap[normalizeRoutePath(routePath)];
+    if (!mappedFile) return routePath;
+
+    if (!isHtmlSubpage) return mappedFile;
+    if (mappedFile.startsWith("html/")) return mappedFile.slice(5);
+    return `../${mappedFile}`;
+  };
+
+  const routeHref = (routePath) =>
+    isLikelyNoRewriteEnv ? resolveLocalRouteHref(routePath) : routePath;
+
+  if (isLikelyNoRewriteEnv) {
+    const rewriteRouteAttribute = (el, attr) => {
+      const rawValue = el.getAttribute(attr);
+      if (!rawValue || !rawValue.startsWith("/") || rawValue.startsWith("//")) return;
+
+      const parsed = new URL(rawValue, "https://local.headstart");
+      const localPath = resolveLocalRouteHref(parsed.pathname);
+      if (!localPath || localPath === parsed.pathname) return;
+
+      el.setAttribute(attr, `${localPath}${parsed.search}${parsed.hash}`);
+    };
+
+    document.querySelectorAll("a[href^='/']").forEach((link) => {
+      rewriteRouteAttribute(link, "href");
+    });
+
+    document.querySelectorAll("form[action^='/']").forEach((form) => {
+      rewriteRouteAttribute(form, "action");
+    });
+  }
+
   // On home, if a hash was left in the URL (e.g. after clicking "Our story"), reset it and jump to top on refresh
   if (document.body.classList.contains("home-page") && location.hash) {
     history.replaceState(null, "", location.pathname + location.search);
@@ -1074,7 +1141,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let yesCount = 0;
     let isAnimating = false;
     const navCta = document.querySelector(".nav-cta--gold");
-    const freeCallHref = navCta?.getAttribute("href") || "discovery-call.html";
+    const freeCallHref = navCta?.getAttribute("href") || routeHref("/discovery-call");
 
     const updateProgress = () => {
       if (progressText) {
@@ -1135,7 +1202,7 @@ document.addEventListener("DOMContentLoaded", () => {
       module.classList.add("pain-quiz__module--complete");
       card.classList.add("pain-quiz__card--result");
       cardText.classList.add("pain-quiz__result");
-      const servicesLink = `<a class="gradient-link gold-link" href="services.html">help</a>`;
+      const servicesLink = `<a class="gradient-link gold-link" href="${routeHref("/services")}">help</a>`;
       const callLink = `<a class="gradient-link gold-link" href="${freeCallHref}">booking a free call</a>`;
       cardText.innerHTML = `You are not alone in this challenge, see how we ${servicesLink} or go straight to ${callLink}.`;
       actions?.setAttribute("hidden", "");
