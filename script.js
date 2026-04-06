@@ -24,14 +24,33 @@ document.addEventListener("DOMContentLoaded", () => {
     "/strategy-intern-application": "html/strategy-intern-application.html",
     "/marketing-intern-role": "html/marketing-intern-role.html",
     "/marketing-intern-application": "html/marketing-intern-application.html",
+    "/mentor-onboarding": "html/mentor-onboarding.html",
+    "/mentor-onboarding/how-headstart-works":
+      "html/mentor-onboarding-how-headstart-works.html",
+    "/mentor-onboarding/professional-standards":
+      "html/mentor-onboarding-professional-standards.html",
+    "/mentor-onboarding/extra-services":
+      "html/mentor-onboarding-extra-services.html",
     "/netlify-forms": "html/netlify-forms.html",
     "/thank-you": "thank-you.html",
+    "/blog": "html/index.html",
+    "/blog/index.html": "html/index.html",
+    "/blog/post-template": "html/post-template.html",
+    "/blog/post-template.html": "html/post-template.html",
+    "/blog/does-your-degree-matter-australia-international-student":
+      "html/does-your-degree-matter-australia-international-student.html",
+    "/blog/does-your-degree-matter-australia-international-student.html":
+      "html/does-your-degree-matter-australia-international-student.html",
   };
 
   const isLikelyNoRewriteEnv =
     location.protocol === "file:" ||
     ["localhost", "127.0.0.1", "[::1]"].includes(location.hostname);
-  const isHtmlSubpage = /\/html\/[^/]+\.html$/.test(location.pathname);
+  const scriptTag =
+    document.querySelector("script[src$='script.js']") ||
+    document.querySelector("script[src*='/script.js']");
+  const scriptSrc = scriptTag?.getAttribute("src") || "script.js";
+  const siteRootUrl = new URL(".", new URL(scriptSrc, location.href));
 
   const normalizeRoutePath = (path) => {
     if (!path) return "/";
@@ -42,10 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const resolveLocalRouteHref = (routePath) => {
     const mappedFile = routeToFileMap[normalizeRoutePath(routePath)];
     if (!mappedFile) return routePath;
-
-    if (!isHtmlSubpage) return mappedFile;
-    if (mappedFile.startsWith("html/")) return mappedFile.slice(5);
-    return `../${mappedFile}`;
+    return new URL(mappedFile, siteRootUrl).toString();
   };
 
   const routeHref = (routePath) =>
@@ -71,6 +87,24 @@ document.addEventListener("DOMContentLoaded", () => {
       rewriteRouteAttribute(form, "action");
     });
   }
+
+  // Ensure a consistent footer insights CTA exists on every page.
+  const insightsCtaHref = routeHref("/blog");
+  let insightsCta = document.querySelector(".mobile-sticky-cta");
+  if (!insightsCta) {
+    insightsCta = document.createElement("div");
+    insightsCta.className = "mobile-sticky-cta";
+    const footer = document.querySelector("footer");
+    if (footer?.parentNode) {
+      footer.parentNode.insertBefore(insightsCta, footer.nextSibling);
+    } else {
+      document.body.appendChild(insightsCta);
+    }
+  }
+  insightsCta.innerHTML = `
+    <p>Want more detailed insights?</p>
+    <a class="btn" href="${insightsCtaHref}"><strong>Check our blog</strong></a>
+  `;
 
   // On home, if a hash was left in the URL (e.g. after clicking "Our story"), reset it and jump to top on refresh
   if (document.body.classList.contains("home-page") && location.hash) {
@@ -112,7 +146,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
           });
         },
-        { threshold: 0.12 }
+        { threshold: 0.05 }
       );
       revealEls.forEach((el) => obs.observe(el));
     }

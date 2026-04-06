@@ -15,6 +15,14 @@
 /marketing-intern-role /html/marketing-intern-role.html 200
 /marketing-intern-application /html/marketing-intern-application.html 200
 /thank-you /thank-you.html 200
+/mentor-onboarding /html/mentor-onboarding.html 200
+/mentor-onboarding/how-headstart-works /html/mentor-onboarding-how-headstart-works.html 200
+/mentor-onboarding/professional-standards /html/mentor-onboarding-professional-standards.html 200
+/mentor-onboarding/extra-services /html/mentor-onboarding-extra-services.html 200
+/blog /html/index.html 200
+/blog/ /html/index.html 200
+/blog/does-your-degree-matter-australia-international-student /html/does-your-degree-matter-australia-international-student.html 200
+/blog/post-template /html/post-template.html 200
 
 /index.html / 301
 /services.html /services 301
@@ -34,3 +42,12 @@
 /marketing-intern-role.html /marketing-intern-role 301
 /marketing-intern-application.html /marketing-intern-application 301
 /thank-you.html /thank-you 301
+/mentor-onboarding.html /mentor-onboarding 301
+/mentor-onboarding-how-headstart-works.html /mentor-onboarding/how-headstart-works 301
+/mentor-onboarding-professional-standards.html /mentor-onboarding/professional-standards 301
+/mentor-onboarding-extra-services.html /mentor-onboarding/extra-services 301
+/blog/index.html /blog 301
+/blog/does-your-degree-matter-australia-international-student.html /blog/does-your-degree-matter-australia-international-student 301
+/blog/post-template.html /blog/post-template 301
+
+/blog/does-your-degree-matter-australia-international-student/index.html /blog/does-your-degree-matter-australia-international-student 301
