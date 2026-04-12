@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 420" width="860" height="420">
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#fdf5c4"/>
+      <stop offset="35%" style="stop-color:#f7d37d"/>
+      <stop offset="68%" style="stop-color:#c08a2d"/>
+      <stop offset="100%" style="stop-color:#ffeb9f"/>
+    </linearGradient>
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1200;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#050505;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="step-bg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:rgba(199,155,59,0.18)"/>
+      <stop offset="100%" style="stop-color:rgba(199,155,59,0.04)"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="860" height="420" fill="url(#bg-grad)" rx="16"/>
+  <rect width="860" height="420" fill="none" stroke="rgba(199,155,59,0.3)" stroke-width="1.5" rx="16"/>
+
+  <!-- Header -->
+  <text x="430" y="54" font-family="system-ui, sans-serif" font-size="13" fill="rgba(255,255,255,0.35)" text-anchor="middle" letter-spacing="0.1em">CUSTOMER JOURNEY</text>
+
+  <!-- Step boxes (5 across) -->
+  <!-- Step 1: Discovers Headstart -->
+  <rect x="38" y="80" width="138" height="130" rx="12" fill="url(#step-bg)" stroke="rgba(199,155,59,0.35)" stroke-width="1"/>
+  <text x="107" y="116" font-family="system-ui, sans-serif" font-size="28" text-anchor="middle">🔍</text>
+  <text x="107" y="148" font-family="system-ui, sans-serif" font-size="12" fill="url(#gold)" text-anchor="middle" font-weight="700">Discovers</text>
+  <text x="107" y="164" font-family="system-ui, sans-serif" font-size="12" fill="url(#gold)" text-anchor="middle" font-weight="700">Headstart</text>
+  <text x="107" y="185" font-family="system-ui, sans-serif" font-size="10" fill="rgba(255,255,255,0.4)" text-anchor="middle">LinkedIn / referral</text>
+  <text x="107" y="200" font-family="system-ui, sans-serif" font-size="10" fill="rgba(255,255,255,0.4)" text-anchor="middle">/ website</text>
+
+  <!-- Arrow 1 -->
+  <line x1="178" y1="145" x2="206" y2="145" stroke="rgba(199,155,59,0.5)" stroke-width="1.5"/>
+  <polygon points="206,140 214,145 206,150" fill="rgba(199,155,59,0.5)"/>
+
+  <!-- Step 2: Books Consult -->
+  <rect x="216" y="80" width="138" height="130" rx="12" fill="url(#step-bg)" stroke="rgba(199,155,59,0.35)" stroke-width="1"/>
+  <text x="285" y="116" font-family="system-ui, sans-serif" font-size="28" text-anchor="middle">📅</text>
+  <text x="285" y="148" font-family="system-ui, sans-serif" font-size="12" fill="url(#gold)" text-anchor="middle" font-weight="700">Books Free</text>
+  <text x="285" y="164" font-family="system-ui, sans-serif" font-size="12" fill="url(#gold)" text-anchor="middle" font-weight="700">Consult</text>
+  <text x="285" y="185" font-family="system-ui, sans-serif" font-size="10" fill="rgba(255,255,255,0.4)" text-anchor="middle">Calendly / direct</text>
+  <text x="285" y="200" font-family="system-ui, sans-serif" font-size="10" fill="rgba(255,255,255,0.4)" text-anchor="middle">message</text>
+
+  <!-- Arrow 2 -->
+  <line x1="356" y1="145" x2="384" y2="145" stroke="rgba(199,155,59,0.5)" stroke-width="1.5"/>
+  <polygon points="384,140 392,145 384,150" fill="rgba(199,155,59,0.5)"/>
+
+  <!-- Step 3: Matched to Mentor -->
+  <rect x="394" y="80" width="138" height="130" rx="12" fill="url(#step-bg)" stroke="rgba(199,155,59,0.6)" stroke-width="1.5"/>
+  <text x="463" y="116" font-family="system-ui, sans-serif" font-size="28" text-anchor="middle">🤝</text>
+  <text x="463" y="148" font-family="system-ui, sans-serif" font-size="12" fill="url(#gold)" text-anchor="middle" font-weight="700">Matched to</text>
+  <text x="463" y="164" font-family="system-ui, sans-serif" font-size="12" fill="url(#gold)" text-anchor="middle" font-weight="700">You</text>
+  <text x="463" y="185" font-family="system-ui, sans-serif" font-size="10" fill="rgba(255,255,255,0.4)" text-anchor="middle">Founder intro call</text>
+  <text x="463" y="200" font-family="system-ui, sans-serif" font-size="10" fill="rgba(255,255,255,0.4)" text-anchor="middle">+ confirmation</text>
+
+  <!-- Arrow 3 -->
+  <line x1="534" y1="145" x2="562" y2="145" stroke="rgba(199,155,59,0.5)" stroke-width="1.5"/>
+  <polygon points="562,140 570,145 562,150" fill="rgba(199,155,59,0.5)"/>
+
+  <!-- Step 4: Active Sessions -->
+  <rect x="572" y="80" width="138" height="130" rx="12" fill="url(#step-bg)" stroke="rgba(199,155,59,0.35)" stroke-width="1"/>
+  <text x="641" y="116" font-family="system-ui, sans-serif" font-size="28" text-anchor="middle">💬</text>
+  <text x="641" y="148" font-family="system-ui, sans-serif" font-size="12" fill="url(#gold)" text-anchor="middle" font-weight="700">Active</text>
+  <text x="641" y="164" font-family="system-ui, sans-serif" font-size="12" fill="url(#gold)" text-anchor="middle" font-weight="700">Sessions</text>
+  <text x="641" y="185" font-family="system-ui, sans-serif" font-size="10" fill="rgba(255,255,255,0.4)" text-anchor="middle">Weekly 1-on-1</text>
+  <text x="641" y="200" font-family="system-ui, sans-serif" font-size="10" fill="rgba(255,255,255,0.4)" text-anchor="middle">mentoring</text>
+
+  <!-- Arrow 4 -->
+  <line x1="712" y1="145" x2="740" y2="145" stroke="rgba(199,155,59,0.5)" stroke-width="1.5"/>
+  <polygon points="740,140 748,145 740,150" fill="rgba(199,155,59,0.5)"/>
+
+  <!-- Step 5: Outcome -->
+  <rect x="750" y="80" width="76" height="130" rx="12" fill="url(#step-bg)" stroke="rgba(199,155,59,0.35)" stroke-width="1"/>
+  <text x="788" y="116" font-family="system-ui, sans-serif" font-size="28" text-anchor="middle">🏆</text>
+  <text x="788" y="148" font-family="system-ui, sans-serif" font-size="12" fill="url(#gold)" text-anchor="middle" font-weight="700">Gets</text>
+  <text x="788" y="164" font-family="system-ui, sans-serif" font-size="12" fill="url(#gold)" text-anchor="middle" font-weight="700">Hired</text>
+  <text x="788" y="185" font-family="system-ui, sans-serif" font-size="10" fill="rgba(255,255,255,0.4)" text-anchor="middle">Outcome</text>
+  <text x="788" y="200" font-family="system-ui, sans-serif" font-size="10" fill="rgba(255,255,255,0.4)" text-anchor="middle">achieved</text>
+
+  <!-- Divider -->
+  <line x1="40" y1="240" x2="820" y2="240" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+
+  <!-- Your role callout -->
+  <text x="430" y="276" font-family="system-ui, sans-serif" font-size="13" fill="rgba(255,255,255,0.3)" text-anchor="middle" letter-spacing="0.06em">YOUR ROLE IN THIS JOURNEY</text>
+
+  <!-- Three role boxes -->
+  <rect x="38" y="296" width="248" height="80" rx="10" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+  <text x="162" y="322" font-family="system-ui, sans-serif" font-size="12" fill="rgba(199,155,59,0.9)" text-anchor="middle" font-weight="600">Deliver Sessions</text>
+  <text x="162" y="342" font-family="system-ui, sans-serif" font-size="11" fill="rgba(255,255,255,0.35)" text-anchor="middle">Log each session in Teachworks</text>
+  <text x="162" y="358" font-family="system-ui, sans-serif" font-size="11" fill="rgba(255,255,255,0.35)" text-anchor="middle">within 24hrs</text>
+
+  <rect x="306" y="296" width="248" height="80" rx="10" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+  <text x="430" y="322" font-family="system-ui, sans-serif" font-size="12" fill="rgba(199,155,59,0.9)" text-anchor="middle" font-weight="600">Confirm Invoices</text>
+  <text x="430" y="342" font-family="system-ui, sans-serif" font-size="11" fill="rgba(255,255,255,0.35)" text-anchor="middle">Reply to invoice emails to</text>
+  <text x="430" y="358" font-family="system-ui, sans-serif" font-size="11" fill="rgba(255,255,255,0.35)" text-anchor="middle">trigger payment</text>
+
+  <rect x="574" y="296" width="248" height="80" rx="10" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+  <text x="698" y="322" font-family="system-ui, sans-serif" font-size="12" fill="rgba(199,155,59,0.9)" text-anchor="middle" font-weight="600">Escalate Issues</text>
+  <text x="698" y="342" font-family="system-ui, sans-serif" font-size="11" fill="rgba(255,255,255,0.35)" text-anchor="middle">WhatsApp Fidel for anything</text>
+  <text x="698" y="358" font-family="system-ui, sans-serif" font-size="11" fill="rgba(255,255,255,0.35)" text-anchor="middle">outside normal flow</text>
+
+  <!-- Bottom note -->
+  <text x="430" y="406" font-family="system-ui, sans-serif" font-size="11" fill="rgba(255,255,255,0.2)" text-anchor="middle">Full journey diagram will be added here — covered in your onboarding call</text>
+</svg>

@@ -10,8 +10,8 @@
 /mentee-agreement /html/mentee-agreement.html 200
 /mentee-agreement-popup /html/mentee-agreement-popup.html 200
 /mentee-agreement-submitted /html/mentee-agreement-submitted.html 200
-/strategy-intern-role /html/strategy-intern-role.html 200
-/strategy-intern-application /html/strategy-intern-application.html 200
+/growth-intern-role /html/growth-intern-role.html 200
+/growth-intern-application /html/growth-intern-application.html 200
 /marketing-intern-role /html/marketing-intern-role.html 200
 /marketing-intern-application /html/marketing-intern-application.html 200
 /thank-you /thank-you.html 200
@@ -19,6 +19,7 @@
 /mentor-onboarding/how-headstart-works /html/mentor-onboarding-how-headstart-works.html 200
 /mentor-onboarding/professional-standards /html/mentor-onboarding-professional-standards.html 200
 /mentor-onboarding/extra-services /html/mentor-onboarding-extra-services.html 200
+/pricing /html/pricing.html 200
 /blog /html/index.html 200
 /blog/ /html/index.html 200
 /blog/does-your-degree-matter-australia-international-student /html/does-your-degree-matter-australia-international-student.html 200
@@ -37,8 +38,8 @@
 /mentee-agreement.html /mentee-agreement 301
 /mentee-agreement-popup.html /mentee-agreement-popup 301
 /mentee-agreement-submitted.html /mentee-agreement-submitted 301
-/strategy-intern-role.html /strategy-intern-role 301
-/strategy-intern-application.html /strategy-intern-application 301
+/growth-intern-role.html /growth-intern-role 301
+/growth-intern-application.html /growth-intern-application 301
 /marketing-intern-role.html /marketing-intern-role 301
 /marketing-intern-application.html /marketing-intern-application 301
 /thank-you.html /thank-you 301

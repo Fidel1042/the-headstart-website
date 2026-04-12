@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 420" width="860" height="420">
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#fdf5c4"/>
+      <stop offset="35%" style="stop-color:#f7d37d"/>
+      <stop offset="68%" style="stop-color:#c08a2d"/>
+      <stop offset="100%" style="stop-color:#ffeb9f"/>
+    </linearGradient>
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1200;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#050505;stop-opacity:1"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="860" height="420" fill="url(#bg-grad)" rx="16"/>
+  <rect width="860" height="420" fill="none" stroke="rgba(199,155,59,0.3)" stroke-width="1.5" rx="16"/>
+
+  <!-- Top bar chrome -->
+  <rect x="0" y="0" width="860" height="48" fill="rgba(199,155,59,0.08)" rx="16"/>
+  <rect x="0" y="32" width="860" height="16" fill="rgba(199,155,59,0.08)"/>
+  <circle cx="28" cy="24" r="6" fill="rgba(255,255,255,0.12)"/>
+  <circle cx="48" cy="24" r="6" fill="rgba(255,255,255,0.08)"/>
+  <circle cx="68" cy="24" r="6" fill="rgba(255,255,255,0.05)"/>
+  <rect x="90" y="14" width="300" height="20" rx="4" fill="rgba(255,255,255,0.06)"/>
+  <text x="240" y="28" font-family="system-ui, sans-serif" font-size="11" fill="rgba(255,255,255,0.25)" text-anchor="middle">app.teachworks.com/sessions</text>
+
+  <!-- Sidebar -->
+  <rect x="0" y="48" width="160" height="372" fill="rgba(255,255,255,0.03)" rx="0"/>
+  <rect x="0" y="380" width="160" height="40" fill="rgba(255,255,255,0.03)" rx="0"/>
+
+  <!-- Sidebar items -->
+  <rect x="16" y="72" width="128" height="28" rx="6" fill="rgba(199,155,59,0.15)"/>
+  <text x="80" y="90" font-family="system-ui, sans-serif" font-size="11" fill="url(#gold)" text-anchor="middle" font-weight="600">Sessions</text>
+  <rect x="16" y="110" width="128" height="24" rx="4" fill="transparent"/>
+  <text x="80" y="126" font-family="system-ui, sans-serif" font-size="11" fill="rgba(255,255,255,0.3)" text-anchor="middle">Invoices</text>
+  <rect x="16" y="142" width="128" height="24" rx="4" fill="transparent"/>
+  <text x="80" y="158" font-family="system-ui, sans-serif" font-size="11" fill="rgba(255,255,255,0.3)" text-anchor="middle">Students</text>
+  <rect x="16" y="174" width="128" height="24" rx="4" fill="transparent"/>
+  <text x="80" y="190" font-family="system-ui, sans-serif" font-size="11" fill="rgba(255,255,255,0.3)" text-anchor="middle">Reports</text>
+
+  <!-- Main content area -->
+  <!-- Table header -->
+  <rect x="172" y="60" width="672" height="34" fill="rgba(255,255,255,0.04)" rx="6"/>
+  <text x="192" y="81" font-family="system-ui, sans-serif" font-size="11" fill="rgba(255,255,255,0.4)" font-weight="600">DATE</text>
+  <text x="290" y="81" font-family="system-ui, sans-serif" font-size="11" fill="rgba(255,255,255,0.4)" font-weight="600">STUDENT</text>
+  <text x="460" y="81" font-family="system-ui, sans-serif" font-size="11" fill="rgba(255,255,255,0.4)" font-weight="600">DURATION</text>
+  <text x="580" y="81" font-family="system-ui, sans-serif" font-size="11" fill="rgba(255,255,255,0.4)" font-weight="600">STATUS</text>
+  <text x="710" y="81" font-family="system-ui, sans-serif" font-size="11" fill="rgba(255,255,255,0.4)" font-weight="600">AMOUNT</text>
+
+  <!-- Table rows -->
+  <rect x="172" y="100" width="672" height="32" rx="4" fill="rgba(255,255,255,0.025)"/>
+  <text x="192" y="120" font-family="system-ui, sans-serif" font-size="12" fill="rgba(255,255,255,0.55)">8 Apr 2026</text>
+  <text x="290" y="120" font-family="system-ui, sans-serif" font-size="12" fill="rgba(255,255,255,0.55)">Wei L.</text>
+  <text x="460" y="120" font-family="system-ui, sans-serif" font-size="12" fill="rgba(255,255,255,0.55)">60 min</text>
+  <rect x="572" y="108" width="56" height="16" rx="8" fill="rgba(100,200,100,0.18)"/>
+  <text x="600" y="120" font-family="system-ui, sans-serif" font-size="10" fill="rgba(100,220,100,0.8)" text-anchor="middle">Invoiced</text>
+  <text x="710" y="120" font-family="system-ui, sans-serif" font-size="12" fill="rgba(255,255,255,0.55)">$60.00</text>
+
+  <rect x="172" y="136" width="672" height="32" rx="4" fill="transparent"/>
+  <text x="192" y="156" font-family="system-ui, sans-serif" font-size="12" fill="rgba(255,255,255,0.35)">5 Apr 2026</text>
+  <text x="290" y="156" font-family="system-ui, sans-serif" font-size="12" fill="rgba(255,255,255,0.35)">Priya M.</text>
+  <text x="460" y="156" font-family="system-ui, sans-serif" font-size="12" fill="rgba(255,255,255,0.35)">60 min</text>
+  <rect x="572" y="144" width="56" height="16" rx="8" fill="rgba(100,200,100,0.12)"/>
+  <text x="600" y="156" font-family="system-ui, sans-serif" font-size="10" fill="rgba(100,220,100,0.6)" text-anchor="middle">Invoiced</text>
+  <text x="710" y="156" font-family="system-ui, sans-serif" font-size="12" fill="rgba(255,255,255,0.35)">$60.00</text>
+
+  <rect x="172" y="172" width="672" height="32" rx="4" fill="rgba(255,255,255,0.025)"/>
+  <text x="192" y="192" font-family="system-ui, sans-serif" font-size="12" fill="rgba(255,255,255,0.25)">2 Apr 2026</text>
+  <text x="290" y="192" font-family="system-ui, sans-serif" font-size="12" fill="rgba(255,255,255,0.25)">James T.</text>
+  <text x="460" y="192" font-family="system-ui, sans-serif" font-size="12" fill="rgba(255,255,255,0.25)">60 min</text>
+  <rect x="572" y="180" width="56" height="16" rx="8" fill="rgba(199,155,59,0.15)"/>
+  <text x="600" y="192" font-family="system-ui, sans-serif" font-size="10" fill="rgba(199,155,59,0.8)" text-anchor="middle">Pending</text>
+  <text x="710" y="192" font-family="system-ui, sans-serif" font-size="12" fill="rgba(255,255,255,0.25)">$60.00</text>
+
+  <rect x="172" y="208" width="672" height="32" rx="4" fill="transparent"/>
+  <text x="192" y="228" font-family="system-ui, sans-serif" font-size="12" fill="rgba(255,255,255,0.15)">30 Mar 2026</text>
+  <text x="290" y="228" font-family="system-ui, sans-serif" font-size="12" fill="rgba(255,255,255,0.15)">Ananya S.</text>
+  <text x="460" y="228" font-family="system-ui, sans-serif" font-size="12" fill="rgba(255,255,255,0.15)">60 min</text>
+  <rect x="572" y="216" width="56" height="16" rx="8" fill="rgba(100,200,100,0.08)"/>
+  <text x="600" y="228" font-family="system-ui, sans-serif" font-size="10" fill="rgba(100,220,100,0.45)" text-anchor="middle">Invoiced</text>
+  <text x="710" y="228" font-family="system-ui, sans-serif" font-size="12" fill="rgba(255,255,255,0.15)">$60.00</text>
+
+  <!-- Blur overlay -->
+  <rect x="160" y="260" width="700" height="160" fill="url(#bg-grad)" opacity="0.92" rx="0"/>
+
+  <!-- Centred label -->
+  <text x="430" y="316" font-family="system-ui, sans-serif" font-size="13" fill="rgba(255,255,255,0.35)" text-anchor="middle" letter-spacing="0.08em" text-transform="uppercase">TEACHWORKS GUIDE</text>
+  <text x="430" y="342" font-family="system-ui, sans-serif" font-size="22" fill="url(#gold)" text-anchor="middle" font-weight="700">Step-by-step guide coming soon</text>
+  <text x="430" y="368" font-family="system-ui, sans-serif" font-size="13" fill="rgba(255,255,255,0.35)" text-anchor="middle">Fidel will walk you through this during your onboarding call</text>
+</svg>

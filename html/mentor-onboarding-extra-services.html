@@ -2,6 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SMH2KVMJT2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag("js", new Date());
+    gtag("config", "G-SMH2KVMJT2");
+  </script>
   <title>Mentor Onboarding – Extra Services</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Private mentor onboarding module: providing extra services." />
@@ -12,16 +20,88 @@
       --bg: #000000;
       --text: #f5f5f5;
       --muted: rgba(255, 255, 255, 0.72);
-      --line: rgba(255, 255, 255, 0.16);
+      --line: rgba(255, 255, 255, 0.07);
       --gold-gradient: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
+      --accent-soft: rgba(199,155,59,0.22);
     }
 
-    * { box-sizing: border-box; }
-    body { margin: 0; background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-    .wrap { width: min(920px, 100% - 2rem); margin: 0 auto; padding: 2.2rem 0 2.6rem; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    h1, h2, h3 {
-      margin: 0;
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(rgba(255,255,255,0.055) 1px, transparent 0),
+        radial-gradient(rgba(255,255,255,0.03) 1px, transparent 0);
+      background-size: 3px 3px, 5px 5px;
+      background-position: 0 0, 1px 1px;
+      opacity: 0.42;
+      mix-blend-mode: screen;
+      z-index: 0;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      width: min(920px, 100% - 2rem);
+      margin: 0 auto;
+      padding: 2.2rem 0 4rem;
+    }
+
+    /* Logo bar */
+    .logo-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      margin-bottom: 2rem;
+      padding-bottom: 1.4rem;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .logo-bar img {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      flex-shrink: 0;
+    }
+
+    .logo-bar a {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      text-decoration: none;
+    }
+
+    .logo-bar__title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.6);
+    }
+
+    .logo-bar__title span {
+      color: rgba(255,255,255,0.3);
+      margin: 0 0.4em;
+    }
+
+    /* Eyebrow + page title */
+    .eyebrow {
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      margin-bottom: 0.5rem;
+    }
+
+    h1 {
+      font-size: clamp(1.6rem, 3.3vw, 2.1rem);
       background: var(--gold-gradient);
       -webkit-background-clip: text;
       background-clip: text;
@@ -29,45 +109,100 @@
       -webkit-text-fill-color: transparent;
       font-weight: 700;
       line-height: 1.2;
+      margin-bottom: 2rem;
     }
 
-    h1 { font-size: clamp(1.6rem, 3.3vw, 2.1rem); }
-    h2 { font-size: clamp(1.2rem, 2.5vw, 1.45rem); }
-    h3 { font-size: 1rem; margin-top: 1.1rem; }
-
-    p, li { color: var(--text); line-height: 1.8; font-size: 1rem; }
-
-    .eyebrow {
-      margin: 0 0 0.6rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      font-size: 0.78rem;
+    h2 {
+      font-size: clamp(1.1rem, 2.2vw, 1.3rem);
+      background: var(--gold-gradient);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 1rem;
     }
 
-    .section { border-top: 1px solid var(--line); padding-top: 1.2rem; margin-top: 1.2rem; }
+    p, li {
+      color: var(--text);
+      line-height: 1.8;
+      font-size: 1rem;
+    }
 
-    .placeholder-grid {
-      margin-top: 0.75rem;
+    /* Card box */
+    .card-box {
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: radial-gradient(circle at top left, var(--accent-soft), #050505);
+      padding: 1.6rem 1.8rem 1.8rem;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.7);
+      margin-bottom: 1.4rem;
+    }
+
+    /* Service placeholder grid */
+    .service-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 0.8rem;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
     }
 
-    .placeholder {
-      border: 1px dashed rgba(255, 255, 255, 0.28);
-      border-radius: 10px;
-      min-height: 120px;
-      display: grid;
-      place-items: center;
-      color: var(--muted);
+    .service-placeholder {
+      border-radius: 14px;
+      border: 1px dashed rgba(199,155,59,0.3);
+      background: rgba(199,155,59,0.04);
+      min-height: 130px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 1.2rem;
       text-align: center;
-      padding: 0.8rem;
-      background: transparent;
     }
 
+    .service-placeholder__label {
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(199,155,59,0.5);
+      font-weight: 600;
+    }
+
+    .service-placeholder__title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.45);
+    }
+
+    .service-placeholder__note {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.22);
+    }
+
+    /* Complete card */
+    .card-box--complete {
+      border-color: rgba(199,155,59,0.2);
+    }
+
+    .complete-check {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(100,220,100,0.7);
+      background: rgba(100,220,100,0.07);
+      border: 1px solid rgba(100,220,100,0.18);
+      border-radius: 999px;
+      padding: 0.3em 0.8em;
+      margin-bottom: 0.9rem;
+    }
+
+    /* Nav controls */
     .controls {
-      margin-top: 1.8rem;
+      margin-top: 2rem;
       display: flex;
       justify-content: space-between;
       gap: 0.7rem;
@@ -78,9 +213,10 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 0.62rem 1rem;
+      gap: 0.4rem;
+      padding: 0.65rem 1.3rem;
       border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.24);
+      border: 1px solid rgba(255,255,255,0.2);
       text-decoration: none;
       color: #f5f5f5;
       font-weight: 700;
@@ -88,39 +224,205 @@
       text-transform: uppercase;
       font-size: 0.72rem;
       background: transparent;
+      transition: background 0.2s, border-color 0.2s;
     }
 
-    .btn:hover { border-color: rgba(255, 255, 255, 0.45); }
+    .btn:hover { border-color: rgba(255,255,255,0.45); }
 
-    @media (max-width: 720px) {
-      .placeholder-grid { grid-template-columns: 1fr; }
+    .btn-gold {
+      border-color: rgba(199,155,59,0.6);
+    }
+
+    .btn-gold:hover {
+      background: rgba(199,155,59,0.1);
+      border-color: rgba(199,155,59,0.9);
+    }
+
+    /* Completion checklist */
+    .checklist {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      margin-bottom: 1.4rem;
+    }
+
+    .checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      cursor: pointer;
+      padding: 0.65rem 0.85rem;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.02);
+      transition: background 0.15s, border-color 0.15s;
+      font-size: 0.97rem;
+      line-height: 1.5;
+      color: var(--text);
+      user-select: none;
+    }
+
+    .checklist li:hover { background: rgba(255,255,255,0.04); }
+
+    .checklist li.checked {
+      background: rgba(100,220,100,0.06);
+      border-color: rgba(100,220,100,0.2);
+    }
+
+    .check-box {
+      width: 20px;
+      height: 20px;
+      min-width: 20px;
+      border-radius: 6px;
+      border: 1.5px solid rgba(255,255,255,0.22);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 0.1rem;
+      transition: background 0.15s, border-color 0.15s;
+      font-size: 12px;
+      color: transparent;
+    }
+
+    .checklist li.checked .check-box {
+      background: rgba(100,220,100,0.22);
+      border-color: rgba(100,220,100,0.6);
+      color: rgba(100,220,100,1);
+    }
+
+    /* Congrats banner */
+    .congrats {
+      display: none;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.1rem 1.4rem;
+      border-radius: 14px;
+      border: 1px solid rgba(199,155,59,0.45);
+      background: radial-gradient(circle at top left, rgba(199,155,59,0.16), rgba(0,0,0,0));
+    }
+
+    .congrats.visible { display: flex; flex-wrap: wrap; }
+
+    .congrats__text { flex: 1; min-width: 160px; }
+
+    .congrats__title {
+      font-size: 1rem;
+      font-weight: 700;
+      background: var(--gold-gradient);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.15rem;
+    }
+
+    .congrats__sub {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.45);
+      line-height: 1.4;
+    }
+
+    .btn-congrats {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.65rem 1.3rem;
+      border-radius: 999px;
+      border: 1px solid rgba(199,155,59,0.7);
+      text-decoration: none;
+      color: #f5f5f5;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-size: 0.72rem;
+      background: rgba(199,155,59,0.12);
+      white-space: nowrap;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .btn-congrats:hover {
+      background: rgba(199,155,59,0.22);
+      border-color: rgba(199,155,59,1);
+    }
+
+    @media (max-width: 600px) {
+      .service-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
   <main class="wrap">
+
+    <div class="logo-bar">
+      <a href="mentor-onboarding.html">
+        <img src="../images/intro-logo.png" alt="The Headstart" />
+        <span class="logo-bar__title">Mentor Onboarding <span>&rsaquo;</span> Module 3</span>
+      </a>
+    </div>
+
     <p class="eyebrow">Module 3 of 3</p>
     <h1>Providing Extra Services</h1>
 
-    <section class="section">
+    <div class="card-box">
       <h2>Future Service Blocks</h2>
-      <div class="placeholder-grid">
-        <div class="placeholder">LinkedIn Marking (placeholder)</div>
-        <div class="placeholder">Resume Marking (placeholder)</div>
+      <div class="service-grid">
+        <div class="service-placeholder">
+          <span class="service-placeholder__label">Coming soon</span>
+          <span class="service-placeholder__title">LinkedIn Marking</span>
+          <span class="service-placeholder__note">Guide will be added here</span>
+        </div>
+        <div class="service-placeholder">
+          <span class="service-placeholder__label">Coming soon</span>
+          <span class="service-placeholder__title">Resume Marking</span>
+          <span class="service-placeholder__note">Guide will be added here</span>
+        </div>
       </div>
-    </section>
+    </div>
 
-    <section class="section">
-      <h2>Module Complete</h2>
+    <div class="card-box card-box--complete">
+      <h2>Onboarding Complete</h2>
+      <span class="complete-check">&#10003; All modules done</span>
       <p>
-        You&rsquo;ve completed the current onboarding modules. Keep this guide open during your founder call and flag any unclear steps before taking mentees.
+        You&rsquo;ve completed the current onboarding modules. Keep this guide open during your founder call and flag any unclear steps before taking on mentees.
       </p>
-    </section>
+    </div>
+
+    <div class="card-box">
+      <h2>Module Checklist</h2>
+      <ul class="checklist" id="checklist">
+        <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I understand that LinkedIn and Resume marking guides are coming and will be added here</li>
+        <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I&rsquo;ve completed all three onboarding modules and reviewed the content</li>
+        <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I have flagged any unclear steps with Fidel before taking on my first mentee</li>
+      </ul>
+      <div class="congrats" id="congrats">
+        <div class="congrats__text">
+          <div class="congrats__title">Onboarding complete</div>
+          <div class="congrats__sub">You&rsquo;re all set. Welcome to the team.</div>
+        </div>
+        <a class="btn-congrats" href="mentor-onboarding.html">Back to Overview</a>
+      </div>
+    </div>
 
     <div class="controls">
-      <a class="btn" href="/mentor-onboarding/professional-standards">&larr; Previous Module</a>
-      <a class="btn" href="/mentor-onboarding">Back to Overview</a>
+      <a class="btn" href="mentor-onboarding-professional-standards.html">&larr; Previous Module</a>
+      <a class="btn btn-gold" href="mentor-onboarding.html">Back to Overview</a>
     </div>
+
+    <script>
+      function toggle(li) {
+        li.classList.toggle('checked');
+        var all = document.querySelectorAll('#checklist li');
+        var done = document.querySelectorAll('#checklist li.checked');
+        if (done.length === all.length) {
+          document.getElementById('congrats').classList.add('visible');
+        } else {
+          document.getElementById('congrats').classList.remove('visible');
+        }
+      }
+    </script>
+
   </main>
 </body>
 </html>

@@ -36,6 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "/blog": "html/index.html",
     "/blog/index.html": "html/index.html",
     "/blog/post-template": "html/post-template.html",
+    "/pricing": "html/pricing.html",
     "/blog/post-template.html": "html/post-template.html",
     "/blog/does-your-degree-matter-australia-international-student":
       "html/does-your-degree-matter-australia-international-student.html",

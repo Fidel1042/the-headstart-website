@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SMH2KVMJT2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag("js", new Date());
+    gtag("config", "G-SMH2KVMJT2");
+  </script>
+  <title>Apply for Growth Intern | Headstart Mentoring</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta name="description" content="Submit your details to apply for the Growth Intern role at Headstart Mentoring." />
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body class="careers-mentor-page mentor-application-page">
+
+  <header>
+    <div class="nav">
+      <a href="/" class="nav-left nav-home">
+        <img src="../images/intro-logo.png" width="500" height="500" decoding="async" alt="Headstart Mentoring logo" class="nav-logo-icon" />
+        <div class="nav-brand-text">
+          <span>Headstart Mentoring</span>
+          <span>Mentors for Entry Level Roles / Internship</span>
+        </div>
+      </a>
+      <nav class="nav-links">
+        <a href="/">Home</a>
+        <a href="/services">Services</a>
+        <a href="/pricing">Pricing</a>
+        <a href="/mentors">Our Mentors</a>
+        <a href="/careers">Careers</a>
+      </nav>
+      <a href="/discovery-call" class="nav-cta nav-cta--gold">Book a free call</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="career-hero">
+      <div class="section-inner narrow">
+        <div class="career-hero-inner">
+          <a href="growth-intern-role.html" class="career-back-link">&larr; Back to role details</a>
+          <p class="section-label">Growth Intern application</p>
+          <h1 class="page-hero-title mentors-headline">Apply for the Growth Intern role</h1>
+        </div>
+      </div>
+    </section>
+
+    <section id="mentor-application" class="mentor-application section">
+      <div class="section-inner narrow">
+        <h2>Submit your details</h2>
+        <form
+          class="mentor-application-form"
+          name="growth-intern-application"
+          method="POST"
+          netlify
+          data-netlify="true"
+          netlify-honeypot="bot-field"
+          action="/thank-you"
+        >
+          <input type="hidden" name="form-name" value="growth-intern-application" />
+          <input type="hidden" name="application_role" value="Growth Intern" />
+          <p class="honeypot">
+            <label>Don't fill this out if you're human: <input name="bot-field" /></label>
+          </p>
+          <label>
+            Full name
+            <input type="text" name="applicant_name" autocomplete="name" required />
+          </label>
+          <label>
+            Email
+            <input type="email" autocomplete="email" name="applicant_email" required />
+          </label>
+          <div class="mentor-phone-field">
+            <label for="growth-phone">Phone number</label>
+            <div class="phone-input-group">
+              <div class="search-select phone-country-field" data-search-source="dial-codes">
+                <div class="search-select-field">
+                  <input
+                    type="text"
+                    id="growth-phone-country"
+                    name="phone_country"
+                    data-search-input
+                    data-country-code-only
+                    inputmode="tel"
+                    pattern="^\+[0-9][0-9-]{0,9}$"
+                    autocomplete="off"
+                    value="+61"
+                    required
+                    aria-label="Country dial code"
+                  />
+                  <div class="search-select-dropdown" hidden></div>
+                </div>
+              </div>
+              <input type="tel" inputmode="tel" autocomplete="tel" pattern="[0-9+()\s-]*" id="growth-phone" name="applicant_phone" placeholder="123 456 789" required />
+            </div>
+          </div>
+          <label>
+            LinkedIn profile
+            <input type="url" name="applicant_linkedin" placeholder="https://linkedin.com/in/..." required />
+          </label>
+          <label>
+            Which university society are you part of, and what is your role?
+            <input type="text" name="applicant_society" placeholder="e.g. UNSW Indonesian Student Association, VP Events" required />
+          </label>
+          <button type="submit" class="btn btn-dark-solid">Submit application</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>&copy; <span id="year"></span> Headstart Mentoring. All rights reserved.</span>
+    <span>Contact: <a href="mailto:info@headstart.com">info@headstart.com</a></span>
+  </footer>
+  <div class="mobile-sticky-cta">
+    <p>Want more detailed insights?</p>
+    <a class="btn" href="/blog"><strong>Check our blog</strong></a>
+  </div>
+  <button class="back-to-top" type="button" aria-label="Back to top">↑</button>
+  <script src="../script.js"></script>
+</body>
+</html>
