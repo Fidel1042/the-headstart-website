@@ -1596,6 +1596,22 @@ html[lang="zh-Hans"] .headline-standalone .hero-ctas .btn {
   color: rgba(255,255,255,0.76);
 }
 
+.blog-post-author-bio {
+  margin-top: 3rem;
+  padding: 1.4rem 1.6rem;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.03);
+  border-radius: 10px;
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.72);
+  line-height: 1.7;
+}
+
+.blog-post-author-bio strong {
+  color: #fff;
+}
+
 .blog-back-link {
   display: inline-flex;
   margin-top: 1.2rem;
@@ -2448,10 +2464,46 @@ html[lang="zh-Hans"] .headline-standalone .hero-ctas .btn {
 
 /* ── MENTOR NEW CARDS ── */
 
+.mentor-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 2rem 0 0;
+}
+
+.mentor-filter-btn {
+  padding: 0.45rem 1.1rem;
+  border-radius: 30px;
+  border: 1px solid rgba(199,155,59,0.4);
+  background: transparent;
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.mentor-filter-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.mentor-filter-btn.active {
+  background: linear-gradient(135deg, #fff0a0 0%, #f0c030 50%, #b87800 100%);
+  border-color: transparent;
+  color: #0d0d0d;
+}
+
+.mentor-new-card.hidden {
+  display: none;
+}
+
 .mentor-new-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.2rem;
+  margin-top: 1.5rem;
 }
 
 .mentor-new-card {
@@ -2493,6 +2545,9 @@ html[lang="zh-Hans"] .headline-standalone .hero-ctas .btn {
   background-clip: text;
   color: transparent;
   margin: 0;
+  min-height: 2.4em;
+  display: flex;
+  align-items: flex-start;
 }
 
 .mentor-new-card__name {
@@ -2535,7 +2590,13 @@ html[lang="zh-Hans"] .headline-standalone .hero-ctas .btn {
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 700px) {
+  .mentor-new-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
   .mentor-new-grid {
     grid-template-columns: 1fr;
   }

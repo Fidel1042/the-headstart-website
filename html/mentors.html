@@ -78,9 +78,20 @@
         <div class="section-title-row reveal">
           <h2>Meet your mentors</h2>
         </div>
+
+        <!-- Filter buttons -->
+        <div class="mentor-filter-bar reveal">
+          <button class="mentor-filter-btn active" data-filter="all">All</button>
+          <button class="mentor-filter-btn" data-filter="finance">Finance &amp; Accounting</button>
+          <button class="mentor-filter-btn" data-filter="tech">Tech</button>
+          <button class="mentor-filter-btn" data-filter="analytics">Analytics</button>
+          <button class="mentor-filter-btn" data-filter="marketing">Marketing</button>
+          <button class="mentor-filter-btn" data-filter="consulting">Consulting</button>
+        </div>
+
         <div class="mentor-new-grid">
 
-          <div class="mentor-new-card reveal">
+          <div class="mentor-new-card reveal" data-category="analytics marketing">
             <div class="mentor-new-card__photo">
               <img src="../images/Mentors/Fidel-mentor-new.jpg" alt="Fidel Hon" />
             </div>
@@ -91,7 +102,7 @@
             </div>
           </div>
 
-          <div class="mentor-new-card reveal">
+          <div class="mentor-new-card reveal" data-category="marketing">
             <div class="mentor-new-card__photo">
               <img src="../images/Mentors/koko-new.jpg" alt="Koko Araki" />
             </div>
@@ -102,7 +113,7 @@
             </div>
           </div>
 
-          <div class="mentor-new-card reveal">
+          <div class="mentor-new-card reveal" data-category="finance">
             <div class="mentor-new-card__photo">
               <img src="../images/Mentors/Deepika.jpg" alt="Deepika Dhulipati" />
             </div>
@@ -113,7 +124,7 @@
             </div>
           </div>
 
-          <div class="mentor-new-card reveal">
+          <div class="mentor-new-card reveal" data-category="tech consulting">
             <div class="mentor-new-card__photo">
               <img src="../images/Mentors/Angelica.jpeg" alt="Angelica Sutantyo" />
             </div>
@@ -124,7 +135,7 @@
             </div>
           </div>
 
-          <div class="mentor-new-card reveal">
+          <div class="mentor-new-card reveal" data-category="analytics">
             <div class="mentor-new-card__photo">
               <img src="../images/Mentors/Aiden.JPG" alt="Aidan Wibrata" />
             </div>
@@ -135,7 +146,7 @@
             </div>
           </div>
 
-          <div class="mentor-new-card reveal">
+          <div class="mentor-new-card reveal" data-category="tech">
             <div class="mentor-new-card__photo">
               <img src="../images/Mentors/Koda.jpg" alt="Koda Edrick" />
             </div>
@@ -143,6 +154,28 @@
               <p class="mentor-new-card__role">Software Engineer &middot; Class of '24</p>
               <h3 class="mentor-new-card__name">Koda</h3>
               <p class="mentor-new-card__bio">As an introverted international student, I thought it was a major disadvantage. I can help you share what I did during my university and asked during the interview that made it possible.</p>
+            </div>
+          </div>
+
+          <div class="mentor-new-card reveal" data-category="finance">
+            <div class="mentor-new-card__photo">
+              <img src="../images/Mentors/Raunaq.png" alt="Raunaq" />
+            </div>
+            <div class="mentor-new-card__info">
+              <p class="mentor-new-card__role">Financial Analyst &middot; Class of '24</p>
+              <h3 class="mentor-new-card__name">Raunaq</h3>
+              <p class="mentor-new-card__bio">I got my Financial Analyst role off a waitlist, through two screening rounds, a behavioural, and a technical. Finance hiring isn't just about knowing Excel and Power BI, it's about when to network and how to carry yourself in every room. I'll help you with both.</p>
+            </div>
+          </div>
+
+          <div class="mentor-new-card reveal" data-category="finance analytics">
+            <div class="mentor-new-card__photo">
+              <img src="../images/Mentors/Woohee.png" alt="Woohee" />
+            </div>
+            <div class="mentor-new-card__info">
+              <p class="mentor-new-card__role">Data Scientist &middot; Class of '25</p>
+              <h3 class="mentor-new-card__name">Wohee</h3>
+              <p class="mentor-new-card__bio">Most people focus only on the technical prep and forget that employers are hiring a person, not a skill set. I'll help you with both sides: the practical interview and resume work, and the confidence and emotional readiness that most mentors skip over.</p>
             </div>
           </div>
 
@@ -157,5 +190,48 @@
   </footer>
   <button class="back-to-top" type="button" aria-label="Back to top">↑</button>
   <script src="../script.js"></script>
+  <script>
+    document.querySelectorAll('.mentor-filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.mentor-filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const filter = btn.dataset.filter;
+        const cards = Array.from(document.querySelectorAll('.mentor-new-card'));
+
+        // Phase 1: fade all visible cards out together
+        cards.forEach(card => {
+          if (!card.classList.contains('hidden')) {
+            card.style.transition = 'opacity 0.18s ease, transform 0.18s ease';
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(10px)';
+          }
+        });
+
+        // Phase 2: after fade out, show matching cards with stagger
+        setTimeout(() => {
+          let delay = 0;
+          cards.forEach(card => {
+            const matches = filter === 'all' || card.dataset.category.split(' ').includes(filter);
+            if (!matches) {
+              card.classList.add('hidden');
+              card.style.opacity = '';
+              card.style.transform = '';
+              card.style.transition = '';
+            } else {
+              card.classList.remove('hidden');
+              card.style.opacity = '0';
+              card.style.transform = 'translateY(10px)';
+              card.style.transition = `opacity 0.3s ease ${delay}ms, transform 0.3s ease ${delay}ms`;
+              requestAnimationFrame(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+              });
+              delay += 70;
+            }
+          });
+        }, 190);
+      });
+    });
+  </script>
 </body>
 </html>

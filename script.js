@@ -42,6 +42,10 @@ document.addEventListener("DOMContentLoaded", () => {
       "html/does-your-degree-matter-australia-international-student.html",
     "/blog/does-your-degree-matter-australia-international-student.html":
       "html/does-your-degree-matter-australia-international-student.html",
+    "/blog/australian-graduate-job-market-2025":
+      "html/australian-graduate-job-market-2025.html",
+    "/blog/australian-graduate-job-market-2025.html":
+      "html/australian-graduate-job-market-2025.html",
   };
 
   const isLikelyNoRewriteEnv =
