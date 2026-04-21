@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375" width="300" height="300">
+  <!-- T letter -->
+  <g transform="matrix(1, 0, 0, 1, 78, 62)">
+    <g transform="translate(1.084885, 193.248184)">
+      <path class="logo-path"
+        d="M 103.390625 -128.96875 L 103.390625 -107.53125 L 66.15625 -107.53125 L 66.15625 0 L 40.75 0 L 40.75 -107.53125 L 3.53125 -107.53125 L 3.53125 -128.96875 Z"
+        fill="none"
+        stroke="#c79b3b"
+        stroke-width="5"
+        stroke-linejoin="round"
+        stroke-linecap="round"
+      />
+    </g>
+  </g>
+  <!-- H letter -->
+  <g transform="translate(165.094359, 255.767969)">
+    <path class="logo-path"
+      d="M 99.671875 -80.15625 L 99.671875 -128.5 L 124.984375 -128.5 L 124.984375 0 L 99.671875 0 L 99.671875 -58.53125 L 42.09375 -58.53125 L 42.09375 0 L 16.703125 0 L 16.703125 -128.5 L 42.09375 -128.5 L 42.09375 -80.15625 Z"
+      fill="none"
+      stroke="#c79b3b"
+      stroke-width="5"
+      stroke-linejoin="round"
+      stroke-linecap="round"
+    />
+  </g>
+</svg>

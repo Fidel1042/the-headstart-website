@@ -23,6 +23,8 @@ body {
   position: relative;
 }
 
+/* On the home page, story blocks have their own animation system */
+
 /* Sections: reusable padding and container widths */
 .section {
   padding: 1.3rem 0;
@@ -405,17 +407,30 @@ header {
   max-width: 1080px;
 }
 
+/* Home page "Why Students" blocks — no box, gold left-border accent */
+.home-page .about-real__block--text {
+  padding: 1.6rem 1.8rem 1.6rem 2rem;
+  border-radius: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+  max-width: calc(1080px + 3.6rem);
+  border-left: 3px solid rgba(247, 216, 121, 0.5);
+}
+
+.home-page .about-real__block--text:hover {
+  transform: none;
+  border-color: rgba(247, 216, 121, 0.5);
+  box-shadow: none;
+}
+
+/* Non-home pages keep the original box style */
 .about-real__block--text {
   padding: 1.6rem 1.8rem;
   border-radius: 18px;
   border: 1px solid rgba(255,255,255,0.08);
   background: rgba(255,255,255,0.02);
   max-width: calc(1080px + 3.6rem);
-  --story-flow-x: 0px;
-  --story-flow-y: 0px;
-  --story-flow-glow: 0.06;
-  transition: transform 0.28s ease-out, box-shadow 0.28s ease-out, border-color 0.28s ease-out;
-  will-change: transform;
 }
 
 .about-real__block--text:hover {
@@ -424,34 +439,17 @@ header {
   box-shadow: 0 20px 44px rgba(0,0,0,0.4), 0 0 0 1px rgba(247,216,121,0.12);
 }
 
-.about-real.about-real--flow-active .about-real__divider {
-  transform: scaleX(calc(0.72 + (var(--story-flow-progress) * 0.28)));
-  opacity: calc(0.56 + (var(--story-flow-progress) * 0.34));
+/* GSAP divider between story blocks */
+.gsap-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(247,216,121,0.3), transparent);
+  margin: 0 auto;
+  width: 60%;
 }
 
-.about-real.about-real--flow-active .about-real__block--text {
-  transform: translate3d(var(--story-flow-x), var(--story-flow-y), 0);
-  border-color: rgba(255,255,255, calc(0.08 + var(--story-flow-glow)));
-  box-shadow:
-    0 14px 28px rgba(0,0,0,0.32),
-    0 0 0 1px rgba(247,216,121, calc(var(--story-flow-glow) * 0.55));
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .about-real__divider,
-  .about-real__block--text {
-    transition: none;
-  }
-
-  .about-real.about-real--flow-active .about-real__divider {
-    transform: none;
-    opacity: 0.7;
-  }
-
-  .about-real.about-real--flow-active .about-real__block--text {
-    transform: none;
-    box-shadow: none;
-  }
+/* Stack spacing for home page */
+.home-page .about-real__stack {
+  gap: 3.5rem;
 }
 
 .about-real__split {
@@ -1650,6 +1648,16 @@ html[lang="zh-Hans"] .headline-standalone .hero-ctas .btn {
   }
 }
 
+@media (max-width: 480px) {
+  .blog-post-body {
+    font-size: 15px;
+  }
+
+  .blog-post-body h2 {
+    font-size: 1.2rem;
+  }
+}
+
 /* Common problems split panels */
 .problem-list {
   display: flex;
@@ -2506,13 +2514,39 @@ html[lang="zh-Hans"] .headline-standalone .hero-ctas .btn {
   margin-top: 1.5rem;
 }
 
+/* 3D flip card container */
 .mentor-new-card {
-  display: flex;
-  flex-direction: column;
+  perspective: 1000px;
+  cursor: pointer;
+  border-radius: 20px;
+  height: 420px; /* explicit height so absolute children have something to fill */
+}
+
+.mentor-new-card__inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* Front and back share the same space */
+.mentor-new-card__front,
+.mentor-new-card__back {
+  position: absolute;
+  inset: 0;
   border-radius: 20px;
   border: 1px solid rgba(255,255,255,0.1);
-  overflow: hidden;
   background: rgba(255,255,255,0.02);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  overflow: hidden;
+}
+
+/* Front face */
+.mentor-new-card__front {
+  display: flex;
+  flex-direction: column;
 }
 
 .mentor-new-card__photo {
@@ -2529,11 +2563,49 @@ html[lang="zh-Hans"] .headline-standalone .hero-ctas .btn {
   display: block;
 }
 
+.mentor-new-card__photo--placeholder {
+  background: linear-gradient(135deg, rgba(199,155,59,0.15), rgba(10,10,10,0.9));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mentor-new-card__photo-initials {
+  font-size: 4rem;
+  font-weight: 700;
+  color: rgba(247,216,121,0.6);
+  user-select: none;
+}
+
 .mentor-new-card__info {
   padding: 1.3rem 1.5rem 1.8rem;
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
+}
+
+.mentor-new-card__hint {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.3);
+  margin: 0.6rem 0 0;
+  letter-spacing: 0.05em;
+}
+
+/* Back face — starts rotated so it's hidden */
+.mentor-new-card__back {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.8rem;
+  padding: 2rem 1.8rem;
+  transform: rotateY(180deg);
+  background: rgba(199,155,59,0.08);
+  border-color: rgba(199,155,59,0.25);
+}
+
+.mentor-new-card__back .btn {
+  margin-top: auto;
+  align-self: flex-start;
 }
 
 .mentor-new-card__role {
@@ -2561,8 +2633,8 @@ html[lang="zh-Hans"] .headline-standalone .hero-ctas .btn {
 .mentor-new-card__bio {
   font-size: 1rem;
   line-height: 1.65;
-  color: rgba(255,255,255,0.5);
-  margin: 0.6rem 0 0;
+  color: rgba(255,255,255,0.75);
+  margin: 0;
 }
 
 @media (max-width: 900px) {
@@ -2593,6 +2665,16 @@ html[lang="zh-Hans"] .headline-standalone .hero-ctas .btn {
 @media (max-width: 700px) {
   .mentor-new-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .mentor-filter-btn {
+    padding: 0.6rem 1rem;
+    font-size: 0.8rem;
+    min-height: 44px;
+  }
+
+  .mentor-filter-bar {
+    gap: 0.5rem;
   }
 }
 
@@ -3663,14 +3745,23 @@ button,
 /* Scroll reveal states */
 .reveal {
   opacity: 0;
-  transform: translateY(56px) scale(0.97);
-  transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1), transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateX(-90px) translateY(70px);
+  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
   transition-delay: var(--reveal-delay, 0s);
+}
+
+.reveal--right {
+  transform: translateX(90px) translateY(70px);
+}
+
+.reveal--up {
+  transform: translateX(0px) translateY(80px);
 }
 
 .reveal-visible {
   opacity: 1;
-  transform: translateY(0) scale(1);
+  transform: translateX(0) translateY(0);
 }
 
 .card-more {
@@ -4043,8 +4134,8 @@ footer a {
   }
 
   .nav-cta {
-    font-size: 0.54rem;
-    padding: 0.38rem 0.65rem;
+    font-size: 0.7rem;
+    padding: 0.5rem 0.8rem;
   }
 
   .headline-standalone__title {

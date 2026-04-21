@@ -54,14 +54,14 @@
     <main class="home-page">
       <section class="section">
         <div class="section-inner headline-standalone">
-          <h1 class="headline-standalone__title">
+          <h1 class="headline-standalone__title reveal reveal--up">
             Build your career with <span class="headline-standalone__highlight">Headstart Mentoring</span>
           </h1>
-          <p class="headline-standalone__subtitle">
+          <p class="headline-standalone__subtitle reveal reveal--up" style="--reveal-delay: 0.1s">
             <span class="headline-standalone__line">Learn directly from people already in the industry</span>
             <span class="headline-standalone__line">you want, through personalised 1:1 mentoring.</span>
           </p>
-          <div class="hero-ctas">
+          <div class="hero-ctas reveal reveal--up" style="--reveal-delay: 0.2s">
             <a href="#our-story" class="btn btn-compact" data-scroll-to="#our-story">Why students come to us</a>
             <a href="#reviews" class="btn btn-compact" data-scroll-to="#reviews">Read our reviews</a>
             <a href="#pain-points-quiz" class="btn btn-compact" data-scroll-to="#pain-points-quiz">Common international student struggles</a>
@@ -81,7 +81,7 @@
           <div class="about-real__divider" aria-hidden="true"></div>
 
           <div class="about-real__stack">
-            <section class="about-real__block about-real__block--split about-real__block--text reveal" style="--reveal-delay: 0s">
+            <section class="about-real__block about-real__block--split about-real__block--text gsap-block" data-story-index="0">
               <p class="about-real__subhead">Built for International Students</p>
               <div class="about-real__split about-real__split--text">
                 <div class="about-real__text">
@@ -89,8 +89,8 @@
                 </div>
               </div>
             </section>
-
-            <section class="about-real__block about-real__block--split about-real__block--text reveal" style="--reveal-delay: 0.15s">
+            <div class="gsap-divider" aria-hidden="true"></div>
+            <section class="about-real__block about-real__block--split about-real__block--text gsap-block" data-story-index="1">
               <p class="about-real__subhead">The Most Up-to-date Information</p>
               <div class="about-real__split about-real__split--text">
                 <div class="about-real__text">
@@ -98,8 +98,8 @@
                 </div>
               </div>
             </section>
-
-            <section class="about-real__block about-real__block--split about-real__block--text reveal" style="--reveal-delay: 0.3s">
+            <div class="gsap-divider" aria-hidden="true"></div>
+            <section class="about-real__block about-real__block--split about-real__block--text gsap-block" data-story-index="2">
               <p class="about-real__subhead">Pay Per Session Support</p>
               <div class="about-real__split about-real__split--text">
                 <div class="about-real__text">
@@ -117,7 +117,7 @@
           <header class="about-real__header reveal">
             <p class="about-real__eyebrow">Reviews</p>
           </header>
-          <div class="review-column__scroller-wrap">
+          <div class="review-column__scroller-wrap reveal reveal--up" style="--reveal-delay: 0.1s">
             <button class="review-column__arrow review-column__arrow--left" type="button" aria-label="Previous reviews" data-review-prev>&larr;</button>
             <div class="review-column__scroller" aria-label="Student reviews">
               <div class="review-column__card">
@@ -156,13 +156,13 @@
 
       <section class="section" id="pain-points-quiz">
         <div class="section-inner pain-quiz">
-          <div class="pain-quiz__head">
+          <div class="pain-quiz__head reveal reveal--up">
             <p class="about-real__eyebrow">COMMON STRUGGLES</p>
             <h2>Be Honest, Is This You?</h2>
             <p class="section-subtitle section-subtitle--white pain-quiz__intro">We totally understand your pain trying to find your first ever Internship/Full time role - see which one you can relate down below</p>
           </div>
 
-          <div class="pain-quiz__module">
+          <div class="pain-quiz__module reveal reveal--up" style="--reveal-delay: 0.12s">
             <div class="pain-quiz__card" data-quiz-card>
               <p data-quiz-card-text>Re-recording digital interviews again and again because they still don't feel right.</p>
             </div>
@@ -199,9 +199,11 @@
     <a class="btn" href="/blog"><strong>Check our blog</strong></a>
   </div>
   <button class="back-to-top" type="button" aria-label="Back to top">↑</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="script.js"></script>
   <script>
-    // Splash timing for home
+    // Splash timing for home — triggers GSAP hero animations when splash finishes
     const prefersReducedMotion =
       window.matchMedia &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -212,11 +214,13 @@
       if (prefersReducedMotion) {
         splash.style.display = "none";
         main.classList.add("ready");
+        if (window._playHeroAnimations) window._playHeroAnimations();
         return;
       }
       setTimeout(function () {
         splash.style.animation = "fadeOut 0.6s ease-out forwards";
         main.classList.add("ready");
+        if (window._playHeroAnimations) window._playHeroAnimations();
         setTimeout(function () { splash.style.display = "none"; }, 650);
       }, 800);
     });

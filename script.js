@@ -1,7 +1,15 @@
 document.addEventListener("DOMContentLoaded", () => {
+  if (typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined") {
+    gsap.registerPlugin(ScrollTrigger);
+  }
+
   const prefersReducedMotion =
     window.matchMedia &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // GSAP is loaded on the home page via CDN
+  const gsapReady = typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined";
+
   const yearEl = document.getElementById("year");
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
@@ -46,6 +54,10 @@ document.addEventListener("DOMContentLoaded", () => {
       "html/australian-graduate-job-market-2025.html",
     "/blog/australian-graduate-job-market-2025.html":
       "html/australian-graduate-job-market-2025.html",
+    "/blog/temporary-graduate-visa-fee-increase-2026-what-it-means":
+      "html/temporary-graduate-visa-fee-increase-2026-what-it-means.html",
+    "/blog/temporary-graduate-visa-fee-increase-2026-what-it-means.html":
+      "html/temporary-graduate-visa-fee-increase-2026-what-it-means.html",
   };
 
   const isLikelyNoRewriteEnv =
@@ -136,7 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
     window.scrollTo({ top: 0, behavior: "smooth" })
   );
 
-  // Reveal on scroll (simple IntersectionObserver)
+  // Reveal on scroll (IntersectionObserver) — works on ALL pages including home
   const revealEls = document.querySelectorAll(".reveal");
   if (revealEls.length) {
     if (prefersReducedMotion) {
@@ -151,7 +163,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
           });
         },
-        { threshold: 0.05 }
+        { threshold: 0.1 }
       );
       revealEls.forEach((el) => obs.observe(el));
     }
@@ -1009,8 +1021,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const resetBlocks = () => {
       section.style.setProperty("--story-flow-progress", "0");
       blocks.forEach((block) => {
-        block.style.setProperty("--story-flow-x", "0px");
-        block.style.setProperty("--story-flow-y", "0px");
         block.style.setProperty("--story-flow-glow", "0.06");
       });
     };
@@ -1035,8 +1045,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const offsetY = Math.cos(phase * 0.85) * yAmplitude;
         const glow = 0.05 + ((Math.sin(phase) + 1) * 0.06);
 
-        block.style.setProperty("--story-flow-x", `${offsetX.toFixed(2)}px`);
-        block.style.setProperty("--story-flow-y", `${offsetY.toFixed(2)}px`);
         block.style.setProperty("--story-flow-glow", glow.toFixed(3));
       });
     };
@@ -1207,34 +1215,50 @@ document.addEventListener("DOMContentLoaded", () => {
         updateProgress();
       };
 
-      const animate = typeof card.animate === "function";
-      if (!animate) {
-        applyChange();
-        return;
-      }
-
       isAnimating = true;
-      const distance = direction > 0 ? -18 : 18;
-      const outAnim = card.animate(
-        [
-          { opacity: 1, transform: "translateX(0)" },
-          { opacity: 0, transform: `translateX(${distance}px)` },
-        ],
-        { duration: 220, easing: "ease", fill: "forwards" }
-      );
 
-      outAnim.onfinish = () => {
-        applyChange();
-        card.animate(
+      // GSAP dramatic toss-out + spring-in
+      if (typeof gsap !== "undefined") {
+        const outX = direction > 0 ? -80 : 80;
+        const outRotate = direction > 0 ? -6 : 6;
+        const inX = direction > 0 ? 60 : -60;
+        const inRotate = direction > 0 ? 4 : -4;
+
+        gsap.to(card, {
+          x: outX, rotation: outRotate, opacity: 0, scale: 0.92,
+          duration: 0.35, ease: "power3.in",
+          onComplete: () => {
+            applyChange();
+            gsap.set(card, { x: inX, rotation: inRotate, opacity: 0, scale: 0.92 });
+            gsap.to(card, {
+              x: 0, rotation: 0, opacity: 1, scale: 1,
+              duration: 0.5, ease: "back.out(1.4)",
+              clearProps: "transform,opacity",
+              onComplete: () => { isAnimating = false; }
+            });
+          }
+        });
+      } else {
+        // Fallback for non-GSAP pages
+        const distance = direction > 0 ? -18 : 18;
+        const outAnim = card.animate(
           [
-            { opacity: 0, transform: `translateX(${-distance}px)` },
             { opacity: 1, transform: "translateX(0)" },
+            { opacity: 0, transform: `translateX(${distance}px)` },
           ],
           { duration: 220, easing: "ease", fill: "forwards" }
-        ).onfinish = () => {
-          isAnimating = false;
+        );
+        outAnim.onfinish = () => {
+          applyChange();
+          card.animate(
+            [
+              { opacity: 0, transform: `translateX(${-distance}px)` },
+              { opacity: 1, transform: "translateX(0)" },
+            ],
+            { duration: 220, easing: "ease", fill: "forwards" }
+          ).onfinish = () => { isAnimating = false; };
         };
-      };
+      }
     };
 
     const finishQuiz = () => {
@@ -1249,11 +1273,30 @@ document.addEventListener("DOMContentLoaded", () => {
       prevBtn?.setAttribute("hidden", "");
       nextBtn?.setAttribute("hidden", "");
       document.removeEventListener("keydown", handleKeyDown);
+
+      // Dramatic result card entrance
+      if (typeof gsap !== "undefined") {
+        gsap.fromTo(card,
+          { scale: 0.8, opacity: 0, rotateX: 10, transformPerspective: 800 },
+          { scale: 1, opacity: 1, rotateX: 0, duration: 0.7, ease: "back.out(1.5)",
+            clearProps: "transform,opacity" }
+        );
+      }
     };
 
     const goNext = (countYes) => {
       if (module.classList.contains("pain-quiz__module--complete")) return;
-      if (countYes) yesCount += 1;
+      if (countYes) {
+        yesCount += 1;
+        // Gold pulse feedback on "Yep, that's me"
+        if (typeof gsap !== "undefined") {
+          gsap.fromTo(card,
+            { borderColor: "rgba(255,214,137,0.9)", boxShadow: "0 0 30px rgba(247,216,121,0.4)" },
+            { borderColor: "rgba(199,155,59,0.35)", boxShadow: "0 30px 70px rgba(0,0,0,0.65)",
+              duration: 0.4, ease: "power2.out" }
+          );
+        }
+      }
       const nextIndex = currentIndex + 1;
       if (nextIndex >= total) {
         finishQuiz();
@@ -1296,8 +1339,158 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   document.querySelectorAll(".month-year-field").forEach((field) => initMonthYearField(field));
-  initOurStoryFlow();
+  // Only run the CSS-based flow effect if GSAP isn't handling it — they fight over transform
+  if (!gsapReady) initOurStoryFlow();
   initReviewScroller();
   initReviewTranslations();
   initPainQuiz();
+
+  // ── GSAP home page animations ──
+  if (gsapReady && document.body.classList.contains("home-page")) {
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Hero: title, subtitle, CTAs stagger in after splash finishes
+    const heroTitle = document.querySelector(".headline-standalone__title");
+    const heroSub = document.querySelector(".headline-standalone__subtitle");
+    const heroCtas = document.querySelector(".hero-ctas");
+
+    // Remove reveal classes so GSAP takes full control, but keep hidden until splash done
+    [heroTitle, heroSub, heroCtas].forEach((el) => {
+      if (el) {
+        el.classList.remove("reveal", "reveal--up");
+        el.style.opacity = "0";
+      }
+    });
+
+    const playHeroAnimations = () => {
+      if (heroTitle) {
+        gsap.fromTo(heroTitle,
+          { opacity: 0, y: 50, scale: 0.95 },
+          { opacity: 1, y: 0, scale: 1, duration: 1, ease: "power3.out", delay: 0.1, clearProps: "transform,opacity" }
+        );
+      }
+      if (heroSub) {
+        gsap.fromTo(heroSub,
+          { opacity: 0, y: 40 },
+          { opacity: 1, y: 0, duration: 0.9, ease: "power3.out", delay: 0.3, clearProps: "transform,opacity" }
+        );
+      }
+      if (heroCtas) {
+        gsap.fromTo(heroCtas,
+          { opacity: 0, y: 35 },
+          { opacity: 1, y: 0, duration: 0.85, ease: "power3.out", delay: 0.5, clearProps: "transform,opacity" }
+        );
+      }
+    };
+
+    // Expose for splash script to call, or play immediately if no splash
+    const splashEl = document.getElementById("splash");
+    if (splashEl && splashEl.style.display !== "none") {
+      window._playHeroAnimations = playHeroAnimations;
+    } else {
+      playHeroAnimations();
+    }
+
+    // ── Story blocks: Demo A cinematic scale + fade + rotation ──
+    const gsapBlocks = document.querySelectorAll(".gsap-block");
+    const gsapDividers = document.querySelectorAll(".gsap-divider");
+
+    gsap.set(gsapBlocks, {
+      opacity: 0,
+      scale: 0.82,
+      rotateX: 8,
+      rotateZ: -2,
+      y: 60,
+      transformOrigin: "center bottom",
+      transformPerspective: 800
+    });
+    gsap.set(gsapDividers, { opacity: 0, scaleX: 0 });
+
+    // Section header
+    const storyHeader = document.querySelector("#our-story .about-real__header");
+    if (storyHeader) {
+      storyHeader.classList.remove("reveal");
+      storyHeader.classList.add("reveal-visible");
+      gsap.fromTo(storyHeader,
+        { opacity: 0, y: 40 },
+        {
+          opacity: 1, y: 0, duration: 0.9, ease: "power3.out",
+          scrollTrigger: { trigger: "#our-story", start: "top 75%", toggleActions: "play none none none" }
+        }
+      );
+    }
+
+    gsapBlocks.forEach((block, i) => {
+      gsap.to(block, {
+        opacity: 1, scale: 1, rotateX: 0, rotateZ: 0, y: 0,
+        duration: 1.1, ease: "power3.out", delay: i * 0.15,
+        scrollTrigger: { trigger: block, start: "top 85%", toggleActions: "play none none none" },
+        clearProps: "transform,opacity"
+      });
+    });
+
+    gsapDividers.forEach((div) => {
+      gsap.to(div, {
+        opacity: 1, scaleX: 1, duration: 0.8, ease: "power2.inOut",
+        scrollTrigger: { trigger: div, start: "top 85%", toggleActions: "play none none none" }
+      });
+    });
+
+    // ── Reviews header ──
+    const reviewHeader = document.querySelector("#reviews .about-real__header");
+    if (reviewHeader) {
+      reviewHeader.classList.remove("reveal");
+      reviewHeader.classList.add("reveal-visible");
+      gsap.fromTo(reviewHeader,
+        { opacity: 0, y: 40 },
+        {
+          opacity: 1, y: 0, duration: 0.9, ease: "power3.out",
+          scrollTrigger: { trigger: "#reviews", start: "top 75%", toggleActions: "play none none none" }
+        }
+      );
+    }
+
+    // Reviews scroller wrap
+    const reviewWrap = document.querySelector(".review-column__scroller-wrap");
+    if (reviewWrap) {
+      reviewWrap.classList.remove("reveal", "reveal--up");
+      reviewWrap.classList.add("reveal-visible");
+      gsap.fromTo(reviewWrap,
+        { opacity: 0, y: 50, scale: 0.96 },
+        {
+          opacity: 1, y: 0, scale: 1, duration: 1, ease: "power3.out",
+          scrollTrigger: { trigger: reviewWrap, start: "top 80%", toggleActions: "play none none none" },
+          clearProps: "transform,opacity"
+        }
+      );
+    }
+
+    // ── Pain quiz section entrance ──
+    const quizHead = document.querySelector(".pain-quiz__head");
+    const quizModule = document.querySelector(".pain-quiz__module");
+
+    if (quizHead) {
+      quizHead.classList.remove("reveal", "reveal--up");
+      quizHead.classList.add("reveal-visible");
+      gsap.fromTo(quizHead,
+        { opacity: 0, y: 50 },
+        {
+          opacity: 1, y: 0, duration: 0.9, ease: "power3.out",
+          scrollTrigger: { trigger: "#pain-points-quiz", start: "top 75%", toggleActions: "play none none none" }
+        }
+      );
+    }
+    if (quizModule) {
+      quizModule.classList.remove("reveal", "reveal--up");
+      quizModule.classList.add("reveal-visible");
+      gsap.fromTo(quizModule,
+        { opacity: 0, y: 60, scale: 0.92, rotateX: 6, transformPerspective: 800 },
+        {
+          opacity: 1, y: 0, scale: 1, rotateX: 0, duration: 1.1, ease: "power3.out",
+          scrollTrigger: { trigger: quizModule, start: "top 82%", toggleActions: "play none none none" },
+          clearProps: "transform,opacity"
+        }
+      );
+    }
+  }
 });
