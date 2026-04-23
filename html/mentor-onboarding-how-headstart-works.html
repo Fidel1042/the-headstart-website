@@ -301,6 +301,56 @@
       background: rgba(199,155,59,0.22);
       border-color: rgba(199,155,59,1);
     }
+
+    /* Customer journey */
+    .journey {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .journey-step {
+      display: flex;
+      gap: 1.2rem;
+      align-items: flex-start;
+    }
+
+    .journey-num {
+      width: 36px;
+      height: 36px;
+      min-width: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #fff0a0 0%, #f0c030 50%, #b87800 100%);
+      color: #0d0d0d;
+      font-weight: 800;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .journey-content {
+      padding-bottom: 0.4rem;
+    }
+
+    .journey-title {
+      font-weight: 700;
+      font-size: 1rem;
+      color: #ffffff;
+      margin-bottom: 0.3rem;
+    }
+
+    .journey-desc {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.6;
+    }
+
+    .journey-connector {
+      width: 2px;
+      height: 28px;
+      background: rgba(199,155,59,0.35);
+      margin-left: 17px;
+    }
   </style>
 </head>
 <body>
@@ -313,56 +363,94 @@
       </a>
     </div>
 
-    <p class="eyebrow">Module 1 of 3</p>
+    <p class="eyebrow">Module 1 of 4</p>
     <h1>How The Headstart Works</h1>
 
     <div class="card-box">
       <h2>Customer Journey</h2>
-      <img
-        src="../images/mentor-onboarding/customer-journey-placeholder.svg"
-        alt="Customer Journey diagram — coming soon"
-        class="placeholder-img"
-      />
-    </div>
-
-    <div class="card-box">
-      <h2>How You Get Paid</h2>
-      <img
-        src="../images/mentor-onboarding/teachworks-placeholder.svg"
-        alt="Teachworks guide — coming soon"
-        class="placeholder-img"
-      />
-    </div>
-
-    <div class="card-box">
-      <h2>Key Operational Steps</h2>
-      <ul>
-        <li>How to log a session</li>
-        <li>Replying to invoices to ensure payment</li>
-        <li>Managing and confirming schedules</li>
-      </ul>
+      <p style="color: rgba(255,255,255,0.6); font-size: 0.95rem; margin-bottom: 1.6rem;">How a typical mentee's journey would look like:</p>
+      <div class="journey">
+        <div class="journey-step">
+          <div class="journey-num">1</div>
+          <div class="journey-content">
+            <div class="journey-title">Initial Consultation</div>
+            <div class="journey-desc">Mentee discovers Headstart Mentoring via LinkedIn, Instagram, or word of mouth. They book a free initial consultation. Koko runs the call to understand their current situation and needs.</div>
+          </div>
+        </div>
+        <div class="journey-connector"></div>
+        <div class="journey-step">
+          <div class="journey-num">2</div>
+          <div class="journey-content">
+            <div class="journey-title">Mentee Signs Up</div>
+            <div class="journey-desc">If the mentee is ready to commit, they sign up to one of our plans:<br><br>
+              <strong>1 Session</strong> — $110/session (pay as you go)<br>
+              <strong>5 Sessions</strong> — $90/session (most popular)<br>
+              <strong>Unlimited</strong> — $2,000 for 6 months (unlimited sessions)
+            </div>
+          </div>
+        </div>
+        <div class="journey-connector"></div>
+        <div class="journey-step">
+          <div class="journey-num">3</div>
+          <div class="journey-content">
+            <div class="journey-title">Mentor Match</div>
+            <div class="journey-desc">We match the mentee with a mentor within the same or similar industry.</div>
+          </div>
+        </div>
+        <div class="journey-connector"></div>
+        <div class="journey-step">
+          <div class="journey-num">4</div>
+          <div class="journey-content">
+            <div class="journey-title">WhatsApp Group Opened</div>
+            <div class="journey-desc">A WhatsApp group is created between the mentee, their mentor, and Fidel. This is the main communication channel for scheduling, updates, and support throughout the mentoring relationship.</div>
+          </div>
+        </div>
+        <div class="journey-connector"></div>
+        <div class="journey-step">
+          <div class="journey-num">5</div>
+          <div class="journey-content">
+            <div class="journey-title">Sessions Begin</div>
+            <div class="journey-desc">1-on-1 mentoring sessions run on an agreed schedule. The mentor logs each session in Teachworks within 24 hours of it occurring.</div>
+          </div>
+        </div>
+        <div class="journey-connector"></div>
+        <div class="journey-step">
+          <div class="journey-num">6</div>
+          <div class="journey-content">
+            <div class="journey-title">Progress & Ongoing Support</div>
+            <div class="journey-desc">The mentee progresses through their goals. Additional sessions are booked as needed. If any issues arise, message Fidel directly on WhatsApp.</div>
+          </div>
+        </div>
+        <div class="journey-connector"></div>
+        <div class="journey-step">
+          <div class="journey-num">7</div>
+          <div class="journey-content">
+            <div class="journey-title">Outcome</div>
+            <div class="journey-desc">Mentee lands their internship or graduate role. The ideal outcome is a mentee who is confident, well-prepared, and refers friends to Headstart.</div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="card-box">
       <h2>Module Checklist</h2>
       <ul class="checklist" id="checklist">
-        <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I understand how a student moves from discovery through to their first session</li>
-        <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I know how to log a session in Teachworks within 24 hours of it occurring</li>
-        <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I understand that I need to reply to invoice emails to trigger my payment</li>
-        <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I know how to manage and confirm session schedules with my mentee</li>
+        <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I understand the 7-step mentee journey from discovery through to outcome</li>
+        <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I understand how mentees are matched with their mentor</li>
+        <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I know that Fidel manages the WhatsApp group and is the main point of contact</li>
       </ul>
       <div class="congrats" id="congrats">
         <div class="congrats__text">
           <div class="congrats__title">Module 1 complete</div>
-          <div class="congrats__sub">Nice work. Move on to Professional Standards when ready.</div>
+          <div class="congrats__sub">Nice work. Move on to Teachworks &amp; Payment when ready.</div>
         </div>
-        <a class="btn-congrats" href="mentor-onboarding-professional-standards.html">Next Module &rarr;</a>
+        <a class="btn-congrats" href="mentor-onboarding-teachworks-payment.html">Next Module &rarr;</a>
       </div>
     </div>
 
     <div class="controls">
       <a class="btn" href="mentor-onboarding.html">&larr; Back to Overview</a>
-      <a class="btn btn-gold" href="mentor-onboarding-professional-standards.html">Next Module &rarr;</a>
+      <a class="btn btn-gold" href="mentor-onboarding-teachworks-payment.html">Next Module &rarr;</a>
     </div>
 
     <script>

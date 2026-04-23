@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SMH2KVMJT2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag("js", new Date());
+    gtag("config", "G-SMH2KVMJT2");
+  </script>
+  <title>Mentor Onboarding – Teachworks &amp; Payment</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Private mentor onboarding module: Teachworks and payment." />
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <style>
+    :root {
+      --bg: #000000;
+      --text: #f5f5f5;
+      --muted: rgba(255, 255, 255, 0.72);
+      --line: rgba(255, 255, 255, 0.07);
+      --gold-gradient: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
+      --accent-soft: rgba(199,155,59,0.22);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(rgba(255,255,255,0.055) 1px, transparent 0),
+        radial-gradient(rgba(255,255,255,0.03) 1px, transparent 0);
+      background-size: 3px 3px, 5px 5px;
+      background-position: 0 0, 1px 1px;
+      opacity: 0.42;
+      mix-blend-mode: screen;
+      z-index: 0;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      width: min(920px, 100% - 2rem);
+      margin: 0 auto;
+      padding: 2.2rem 0 4rem;
+    }
+
+    .logo-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      margin-bottom: 2rem;
+      padding-bottom: 1.4rem;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .logo-bar img { width: 42px; height: 42px; border-radius: 10px; flex-shrink: 0; }
+
+    .logo-bar a { display: flex; align-items: center; gap: 0.85rem; text-decoration: none; }
+
+    .logo-bar__title { font-size: 0.9rem; font-weight: 600; color: rgba(255,255,255,0.6); }
+    .logo-bar__title span { color: rgba(255,255,255,0.3); margin: 0 0.4em; }
+
+    .eyebrow {
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      margin-bottom: 0.5rem;
+    }
+
+    h1 {
+      font-size: clamp(1.6rem, 3.3vw, 2.1rem);
+      background: var(--gold-gradient);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 2rem;
+    }
+
+    h2 {
+      font-size: clamp(1.1rem, 2.2vw, 1.3rem);
+      background: var(--gold-gradient);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+    }
+
+    p, li { color: var(--text); line-height: 1.8; font-size: 1rem; }
+
+    .card-box {
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: radial-gradient(circle at top left, var(--accent-soft), #050505);
+      padding: 1.6rem 1.8rem 1.8rem;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.7);
+      margin-bottom: 1.4rem;
+    }
+
+    ul { padding-left: 1.2rem; }
+    li + li { margin-top: 0.4rem; }
+
+    ol.steps { padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 0.8rem; margin-top: 0.8rem; }
+    ol.steps li { display: flex; gap: 0.9rem; align-items: flex-start; }
+    .step-num {
+      width: 26px; height: 26px; min-width: 26px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      border: 1px solid rgba(199,155,59,0.4);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.78rem; font-weight: 700; color: #f0c030;
+      margin-top: 0.15rem;
+    }
+
+    .alert-box {
+      background: rgba(199,155,59,0.1);
+      border: 1px solid rgba(199,155,59,0.4);
+      border-radius: 12px;
+      padding: 1rem 1.2rem;
+      margin-top: 1.2rem;
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.85);
+      line-height: 1.7;
+    }
+
+    .muted-section { margin-top: 1.4rem; padding-top: 1.4rem; border-top: 1px solid var(--line); }
+    .muted-section h2 { font-size: 1rem; margin-bottom: 0.6rem; }
+    .muted-section p { font-size: 0.9rem; color: #ffffff; line-height: 1.7; }
+    .muted-section p + p { margin-top: 0.8rem; }
+
+    .checklist {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      margin-bottom: 1.4rem;
+    }
+
+    .checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      cursor: pointer;
+      padding: 0.65rem 0.85rem;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.02);
+      transition: background 0.15s, border-color 0.15s;
+      font-size: 0.97rem;
+      line-height: 1.5;
+      color: var(--text);
+      user-select: none;
+    }
+
+    .checklist li:hover { background: rgba(255,255,255,0.04); }
+    .checklist li.checked { background: rgba(100,220,100,0.06); border-color: rgba(100,220,100,0.2); }
+
+    .check-box {
+      width: 20px; height: 20px; min-width: 20px;
+      border-radius: 6px;
+      border: 1.5px solid rgba(255,255,255,0.22);
+      display: flex; align-items: center; justify-content: center;
+      margin-top: 0.1rem;
+      transition: background 0.15s, border-color 0.15s;
+      font-size: 12px;
+      color: transparent;
+    }
+
+    .checklist li.checked .check-box {
+      background: rgba(100,220,100,0.22);
+      border-color: rgba(100,220,100,0.6);
+      color: rgba(100,220,100,1);
+    }
+
+    .congrats {
+      display: none;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.1rem 1.4rem;
+      border-radius: 14px;
+      border: 1px solid rgba(199,155,59,0.45);
+      background: radial-gradient(circle at top left, rgba(199,155,59,0.16), rgba(0,0,0,0));
+    }
+
+    .congrats.visible { display: flex; flex-wrap: wrap; }
+    .congrats__text { flex: 1; min-width: 160px; }
+
+    .congrats__title {
+      font-size: 1rem; font-weight: 700;
+      background: var(--gold-gradient);
+      -webkit-background-clip: text; background-clip: text;
+      color: transparent; -webkit-text-fill-color: transparent;
+      margin-bottom: 0.15rem;
+    }
+
+    .congrats__sub { font-size: 0.85rem; color: rgba(255,255,255,0.45); line-height: 1.4; }
+
+    .btn-congrats {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.65rem 1.3rem; border-radius: 999px;
+      border: 1px solid rgba(199,155,59,0.7);
+      text-decoration: none; color: #f5f5f5;
+      font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; font-size: 0.72rem;
+      background: rgba(199,155,59,0.12); white-space: nowrap;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .btn-congrats:hover { background: rgba(199,155,59,0.22); border-color: rgba(199,155,59,1); }
+
+    .controls {
+      margin-top: 2rem; display: flex; justify-content: space-between; gap: 0.7rem; flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+      padding: 0.65rem 1.3rem; border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.2);
+      text-decoration: none; color: #f5f5f5;
+      font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; font-size: 0.72rem;
+      background: transparent; transition: background 0.2s, border-color 0.2s;
+    }
+
+    .btn:hover { border-color: rgba(255,255,255,0.45); }
+    .btn-gold { border-color: rgba(199,155,59,0.6); }
+    .btn-gold:hover { background: rgba(199,155,59,0.1); border-color: rgba(199,155,59,0.9); }
+
+    h3 {
+      font-size: 0.97rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.75);
+      margin-bottom: 0.6rem;
+      margin-top: 0.1rem;
+      letter-spacing: 0.01em;
+    }
+
+    .sub-section {
+      margin-top: 1.4rem;
+      padding-top: 1.4rem;
+      border-top: 1px solid var(--line);
+    }
+
+    .sub-section p + p { margin-top: 0.65rem; }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+
+    <div class="logo-bar">
+      <a href="mentor-onboarding.html">
+        <img src="../images/intro-logo.png" alt="The Headstart" />
+        <span class="logo-bar__title">Mentor Onboarding <span>&rsaquo;</span> Module 2</span>
+      </a>
+    </div>
+
+    <p class="eyebrow">Module 2 of 3</p>
+    <h1>Teachworks &amp; Payment</h1>
+
+    <!-- SECTION 1: TEACHWORKS -->
+    <div class="card-box">
+      <h2>1. Teachworks</h2>
+      <p>Teachworks is the platform Headstart uses to track sessions and calculate mentor payments. You will receive a login from Fidel before your first session.</p>
+
+      <div class="sub-section">
+        <h3>1.1 &nbsp;Managing Schedules</h3>
+        <p>Session times are agreed with your mentee over WhatsApp first. Once confirmed, enter the session into Teachworks before it occurs so it is on the official record.</p>
+        <p>If you need to reschedule, notify the mentee and Fidel on WhatsApp as early as possible, then update Teachworks accordingly.</p>
+      </div>
+
+      <div class="sub-section">
+        <h3>1.2 &nbsp;How to Log a Session</h3>
+        <p>After every session, mark it as complete in Teachworks within 24 hours. This is how Headstart tracks what sessions have been completed and what each mentor is owed.</p>
+        <div class="alert-box">
+          Log every session within 24 hours. Missing this will cause your payment record to be inaccurate.
+        </div>
+        <p style="margin-top: 1rem; color: rgba(255,255,255,0.45); font-size: 0.88rem; font-style: italic;">Step-by-step screenshots will be added here once the platform is set up.</p>
+      </div>
+    </div>
+
+    <!-- SECTION 2: PAYMENT -->
+    <div class="card-box">
+      <h2>2. Payment</h2>
+
+      <div class="sub-section">
+        <h3>2.1 &nbsp;How You Get Paid</h3>
+        <p>Payments are managed manually by Fidel on a bi-weekly basis. He uses Teachworks to confirm which sessions have been logged, then calculates and sends each mentor's payment directly.</p>
+        <p>If you have any questions about a payment, message Fidel on WhatsApp.</p>
+      </div>
+
+      <div class="sub-section">
+        <h3>2.2 &nbsp;ABN Setup</h3>
+        <p>You are paid as a contractor, not an employee. You need an Australian Business Number (ABN) to receive payment legally.</p>
+        <ol class="steps">
+          <li><span class="step-num">1</span> Go to abr.gov.au and click "Apply for an ABN"</li>
+          <li><span class="step-num">2</span> Select entity type: <strong>Sole Trader</strong></li>
+          <li><span class="step-num">3</span> For business activity, enter: <em>mentoring services</em> or <em>educational consulting</em></li>
+          <li><span class="step-num">4</span> Submit. Your ABN is issued instantly in most cases</li>
+        </ol>
+        <div class="alert-box">
+          Register your ABN before your first session. Without it, Australian tax law requires us to withhold 47% of your payment.
+        </div>
+      </div>
+
+      <div class="sub-section">
+        <h3>2.3 &nbsp;Tax</h3>
+        <p>As a contractor, you are responsible for your own tax. Headstart pays you the full agreed amount without withholding tax, provided your ABN is on file.</p>
+        <p>Set aside a portion of your earnings for tax and lodge your own return at the end of the financial year. Visit ato.gov.au for guidance on sole trader tax obligations.</p>
+      </div>
+    </div>
+
+    <div class="card-box">
+      <h2>Module Checklist</h2>
+      <ul class="checklist" id="checklist">
+        <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I will enter agreed sessions into Teachworks before they occur</li>
+        <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I will log every session in Teachworks within 24 hours of it occurring</li>
+        <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I understand payments are managed manually by Fidel on a bi-weekly basis</li>
+        <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I have or will register my ABN before my first session</li>
+      </ul>
+      <div class="congrats" id="congrats">
+        <div class="congrats__text">
+          <div class="congrats__title">Module 2 complete</div>
+          <div class="congrats__sub">Nice work. Move on to Professional Standards when ready.</div>
+        </div>
+        <a class="btn-congrats" href="mentor-onboarding-professional-standards.html">Next Module &rarr;</a>
+      </div>
+    </div>
+
+    <div class="controls">
+      <a class="btn" href="mentor-onboarding-how-headstart-works.html">&larr; Previous Module</a>
+      <a class="btn btn-gold" href="mentor-onboarding-professional-standards.html">Next Module &rarr;</a>
+    </div>
+
+    <script>
+      function toggle(li) {
+        li.classList.toggle('checked');
+        var all = document.querySelectorAll('#checklist li');
+        var done = document.querySelectorAll('#checklist li.checked');
+        if (done.length === all.length) {
+          document.getElementById('congrats').classList.add('visible');
+        } else {
+          document.getElementById('congrats').classList.remove('visible');
+        }
+      }
+    </script>
+
+  </main>
+</body>
+</html>
