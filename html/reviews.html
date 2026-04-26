@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SMH2KVMJT2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag("js", new Date());
+    gtag("config", "G-SMH2KVMJT2");
+  </script>
+  <title>Student Reviews | Headstart Mentoring</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta name="description" content="Read real reviews from international students in Australia who landed internships and graduate roles through Headstart Mentoring." />
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    .review-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.4rem;
+      margin-top: 2rem;
+    }
+
+    .review-card {
+      background: #111;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .review-card:hover {
+      border-color: rgba(199,155,59,0.25);
+      transform: translateY(-3px);
+    }
+    .review-card.hidden { display: none; }
+
+    .review-card__quote {
+      font-size: 0.97rem;
+      line-height: 1.7;
+      color: rgba(255,255,255,0.78);
+      flex: 1;
+      position: relative;
+      padding-left: 1.5rem;
+    }
+    .review-card__quote::before {
+      content: '\201C';
+      position: absolute;
+      left: 0;
+      top: -0.2rem;
+      font-size: 2.5rem;
+      line-height: 1;
+      color: #c9a84c;
+      font-family: Georgia, serif;
+    }
+
+    .review-card__meta {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+    }
+    .review-card__avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background-size: cover;
+      background-position: center;
+      flex-shrink: 0;
+      border: 2px solid rgba(199,155,59,0.3);
+    }
+    .review-card__info {}
+    .review-card__name {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .review-card__tag {
+      font-size: 0.72rem;
+      color: #c9a84c;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-top: 0.1rem;
+    }
+
+    @media (max-width: 700px) {
+      .review-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="nav">
+      <a href="/" class="nav-left nav-home">
+        <img src="../images/intro-logo.png" width="500" height="500" decoding="async" alt="Headstart Mentoring logo" class="nav-logo-icon" />
+        <div class="nav-brand-text">
+          <span>Headstart Mentoring</span>
+          <span>Mentors for Entry Level Roles / Internship</span>
+        </div>
+      </a>
+      <nav class="nav-links">
+        <a href="/">Home</a>
+        <a href="/services">Services</a>
+        <a href="/mentors">Our Mentors</a>
+        <a href="/reviews" class="active">Reviews</a>
+        <a href="/careers">Careers</a>
+      </nav>
+      <a href="/discovery-call" class="nav-cta nav-cta--gold">Book a free call</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="section services-hero">
+      <div class="section-inner">
+        <div class="page-hero">
+          <div class="page-hero-text reveal reveal--up">
+            <div class="hero-tagline">Reviews</div>
+            <h1>What our students say</h1>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-alt">
+      <div class="section-inner">
+
+        <!-- Filter bar — same classes as mentor page -->
+        <div class="mentor-filter-bar reveal">
+          <button class="mentor-filter-btn active" data-filter="all">All</button>
+          <button class="mentor-filter-btn" data-filter="finance">Finance &amp; Accounting</button>
+          <button class="mentor-filter-btn" data-filter="analytics">Analytics</button>
+          <button class="mentor-filter-btn" data-filter="marketing">Marketing</button>
+          <button class="mentor-filter-btn" data-filter="consulting">Consulting</button>
+          <button class="mentor-filter-btn" data-filter="tech">Tech</button>
+        </div>
+
+        <div class="review-grid">
+
+          <div class="review-card reveal" data-category="analytics">
+            <p class="review-card__quote">I used to spend hours messaging people on LinkedIn hoping for advice, but most conversations didn&rsquo;t really apply to my situation. With this mentoring, every session was actually productive. My mentor asked the right questions, and gave me clear next steps instead of vague suggestions. It felt like every hour I was learning something useful.</p>
+            <div class="review-card__meta">
+              <span class="review-card__avatar" style="background-image: url('../images/Mentee-review/Amy.jpg');"></span>
+              <div class="review-card__info">
+                <div class="review-card__name">Amy</div>
+                <div class="review-card__tag">Business Analytics</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="review-card reveal reveal--right" data-category="finance">
+            <p class="review-card__quote">What stood out was that my mentor had landed their role less than a year ago. They showed me what their resume looked like, how they answered interview questions, and what recruiters actually cared about recently. It felt like getting insider tips from someone just a step ahead of me.</p>
+            <div class="review-card__meta">
+              <span class="review-card__avatar" style="background-image: url('../images/Mentee-review/Jordan-Lin.jpg');"></span>
+              <div class="review-card__info">
+                <div class="review-card__name">Jordan Lin</div>
+                <div class="review-card__tag">Finance</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="review-card reveal" data-category="marketing">
+            <p class="review-card__quote">Before this, I spoke to a few agencies that wanted me to commit thousands of dollars for ongoing support over several months. Here, I booked sessions only when I need help and paused when uni got busy. It felt student-friendly, but still high quality. I never felt like I was paying for things I didn&rsquo;t need.</p>
+            <div class="review-card__meta">
+              <span class="review-card__avatar" style="background-image: url('../images/Mentee-review/Shreya.jpg');"></span>
+              <div class="review-card__info">
+                <div class="review-card__name">Shreya</div>
+                <div class="review-card__tag">Marketing</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="review-card reveal reveal--right" data-category="consulting">
+            <p class="review-card__quote">Before this, I couldn&rsquo;t visualise myself working full time. But my mentor showed me the actual work they do day to day. The slides he made for his work looked very professional and it made me want to learn how to do that. Now I have the strong &ldquo;Why&rdquo; I want the role.</p>
+            <div class="review-card__meta">
+              <span class="review-card__avatar" style="background-image: url('../images/Mentee-review/Daniel-new.jpg');"></span>
+              <div class="review-card__info">
+                <div class="review-card__name">Daniel</div>
+                <div class="review-card__tag">Consulting</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-inner" style="text-align:center">
+        <div class="reveal reveal--up">
+          <p style="color:rgba(255,255,255,0.55); margin-bottom:1.5rem">Ready to write your own story?</p>
+          <a href="/discovery-call" class="btn btn-premium btn-gold">Book a free call</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>&copy; <span id="year"></span> Headstart Mentoring. All rights reserved.</span>
+    <span>Contact: <a href="mailto:info@headstart.com">info@headstart.com</a></span>
+  </footer>
+  <button class="back-to-top" type="button" aria-label="Back to top">↑</button>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="../script.js"></script>
+  <script>
+    document.querySelectorAll('.mentor-filter-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.mentor-filter-btn').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+
+        var filter = btn.dataset.filter;
+        var cards = Array.from(document.querySelectorAll('.review-card'));
+        var matched   = cards.filter(function(c) { return filter === 'all' || c.dataset.category.split(' ').includes(filter); });
+        var unmatched = cards.filter(function(c) { return !matched.includes(c); });
+
+        gsap.to(cards, { opacity: 0, duration: 0.2, ease: 'power1.in',
+          onComplete: function() {
+            unmatched.forEach(function(c) { c.classList.add('hidden'); });
+            matched.forEach(function(c) { c.classList.remove('hidden'); });
+            gsap.fromTo(matched,
+              { opacity: 0, y: 12 },
+              { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out', stagger: 0.06, clearProps: 'transform,opacity' }
+            );
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

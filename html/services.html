@@ -10,11 +10,120 @@
     gtag("js", new Date());
     gtag("config", "G-SMH2KVMJT2");
   </script>
-  <title>Internship &amp; Grad Job Search Mentoring Services | Headstart Mentoring</title>
+  <title>Services &amp; Pricing | Headstart Mentoring</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <meta name="description" content="1-on-1 mentoring for international students in Australia. Get targeted help with graduate job applications, interview prep, resume reviews, and mock assessment centres." />
   <link rel="stylesheet" href="../style.css" />
+  <style>
+    html { scroll-behavior: smooth; }
+
+    /* ── Service card reveal ── */
+    .svc-flip {
+      margin-bottom: 1.2rem;
+    }
+    .svc-flip-inner {
+      position: relative;
+      width: 100%;
+    }
+
+    /* Front stays in normal flow so images size naturally */
+    .svc-flip-front { /* natural flow */ }
+
+    /* Back sits absolutely over the front, hidden until triggered */
+    .svc-flip-back {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      background: #0a0a0a;
+      border-radius: 20px;
+      border: 1px solid #2a2a2a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 2.5rem 2.5rem;
+      box-sizing: border-box;
+    }
+    .svc-flip-back.is-open {
+      pointer-events: auto;
+    }
+
+    /* On mobile, stack pricing tiers vertically so they fit */
+    @media (max-width: 700px) {
+      .svc-flip-back {
+        padding: 3.5rem 1.25rem 1.5rem;
+        align-items: flex-start;
+        overflow-y: auto;
+      }
+      .svc-flip-back .pricing-tiers {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    /* "See pricing" — golden gradient text */
+    .svc-flip-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      margin-top: 1.25rem;
+      background: none;
+      border: 1px solid rgba(199,155,59,0.4);
+      border-radius: 8px;
+      padding: 0.5rem 1.1rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+    .svc-flip-trigger:hover { border-color: #c9a84c; }
+    .svc-flip-trigger__text {
+      background: linear-gradient(135deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .svc-flip-trigger svg {
+      color: #c9a84c;
+      flex-shrink: 0;
+      transition: transform 0.2s;
+    }
+    .svc-flip-trigger:hover svg { transform: rotate(15deg); }
+
+    /* Back: close button */
+    .svc-flip-back__close {
+      position: absolute;
+      top: 1.25rem;
+      right: 1.25rem;
+      background: none;
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 0.3rem 0.75rem;
+      font-size: 0.75rem;
+      color: #888;
+      cursor: pointer;
+      font-family: inherit;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .svc-flip-back__close:hover { border-color: #c9a84c; color: #c9a84c; }
+
+    /* Back: pricing grid */
+    .svc-flip-back .pricing-tiers { width: 100%; }
+    .svc-flip-back .pricing-tier { flex: 1; }
+    /* Disable hover lift on back so it doesn't conflict with 3D perspective */
+    .svc-flip-back .pricing-tier:hover {
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Bullet spacing: even gaps instead of space-evenly so they look uniform */
+    .svc-flip .svc-row__features {
+      justify-content: flex-start;
+      gap: 0.85rem;
+    }
+  </style>
 </head>
 <body>
 
@@ -30,8 +139,8 @@
       <nav class="nav-links">
         <a href="/">Home</a>
         <a href="/services">Services</a>
-        <a href="/pricing">Pricing</a>
         <a href="/mentors">Our Mentors</a>
+        <a href="/reviews">Reviews</a>
         <a href="/careers">Careers</a>
       </nav>
       <a href="/discovery-call" class="nav-cta nav-cta--gold">Book a free call</a>
@@ -43,8 +152,8 @@
       <div class="section-inner">
         <div class="page-hero">
           <div class="page-hero-text reveal reveal--up">
-            <div class="hero-tagline">Services</div>
-            <h1>Our Services</h1>
+            <div class="hero-tagline">Services &amp; Pricing</div>
+            <h1>What we offer</h1>
           </div>
         </div>
       </div>
@@ -55,78 +164,206 @@
         <div class="svc-list">
 
           <!-- 01 · 1-on-1 Mentoring -->
-          <div class="svc-row reveal" style="--reveal-delay:0s">
-            <div class="svc-row__badge">
-              <div class="svc-row__num">01</div>
-              <div class="svc-row__icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                  <circle cx="9" cy="7" r="4"/>
-                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                </svg>
+          <div class="svc-flip reveal" style="--reveal-delay:0s">
+            <div class="svc-flip-inner">
+
+              <!-- FRONT -->
+              <div class="svc-flip-front">
+                <div class="svc-row">
+                  <div class="svc-row__badge">
+                    <div class="svc-row__num">01</div>
+                    <div class="svc-row__icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="svc-row__left">
+                    <h2 class="svc-row__name">1-on-1 Mentoring</h2>
+                    <img class="svc-row__img" src="../images/services/1 v1 mentoring.jpg" alt="1-on-1 mentoring session" loading="lazy" />
+                  </div>
+                  <div>
+                    <ul class="svc-row__features">
+                      <li>Free initial consultation included</li>
+                      <li>Get matched with a Mentor</li>
+                      <li>Receive personal feedback on your current approach</li>
+                      <li>Change Mentors at no extra cost</li>
+                    </ul>
+                    <button class="svc-flip-trigger" onclick="flipOpen(this)">
+                      <span class="svc-flip-trigger__text">See pricing</span>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+                    </button>
+                  </div>
+                </div>
               </div>
+
+              <!-- BACK: 3 pricing tiers -->
+              <div class="svc-flip-back">
+                <button class="svc-flip-back__close" onclick="flipClose(this)">&larr; Back</button>
+                <div class="pricing-tiers" style="width:100%">
+                  <div class="pricing-tier pricing-tier--bronze">
+                    <div class="pricing-tier__name-row">
+                      <div class="pricing-tier__name">1 Session</div>
+                    </div>
+                    <div class="pricing-tier__price"><span class="pricing-tier__price-number">$110</span><span>/session</span></div>
+                    <ul class="svc-row__features">
+                      <li>Pay as you need</li>
+                      <li>No upfront commitment</li>
+                      <li>Best for trying out mentoring</li>
+                    </ul>
+                  </div>
+                  <div class="pricing-tier pricing-tier--silver">
+                    <div class="pricing-tier__name-row">
+                      <div class="pricing-tier__name">5 Sessions</div>
+                      <div class="pricing-tier__badge">Most popular</div>
+                    </div>
+                    <div class="pricing-tier__price"><span class="pricing-tier__price-number">$90</span><span>/session</span></div>
+                    <ul class="svc-row__features">
+                      <li>Lower per-session rate</li>
+                      <li>Best for active job hunters</li>
+                      <li>Perfect before a big interview</li>
+                    </ul>
+                  </div>
+                  <div class="pricing-tier pricing-tier--gold">
+                    <div class="pricing-tier__name-row">
+                      <div class="pricing-tier__name">Unlimited</div>
+                    </div>
+                    <div class="pricing-tier__price"><span class="pricing-tier__price-number">$2,000</span><span>/6 months</span></div>
+                    <ul class="svc-row__features">
+                      <li>Unlimited sessions with your mentor</li>
+                      <li>Ongoing support throughout</li>
+                      <li>Final stage interview guaranteed</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
             </div>
-            <div class="svc-row__left">
-              <h2 class="svc-row__name">1-on-1 Mentoring</h2>
-              <img class="svc-row__img" src="../images/services/1 v1 mentoring.jpg" alt="1-on-1 mentoring session" loading="lazy" />
-            </div>
-            <ul class="svc-row__features">
-              <li>Free initial consultation included</li>
-              <li>Get matched with a Mentor</li>
-              <li>Receive personal feedback on your current approach</li>
-              <li>Change Mentors at no extra cost</li>
-            </ul>
           </div>
 
-          <!-- 02 · Resume & LinkedIn Suggestion Service -->
-          <div class="svc-row reveal reveal--right" style="--reveal-delay:0s">
-            <div class="svc-row__badge">
-              <div class="svc-row__num">02</div>
-              <div class="svc-row__icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                  <polyline points="14 2 14 8 20 8"/>
-                  <line x1="16" y1="13" x2="8" y2="13"/>
-                  <line x1="16" y1="17" x2="8" y2="17"/>
-                  <polyline points="10 9 9 9 8 9"/>
-                </svg>
+          <!-- 02 · Resume & LinkedIn -->
+          <div class="svc-flip reveal reveal--right" style="--reveal-delay:0s">
+            <div class="svc-flip-inner">
+
+              <!-- FRONT -->
+              <div class="svc-flip-front">
+                <div class="svc-row">
+                  <div class="svc-row__badge">
+                    <div class="svc-row__num">02</div>
+                    <div class="svc-row__icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10 9 9 9 8 9"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="svc-row__left">
+                    <h2 class="svc-row__name">Resume &amp; LinkedIn Suggestion Service</h2>
+                    <img class="svc-row__img" src="../images/services/Resume Annotation.jpg" alt="Resume annotation feedback" loading="lazy" />
+                  </div>
+                  <div>
+                    <ul class="svc-row__features">
+                      <li>Annotated feedback</li>
+                      <li>Actionable changes</li>
+                      <li>Overall letter from the marker</li>
+                    </ul>
+                    <button class="svc-flip-trigger" onclick="flipOpen(this)">
+                      <span class="svc-flip-trigger__text">See pricing</span>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+                    </button>
+                  </div>
+                </div>
               </div>
+
+              <!-- BACK: 2 pricing tiers -->
+              <div class="svc-flip-back">
+                <button class="svc-flip-back__close" onclick="flipClose(this)">&larr; Back</button>
+                <div class="pricing-tiers" style="width:100%; max-width:600px; grid-template-columns:repeat(2,1fr)">
+                  <div class="pricing-tier pricing-tier--bronze">
+                    <div class="pricing-tier__name-row"><div class="pricing-tier__name">Resume Review</div></div>
+                    <div class="pricing-tier__price"><span class="pricing-tier__price-number">$69</span></div>
+                    <ul class="svc-row__features">
+                      <li>Detailed annotated feedback</li>
+                      <li>Actionable changes to make</li>
+                      <li>Overall letter from the marker</li>
+                    </ul>
+                  </div>
+                  <div class="pricing-tier pricing-tier--linkedin">
+                    <div class="pricing-tier__name-row"><div class="pricing-tier__name">LinkedIn Review</div></div>
+                    <div class="pricing-tier__price"><span class="pricing-tier__price-number">$69</span></div>
+                    <ul class="svc-row__features">
+                      <li>Detailed annotated feedback</li>
+                      <li>Actionable changes to make</li>
+                      <li>Cold messaging template included</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
             </div>
-            <div class="svc-row__left">
-              <h2 class="svc-row__name">Resume &amp; LinkedIn Suggestion Service</h2>
-              <img class="svc-row__img" src="../images/services/Resume Annotation.jpg" alt="Resume annotation feedback" loading="lazy" />
-            </div>
-            <ul class="svc-row__features">
-              <li>Annotated feedback</li>
-              <li>Actionable changes</li>
-              <li>Overall letter from the marker</li>
-            </ul>
           </div>
 
-          <!-- 03 · Mock Assessment Center -->
-          <div class="svc-row reveal" style="--reveal-delay:0s">
-            <div class="svc-row__badge">
-              <div class="svc-row__num">03</div>
-              <div class="svc-row__icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="3" width="18" height="18" rx="3"/>
-                  <path d="M9 12l2 2 4-4"/>
-                  <path d="M3 9h18"/>
-                </svg>
+          <!-- 03 · Mock Assessment Centre -->
+          <div class="svc-flip reveal" style="--reveal-delay:0s">
+            <div class="svc-flip-inner">
+
+              <!-- FRONT -->
+              <div class="svc-flip-front">
+                <div class="svc-row">
+                  <div class="svc-row__badge">
+                    <div class="svc-row__num">03</div>
+                    <div class="svc-row__icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="3"/>
+                        <path d="M9 12l2 2 4-4"/>
+                        <path d="M3 9h18"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="svc-row__left">
+                    <h2 class="svc-row__name">Mock Assessment Center</h2>
+                    <img class="svc-row__img" src="../images/services/assessment-centre.jpg" alt="Mock assessment centre" loading="lazy" />
+                  </div>
+                  <div>
+                    <ul class="svc-row__features">
+                      <li>Business Case Study prepared by the Headstart</li>
+                      <li>20 min group analysis</li>
+                      <li>10 min presentation to the judges</li>
+                      <li>10 min Q&amp;A</li>
+                      <li>Detailed individual feedback on your performance</li>
+                    </ul>
+                    <button class="svc-flip-trigger" onclick="flipOpen(this)">
+                      <span class="svc-flip-trigger__text">See pricing</span>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+                    </button>
+                  </div>
+                </div>
               </div>
+
+              <!-- BACK: 1 pricing tier -->
+              <div class="svc-flip-back">
+                <button class="svc-flip-back__close" onclick="flipClose(this)">&larr; Back</button>
+                <div class="pricing-tiers" style="width:100%; max-width:360px; grid-template-columns:1fr">
+                  <div class="pricing-tier pricing-tier--gold">
+                    <div class="pricing-tier__name-row"><div class="pricing-tier__name">Mock Assessment Centre</div></div>
+                    <div class="pricing-tier__price"><span class="pricing-tier__price-number">$499</span><span>/group of 3-6</span></div>
+                    <ul class="svc-row__features">
+                      <li>Business case study prepared by Headstart</li>
+                      <li>Group Assessment Centre simulation</li>
+                      <li>Group Presentation and Q&amp;A</li>
+                      <li>Individual written feedback</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
             </div>
-            <div class="svc-row__left">
-              <h2 class="svc-row__name">Mock Assessment Center</h2>
-              <img class="svc-row__img" src="../images/services/assessment-centre.jpg" alt="Mock assessment centre" loading="lazy" />
-            </div>
-            <ul class="svc-row__features">
-              <li>Business Case Study prepared by the Headstart</li>
-              <li>20 min group analysis</li>
-              <li>10 min presentation to the judges</li>
-              <li>10 min Q&amp;A</li>
-              <li>Detailed individual feedback on your performance</li>
-            </ul>
           </div>
 
         </div>
@@ -166,6 +403,70 @@
     <a class="btn" href="/blog"><strong>Check our blog</strong></a>
   </div>
   <button class="back-to-top" type="button" aria-label="Back to top">↑</button>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="../script.js"></script>
+  <script>
+    function setHeights() {
+      document.querySelectorAll('.svc-flip-inner').forEach(function(inner) {
+        var front = inner.querySelector('.svc-flip-front');
+        var back  = inner.querySelector('.svc-flip-back');
+
+        // Reset so we measure fresh
+        inner.style.height = '';
+
+        var frontH = front.offsetHeight;
+
+        // Pull back into flow temporarily to measure its natural height
+        back.style.position = 'relative';
+        back.style.opacity = '0';
+        back.style.visibility = 'hidden';
+        var backH = back.offsetHeight;
+        back.style.position = '';
+        back.style.opacity = '';
+        back.style.visibility = '';
+
+        inner.style.height = Math.max(frontH, backH) + 'px';
+      });
+    }
+
+    // Wait for images to load before measuring
+    window.addEventListener('load', setHeights);
+
+    // Re-measure when screen is resized so mobile layout is correct
+    var resizeTimer;
+    window.addEventListener('resize', function() {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(setHeights, 150);
+    });
+
+    function flipOpen(btn) {
+      var inner = btn.closest('.svc-flip-inner');
+      var front = inner.querySelector('.svc-flip-front');
+      var back  = inner.querySelector('.svc-flip-back');
+
+      back.classList.add('is-open');
+      gsap.to(front, { opacity: 0, y: -8, duration: 0.25, ease: 'power2.in' });
+      gsap.fromTo(back,
+        { opacity: 0, y: 12 },
+        { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out', delay: 0.2 }
+      );
+    }
+
+    function flipClose(btn) {
+      var inner = btn.closest('.svc-flip-inner');
+      var front = inner.querySelector('.svc-flip-front');
+      var back  = inner.querySelector('.svc-flip-back');
+
+      gsap.to(back, { opacity: 0, y: 8, duration: 0.25, ease: 'power2.in',
+        onComplete: function() { back.classList.remove('is-open'); }
+      });
+      gsap.fromTo(front,
+        { opacity: 0, y: -8 },
+        { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out', delay: 0.2 }
+      );
+    }
+  </script>
 </body>
 </html>
