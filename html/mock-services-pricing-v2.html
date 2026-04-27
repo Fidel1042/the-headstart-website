@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Option 2 — Tab Toggle | Headstart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    /* ---- OPTION 2: Tab toggle — Services / Pricing on same page ---- */
+    .tab-bar {
+      display: flex;
+      gap: 0;
+      border: 1px solid #2a2a2a;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 2.5rem;
+      width: fit-content;
+    }
+    .tab-btn {
+      background: transparent;
+      border: none;
+      padding: 0.75rem 2rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .tab-btn.active {
+      background: #c9a84c;
+      color: #000;
+    }
+    .tab-btn:not(.active):hover { color: #fff; }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+
+    /* Services tab styles */
+    .svc2-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+    .svc2-card {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 14px;
+      overflow: hidden;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .svc2-card:hover { border-color: #c9a84c44; transform: translateY(-2px); }
+    .svc2-card__img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      display: block;
+    }
+    .svc2-card__body { padding: 1.25rem; }
+    .svc2-card__num {
+      font-size: 0.68rem;
+      color: #c9a84c;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 0.3rem;
+    }
+    .svc2-card__title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.75rem;
+    }
+    .svc2-card__features {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .svc2-card__features li {
+      font-size: 0.83rem;
+      color: #999;
+      padding: 0.22rem 0;
+      padding-left: 1rem;
+      position: relative;
+    }
+    .svc2-card__features li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: #c9a84c;
+      font-size: 0.7rem;
+    }
+
+    /* Pricing tab uses existing site classes mostly */
+    .p2-free {
+      background: #0d1a12;
+      border: 1px solid #1e3a28;
+      border-radius: 12px;
+      padding: 1.75rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      gap: 2rem;
+    }
+    .p2-free__title { font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem; }
+    .p2-free__price { font-size: 2rem; font-weight: 800; color: #4caf82; white-space: nowrap; }
+    .p2-free__features { list-style: none; padding: 0; margin: 0; }
+    .p2-free__features li { font-size: 0.85rem; color: #aaa; padding: 0.2rem 0; padding-left: 1rem; position: relative; }
+    .p2-free__features li::before { content: '✓'; position: absolute; left: 0; color: #4caf82; font-size: 0.7rem; }
+
+    .p2-heading {
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #888;
+      margin: 2rem 0 1rem;
+      border-bottom: 1px solid #2a2a2a;
+      padding-bottom: 0.5rem;
+    }
+    .sp-cta-strip {
+      background: linear-gradient(135deg, #1a1608, #0d0d0d);
+      border: 1px solid #c9a84c33;
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      margin-top: 2.5rem;
+    }
+    .sp-cta-strip h3 { color: #fff; margin-bottom: 0.5rem; }
+    .sp-cta-strip p { color: #888; font-size: 0.9rem; margin-bottom: 1.25rem; }
+
+    @media (max-width: 700px) {
+      .svc2-grid { grid-template-columns: 1fr; }
+      .p2-free { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="nav">
+      <a href="/" class="nav-left nav-home">
+        <img src="../images/intro-logo.png" width="500" height="500" decoding="async" alt="Headstart Mentoring logo" class="nav-logo-icon" />
+        <div class="nav-brand-text">
+          <span>Headstart Mentoring</span>
+          <span>Mentors for Entry Level Roles / Internship</span>
+        </div>
+      </a>
+      <nav class="nav-links">
+        <a href="/">Home</a>
+        <a href="/services" class="active">Services</a>
+        <a href="/mentors">Our Mentors</a>
+        <a href="/careers">Careers</a>
+      </nav>
+      <a href="/discovery-call" class="nav-cta nav-cta--gold">Book a free call</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="section services-hero">
+      <div class="section-inner">
+        <div class="page-hero">
+          <div class="page-hero-text reveal reveal--up">
+            <div class="hero-tagline">Services &amp; Pricing</div>
+            <h1>What we offer</h1>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-alt">
+      <div class="section-inner">
+
+        <div class="tab-bar">
+          <button class="tab-btn active" onclick="switchTab('services')">Services</button>
+          <button class="tab-btn" onclick="switchTab('pricing')">Pricing</button>
+        </div>
+
+        <!-- SERVICES TAB -->
+        <div class="tab-pane active" id="tab-services">
+          <div class="svc2-grid">
+            <div class="svc2-card">
+              <img class="svc2-card__img" src="../images/services/1 v1 mentoring.jpg" alt="1-on-1 mentoring" loading="lazy" />
+              <div class="svc2-card__body">
+                <div class="svc2-card__num">01</div>
+                <div class="svc2-card__title">1-on-1 Mentoring</div>
+                <ul class="svc2-card__features">
+                  <li>Free initial consultation</li>
+                  <li>Get matched with a mentor</li>
+                  <li>Personal feedback on your approach</li>
+                  <li>Change mentors at no extra cost</li>
+                </ul>
+              </div>
+            </div>
+            <div class="svc2-card">
+              <img class="svc2-card__img" src="../images/services/Resume Annotation.jpg" alt="Resume review" loading="lazy" />
+              <div class="svc2-card__body">
+                <div class="svc2-card__num">02</div>
+                <div class="svc2-card__title">Resume &amp; LinkedIn Review</div>
+                <ul class="svc2-card__features">
+                  <li>Annotated feedback</li>
+                  <li>Actionable changes</li>
+                  <li>Overall letter from the marker</li>
+                </ul>
+              </div>
+            </div>
+            <div class="svc2-card">
+              <img class="svc2-card__img" src="../images/services/assessment-centre.jpg" alt="Mock Assessment Centre" loading="lazy" />
+              <div class="svc2-card__body">
+                <div class="svc2-card__num">03</div>
+                <div class="svc2-card__title">Mock Assessment Centre</div>
+                <ul class="svc2-card__features">
+                  <li>Business case study prepared by Headstart</li>
+                  <li>20-min group analysis</li>
+                  <li>10-min presentation + Q&amp;A</li>
+                  <li>Individual written feedback</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="sp-cta-strip" style="margin-top:2rem">
+            <h3>Want to see pricing?</h3>
+            <p>Switch to the Pricing tab above or book a free call to talk it through.</p>
+            <a href="/discovery-call" class="btn btn-premium btn-gold">Book a free call</a>
+          </div>
+        </div>
+
+        <!-- PRICING TAB -->
+        <div class="tab-pane" id="tab-pricing">
+
+          <div class="p2-free">
+            <div>
+              <div class="p2-free__title">30-Minute Discovery Call</div>
+              <ul class="p2-free__features">
+                <li>Real readiness assessment from mentors who've been there</li>
+                <li>Leave with a clear action plan</li>
+                <li>No commitment required</li>
+              </ul>
+            </div>
+            <div class="p2-free__price">Free</div>
+          </div>
+
+          <p class="p2-heading">1-on-1 Mentoring Sessions</p>
+          <div class="pricing-block">
+            <div class="pricing-tiers">
+              <div class="pricing-tier pricing-tier--bronze">
+                <div class="pricing-tier__name-row"><div class="pricing-tier__name">1 Session</div></div>
+                <div class="pricing-tier__price"><span class="pricing-tier__price-number">$110</span><span>/session</span></div>
+                <ul class="svc-row__features">
+                  <li>Pay as you need</li>
+                  <li>No upfront commitment</li>
+                  <li>Best for trying out mentoring</li>
+                </ul>
+              </div>
+              <div class="pricing-tier pricing-tier--silver">
+                <div class="pricing-tier__name-row">
+                  <div class="pricing-tier__name">5 Sessions</div>
+                  <div class="pricing-tier__badge">Most popular</div>
+                </div>
+                <div class="pricing-tier__price"><span class="pricing-tier__price-number">$90</span><span>/session</span></div>
+                <ul class="svc-row__features">
+                  <li>Lower per-session rate</li>
+                  <li>Best for active job hunters</li>
+                  <li>Perfect before a big interview</li>
+                </ul>
+              </div>
+              <div class="pricing-tier pricing-tier--gold">
+                <div class="pricing-tier__name-row"><div class="pricing-tier__name">Unlimited</div></div>
+                <div class="pricing-tier__price"><span class="pricing-tier__price-number">$2,000</span><span>/6 months</span></div>
+                <ul class="svc-row__features">
+                  <li>Unlimited sessions</li>
+                  <li>Ongoing support throughout</li>
+                  <li>Final stage interview guaranteed</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <p class="p2-heading">Specific Services</p>
+          <div class="pricing-block">
+            <div class="pricing-tiers">
+              <div class="pricing-tier pricing-tier--bronze">
+                <div class="pricing-tier__name-row"><div class="pricing-tier__name">Resume Review</div></div>
+                <div class="pricing-tier__price"><span class="pricing-tier__price-number">$69</span></div>
+                <ul class="svc-row__features">
+                  <li>Detailed annotated feedback</li>
+                  <li>Actionable changes</li>
+                  <li>Letter from the marker</li>
+                </ul>
+              </div>
+              <div class="pricing-tier pricing-tier--linkedin">
+                <div class="pricing-tier__name-row"><div class="pricing-tier__name">LinkedIn Review</div></div>
+                <div class="pricing-tier__price"><span class="pricing-tier__price-number">$69</span></div>
+                <ul class="svc-row__features">
+                  <li>Detailed annotated feedback</li>
+                  <li>Actionable changes</li>
+                  <li>Cold messaging template included</li>
+                </ul>
+              </div>
+              <div class="pricing-tier pricing-tier--gold">
+                <div class="pricing-tier__name-row"><div class="pricing-tier__name">Mock Assessment Centre</div></div>
+                <div class="pricing-tier__price"><span class="pricing-tier__price-number">$499</span><span>/group of 3–6</span></div>
+                <ul class="svc-row__features">
+                  <li>Business case study prepared by Headstart</li>
+                  <li>Group simulation + presentation</li>
+                  <li>Individual written feedback</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="sp-cta-strip">
+            <h3>Not sure where to start?</h3>
+            <p>Book a free 30-minute call — we will tell you exactly what you need.</p>
+            <a href="/discovery-call" class="btn btn-premium btn-gold">Book a free call</a>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>&copy; <span id="year"></span> Headstart Mentoring. All rights reserved.</span>
+    <span>Contact: <a href="mailto:info@headstart.com">info@headstart.com</a></span>
+  </footer>
+  <script src="../script.js"></script>
+  <script>
+    function switchTab(name) {
+      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tab-' + name).classList.add('active');
+      event.target.classList.add('active');
+    }
+  </script>
+</body>
+</html>

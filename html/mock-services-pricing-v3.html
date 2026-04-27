@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Option 3 — Service + Price Rows | Headstart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    /* ---- OPTION 3: Each service row has description left, pricing right ---- */
+    .sp3-section-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #888;
+      margin: 2.5rem 0 1.25rem;
+      border-bottom: 1px solid #2a2a2a;
+      padding-bottom: 0.5rem;
+    }
+
+    /* Free call banner */
+    .sp3-free-banner {
+      background: linear-gradient(135deg, #0d1a12, #0a0f0c);
+      border: 1px solid #1e4a2a;
+      border-radius: 14px;
+      padding: 1.75rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    .sp3-free-banner__text h3 { color: #fff; font-size: 1.1rem; margin-bottom: 0.3rem; }
+    .sp3-free-banner__text p { color: #888; font-size: 0.85rem; margin: 0; }
+    .sp3-free-banner__price { font-size: 2.2rem; font-weight: 800; color: #4caf82; white-space: nowrap; }
+
+    /* Main service+price rows */
+    .sp3-row {
+      display: grid;
+      grid-template-columns: 56px 1fr 1fr;
+      gap: 0 2rem;
+      align-items: start;
+      background: #111;
+      border: 1px solid #1e1e1e;
+      border-radius: 14px;
+      padding: 2rem;
+      margin-bottom: 1rem;
+      transition: border-color 0.2s;
+    }
+    .sp3-row:hover { border-color: #c9a84c33; }
+
+    .sp3-row__num {
+      font-size: 2rem;
+      font-weight: 900;
+      color: #2a2a2a;
+      line-height: 1;
+      padding-top: 0.2rem;
+    }
+
+    .sp3-row__left h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.6rem;
+    }
+    .sp3-row__left p {
+      font-size: 0.85rem;
+      color: #888;
+      margin-bottom: 0.75rem;
+      line-height: 1.5;
+    }
+    .sp3-row__features {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .sp3-row__features li {
+      font-size: 0.83rem;
+      color: #aaa;
+      padding: 0.22rem 0;
+      padding-left: 1rem;
+      position: relative;
+    }
+    .sp3-row__features li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: #c9a84c;
+      font-size: 0.7rem;
+    }
+
+    /* Right column — pricing */
+    .sp3-row__pricing {
+      border-left: 1px solid #2a2a2a;
+      padding-left: 2rem;
+    }
+    .sp3-price-option {
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #1e1e1e;
+    }
+    .sp3-price-option:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+    .sp3-price-option__name {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .sp3-badge {
+      font-size: 0.6rem;
+      background: #c9a84c22;
+      color: #c9a84c;
+      border: 1px solid #c9a84c44;
+      border-radius: 20px;
+      padding: 0.05rem 0.5rem;
+      letter-spacing: 0;
+      text-transform: none;
+      font-weight: 600;
+    }
+    .sp3-price-option__amount {
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, #e8c97a, #c9a84c);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .sp3-price-option__amount span {
+      font-size: 0.75rem;
+      color: #666;
+      -webkit-text-fill-color: #666;
+      font-weight: 400;
+    }
+    .sp3-price-option__note {
+      font-size: 0.78rem;
+      color: #666;
+      margin-top: 0.15rem;
+    }
+
+    /* Single-price variant */
+    .sp3-price-single .sp3-price-option__amount { font-size: 2rem; }
+
+    .sp3-cta {
+      background: linear-gradient(135deg, #1a1608, #0d0d0d);
+      border: 1px solid #c9a84c33;
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      margin-top: 2rem;
+    }
+    .sp3-cta h3 { color: #fff; margin-bottom: 0.5rem; }
+    .sp3-cta p { color: #888; font-size: 0.9rem; margin-bottom: 1.25rem; }
+
+    @media (max-width: 860px) {
+      .sp3-row { grid-template-columns: 40px 1fr; }
+      .sp3-row__pricing { grid-column: 2; border-left: none; padding-left: 0; border-top: 1px solid #2a2a2a; padding-top: 1.25rem; margin-top: 1rem; }
+      .sp3-free-banner { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="nav">
+      <a href="/" class="nav-left nav-home">
+        <img src="../images/intro-logo.png" width="500" height="500" decoding="async" alt="Headstart Mentoring logo" class="nav-logo-icon" />
+        <div class="nav-brand-text">
+          <span>Headstart Mentoring</span>
+          <span>Mentors for Entry Level Roles / Internship</span>
+        </div>
+      </a>
+      <nav class="nav-links">
+        <a href="/">Home</a>
+        <a href="/services" class="active">Services</a>
+        <a href="/mentors">Our Mentors</a>
+        <a href="/careers">Careers</a>
+      </nav>
+      <a href="/discovery-call" class="nav-cta nav-cta--gold">Book a free call</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="section services-hero">
+      <div class="section-inner">
+        <div class="page-hero">
+          <div class="page-hero-text reveal reveal--up">
+            <div class="hero-tagline">Services &amp; Pricing</div>
+            <h1>What we offer</h1>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-alt">
+      <div class="section-inner">
+
+        <p class="sp3-section-label">Start here — always free</p>
+        <div class="sp3-free-banner">
+          <div class="sp3-free-banner__text">
+            <h3>30-Minute Discovery Call</h3>
+            <p>Get a real assessment of your readiness from mentors who've been there. Leave with a clear action plan. No commitment required.</p>
+          </div>
+          <div class="sp3-free-banner__price">Free</div>
+        </div>
+
+        <p class="sp3-section-label">Core service</p>
+
+        <!-- 1-on-1 Mentoring -->
+        <div class="sp3-row">
+          <div class="sp3-row__num">01</div>
+          <div class="sp3-row__left">
+            <h2>1-on-1 Mentoring Sessions</h2>
+            <p>Matched with a recent grad who landed the exact roles you're targeting. Ongoing support from application to offer.</p>
+            <ul class="sp3-row__features">
+              <li>Free initial consultation included</li>
+              <li>Get matched with a mentor</li>
+              <li>Personal feedback on your approach</li>
+              <li>Change mentors at no extra cost</li>
+            </ul>
+          </div>
+          <div class="sp3-row__pricing">
+            <div class="sp3-price-option">
+              <div class="sp3-price-option__name">1 Session</div>
+              <div class="sp3-price-option__amount">$110 <span>/session</span></div>
+              <div class="sp3-price-option__note">Pay as you go, no commitment</div>
+            </div>
+            <div class="sp3-price-option">
+              <div class="sp3-price-option__name">5 Sessions <span class="sp3-badge">Most popular</span></div>
+              <div class="sp3-price-option__amount">$90 <span>/session</span></div>
+              <div class="sp3-price-option__note">Best for active job hunters</div>
+            </div>
+            <div class="sp3-price-option">
+              <div class="sp3-price-option__name">Unlimited</div>
+              <div class="sp3-price-option__amount">$2,000 <span>/6 months</span></div>
+              <div class="sp3-price-option__note">Includes final stage interview guarantee</div>
+            </div>
+          </div>
+        </div>
+
+        <p class="sp3-section-label">Add-on services</p>
+
+        <!-- Resume -->
+        <div class="sp3-row">
+          <div class="sp3-row__num">02</div>
+          <div class="sp3-row__left">
+            <h2>Resume Review</h2>
+            <p>Get detailed written feedback on your resume with specific changes to make before your next application.</p>
+            <ul class="sp3-row__features">
+              <li>Detailed annotated feedback</li>
+              <li>Actionable changes to make</li>
+              <li>Overall letter from the marker</li>
+            </ul>
+          </div>
+          <div class="sp3-row__pricing sp3-price-single">
+            <div class="sp3-price-option">
+              <div class="sp3-price-option__name">One-off review</div>
+              <div class="sp3-price-option__amount">$69</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LinkedIn -->
+        <div class="sp3-row">
+          <div class="sp3-row__num">03</div>
+          <div class="sp3-row__left">
+            <h2>LinkedIn Review</h2>
+            <p>Improve your LinkedIn so recruiters actually find you and reach out first.</p>
+            <ul class="sp3-row__features">
+              <li>Detailed annotated feedback</li>
+              <li>Actionable changes to make</li>
+              <li>Cold messaging template included</li>
+            </ul>
+          </div>
+          <div class="sp3-row__pricing sp3-price-single">
+            <div class="sp3-price-option">
+              <div class="sp3-price-option__name">One-off review</div>
+              <div class="sp3-price-option__amount">$69</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mock AC -->
+        <div class="sp3-row">
+          <div class="sp3-row__num">04</div>
+          <div class="sp3-row__left">
+            <h2>Mock Assessment Centre</h2>
+            <p>Simulate a real group assessment centre with your peers before the real thing. Get scored and debriefed individually.</p>
+            <ul class="sp3-row__features">
+              <li>Business case prepared by Headstart</li>
+              <li>20-min group analysis</li>
+              <li>10-min presentation + Q&amp;A with judges</li>
+              <li>Individual written feedback report</li>
+            </ul>
+          </div>
+          <div class="sp3-row__pricing sp3-price-single">
+            <div class="sp3-price-option">
+              <div class="sp3-price-option__name">Per group of 3–6</div>
+              <div class="sp3-price-option__amount">$499</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sp3-cta">
+          <h3>Not sure what you need?</h3>
+          <p>Book a free 30-minute call and we will tell you exactly which service fits your situation.</p>
+          <a href="/discovery-call" class="btn btn-premium btn-gold">Book a free call</a>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>&copy; <span id="year"></span> Headstart Mentoring. All rights reserved.</span>
+    <span>Contact: <a href="mailto:info@headstart.com">info@headstart.com</a></span>
+  </footer>
+  <script src="../script.js"></script>
+</body>
+</html>
