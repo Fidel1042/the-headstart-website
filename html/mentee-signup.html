@@ -28,10 +28,16 @@
       <nav class="nav-links">
         <a href="/">Home</a>
         <a href="/services">Services</a>
-        
-        <a href="/mentors">Our Mentors</a>
+        <a href="/mentors">Mentors</a>
         <a href="/reviews">Reviews</a>
-        <a href="/careers">Careers</a>
+        <a href="/job-alerts">Job Alerts</a>
+        <div class="nav-more">
+          <button class="nav-more__trigger">More <span class="nav-more__arrow">▾</span></button>
+          <div class="nav-more__menu">
+            <a href="/blog">Blog</a>
+            <a href="/careers">Careers</a>
+          </div>
+        </div>
       </nav>
       <a href="/discovery-call" class="nav-cta nav-cta--gold">Book a free call</a>
     </div>
@@ -57,7 +63,7 @@
         <form class="signup-form" name="mentee-signup" method="POST" data-netlify="true" netlify-honeypot="bot-field" action="/free-call-submitted">
           <input type="hidden" name="form-name" value="mentee-signup" />
           <p class="honeypot">
-            <label>Don’t fill this out if you're human: <input name="bot-field" /></label>
+            <label>Donât fill this out if you're human: <input name="bot-field" /></label>
           </p>
           <div class="signup-grid">
             <div class="form-group">
@@ -104,7 +110,7 @@
                   aria-controls="mentee-start-month-year"
                   data-month-year-input
                 />
-                <button class="month-year-toggle" type="button" aria-label="Toggle month and year list">▾</button>
+                <button class="month-year-toggle" type="button" aria-label="Toggle month and year list">â¾</button>
               </div>
               <div class="month-year-dropdown" id="mentee-start-month-year" data-month-year-dropdown>
                 <div class="month-year-column">
@@ -132,7 +138,7 @@
                   aria-controls="mentee-grad-month-year"
                   data-month-year-input
                 />
-                <button class="month-year-toggle" type="button" aria-label="Toggle month and year list">▾</button>
+                <button class="month-year-toggle" type="button" aria-label="Toggle month and year list">â¾</button>
               </div>
               <div class="month-year-dropdown" id="mentee-grad-month-year" data-month-year-dropdown>
                 <div class="month-year-column">

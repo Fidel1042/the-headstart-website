@@ -15,10 +15,497 @@
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <meta name="description" content="Whether you're job hunting, adapting to Uni life, building a business, or just figuring out life after graduating, we have mentors who've lived it, and can guide you through it." />
   <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ── Comparison split ── */
+    .why-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+    @media (max-width: 700px) {
+      .why-split { grid-template-columns: 1fr; }
+    }
+    .why-split__col {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 1.6rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .why-split__col--hs { border-color: rgba(199,155,59,0.3); }
+    .why-split__label {
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #fff;
+      margin-bottom: 1.1rem;
+    }
+    .why-split__col--hs .why-split__label {
+      background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .why-split__list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .why-split__list li {
+      padding-left: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+    .why-split__list li::before { content: none; }
+    .free-opt__title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #ccc;
+      line-height: 1.3;
+    }
+    .free-opt__desc {
+      font-size: 0.8rem;
+      color: #666;
+      line-height: 1.5;
+    }
+    /* Skeptic line below the split table */
+    .why-skeptic {
+      margin-top: 1.75rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .why-skeptic a {
+      background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(199,155,59,0.45);
+      padding-bottom: 1px;
+      transition: border-color 0.2s;
+    }
+    .why-skeptic a:hover { border-color: #f5d591; }
+    /* Breakdown link inside free options col */
+    .why-split__breakdown {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      margin-top: 1.25rem;
+      font-size: 0.82rem;
+      color: #c79b3b;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      cursor: pointer;
+      transition: color 0.2s;
+      background: none;
+      border: none;
+      padding: 0;
+      font-family: inherit;
+    }
+    .why-split__breakdown:hover { color: #f5d591; }
+
+    /* Headstart selling points */
+    .hs-points {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      flex: 1;
+    }
+    .hs-point {
+      display: flex;
+      gap: 1rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .hs-point:first-child { padding-top: 0; }
+    .hs-point:last-child { border-bottom: none; padding-bottom: 0; }
+    .hs-point__num {
+      flex-shrink: 0;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(199,155,59,0.15);
+      border: 1px solid rgba(199,155,59,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: #c79b3b;
+      margin-top: 0.15rem;
+    }
+    .hs-point__title {
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.35;
+      margin-bottom: 0.3rem;
+    }
+    .hs-point--featured .hs-point__title {
+      font-size: 1.02rem;
+    }
+    .hs-point:not(.hs-point--featured) .hs-point__title {
+      font-size: 0.92rem;
+    }
+    .hs-point__desc {
+      font-size: 0.85rem;
+      color: #777;
+      line-height: 1.6;
+    }
+
+    /* Section intro text */
+    .why-hs-intro {
+      max-width: 660px;
+      margin-top: 0.6rem;
+    }
+    .why-hs-intro p {
+      color: #aaa;
+      font-size: 1.02rem;
+      line-height: 1.7;
+    }
+
+    /* ── Modal ── */
+    .why-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: flex-end;
+      pointer-events: none;
+    }
+    .why-modal__backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(6px);
+      opacity: 0;
+    }
+    .why-modal__panel {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-height: 82vh;
+      overflow: hidden;
+      background: #0d0d0d;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px 20px 0 0;
+      padding: 2.5rem 2rem 1.5rem;
+      transform: translateY(100%);
+      display: flex;
+      flex-direction: column;
+    }
+    @media (max-width: 900px) {
+      .why-modal__panel { max-height: 86vh; }
+    }
+    @media (max-width: 700px) {
+      .why-modal__panel { padding: 1.75rem 1.2rem 1rem; max-height: 90vh; }
+      .why-modal__header { margin-bottom: 1.25rem; }
+      .why-modal__title { font-size: 1.3rem; }
+    }
+    @media (max-width: 480px) {
+      .why-modal__panel { padding: 1.5rem 1rem 0.75rem; }
+    }
+    .why-modal__header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.75rem;
+    }
+    .why-modal__title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.2;
+    }
+    .why-modal__close {
+      flex-shrink: 0;
+      background: none;
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 0.35rem 0.85rem;
+      font-size: 0.78rem;
+      color: #888;
+      cursor: pointer;
+      font-family: inherit;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .why-modal__close:hover { border-color: #c9a84c; color: #c9a84c; }
+
+    /* Carousel */
+    .modal-carousel-wrap {
+      position: relative;
+      flex: 1;
+      overflow: hidden;
+    }
+    .modal-carousel {
+      display: flex;
+      gap: 1rem;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding-bottom: 1rem;
+      height: 100%;
+      align-items: flex-start;
+    }
+    .modal-carousel::-webkit-scrollbar { display: none; }
+    .modal-carousel .free-option-card {
+      flex-shrink: 0;
+      width: calc(33.33% - 0.68rem);
+      scroll-snap-align: start;
+      height: auto;
+    }
+    @media (max-width: 900px) {
+      .modal-carousel .free-option-card { width: calc(50% - 0.5rem); }
+    }
+    @media (max-width: 600px) {
+      .modal-carousel { gap: 0.75rem; }
+      .modal-carousel .free-option-card { width: 88%; }
+    }
+    @media (max-width: 400px) {
+      .modal-carousel .free-option-card { width: 92%; }
+    }
+
+    /* Carousel nav */
+    .modal-carousel-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 0 0;
+    }
+    .modal-carousel-dots {
+      display: flex;
+      gap: 0.4rem;
+    }
+    .modal-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #333;
+      transition: background 0.2s, width 0.2s;
+    }
+    .modal-dot.is-active {
+      width: 18px;
+      border-radius: 3px;
+      background: #c79b3b;
+    }
+    .modal-nav-btns { display: flex; gap: 0.5rem; }
+    .modal-nav-btn {
+      background: none;
+      border: 1px solid #333;
+      border-radius: 8px;
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #888;
+      font-size: 1rem;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .modal-nav-btn:hover { border-color: #c9a84c; color: #c9a84c; }
+
+    /* Free option cards */
+    .free-option-card {
+      display: flex;
+      flex-direction: column;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 1.5rem;
+    }
+    .free-option-card__title {
+      font-size: 1.02rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.65rem;
+      line-height: 1.3;
+    }
+    .free-option-card__body {
+      flex: 1;
+      font-size: 0.88rem;
+      color: #888;
+      line-height: 1.65;
+      margin: 0 0 1rem;
+    }
+    .free-option-card__verdict {
+      display: inline-block;
+      align-self: flex-start;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: #c0392b;
+      background: rgba(192,57,43,0.1);
+      border: 1px solid rgba(192,57,43,0.2);
+      border-radius: 6px;
+      padding: 0.28rem 0.65rem;
+    }
+
+    /* ── Calculator ── */
+    .cost-calc {
+      background: rgba(199,155,59,0.05);
+      border: 1px solid rgba(199,155,59,0.2);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-top: 2rem;
+    }
+    .cost-calc__controls {
+      padding-bottom: 1.5rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .cost-calc__control label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 0.55rem;
+    }
+    .cost-calc__control label strong { color: #f5d591; }
+    .cost-calc__control input[type="range"] {
+      width: 100%;
+      -webkit-appearance: none;
+      height: 4px;
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+      margin: 0.3rem 0 0.4rem;
+    }
+    .cost-calc__control input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #c79b3b;
+      cursor: pointer;
+      border: 2px solid #000;
+      box-shadow: 0 0 0 3px rgba(199,155,59,0.3);
+      transition: box-shadow 0.15s;
+    }
+    .cost-calc__control input[type="range"]::-webkit-slider-thumb:hover {
+      box-shadow: 0 0 0 6px rgba(199,155,59,0.18);
+    }
+    .cost-calc__range-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: #555;
+    }
+    .cost-calc__row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      font-size: 0.92rem;
+    }
+    .cost-calc__row-label { color: #888; }
+    .cost-calc__row-value { color: #fff; font-weight: 600; }
+    .cost-calc__row--salary {
+      padding: 1rem 1.1rem;
+      margin: 0 -1.1rem;
+      background: rgba(199,155,59,0.07);
+      border-radius: 10px;
+      border-bottom: none;
+    }
+    .cost-calc__row--salary .cost-calc__row-label {
+      color: #ccc;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .cost-calc__row--salary .cost-calc__row-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #f5d591;
+    }
+    .cost-calc__total {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-top: 0.75rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(199,155,59,0.25);
+      font-size: 0.95rem;
+    }
+    .cost-calc__total-label { color: #ccc; font-weight: 600; }
+    .cost-calc__total-value {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #f5d591;
+    }
+    .cost-calc__note {
+      margin-top: 1.25rem;
+      font-size: 0.96rem;
+      color: #fff;
+      line-height: 1.65;
+    }
+    .cost-calc__multiplier {
+      background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 800;
+      font-size: 1.15rem;
+    }
+
+    /* Section breathing room + anchor offset for sticky nav */
+    #why-headstart,
+    #pain-points-quiz,
+    #graduation-calc {
+      padding-top: 6rem;
+      padding-bottom: 6rem;
+      scroll-margin-top: 104px;
+    }
+    @media (max-width: 700px) {
+      #why-headstart,
+      #pain-points-quiz,
+      #graduation-calc {
+        padding-top: 4rem;
+        padding-bottom: 4rem;
+      }
+    }
+
+    /* GSAP start states */
+    .gsap-fade { opacity: 0; }
+    .gsap-left { opacity: 0; transform: translateX(-28px); }
+    .gsap-right { opacity: 0; transform: translateX(28px); }
+    .gsap-up { opacity: 0; transform: translateY(24px); }
+
+    /* Unified section header — left aligned, consistent h2 across all 3 sections */
+    .home-sec-head {
+      text-align: left;
+      margin-bottom: 1.5rem;
+    }
+    .home-sec-head h2 {
+      font-size: 2.6rem;
+      line-height: 1.15;
+      margin-top: 0.3rem;
+      margin-bottom: 0;
+    }
+    .home-sec-head__desc {
+      margin-top: 0.7rem;
+      font-size: 1.02rem;
+      color: #aaa;
+      line-height: 1.7;
+    }
+    @media (max-width: 900px) {
+      .home-sec-head h2 { font-size: 2rem; }
+    }
+  </style>
 </head>
 <body class="home-page">
 
-  <!-- Splash only on home -->
   <div id="splash">
     <div class="splash-inner">
       <div class="splash-logo-wrap">
@@ -43,104 +530,179 @@
       <nav class="nav-links">
         <a href="/">Home</a>
         <a href="/services">Services</a>
-        <a href="/mentors">Our Mentors</a>
+        <a href="/mentors">Mentors</a>
         <a href="/reviews">Reviews</a>
-        <a href="/careers">Careers</a>
+        <a href="/job-alerts">Job Alerts</a>
+        <div class="nav-more">
+          <button class="nav-more__trigger">More <span class="nav-more__arrow">▾</span></button>
+          <div class="nav-more__menu">
+            <a href="/blog">Blog</a>
+            <a href="/careers">Careers</a>
+          </div>
+        </div>
       </nav>
       <a href="/discovery-call" class="nav-cta nav-cta--gold">Book a free call</a>
     </div>
   </header>
 
     <main class="home-page">
+
+      <!-- ── Hero ── -->
       <section class="section">
         <div class="section-inner headline-standalone">
           <h1 class="headline-standalone__title reveal reveal--up">
             Build your career with <span class="headline-standalone__highlight">Headstart Mentoring</span>
           </h1>
           <p class="headline-standalone__subtitle reveal reveal--up" style="--reveal-delay: 0.1s">
-            <span class="headline-standalone__line">Learn directly from people already in the industry</span>
-            <span class="headline-standalone__line">you want, through personalised 1:1 mentoring.</span>
+            <span class="headline-standalone__line">1:1 mentoring with mentors in your target industry in Australia</span>
           </p>
           <div class="hero-ctas reveal reveal--up" style="--reveal-delay: 0.2s">
-            <a href="#our-story" class="btn btn-compact" data-scroll-to="#our-story">Why students come to us</a>
-            <a href="/reviews" class="btn btn-compact">Read our reviews</a>
-            <a href="#pain-points-quiz" class="btn btn-compact" data-scroll-to="#pain-points-quiz">Common international student struggles</a>
-            <div class="hero-cta-row hero-cta-row--book-call">
-              <a href="/discovery-call" class="btn btn-compact hero-cta-book-call">Book a free call</a>
+            <a href="#why-headstart" class="btn btn-compact" data-scroll-to="#why-headstart">Why Students choose us</a>
+            <a href="#pain-points-quiz" class="btn btn-compact" data-scroll-to="#pain-points-quiz">International Student Struggles</a>
+            <a href="#graduation-calc" class="btn btn-compact" data-scroll-to="#graduation-calc">Are you graduating soon?</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Why Students Choose Us ── -->
+      <section class="section-alt" id="why-headstart">
+        <div class="section-inner">
+
+          <div class="home-sec-head gsap-up">
+            <h2>Specialised for International Students</h2>
+            <p class="home-sec-head__desc">There are PLENTY of free career mentoring services out there. Why do students pay for Headstart Mentoring?</p>
+          </div>
+
+          <div class="why-split" style="margin-top:2.5rem;">
+            <div class="why-split__col gsap-left">
+              <div class="why-split__label">Free options</div>
+              <ul class="why-split__list">
+                <li>
+                  <span class="free-opt__title">Uni mentorship programs</span>
+                  <span class="free-opt__desc">Mentors stop showing up after 2 sessions with no accountability.</span>
+                </li>
+                <li>
+                  <span class="free-opt__title">Coffee chats</span>
+                  <span class="free-opt__desc">One useful conversation, then zero follow-up on your progress.</span>
+                </li>
+                <li>
+                  <span class="free-opt__title">Online help</span>
+                  <span class="free-opt__desc">Generic advice that can't diagnose why your approach isn't working.</span>
+                </li>
+                <li>
+                  <span class="free-opt__title">Friend with a job</span>
+                  <span class="free-opt__desc">What worked for them won't necessarily work for you.</span>
+                </li>
+                <li>
+                  <span class="free-opt__title">ChatGPT</span>
+                  <span class="free-opt__desc">Polishes wording but doesn't know the Australian graduate market.</span>
+                </li>
+              </ul>
+              <button class="why-split__breakdown" id="why-free-trigger">
+                Why don't these work? See the full breakdown &rarr;
+              </button>
+            </div>
+            <div class="why-split__col why-split__col--hs gsap-right">
+              <div class="why-split__label">Headstart Mentoring</div>
+              <div class="hs-points">
+                <div class="hs-point hs-point--featured">
+                  <div class="hs-point__num">1</div>
+                  <div>
+                    <div class="hs-point__title">Specific to your visa situation</div>
+                    <div class="hs-point__desc">Most mentors were former international students who went through the same pain.</div>
+                  </div>
+                </div>
+                <div class="hs-point">
+                  <div class="hs-point__num">2</div>
+                  <div>
+                    <div class="hs-point__title">Mentors keeping you accountable</div>
+                    <div class="hs-point__desc">Mentors keep track of your progress based on a customised plan built specifically for you.</div>
+                  </div>
+                </div>
+                <div class="hs-point">
+                  <div class="hs-point__num">3</div>
+                  <div>
+                    <div class="hs-point__title">Flexible payment</div>
+                    <div class="hs-point__desc">Charged per session with no long-term commitment. Bundle deals available for a better rate.</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
+
+          <p class="why-skeptic">Still skeptical? <a href="/reviews">Check what our mentees have to say &rarr;</a></p>
+
         </div>
       </section>
 
-      <section class="section about-real" id="our-story">
-        <div class="section-inner">
-          <header class="about-real__header reveal">
-            <p class="about-real__eyebrow">Why Students Come To Us?</p>
-          </header>
-
-          <div class="about-real__divider" aria-hidden="true"></div>
-
-          <div class="about-real__stack">
-            <section class="about-real__block about-real__block--split about-real__block--text gsap-block" data-story-index="0">
-              <p class="about-real__subhead">Built for International Students</p>
-              <div class="about-real__split about-real__split--text">
-                <div class="about-real__text">
-                  <p>You are matched with mentors who were an international student and landed an entry-level role in Australia under Visa 500/485. We understand the pain international students face and how to work within it.</p>
-                </div>
-              </div>
-            </section>
-            <div class="gsap-divider" aria-hidden="true"></div>
-            <section class="about-real__block about-real__block--split about-real__block--text gsap-block" data-story-index="1">
-              <p class="about-real__subhead">The Most Up-to-date Information</p>
-              <div class="about-real__split about-real__split--text">
-                <div class="about-real__text">
-                  <p>Our mentors are currently working full-time in entry-level roles in Australia. They have the most up-to-date strategy because they have done it recently.</p>
-                </div>
-              </div>
-            </section>
-            <div class="gsap-divider" aria-hidden="true"></div>
-            <section class="about-real__block about-real__block--split about-real__block--text gsap-block" data-story-index="2">
-              <p class="about-real__subhead">Pay Per Session Support</p>
-              <div class="about-real__split about-real__split--text">
-                <div class="about-real__text">
-                  <p>Book sessions one at a time with no long-term commitment. Get help when you need it, for what you need.</p>
-                </div>
-              </div>
-            </section>
-
-          </div>
-        </div>
-      </section>
-
+      <!-- ── International student struggles quiz ── -->
       <section class="section" id="pain-points-quiz">
         <div class="section-inner pain-quiz">
-          <div class="pain-quiz__head reveal reveal--up">
+          <div class="home-sec-head reveal reveal--up">
             <p class="about-real__eyebrow">COMMON STRUGGLES</p>
             <h2>Be Honest, Is This You?</h2>
-            <p class="section-subtitle section-subtitle--white pain-quiz__intro">We totally understand your pain trying to find your first ever Internship/Full time role - see which one you can relate down below</p>
           </div>
 
-          <div class="pain-quiz__module reveal reveal--up" style="--reveal-delay: 0.12s">
+          <div class="pain-quiz__module reveal reveal--up" style="--reveal-delay:0.1s">
+            <div class="pain-quiz__live">
+              <span class="pain-quiz__live-dot"></span>
+              <span data-quiz-live-count></span>
+            </div>
             <div class="pain-quiz__card" data-quiz-card>
-              <p data-quiz-card-text>Re-recording digital interviews again and again because they still don't feel right.</p>
+              <p class="pain-quiz__q-num" data-quiz-num></p>
+              <p data-quiz-card-text></p>
             </div>
             <div class="pain-quiz__actions" data-quiz-actions>
-              <button class="btn pain-quiz__btn pain-quiz__btn--primary" type="button" data-quiz-yes>Yep, that's me</button>
-              <button class="btn pain-quiz__btn pain-quiz__btn--ghost" type="button" data-quiz-skip>Never happened</button>
+              <button class="btn pain-quiz__btn pain-quiz__btn--primary" type="button" data-quiz-yes>Same as me</button>
+              <button class="btn pain-quiz__btn pain-quiz__btn--ghost" type="button" data-quiz-no>Not really</button>
             </div>
-            <div class="pain-quiz__progress" data-quiz-progress>
-              <span class="pain-quiz__progress-text" data-quiz-progress-text>Card 1 of 6</span>
-              <div class="pain-quiz__dots">
-                <span class="pain-quiz__dot is-active" data-quiz-dot></span>
-                <span class="pain-quiz__dot" data-quiz-dot></span>
-                <span class="pain-quiz__dot" data-quiz-dot></span>
-                <span class="pain-quiz__dot" data-quiz-dot></span>
-                <span class="pain-quiz__dot" data-quiz-dot></span>
-                <span class="pain-quiz__dot" data-quiz-dot></span>
+            <div class="pain-quiz__bars" data-quiz-bars>
+              <div class="pain-quiz__bar-row">
+                <div class="pain-quiz__bar-label"><span>Same as me</span><strong data-quiz-yes-pct>0%</strong></div>
+                <div class="pain-quiz__bar-track"><div class="pain-quiz__bar-fill pain-quiz__bar-fill--yes" data-quiz-yes-bar></div></div>
+              </div>
+              <div class="pain-quiz__bar-row">
+                <div class="pain-quiz__bar-label"><span>Not really</span><strong data-quiz-no-pct>0%</strong></div>
+                <div class="pain-quiz__bar-track"><div class="pain-quiz__bar-fill pain-quiz__bar-fill--no" data-quiz-no-bar></div></div>
+              </div>
+              <p class="pain-quiz__peer-line" data-quiz-peer-line></p>
+              <button class="pain-quiz__next-btn" type="button" data-quiz-next>Next &rarr;</button>
+            </div>
+            <div class="pain-quiz__pips" data-quiz-pips></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Graduation calculator ── -->
+      <section class="section-alt" id="graduation-calc">
+        <div class="section-inner">
+          <div class="home-sec-head gsap-up">
+            <p class="about-real__eyebrow">Are you graduating soon?</p>
+            <h2>What staying stuck costs you</h2>
+          </div>
+
+          <div class="cost-calc gsap-up" id="home-cost-calc">
+            <div class="cost-calc__controls">
+              <div class="cost-calc__control">
+                <label for="home-calc-months">Months since graduation: <strong id="home-calc-months-display">2 months</strong></label>
+                <input type="range" id="home-calc-months" min="1" max="6" step="0.5" value="2" oninput="homeUpdateCalc()" />
+                <div class="cost-calc__range-labels"><span>1 month</span><span>6 months</span></div>
               </div>
             </div>
-            <button class="pain-quiz__arrow pain-quiz__arrow--left" type="button" aria-label="Previous card" data-quiz-prev>&larr;</button>
-            <button class="pain-quiz__arrow pain-quiz__arrow--right" type="button" aria-label="Next card" data-quiz-next>&rarr;</button>
+
+            <div class="cost-calc__row cost-calc__row--salary">
+              <span class="cost-calc__row-label">Salary missed out</span>
+              <span class="cost-calc__row-value" id="home-calc-salary">$9,000</span>
+            </div>
+            <div class="cost-calc__row">
+              <span class="cost-calc__row-label">Graduate visa extension cost</span>
+              <span class="cost-calc__row-value">$4,600</span>
+            </div>
+            <div class="cost-calc__total">
+              <span class="cost-calc__total-label">Total cost of staying stuck</span>
+              <span class="cost-calc__total-value" id="home-calc-grand">$13,600+</span>
+            </div>
+            <p class="cost-calc__note">Our 5-session package is $450. <span id="home-calc-note-months">2 months</span> without a job costs you roughly <strong class="cost-calc__multiplier" id="home-calc-multiplier">20x</strong> that in salary alone.</p>
           </div>
         </div>
       </section>
@@ -152,22 +714,81 @@
     <span>Contact: <a href="mailto:info@headstart.com">info@headstart.com</a></span>
   </footer>
   </div>
+
+  <!-- ── Modal: free options breakdown ── -->
+  <div id="free-services-modal" class="why-modal" aria-modal="true" role="dialog">
+    <div class="why-modal__backdrop" id="modal-backdrop"></div>
+    <div class="why-modal__panel" id="modal-panel">
+      <div class="why-modal__header">
+        <div class="why-modal__title">Why free options fall short</div>
+        <button class="why-modal__close" id="modal-close">Close</button>
+      </div>
+
+      <div class="modal-carousel-wrap">
+        <div class="modal-carousel" id="modal-carousel">
+          <div class="free-option-card">
+            <div class="free-option-card__title">Official Uni/Societies Mentorship Programs</div>
+            <p class="free-option-card__body">Since the mentorship is free, 80% of mentors won't prioritise keeping you accountable after 2 sessions. There's no consistency in who you get, how often you meet, or whether they follow through.</p>
+            <span class="free-option-card__verdict">Too inconsistent</span>
+          </div>
+          <div class="free-option-card">
+            <div class="free-option-card__title">Coffee Chats</div>
+            <p class="free-option-card__body">You message 50 people, 5 reply, 1 turns into a coffee chat. Helpful to meet them, but they won't follow up on your progress or actually help you improve.</p>
+            <span class="free-option-card__verdict">Lack of structure to allow improvement</span>
+          </div>
+          <div class="free-option-card">
+            <div class="free-option-card__title">Online Help</div>
+            <p class="free-option-card__body">Job search hacks are helpful. Most aren't really applicable to your own situation, and they don't tell you why your current approach isn't working.</p>
+            <span class="free-option-card__verdict">Generic, no diagnosis</span>
+          </div>
+          <div class="free-option-card">
+            <div class="free-option-card__title">Your Friend Who Has a Job</div>
+            <p class="free-option-card__body">Different role, company, and situation. Their advice worked for them. That doesn't mean it works for you.</p>
+            <span class="free-option-card__verdict">Not directly applicable</span>
+          </div>
+          <div class="free-option-card">
+            <div class="free-option-card__title">ChatGPT</div>
+            <p class="free-option-card__body">Helpful for polishing resumes, but doesn't know the specific Australian graduate market or the roles you're targeting.</p>
+            <span class="free-option-card__verdict">Generic advice</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-carousel-nav">
+        <div class="modal-carousel-dots" id="modal-dots">
+          <div class="modal-dot is-active"></div>
+          <div class="modal-dot"></div>
+          <div class="modal-dot"></div>
+          <div class="modal-dot"></div>
+          <div class="modal-dot"></div>
+        </div>
+        <div class="modal-nav-btns">
+          <button class="modal-nav-btn" id="carousel-prev" aria-label="Previous">&#8592;</button>
+          <button class="modal-nav-btn" id="carousel-next" aria-label="Next">&#8594;</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <div class="mobile-sticky-cta">
     <p>Want more detailed insights?</p>
     <a class="btn" href="/blog"><strong>Check our blog</strong></a>
   </div>
   <button class="back-to-top" type="button" aria-label="Back to top">↑</button>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="script.js"></script>
   <script>
-    // Splash timing for home — triggers GSAP hero animations when splash finishes
+    gsap.registerPlugin(ScrollTrigger);
+
+    // ── Splash timing ──
     const prefersReducedMotion =
-      window.matchMedia &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     window.addEventListener("load", function () {
-      const splash = document.getElementById("splash");
-      const main = document.getElementById("main");
+      var splash = document.getElementById("splash");
+      var main   = document.getElementById("main");
       if (!splash || !main) return;
       if (prefersReducedMotion) {
         splash.style.display = "none";
@@ -182,6 +803,184 @@
         setTimeout(function () { splash.style.display = "none"; }, 650);
       }, 800);
     });
+
+    // ── GSAP scroll animations ──
+    function scrollAnim(selector, vars, trigger, triggerOpts) {
+      var el = document.querySelectorAll(selector);
+      if (!el.length) return;
+      gsap.to(el, Object.assign({
+        scrollTrigger: Object.assign({ trigger: trigger || el[0], start: "top 80%", once: true }, triggerOpts || {})
+      }, { opacity: 1, x: 0, y: 0, duration: 0.55, ease: "power2.out" }, vars));
+    }
+
+    // Why Headstart section
+    ScrollTrigger.create({
+      trigger: "#why-headstart",
+      start: "top 78%",
+      once: true,
+      onEnter: function() {
+        gsap.to("#why-headstart .home-sec-head.gsap-up", { opacity: 1, y: 0, duration: 0.55, ease: "power2.out" });
+        gsap.to(".why-split__col.gsap-left",  { opacity: 1, x: 0, duration: 0.6, delay: 0.25, ease: "power2.out" });
+        gsap.to(".why-split__col.gsap-right", { opacity: 1, x: 0, duration: 0.6, delay: 0.35, ease: "power2.out" });
+        gsap.from(".hs-point", {
+          opacity: 0, y: 14,
+          duration: 0.45,
+          stagger: 0.1,
+          delay: 0.5,
+          ease: "power2.out"
+        });
+      }
+    });
+
+    // Calculator section
+    ScrollTrigger.create({
+      trigger: "#graduation-calc",
+      start: "top 78%",
+      once: true,
+      onEnter: function() {
+        var els = document.querySelectorAll("#graduation-calc .gsap-up");
+        gsap.to(els, { opacity: 1, y: 0, duration: 0.55, stagger: 0.1, ease: "power2.out" });
+
+        // Count up on entry
+        var salProxy   = { val: 0 };
+        var grandProxy = { val: 0 };
+        var multProxy  = { val: 0 };
+        gsap.to(salProxy, {
+          val: homeCalcState.salary, duration: 1.0, ease: "power2.out",
+          onUpdate: function() {
+            document.getElementById("home-calc-salary").textContent =
+              "$" + Math.round(salProxy.val).toLocaleString();
+          }
+        });
+        gsap.to(grandProxy, {
+          val: homeCalcState.grand, duration: 1.2, ease: "power2.out",
+          onUpdate: function() {
+            document.getElementById("home-calc-grand").textContent =
+              "$" + Math.round(grandProxy.val).toLocaleString() + "+";
+          }
+        });
+        gsap.to(multProxy, {
+          val: homeCalcState.mult, duration: 1.0, ease: "power2.out",
+          onUpdate: function() {
+            var el = document.getElementById("home-calc-multiplier");
+            if (el) el.textContent = Math.round(multProxy.val) + "x";
+          }
+        });
+      }
+    });
+
+    // ── Modal ──
+    var modal    = document.getElementById("free-services-modal");
+    var panel    = document.getElementById("modal-panel");
+    var backdrop = document.getElementById("modal-backdrop");
+
+    function openModal(e) {
+      e.preventDefault();
+      modal.style.pointerEvents = "auto";
+      document.body.style.overflow = "hidden";
+      gsap.to(backdrop, { opacity: 1, duration: 0.3 });
+      gsap.to(panel,    { y: "0%",   duration: 0.45, ease: "power3.out" });
+    }
+    function closeModal() {
+      gsap.to(panel,    { y: "100%", duration: 0.35, ease: "power2.in" });
+      gsap.to(backdrop, { opacity: 0, duration: 0.3, delay: 0.1,
+        onComplete: function() {
+          modal.style.pointerEvents = "none";
+          document.body.style.overflow = "";
+        }
+      });
+    }
+
+    document.getElementById("why-free-trigger").addEventListener("click", openModal);
+    document.getElementById("modal-close").addEventListener("click", closeModal);
+    backdrop.addEventListener("click", closeModal);
+    document.addEventListener("keydown", function(e) {
+      if (e.key === "Escape") closeModal();
+    });
+
+    // ── Carousel ──
+    var carousel = document.getElementById("modal-carousel");
+    var dots     = document.querySelectorAll(".modal-dot");
+    var TOTAL    = 5;
+    var current  = 0;
+
+    function getCardWidth() {
+      var card = carousel.querySelector(".free-option-card");
+      return card ? card.offsetWidth + 16 : 0; // 16 = gap
+    }
+
+    function goTo(idx) {
+      idx = Math.max(0, Math.min(idx, TOTAL - 1));
+      current = idx;
+      carousel.scrollTo({ left: idx * getCardWidth(), behavior: "smooth" });
+      dots.forEach(function(d, i) { d.classList.toggle("is-active", i === idx); });
+    }
+
+    document.getElementById("carousel-prev").addEventListener("click", function() { goTo(current - 1); });
+    document.getElementById("carousel-next").addEventListener("click", function() { goTo(current + 1); });
+
+    // Sync dots on native scroll (swipe)
+    carousel.addEventListener("scroll", function() {
+      var w = getCardWidth();
+      if (!w) return;
+      var idx = Math.round(carousel.scrollLeft / w);
+      if (idx !== current) {
+        current = idx;
+        dots.forEach(function(d, i) { d.classList.toggle("is-active", i === current); });
+      }
+    }, { passive: true });
+
+    // ── Calculator ──
+    var HOME_SALARY = 4500;
+    var HOME_VISA   = 4600;
+    var homeCalcState  = { salary: 9000, grand: 13600, mult: 20 };
+    var homeActiveTweens = {};
+
+    function homeTween(key, el, toVal, prefix, suffix) {
+      if (homeActiveTweens[key]) homeActiveTweens[key].kill();
+      var proxy = { val: homeCalcState[key] };
+      homeActiveTweens[key] = gsap.to(proxy, {
+        val: toVal, duration: 0.45, ease: "power2.out",
+        onUpdate: function() {
+          el.textContent = (prefix || "") + "$" + Math.round(proxy.val).toLocaleString() + (suffix || "");
+        },
+        onComplete: function() { homeCalcState[key] = toVal; }
+      });
+    }
+
+    function homeUpdateSlider(slider) {
+      var pct = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
+      slider.style.background =
+        "linear-gradient(to right, #c79b3b 0%, #c79b3b " + pct + "%, rgba(255,255,255,0.1) " + pct + "%, rgba(255,255,255,0.1) 100%)";
+    }
+
+    function homeUpdateCalc() {
+      var slider = document.getElementById("home-calc-months");
+      var months = parseFloat(slider.value);
+      homeUpdateSlider(slider);
+      var monthLabel = months + (months === 1 ? " month" : " months");
+      document.getElementById("home-calc-months-display").textContent = monthLabel;
+      var noteEl = document.getElementById("home-calc-note-months");
+      if (noteEl) noteEl.textContent = monthLabel;
+      var newSal   = Math.round(HOME_SALARY * months);
+      var newGrand = newSal + HOME_VISA;
+      var newMult  = Math.round(newSal / 450);
+      homeTween("salary", document.getElementById("home-calc-salary"), newSal,   "", "");
+      homeTween("grand",  document.getElementById("home-calc-grand"),  newGrand, "", "+");
+      // Tween multiplier
+      if (homeActiveTweens["mult"]) homeActiveTweens["mult"].kill();
+      var multProxy = { val: homeCalcState.mult };
+      homeActiveTweens["mult"] = gsap.to(multProxy, {
+        val: newMult, duration: 0.45, ease: "power2.out",
+        onUpdate: function() {
+          var el = document.getElementById("home-calc-multiplier");
+          if (el) el.textContent = Math.round(multProxy.val) + "x";
+        },
+        onComplete: function() { homeCalcState.mult = newMult; }
+      });
+    }
+
+    homeUpdateSlider(document.getElementById("home-calc-months"));
   </script>
 </body>
 </html>

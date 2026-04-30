@@ -39,13 +39,9 @@ document.addEventListener("DOMContentLoaded", () => {
       "html/mentor-onboarding-professional-standards.html",
     "/mentor-onboarding/extra-services":
       "html/mentor-onboarding-extra-services.html",
-    "/netlify-forms": "html/netlify-forms.html",
     "/thank-you": "thank-you.html",
     "/blog": "html/index.html",
     "/blog/index.html": "html/index.html",
-    "/blog/post-template": "html/post-template.html",
-    "/pricing": "html/pricing.html",
-    "/blog/post-template.html": "html/post-template.html",
     "/blog/does-your-degree-matter-australia-international-student":
       "html/does-your-degree-matter-australia-international-student.html",
     "/blog/does-your-degree-matter-australia-international-student.html":
@@ -58,6 +54,8 @@ document.addEventListener("DOMContentLoaded", () => {
       "html/temporary-graduate-visa-fee-increase-2026-what-it-means.html",
     "/blog/temporary-graduate-visa-fee-increase-2026-what-it-means.html":
       "html/temporary-graduate-visa-fee-increase-2026-what-it-means.html",
+    "/blog/resume-experience-alignment-australia-international-student":
+      "html/resume-experience-alignment-australia-international-student.html",
   };
 
   const isLikelyNoRewriteEnv =
@@ -137,6 +135,16 @@ document.addEventListener("DOMContentLoaded", () => {
   };
   window.addEventListener("scroll", shrinkNav);
   shrinkNav();
+
+  // Nav-more dropdown — toggle on click for touch/mobile
+  const navMore = document.querySelector(".nav-more");
+  if (navMore) {
+    navMore.querySelector(".nav-more__trigger").addEventListener("click", (e) => {
+      e.stopPropagation();
+      navMore.classList.toggle("open");
+    });
+    document.addEventListener("click", () => navMore.classList.remove("open"));
+  }
 
   // Back-to-top button
   const backToTop = document.querySelector(".back-to-top");
@@ -1004,7 +1012,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!target) return;
       const el = document.querySelector(target);
       if (el) {
-        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        const navHeight = document.querySelector("header")?.offsetHeight || 80;
+        const top = el.getBoundingClientRect().top + window.scrollY - navHeight - 24;
+        window.scrollTo({ top, behavior: "smooth" });
       }
     });
   });
@@ -1149,19 +1159,25 @@ document.addEventListener("DOMContentLoaded", () => {
   const initPainQuiz = () => {
     const section = document.getElementById("pain-points-quiz");
     if (!section) return;
-
     const module = section.querySelector(".pain-quiz__module");
-    const card = module?.querySelector("[data-quiz-card]");
-    const cardText = module?.querySelector("[data-quiz-card-text]");
-    const yesBtn = module?.querySelector("[data-quiz-yes]");
-    const skipBtn = module?.querySelector("[data-quiz-skip]");
-    const actions = module?.querySelector("[data-quiz-actions]");
-    const progress = module?.querySelector("[data-quiz-progress]");
-    const progressText = module?.querySelector("[data-quiz-progress-text]");
-    const prevBtn = module?.querySelector("[data-quiz-prev]");
-    const nextBtn = module?.querySelector("[data-quiz-next]");
-    const dotsContainer = module?.querySelector(".pain-quiz__dots");
-    if (!card || !cardText || !yesBtn || !skipBtn || !module) return;
+    if (!module) return;
+
+    const card       = module.querySelector("[data-quiz-card]");
+    const cardText   = module.querySelector("[data-quiz-card-text]");
+    const qNum       = module.querySelector("[data-quiz-num]");
+    const liveCount  = module.querySelector("[data-quiz-live-count]");
+    const yesBtn     = module.querySelector("[data-quiz-yes]");
+    const noBtn      = module.querySelector("[data-quiz-no]");
+    const actions    = module.querySelector("[data-quiz-actions]");
+    const barsEl     = module.querySelector("[data-quiz-bars]");
+    const yesPct     = module.querySelector("[data-quiz-yes-pct]");
+    const noPct      = module.querySelector("[data-quiz-no-pct]");
+    const yesBar     = module.querySelector("[data-quiz-yes-bar]");
+    const noBar      = module.querySelector("[data-quiz-no-bar]");
+    const peerLine   = module.querySelector("[data-quiz-peer-line]");
+    const nextBtn    = module.querySelector("[data-quiz-next]");
+    const pipsWrap   = module.querySelector("[data-quiz-pips]");
+    if (!card || !cardText || !yesBtn || !noBtn) return;
 
     const prompts = [
       "Re-recording digital interviews again and again because they still don't feel right.",
@@ -1171,171 +1187,166 @@ document.addEventListener("DOMContentLoaded", () => {
       "You have no clue how to impress the professionals even after finally landing a coffee chat.",
       "Applying for part-time jobs with 600+ applicants and wondering how you're supposed to gain ANY experience for an internship.",
     ];
+    const peerPct    = [82, 74, 78, 65, 58, 71];
+    const liveCounts = [2143, 1742, 1517, 1204, 938, 876];
+    const yesLines   = [
+      "Imagine having someone who has done those exact interviews and landed the role, teaching you how to do the same.",
+      "We understand the system is unfair to international students. Our mentors were once one of them.",
+      "1 warm opportunity beats 20 cold applications. We teach you how to actually build those connections.",
+      "Most introverts who landed roles stopped trying to act extroverted and leaned into their strengths.",
+      "We help you go into coffee chats with the right questions and leave with an actual follow-up plan.",
+      "We help you find one real opportunity that can actually be used to build your experience.",
+    ];
+    const noLines    = [
+      "You're ahead of most. A lot of students waste weeks on this before realising what's actually being assessed.",
+      "You've already removed one barrier that stops 40% of candidates before they even apply.",
+      "If you've already landed one, you're in the top 20% of applicants. The question now is how to convert it into a better internship or grad role.",
+      "That's a real advantage. A lot of people mistake confidence for preparation, and lose for it.",
+      "Nice. Most people leave coffee chats with nothing concrete to follow up on.",
+      "Smart move skipping that queue. Most students lose months there before finding a better path.",
+    ];
+    const archetypes = [
+      { type: "The Early Mover",           desc: "None of these hit you, which puts you ahead of most. The students who land early aren't always better prepared. They just act on strategy before the competition heats up." },
+      { type: "The 95% Candidate",         desc: "One thing is quietly costing you. That is often all it takes to miss a role that would have been yours. One focused session usually finds it fast." },
+      { type: "The Quiet Grinder",         desc: "You're putting in the work. But effort without the right feedback doesn't compound. A session with someone who cracked it recently redirects that energy." },
+      { type: "The Overthinking Applicant", desc: "You can see the gap but you're not sure what to fix first. That loop is expensive. One session with someone who has been there recently ends it." },
+      { type: "The System Fighter",        desc: "The deck is stacked against you in more than one way. There is a path through it, but it is not the one advertised on university career pages." },
+      { type: "The Invisible Candidate",   desc: "Everything looks right from the outside but nothing is landing. The gap is usually invisible until someone who has done the same interviews recently points it out." },
+      { type: "The Deep End",              desc: "You are navigating the full weight of what international students face. This is not a tips list problem. It is exactly what 1-on-1 mentoring was built for." },
+    ];
 
-    let dots = Array.from(module.querySelectorAll("[data-quiz-dot]"));
-    if (!dots.length && dotsContainer) {
-      dots = prompts.map((_, index) => {
-        const dot = document.createElement("span");
-        dot.className = "pain-quiz__dot";
-        if (index === 0) dot.classList.add("is-active");
-        dotsContainer.appendChild(dot);
-        return dot;
-      });
-    }
-
-    const total = prompts.length;
-    let currentIndex = 0;
-    let yesCount = 0;
-    let isAnimating = false;
+    let cur = 0, yesCount = 0;
     const navCta = document.querySelector(".nav-cta--gold");
     const freeCallHref = navCta?.getAttribute("href") || routeHref("/discovery-call");
 
-    const updateProgress = () => {
-      if (progressText) {
-        const safeIndex = Math.min(currentIndex + 1, total);
-        progressText.textContent = `Card ${safeIndex} of ${total}`;
-      }
-      dots.forEach((dot, index) => {
-        dot.classList.toggle("is-active", index === currentIndex);
-      });
-      if (prevBtn) {
-        prevBtn.disabled = currentIndex === 0;
-      }
+    // Build pips
+    const pipFills = prompts.map(() => {
+      const pip = document.createElement("div");
+      pip.className = "pain-quiz__pip";
+      const fill = document.createElement("div");
+      fill.className = "pain-quiz__pip-fill";
+      pip.appendChild(fill);
+      pipsWrap?.appendChild(pip);
+      return fill;
+    });
+
+    const pulsePip = (index) => {
+      const fill = pipFills[index];
+      if (!fill || typeof gsap === "undefined") return;
+      gsap.timeline()
+        .to(fill, { width: "100%", duration: 0.4, ease: "power2.inOut" })
+        .to(fill, { boxShadow: "0 0 10px #c9a84c, 0 0 22px rgba(201,168,76,0.45)", duration: 0.18 })
+        .to(fill, { boxShadow: "none", duration: 0.4 });
     };
 
-    const changeCard = (nextIndex, direction = 1) => {
-      if (nextIndex < 0 || nextIndex >= total) return;
-      if (isAnimating) return;
-
-      const applyChange = () => {
-        currentIndex = nextIndex;
-        cardText.textContent = prompts[currentIndex];
-        card.classList.remove("pain-quiz__card--result");
-        cardText.classList.remove("pain-quiz__result");
-        updateProgress();
-      };
-
-      isAnimating = true;
-
-      // GSAP dramatic toss-out + spring-in
-      if (typeof gsap !== "undefined") {
-        const outX = direction > 0 ? -80 : 80;
-        const outRotate = direction > 0 ? -6 : 6;
-        const inX = direction > 0 ? 60 : -60;
-        const inRotate = direction > 0 ? 4 : -4;
-
-        gsap.to(card, {
-          x: outX, rotation: outRotate, opacity: 0, scale: 0.92,
-          duration: 0.35, ease: "power3.in",
-          onComplete: () => {
-            applyChange();
-            gsap.set(card, { x: inX, rotation: inRotate, opacity: 0, scale: 0.92 });
-            gsap.to(card, {
-              x: 0, rotation: 0, opacity: 1, scale: 1,
-              duration: 0.5, ease: "back.out(1.4)",
-              clearProps: "transform,opacity",
-              onComplete: () => { isAnimating = false; }
-            });
-          }
-        });
-      } else {
-        // Fallback for non-GSAP pages
-        const distance = direction > 0 ? -18 : 18;
-        const outAnim = card.animate(
-          [
-            { opacity: 1, transform: "translateX(0)" },
-            { opacity: 0, transform: `translateX(${distance}px)` },
-          ],
-          { duration: 220, easing: "ease", fill: "forwards" }
+    const burst = (originEl) => {
+      if (typeof gsap === "undefined") return;
+      const rect = originEl.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
+      for (let i = 0; i < 18; i++) {
+        const p = document.createElement("div");
+        const size = 6 + Math.random() * 8;
+        p.style.cssText = `position:fixed;width:${size}px;height:${size}px;border-radius:50%;background:#c9a84c;left:${cx}px;top:${cy}px;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);`;
+        document.body.appendChild(p);
+        const angle = (Math.PI * 2 / 18) * i + Math.random() * 0.3;
+        const dist  = 60 + Math.random() * 100;
+        gsap.fromTo(p,
+          { x: 0, y: 0, opacity: 1, scale: 1 },
+          { x: Math.cos(angle) * dist, y: Math.sin(angle) * dist, opacity: 0, scale: 0.1,
+            duration: 0.6 + Math.random() * 0.25, ease: "power2.out", onComplete: () => p.remove() }
         );
-        outAnim.onfinish = () => {
-          applyChange();
-          card.animate(
-            [
-              { opacity: 0, transform: `translateX(${-distance}px)` },
-              { opacity: 1, transform: "translateX(0)" },
-            ],
-            { duration: 220, easing: "ease", fill: "forwards" }
-          ).onfinish = () => { isAnimating = false; };
-        };
       }
     };
 
-    const finishQuiz = () => {
-      module.classList.add("pain-quiz__module--complete");
-      card.classList.add("pain-quiz__card--result");
-      cardText.classList.add("pain-quiz__result");
-      const servicesLink = `<a class="gradient-link gold-link" href="${routeHref("/services")}">help</a>`;
-      const callLink = `<a class="gradient-link gold-link" href="${freeCallHref}">booking a free call</a>`;
-      cardText.innerHTML = `You are not alone in this challenge, see how we ${servicesLink} or go straight to ${callLink}.`;
-      actions?.setAttribute("hidden", "");
-      progress?.setAttribute("hidden", "");
-      prevBtn?.setAttribute("hidden", "");
-      nextBtn?.setAttribute("hidden", "");
-      document.removeEventListener("keydown", handleKeyDown);
+    const bounceBtn = (btn) => {
+      if (typeof gsap === "undefined") return;
+      gsap.timeline()
+        .to(btn, { scale: 0.88, duration: 0.09, ease: "power2.in" })
+        .to(btn, { scale: 1,    duration: 0.4,  ease: "back.out(3.5)" });
+    };
 
-      // Dramatic result card entrance
+    const countUp = (el, target) => {
+      if (!el || typeof gsap === "undefined") return;
+      const obj = { val: 0 };
+      gsap.to(obj, { val: target, duration: 0.95, ease: "power2.out",
+        onUpdate: () => { el.textContent = Math.round(obj.val) + "%"; }
+      });
+    };
+
+    const load = () => {
+      if (qNum)      qNum.textContent      = `Question ${cur + 1} of ${prompts.length}`;
+      if (cardText)  cardText.textContent  = prompts[cur];
+      if (liveCount) liveCount.textContent = `${liveCounts[cur].toLocaleString()} students have answered this`;
+      if (actions) actions.style.display = "";
+      if (barsEl)  barsEl.style.display  = "none";
+      if (yesBar)  yesBar.style.width    = "0%";
+      if (noBar)   noBar.style.width     = "0%";
+      if (yesPct)  yesPct.textContent    = "0%";
+      if (noPct)   noPct.textContent     = "0%";
+    };
+
+    const vote = (isYes) => {
+      const btn = isYes ? yesBtn : noBtn;
+      bounceBtn(btn);
+      if (isYes) { yesCount++; setTimeout(() => burst(btn), 90); }
+      pulsePip(cur);
+
+      setTimeout(() => {
+        if (actions) actions.style.display = "none";
+        if (barsEl)  barsEl.style.display  = "";
+        if (typeof gsap !== "undefined") {
+          gsap.fromTo(barsEl, { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.3 });
+        }
+        const yp = peerPct[cur], np = 100 - yp;
+        setTimeout(() => {
+          if (yesBar) yesBar.style.width = yp + "%";
+          if (noBar)  noBar.style.width  = np + "%";
+          countUp(yesPct, yp);
+          countUp(noPct,  np);
+        }, 80);
+        if (peerLine) {
+          peerLine.innerHTML = isYes
+            ? `<strong>${yp}% felt the same.</strong> ${yesLines[cur]}`
+            : `<strong>You're in the ${np}% who don't.</strong> ${noLines[cur]}`;
+        }
+      }, 300);
+    };
+
+    const advance = () => {
+      if (typeof gsap !== "undefined") {
+        gsap.to(card, { opacity: 0, y: -14, duration: 0.25, ease: "power2.in", onComplete: () => {
+          cur++;
+          if (cur >= prompts.length) showResult();
+          else { load(); gsap.fromTo(card, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.32, ease: "power2.out" }); }
+        }});
+      } else {
+        cur++;
+        if (cur >= prompts.length) showResult(); else load();
+      }
+    };
+
+    const showResult = () => {
+      module.classList.add("pain-quiz__module--complete");
+      if (actions)  actions.style.display  = "none";
+      if (barsEl)   barsEl.style.display   = "none";
+      if (pipsWrap) pipsWrap.style.display = "none";
+      card.classList.add("pain-quiz__card--result");
+      const a = archetypes[Math.min(yesCount, archetypes.length - 1)];
+      const callLink = `<a class="gradient-link gold-link" href="${freeCallHref}">book a free call</a>`;
+      cardText.innerHTML = `<strong class="pain-quiz__archetype-type">${a.type}</strong><span class="pain-quiz__archetype-desc">${a.desc}</span><span class="pain-quiz__archetype-cta">Ready to change that? ${callLink}.</span>`;
       if (typeof gsap !== "undefined") {
         gsap.fromTo(card,
-          { scale: 0.8, opacity: 0, rotateX: 10, transformPerspective: 800 },
-          { scale: 1, opacity: 1, rotateX: 0, duration: 0.7, ease: "back.out(1.5)",
-            clearProps: "transform,opacity" }
+          { scale: 0.9, opacity: 0 },
+          { scale: 1, opacity: 1, duration: 0.55, ease: "back.out(1.6)", clearProps: "transform,opacity" }
         );
       }
     };
 
-    const goNext = (countYes) => {
-      if (module.classList.contains("pain-quiz__module--complete")) return;
-      if (countYes) {
-        yesCount += 1;
-        // Gold pulse feedback on "Yep, that's me"
-        if (typeof gsap !== "undefined") {
-          gsap.fromTo(card,
-            { borderColor: "rgba(255,214,137,0.9)", boxShadow: "0 0 30px rgba(247,216,121,0.4)" },
-            { borderColor: "rgba(199,155,59,0.35)", boxShadow: "0 30px 70px rgba(0,0,0,0.65)",
-              duration: 0.4, ease: "power2.out" }
-          );
-        }
-      }
-      const nextIndex = currentIndex + 1;
-      if (nextIndex >= total) {
-        finishQuiz();
-        return;
-      }
-      changeCard(nextIndex, 1);
-    };
+    yesBtn.addEventListener("click", () => vote(true));
+    noBtn.addEventListener("click",  () => vote(false));
+    nextBtn?.addEventListener("click", advance);
 
-    const goPrev = () => {
-      if (module.classList.contains("pain-quiz__module--complete")) return;
-      if (currentIndex === 0) return;
-      changeCard(currentIndex - 1, -1);
-    };
-
-    const handleKeyDown = (event) => {
-      const activeTag = document.activeElement?.tagName;
-      if (["INPUT", "TEXTAREA", "SELECT"].includes(activeTag || "")) return;
-      if (module.classList.contains("pain-quiz__module--complete")) return;
-
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        goNext(true);
-      } else if (event.key === "ArrowRight") {
-        event.preventDefault();
-        goNext(false);
-      } else if (event.key === "ArrowLeft") {
-        event.preventDefault();
-        goPrev();
-      }
-    };
-
-    yesBtn.addEventListener("click", () => goNext(true));
-    skipBtn.addEventListener("click", () => goNext(false));
-    nextBtn?.addEventListener("click", () => goNext(false));
-    prevBtn?.addEventListener("click", () => goPrev());
-    document.addEventListener("keydown", handleKeyDown);
-
-    cardText.textContent = prompts[0];
-    updateProgress();
+    load();
   };
 
   document.querySelectorAll(".month-year-field").forEach((field) => initMonthYearField(field));

@@ -18,6 +18,364 @@
   <style>
     html { scroll-behavior: smooth; }
 
+    /* ── Why-free bottom sheet modal ── */
+    .why-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0);
+      z-index: 8000;
+      pointer-events: none;
+    }
+    .why-modal-backdrop.is-open { pointer-events: auto; }
+    .why-modal {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 8001;
+      background: #111;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px 20px 0 0;
+      padding: 2.5rem 2rem 3rem;
+      max-height: 82vh;
+      overflow-y: auto;
+      transform: translateY(100%);
+    }
+    .why-modal__drag {
+      width: 40px;
+      height: 4px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 99px;
+      margin: 0 auto 1.8rem;
+    }
+    .why-modal__close {
+      position: absolute;
+      top: 1.1rem;
+      right: 1.1rem;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.55);
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+    }
+    .why-modal__close:hover { background: rgba(255,255,255,0.14); }
+    .why-modal__title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 1.8rem;
+      padding-right: 2.5rem;
+    }
+    .why-modal__cta {
+      text-align: center;
+      margin-top: 2rem;
+    }
+
+    /* ── Free breakdown single-card modal ── */
+    .svc-breakdown {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      pointer-events: none;
+    }
+    .svc-breakdown__backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(6px);
+      opacity: 0;
+    }
+    .svc-breakdown__panel {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: #0d0d0d;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 2.5rem;
+      opacity: 0;
+    }
+    .svc-breakdown__header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .svc-breakdown__title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.3;
+    }
+    .svc-breakdown__close {
+      flex-shrink: 0;
+      background: none;
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 0.35rem 0.85rem;
+      font-size: 0.78rem;
+      color: #888;
+      cursor: pointer;
+      font-family: inherit;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .svc-breakdown__close:hover { border-color: #c9a84c; color: #c9a84c; }
+    .free-option-card {
+      display: flex;
+      flex-direction: column;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 1.5rem;
+    }
+    .free-option-card__title {
+      font-size: 1.02rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.65rem;
+      line-height: 1.3;
+    }
+    .free-option-card__body {
+      flex: 1;
+      font-size: 1rem;
+      color: #888;
+      line-height: 1.7;
+      margin: 0 0 1.2rem;
+    }
+    .free-option-card__verdict {
+      display: inline-block;
+      align-self: flex-start;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: #c0392b;
+      background: rgba(192,57,43,0.1);
+      border: 1px solid rgba(192,57,43,0.2);
+      border-radius: 6px;
+      padding: 0.28rem 0.65rem;
+    }
+    .svc-why-deeper {
+      display: inline;
+      background: none;
+      border: none;
+      padding: 0;
+      font-size: inherit;
+      color: inherit;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      font-family: inherit;
+      opacity: 0.85;
+    }
+    .svc-why-deeper:hover { opacity: 1; }
+
+    /* ── Why-split comparison (shared with modal) ── */
+    .why-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+    @media (max-width: 700px) {
+      .why-split { grid-template-columns: 1fr; }
+    }
+    .why-split__col {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 1.6rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .why-split__col--hs { border-color: rgba(199,155,59,0.3); }
+    .why-split__label {
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #fff;
+      margin-bottom: 1.1rem;
+    }
+    .why-split__col--hs .why-split__label {
+      background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .why-split__list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .why-split__list li {
+      padding-left: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+    .why-split__list li::before { content: none; }
+    .free-opt__title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #ccc;
+      line-height: 1.3;
+    }
+    .free-opt__desc {
+      font-size: 0.8rem;
+      color: #666;
+      line-height: 1.5;
+    }
+    .hs-points {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      flex: 1;
+    }
+    .hs-point {
+      display: flex;
+      gap: 1rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .hs-point:first-child { padding-top: 0; }
+    .hs-point:last-child { border-bottom: none; padding-bottom: 0; }
+    .hs-point__num {
+      flex-shrink: 0;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(199,155,59,0.15);
+      border: 1px solid rgba(199,155,59,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: #c79b3b;
+      margin-top: 0.15rem;
+    }
+    .hs-point__title {
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.35;
+      margin-bottom: 0.3rem;
+    }
+    .hs-point--featured .hs-point__title { font-size: 1.02rem; }
+    .hs-point:not(.hs-point--featured) .hs-point__title { font-size: 0.92rem; }
+    .hs-point__desc {
+      font-size: 0.85rem;
+      color: #777;
+      line-height: 1.6;
+    }
+
+    /* ── Image zoom ── */
+    .img-zoom-wrap {
+      position: relative;
+      display: block;
+      cursor: zoom-in;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .img-zoom-wrap .svc-row__img {
+      display: block;
+      transition: transform 0.3s ease;
+    }
+    .img-zoom-wrap:hover .svc-row__img {
+      transform: scale(1.03);
+    }
+    .img-zoom-icon {
+      position: absolute;
+      bottom: 0.7rem;
+      right: 0.7rem;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(255,255,255,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: scale(0.85);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      pointer-events: none;
+    }
+    .img-zoom-wrap:hover .img-zoom-icon {
+      opacity: 1;
+      transform: scale(1);
+    }
+    .img-zoom-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: #fff;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+    }
+
+    /* ── Lightbox ── */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0);
+      pointer-events: none;
+      padding: 1.5rem;
+    }
+    .lightbox.is-open {
+      pointer-events: auto;
+    }
+    .lightbox__img {
+      max-width: 92vw;
+      max-height: 88vh;
+      border-radius: 12px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.7);
+      opacity: 0;
+      transform: scale(0.93);
+      object-fit: contain;
+    }
+    .lightbox__close {
+      position: fixed;
+      top: 1.25rem;
+      right: 1.25rem;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: background 0.15s;
+    }
+    .lightbox__close:hover { background: rgba(255,255,255,0.18); }
+
     /* ── Service card reveal ── */
     .svc-flip {
       margin-bottom: 1.2rem;
@@ -123,6 +481,37 @@
       justify-content: flex-start;
       gap: 0.85rem;
     }
+
+    /* Button row: See pricing + Why pay */
+    .svc-flip-actions {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 1.25rem;
+    }
+    .svc-flip-actions .svc-flip-trigger {
+      margin-top: 0;
+    }
+    .svc-why-free-btn {
+      display: inline-flex;
+      align-items: center;
+      background: none;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 0.5rem 1.1rem;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: #777;
+      cursor: pointer;
+      font-family: inherit;
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .svc-why-free-btn:hover {
+      border-color: rgba(255,255,255,0.25);
+      color: #aaa;
+    }
   </style>
 </head>
 <body>
@@ -138,10 +527,17 @@
       </a>
       <nav class="nav-links">
         <a href="/">Home</a>
-        <a href="/services">Services</a>
-        <a href="/mentors">Our Mentors</a>
+        <a href="/services" class="active">Services</a>
+        <a href="/mentors">Mentors</a>
         <a href="/reviews">Reviews</a>
-        <a href="/careers">Careers</a>
+        <a href="/job-alerts">Job Alerts</a>
+        <div class="nav-more">
+          <button class="nav-more__trigger">More <span class="nav-more__arrow">▾</span></button>
+          <div class="nav-more__menu">
+            <a href="/blog">Blog</a>
+            <a href="/careers">Careers</a>
+          </div>
+        </div>
       </nav>
       <a href="/discovery-call" class="nav-cta nav-cta--gold">Book a free call</a>
     </div>
@@ -183,7 +579,10 @@
                   </div>
                   <div class="svc-row__left">
                     <h2 class="svc-row__name">1-on-1 Mentoring</h2>
-                    <img class="svc-row__img" src="../images/services/1 v1 mentoring.jpg" alt="1-on-1 mentoring session" loading="lazy" />
+                    <button class="img-zoom-wrap" onclick="openLightbox(this)" aria-label="Expand image">
+                      <img class="svc-row__img" src="../images/services/1 v 1 mentoring.png" alt="1-on-1 mentoring session" loading="lazy" />
+                      <span class="img-zoom-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></span>
+                    </button>
                   </div>
                   <div>
                     <ul class="svc-row__features">
@@ -192,10 +591,13 @@
                       <li>Receive personal feedback on your current approach</li>
                       <li>Change Mentors at no extra cost</li>
                     </ul>
-                    <button class="svc-flip-trigger" onclick="flipOpen(this)">
-                      <span class="svc-flip-trigger__text">See pricing</span>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
-                    </button>
+                    <div class="svc-flip-actions">
+                      <button class="svc-flip-trigger" onclick="flipOpen(this)">
+                        <span class="svc-flip-trigger__text">See pricing</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+                      </button>
+                      <button type="button" class="svc-why-free-btn" onclick="openWhyModal()">Why pay when there are similar mentoring for free?</button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -265,7 +667,10 @@
                   </div>
                   <div class="svc-row__left">
                     <h2 class="svc-row__name">Resume &amp; LinkedIn Suggestion Service</h2>
-                    <img class="svc-row__img" src="../images/services/Resume Annotation.jpg" alt="Resume annotation feedback" loading="lazy" />
+                    <button class="img-zoom-wrap" onclick="openLightbox(this)" aria-label="Expand image">
+                      <img class="svc-row__img" src="../images/services/Resume Marking.png" alt="Resume annotation feedback" loading="lazy" />
+                      <span class="img-zoom-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></span>
+                    </button>
                   </div>
                   <div>
                     <ul class="svc-row__features">
@@ -273,10 +678,13 @@
                       <li>Actionable changes</li>
                       <li>Overall letter from the marker</li>
                     </ul>
-                    <button class="svc-flip-trigger" onclick="flipOpen(this)">
-                      <span class="svc-flip-trigger__text">See pricing</span>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
-                    </button>
+                    <div class="svc-flip-actions">
+                      <button class="svc-flip-trigger" onclick="flipOpen(this)">
+                        <span class="svc-flip-trigger__text">See pricing</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+                      </button>
+                      <button type="button" class="svc-why-free-btn" onclick="openWhyModal()">Why pay when there are similar mentoring for free?</button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -328,7 +736,10 @@
                   </div>
                   <div class="svc-row__left">
                     <h2 class="svc-row__name">Mock Assessment Center</h2>
-                    <img class="svc-row__img" src="../images/services/assessment-centre.jpg" alt="Mock assessment centre" loading="lazy" />
+                    <button class="img-zoom-wrap" onclick="openLightbox(this)" aria-label="Expand image">
+                      <img class="svc-row__img" src="../images/services/assessment-centre.jpg" alt="Mock assessment centre" loading="lazy" />
+                      <span class="img-zoom-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></span>
+                    </button>
                   </div>
                   <div>
                     <ul class="svc-row__features">
@@ -338,10 +749,13 @@
                       <li>10 min Q&amp;A</li>
                       <li>Detailed individual feedback on your performance</li>
                     </ul>
-                    <button class="svc-flip-trigger" onclick="flipOpen(this)">
-                      <span class="svc-flip-trigger__text">See pricing</span>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
-                    </button>
+                    <div class="svc-flip-actions">
+                      <button class="svc-flip-trigger" onclick="flipOpen(this)">
+                        <span class="svc-flip-trigger__text">See pricing</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+                      </button>
+                      <button type="button" class="svc-why-free-btn" onclick="openWhyModal()">Why pay when there are similar mentoring for free?</button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -398,6 +812,12 @@
     <span>&copy; <span id="year"></span> Headstart Mentoring. All rights reserved.</span>
     <span>Contact: <a href="mailto:info@headstart.com">info@headstart.com</a></span>
   </footer>
+  <!-- ── Lightbox ── -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image preview">
+    <img class="lightbox__img" id="lightbox-img" src="" alt="" />
+    <button class="lightbox__close" id="lightbox-close" aria-label="Close">&#x2715;</button>
+  </div>
+
   <div class="mobile-sticky-cta">
     <p>Want more detailed insights?</p>
     <a class="btn" href="/blog"><strong>Check our blog</strong></a>
@@ -441,10 +861,15 @@
       resizeTimer = setTimeout(setHeights, 150);
     });
 
+    var flipTimers = new WeakMap();
+
     function flipOpen(btn) {
       var inner = btn.closest('.svc-flip-inner');
       var front = inner.querySelector('.svc-flip-front');
       var back  = inner.querySelector('.svc-flip-back');
+
+      // Clear any existing timer for this card
+      clearTimeout(flipTimers.get(inner));
 
       back.classList.add('is-open');
       gsap.to(front, { opacity: 0, y: -8, duration: 0.25, ease: 'power2.in' });
@@ -452,12 +877,23 @@
         { opacity: 0, y: 12 },
         { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out', delay: 0.2 }
       );
+
+      // Auto-flip back after 20 seconds
+      var closeBtn = back.querySelector('[onclick*="flipClose"]');
+      if (closeBtn) {
+        flipTimers.set(inner, setTimeout(function() {
+          flipClose(closeBtn);
+        }, 20000));
+      }
     }
 
     function flipClose(btn) {
       var inner = btn.closest('.svc-flip-inner');
       var front = inner.querySelector('.svc-flip-front');
       var back  = inner.querySelector('.svc-flip-back');
+
+      // Cancel the auto-reset timer if the user closes manually
+      clearTimeout(flipTimers.get(inner));
 
       gsap.to(back, { opacity: 0, y: 8, duration: 0.25, ease: 'power2.in',
         onComplete: function() { back.classList.remove('is-open'); }
@@ -467,6 +903,191 @@
         { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out', delay: 0.2 }
       );
     }
+
+    // ── Lightbox ──
+    var lightbox     = document.getElementById("lightbox");
+    var lightboxImg  = document.getElementById("lightbox-img");
+    var lightboxClose = document.getElementById("lightbox-close");
+
+    function openLightbox(btn) {
+      var img = btn.querySelector("img");
+      lightboxImg.src = img.src;
+      lightboxImg.alt = img.alt;
+      lightbox.classList.add("is-open");
+      document.body.style.overflow = "hidden";
+      gsap.to(lightbox,     { background: "rgba(0,0,0,0.88)", duration: 0.3 });
+      gsap.to(lightboxImg,  { opacity: 1, scale: 1, duration: 0.35, ease: "power2.out" });
+      gsap.to(lightboxClose,{ opacity: 1, duration: 0.25, delay: 0.15 });
+    }
+
+    function closeLightbox() {
+      gsap.to(lightboxImg,  { opacity: 0, scale: 0.93, duration: 0.25, ease: "power2.in" });
+      gsap.to(lightboxClose,{ opacity: 0, duration: 0.2 });
+      gsap.to(lightbox, { background: "rgba(0,0,0,0)", duration: 0.3, delay: 0.1,
+        onComplete: function() {
+          lightbox.classList.remove("is-open");
+          document.body.style.overflow = "";
+          lightboxImg.src = "";
+        }
+      });
+    }
+
+    lightboxClose.addEventListener("click", closeLightbox);
+    lightbox.addEventListener("click", function(e) {
+      if (e.target === lightbox) closeLightbox();
+    });
+    document.addEventListener("keydown", function(e) {
+      if (e.key === "Escape" && lightbox.classList.contains("is-open")) closeLightbox();
+    });
+
+    // ── Free breakdown single-card modal ──
+    var svcBreakdownData = [
+      { title: 'Uni/Societies Mentorship Programs', body: "Since the mentorship is free, 80% of mentors won't prioritise keeping you accountable after 2 sessions. There's no consistency in who you get, how often you meet, or whether they follow through.", verdict: 'Too inconsistent' },
+      { title: 'Coffee Chats',                      body: "You message 50 people, 5 reply, 1 turns into a coffee chat. Helpful to meet them, but they won't follow up on your progress or actually help you improve.", verdict: 'Lack of structure to allow improvement' },
+      { title: 'Online Help',                       body: "Job search hacks are helpful. Most aren't really applicable to your own situation, and they don't tell you why your current approach isn't working.", verdict: 'Generic, no diagnosis' },
+      { title: 'Your Friend Who Has a Job',         body: "Different role, company, and situation. Their advice worked for them. That doesn't mean it works for you.", verdict: 'Not directly applicable' },
+      { title: 'ChatGPT',                           body: "Helpful for polishing resumes, but doesn't know the specific Australian graduate market or the roles you're targeting.", verdict: 'Generic advice' },
+    ];
+
+    function openBreakdownModal(idx) {
+      var data = svcBreakdownData[idx];
+      document.getElementById('svcBreakdownTitle').textContent = data.title;
+      document.getElementById('svcBreakdownBody').textContent  = data.body;
+      document.getElementById('svcBreakdownVerdict').textContent = data.verdict;
+      var modal    = document.getElementById('svc-breakdown-modal');
+      var panel    = document.getElementById('svcBreakdownPanel');
+      var backdrop = document.getElementById('svcBreakdownBackdrop');
+      modal.style.pointerEvents = 'auto';
+      document.body.style.overflow = 'hidden';
+      gsap.to(backdrop, { opacity: 1, duration: 0.3 });
+      gsap.fromTo(panel, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.35, ease: 'power3.out' });
+    }
+
+    function closeBreakdownModal() {
+      var modal    = document.getElementById('svc-breakdown-modal');
+      var panel    = document.getElementById('svcBreakdownPanel');
+      var backdrop = document.getElementById('svcBreakdownBackdrop');
+      gsap.to(panel,    { opacity: 0, y: 10, duration: 0.25, ease: 'power2.in' });
+      gsap.to(backdrop, { opacity: 0, duration: 0.3, delay: 0.1,
+        onComplete: function() {
+          modal.style.pointerEvents = 'none';
+          document.body.style.overflow = '';
+        }
+      });
+    }
+
+    document.addEventListener('keydown', function(e) {
+      var modal = document.getElementById('svc-breakdown-modal');
+      if (e.key === 'Escape' && modal && modal.style.pointerEvents === 'auto') closeBreakdownModal();
+    });
+
+    // ── Why-free bottom sheet modal ──
+    function openWhyModal() {
+      var backdrop = document.getElementById('whyModalBackdrop');
+      var modal    = document.getElementById('whyModal');
+      backdrop.classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+      gsap.to(backdrop, { background: 'rgba(0,0,0,0.65)', duration: 0.3 });
+      gsap.to(modal,    { y: 0, duration: 0.45, ease: 'power3.out' });
+    }
+
+    function closeWhyModal() {
+      var backdrop = document.getElementById('whyModalBackdrop');
+      var modal    = document.getElementById('whyModal');
+      gsap.to(modal, { y: '100%', duration: 0.35, ease: 'power3.in',
+        onComplete: function() {
+          backdrop.classList.remove('is-open');
+          document.body.style.overflow = '';
+        }
+      });
+      gsap.to(backdrop, { background: 'rgba(0,0,0,0)', duration: 0.3 });
+    }
+
+    document.addEventListener('keydown', function(e) {
+      var backdrop = document.getElementById('whyModalBackdrop');
+      if (e.key === 'Escape' && backdrop && backdrop.classList.contains('is-open')) closeWhyModal();
+    });
   </script>
+
+  <!-- ── Free breakdown single-card modal ── -->
+  <div id="svc-breakdown-modal" class="svc-breakdown" aria-modal="true" role="dialog">
+    <div class="svc-breakdown__backdrop" id="svcBreakdownBackdrop" onclick="closeBreakdownModal()"></div>
+    <div class="svc-breakdown__panel" id="svcBreakdownPanel">
+      <div class="svc-breakdown__header">
+        <div class="svc-breakdown__title" id="svcBreakdownTitle"></div>
+        <button class="svc-breakdown__close" onclick="closeBreakdownModal()">Close</button>
+      </div>
+      <div class="free-option-card" style="border:none;padding:0;background:none">
+        <p class="free-option-card__body" id="svcBreakdownBody"></p>
+        <span class="free-option-card__verdict" id="svcBreakdownVerdict"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Why-free bottom sheet modal ── -->
+  <div class="why-modal-backdrop" id="whyModalBackdrop" onclick="closeWhyModal()"></div>
+  <div class="why-modal" id="whyModal" role="dialog" aria-modal="true" aria-label="Why pay when free options exist">
+    <div class="why-modal__drag"></div>
+    <button class="why-modal__close" id="whyModalClose" aria-label="Close" onclick="closeWhyModal()">&#x2715;</button>
+    <h3 class="why-modal__title">Why pay when free options exist?</h3>
+
+    <div class="why-split">
+      <div class="why-split__col">
+        <div class="why-split__label">Free options</div>
+        <ul class="why-split__list">
+          <li>
+            <span class="free-opt__title">Uni mentorship programs</span>
+            <span class="free-opt__desc">Mentors stop showing up after 2 sessions with no accountability. <button class="svc-why-deeper" onclick="openBreakdownModal(0)">detailed explanation</button></span>
+          </li>
+          <li>
+            <span class="free-opt__title">Coffee chats</span>
+            <span class="free-opt__desc">One useful conversation, then zero follow-up on your progress. <button class="svc-why-deeper" onclick="openBreakdownModal(1)">detailed explanation</button></span>
+          </li>
+          <li>
+            <span class="free-opt__title">Online help</span>
+            <span class="free-opt__desc">Generic advice that can't diagnose why your approach isn't working. <button class="svc-why-deeper" onclick="openBreakdownModal(2)">detailed explanation</button></span>
+          </li>
+          <li>
+            <span class="free-opt__title">Friend with a job</span>
+            <span class="free-opt__desc">What worked for them won't necessarily work for you. <button class="svc-why-deeper" onclick="openBreakdownModal(3)">detailed explanation</button></span>
+          </li>
+          <li>
+            <span class="free-opt__title">ChatGPT</span>
+            <span class="free-opt__desc">Polishes wording but doesn't know the Australian graduate market. <button class="svc-why-deeper" onclick="openBreakdownModal(4)">detailed explanation</button></span>
+          </li>
+        </ul>
+      </div>
+      <div class="why-split__col why-split__col--hs">
+        <div class="why-split__label">Headstart Mentoring</div>
+        <div class="hs-points">
+          <div class="hs-point hs-point--featured">
+            <div class="hs-point__num">1</div>
+            <div>
+              <div class="hs-point__title">Specific to your visa situation</div>
+              <div class="hs-point__desc">Most mentors were former international students who went through the same pain.</div>
+            </div>
+          </div>
+          <div class="hs-point">
+            <div class="hs-point__num">2</div>
+            <div>
+              <div class="hs-point__title">Mentors keeping you accountable</div>
+              <div class="hs-point__desc">Mentors keep track of your progress based on a customised plan built specifically for you.</div>
+            </div>
+          </div>
+          <div class="hs-point">
+            <div class="hs-point__num">3</div>
+            <div>
+              <div class="hs-point__title">Flexible payment</div>
+              <div class="hs-point__desc">Charged per session with no long-term commitment. Bundle deals available for a better rate.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="why-modal__cta">
+      <a href="/discovery-call" class="btn btn-premium btn-gold">Book a free call</a>
+    </div>
+  </div>
 </body>
 </html>

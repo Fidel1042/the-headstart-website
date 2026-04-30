@@ -14,6 +14,42 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <link rel="stylesheet" href="../style.css" />
+  <style>
+    /* ââ Word-by-word h1 ââ */
+    .page-hero { grid-template-columns: 1fr; }
+    .page-hero-text p { max-width: 100%; }
+    .page-hero-text h1 .word {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(18px);
+    }
+
+    /* ââ Ambient glow ââ */
+    .discovery-glow {
+      position: fixed;
+      top: 42%;
+      left: 50%;
+      translate: -50% -50%;
+      width: 720px;
+      height: 720px;
+      background: radial-gradient(circle, rgba(199,155,59,0.07) 0%, transparent 65%);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.5;
+    }
+
+    /* ââ Form + fields initial states ââ */
+    .section-alt {
+      opacity: 0;
+      transform: translateY(28px);
+    }
+    .form-group,
+    .form-nav {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+  </style>
 </head>
 <body class="discovery-page">
   <header>
@@ -28,21 +64,29 @@
       <nav class="nav-links">
         <a href="/">Home</a>
         <a href="/services">Services</a>
-        
-        <a href="/mentors">Our Mentors</a>
+        <a href="/mentors">Mentors</a>
         <a href="/reviews">Reviews</a>
-        <a href="/careers">Careers</a>
+        <a href="/job-alerts">Job Alerts</a>
+        <div class="nav-more">
+          <button class="nav-more__trigger">More <span class="nav-more__arrow">▾</span></button>
+          <div class="nav-more__menu">
+            <a href="/blog">Blog</a>
+            <a href="/careers">Careers</a>
+          </div>
+        </div>
       </nav>
       <a href="/discovery-call" class="nav-cta nav-cta--gold">Book a free call</a>
     </div>
   </header>
 
+  <div class="discovery-glow" aria-hidden="true"></div>
   <main>
     <section class="section">
       <div class="section-inner">
         <div class="page-hero">
           <div class="page-hero-text">
             <h1>Book a Free Initial Consultation to Find a Mentor</h1>
+            <p style="color:#aaa; margin-top:0.9rem; font-size:1.05rem; line-height:1.75;">To change your career trajectory, all you need is 30 seconds to fill your info, a 20 minute free consultation, and you will know exactly how far away you are from getting a job, and how we can help you.</p>
           </div>
         </div>
       </div>
@@ -53,7 +97,7 @@
         <form class="signup-form multi-step" name="mentee-signup" method="POST" data-netlify="true" netlify-honeypot="bot-field" action="/free-call-submitted" target="calendlyRedirect" onsubmit="window.open('https://calendly.com/theuniheadstart/30min','calendlyRedirect');">
           <input type="hidden" name="form-name" value="mentee-signup" />
           <p class="honeypot">
-            <label>Don’t fill this out if you're human: <input name="bot-field" /></label>
+            <label>Donât fill this out if you're human: <input name="bot-field" /></label>
           </p>
 
           <div class="form-step is-active" data-step="1">
@@ -132,6 +176,7 @@
             </div>
           </div>
         </form>
+
       </div>
     </section>
   </main>
@@ -140,6 +185,93 @@
     <span>&copy; <span id="year"></span> Headstart Mentoring. All rights reserved.</span>
     <span>Contact: <a href="mailto:info@headstart.com">info@headstart.com</a></span>
   </footer>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="../script.js"></script>
+  <script>
+    gsap.registerPlugin(ScrollTrigger);
+
+    // ââ Ambient glow: slow infinite breathe ââ
+    gsap.to('.discovery-glow', {
+      scale: 1.35,
+      opacity: 0.85,
+      duration: 5,
+      ease: 'sine.inOut',
+      repeat: -1,
+      yoyo: true
+    });
+
+    // ââ h1 word-by-word reveal ââ
+    var h1 = document.querySelector('.page-hero-text h1');
+    var words = h1.textContent.trim().split(/\s+/);
+    h1.innerHTML = words.map(function(w) {
+      return '<span class="word">' + w + '</span>';
+    }).join(' ');
+
+    gsap.to('.word', {
+      opacity: 1,
+      y: 0,
+      duration: 0.55,
+      stagger: 0.07,
+      ease: 'power2.out',
+      delay: 0.15
+    });
+
+    // ââ Form card springs up ââ
+    gsap.to('.section-alt', {
+      opacity: 1,
+      y: 0,
+      duration: 0.7,
+      ease: 'back.out(1.5)',
+      delay: 0.4
+    });
+
+    // ââ Form fields stagger in ââ
+    var fields = document.querySelectorAll('.form-group, .form-nav');
+    gsap.to(fields, {
+      opacity: 1,
+      y: 0,
+      duration: 0.45,
+      stagger: 0.06,
+      ease: 'power2.out',
+      delay: 0.65
+    });
+
+    // ââ Submit button pulse when all required fields filled ââ
+    var requiredInputs = document.querySelectorAll('[required]');
+    var submitBtn      = document.querySelector('.discovery-submit-btn');
+    var pulseTween     = null;
+
+    function allFilled() {
+      return Array.from(requiredInputs).every(function(inp) {
+        if (inp.type === 'radio') {
+          return !!document.querySelector('input[name="' + inp.name + '"]:checked');
+        }
+        return inp.value.trim() !== '';
+      });
+    }
+
+    function syncPulse() {
+      if (allFilled() && !pulseTween) {
+        pulseTween = gsap.to(submitBtn, {
+          scale: 1.05,
+          duration: 0.9,
+          repeat: -1,
+          yoyo: true,
+          ease: 'sine.inOut'
+        });
+      } else if (!allFilled() && pulseTween) {
+        pulseTween.kill();
+        pulseTween = null;
+        gsap.set(submitBtn, { scale: 1 });
+      }
+    }
+
+    requiredInputs.forEach(function(inp) {
+      inp.addEventListener('input',  syncPulse);
+      inp.addEventListener('change', syncPulse);
+    });
+
+  </script>
 </body>
 </html>
