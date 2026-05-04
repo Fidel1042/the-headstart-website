@@ -483,9 +483,9 @@
     <!-- TABS -->
     <div class="tabs-wrap">
       <div class="tabs">
-        <button class="tab" data-cat="all">All <span class="tab-count" id="count-all">55</span></button>
+        <button class="tab" data-cat="all">All <span class="tab-count" id="count-all">88</span></button>
         <button class="tab active" data-cat="finance">Finance <span class="tab-count" id="count-finance">19</span></button>
-        <button class="tab soon" data-cat="accounting" title="Coming soon">Accounting <span class="tab-soon-badge">Soon</span></button>
+        <button class="tab" data-cat="accounting">Accounting <span class="tab-count" id="count-accounting">33</span></button>
         <button class="tab soon" data-cat="tech" title="Coming soon">Tech <span class="tab-soon-badge">Soon</span></button>
         <button class="tab" data-cat="marketing">Marketing <span class="tab-count" id="count-marketing">36</span></button>
         <button class="tab soon" data-cat="consulting" title="Coming soon">Consulting <span class="tab-soon-badge">Soon</span></button>
@@ -660,6 +660,51 @@ const JOBS = [
   { title: "Marketing Assistant",                                  company: "Xenith Consulting",      city: "Brisbane",  cat: "marketing", type: "graduate", source: "Seek",     url: "https://www.seek.com.au/job/91811561" },
   { title: "Marketing Trainee",                                    company: "Sandhills Global Inc.",  city: "Brisbane",  cat: "marketing", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=e321646650174e26" },
   { title: "Marketing Assistant",                                  company: "Universal Store",        city: "Brisbane",  cat: "marketing", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=5d1c72da5e511dbe" },
+
+  // ── Accounting · Sydney · Intern ──
+  { title: "2026/27 KPMG Vacationer (Intern) Program – Rolling Intake", company: "KPMG Australia",     city: "Sydney",    cat: "accounting", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4404398675/" },
+  { title: "Summer Analyst Program – Services 2026",               company: "Citi",                   city: "Sydney",    cat: "accounting", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4407008812/" },
+  { title: "2026 Graduate / Intern Programs – Expression of Interest", company: "Suncorp Group",      city: "Sydney",    cat: "accounting", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4373659438/" },
+  { title: "Accounting Internship",                                company: "Accurate Accounting & Taxation Services", city: "Sydney", cat: "accounting", type: "intern", source: "Seek", url: "https://au.seek.com/job/91329749" },
+  { title: "Accounting Internship – Chinese / Thai Speaker (Chatswood)", company: "Thaitax",          city: "Sydney",    cat: "accounting", type: "intern",   source: "Seek",     url: "https://au.seek.com/job/91759914" },
+  { title: "FX Trading Sales / Account Manager – Intern (Chinese / Thai / Lao)", company: "ACCM Prime", city: "Sydney",  cat: "accounting", type: "intern",   source: "Seek",     url: "https://au.seek.com/job/91622233" },
+
+  // ── Accounting · Sydney · Graduate ──
+  { title: "Enterprise Credit Summer Analyst 2026/27",             company: "Bank of America",        city: "Sydney",    cat: "accounting", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4372358005/" },
+  { title: "Graduate Assistant Accountant",                        company: "Core Talent",            city: "Sydney",    cat: "accounting", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4403901510/" },
+  { title: "Tax Undergraduate Analyst",                            company: "Alvarez & Marsal",       city: "Sydney",    cat: "accounting", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4407314346/" },
+  { title: "Undergraduate Accountant",                             company: "Careers at Council",     city: "Sydney",    cat: "accounting", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4406515466/" },
+  { title: "Junior Accountant",                                    company: "Cogent Resources",       city: "Sydney",    cat: "accounting", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/91772339" },
+  { title: "Assistant Accountant",                                 company: "AccorHotel",             city: "Sydney",    cat: "accounting", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=6d6f98186bf9fc54" },
+  { title: "Graduate Accountant (July 2026 Start)",                company: "ESV Business Advice",    city: "Sydney",    cat: "accounting", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=8b7b23cf5f524b40" },
+  { title: "Assistant Accountant",                                 company: "Veolia Environmental Services", city: "Sydney", cat: "accounting", type: "graduate", source: "Indeed", url: "https://au.indeed.com/viewjob?jk=2b7d1852671f91e0" },
+  { title: "Assistant Accountant",                                 company: "Renewable Energy Systems", city: "Sydney",  cat: "accounting", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=ec7d24a34d5c6050" },
+
+  // ── Accounting · Melbourne · Intern ──
+  { title: "Casual Tax Accountant / Internship Opportunity",       company: "R&K Taxation Experts",   city: "Melbourne", cat: "accounting", type: "intern",   source: "Seek",     url: "https://au.seek.com/job/91746341" },
+
+  // ── Accounting · Melbourne · Graduate ──
+  { title: "Graduate Accounting Program 2027",                     company: "BlueRock",               city: "Melbourne", cat: "accounting", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4394986607/" },
+  { title: "EOFY Tax Temporary Roles – Expressions of Interest",   company: "HUB24",                  city: "Melbourne", cat: "accounting", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4384949950/" },
+  { title: "Accounts Receivable Officer",                          company: "Melba Support Services", city: "Melbourne", cat: "accounting", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4406917397/" },
+  { title: "Assistant Accountant",                                 company: "Numberspro Prahran",     city: "Melbourne", cat: "accounting", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/91860272" },
+  { title: "Graduate Accountant",                                  company: "Abound Business Solutions", city: "Melbourne", cat: "accounting", type: "graduate", source: "Seek",  url: "https://au.seek.com/job/91606089" },
+  { title: "Assistant Accountant",                                 company: "Horner Recruitment",     city: "Melbourne", cat: "accounting", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=17f899bc998d4d12" },
+  { title: "Assistant Accountant",                                 company: "Authentic Sichuan Food", city: "Melbourne", cat: "accounting", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=d8cff08df56a5dc4" },
+
+  // ── Accounting · Brisbane · Intern ──
+  { title: "Accounting Intern (Paid)",                             company: "Career Panacea",         city: "Brisbane",  cat: "accounting", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4409536513/" },
+  { title: "2026/27 KPMG Vacationer (Intern) Program – Rolling Intake", company: "KPMG Australia",   city: "Brisbane",  cat: "accounting", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4404500590/" },
+
+  // ── Accounting · Brisbane · Graduate ──
+  { title: "Assistant Accountant – South Bank QLD",                company: "Flight Centre Travel Group", city: "Brisbane", cat: "accounting", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4408207036/" },
+  { title: "Global Payroll Services Associate",                    company: "Vialto",                 city: "Brisbane",  cat: "accounting", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4406269213/" },
+  { title: "Undergraduate Accountant",                             company: "PKF Australia",          city: "Brisbane",  cat: "accounting", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4407155624/" },
+  { title: "Assistant Accountant",                                 company: "R6 Digital",             city: "Brisbane",  cat: "accounting", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/91828364" },
+  { title: "Junior Auditor",                                       company: "Niche Talent",           city: "Brisbane",  cat: "accounting", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/91686487" },
+  { title: "Assistant Accountant",                                 company: "Abacus Human Capital",   city: "Brisbane",  cat: "accounting", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/91785767" },
+  { title: "Graduate Accountants",                                 company: "APC Chartered Accountants", city: "Brisbane", cat: "accounting", type: "graduate", source: "Indeed", url: "https://au.indeed.com/viewjob?jk=cea1be41ed11b668" },
+  { title: "2027 Graduate Accountant",                             company: "Moore Australia (QLD/NNSW)", city: "Brisbane", cat: "accounting", type: "graduate", source: "Indeed", url: "https://au.indeed.com/viewjob?jk=48fefad403d00101" },
 ];
 
 const CAT_LABELS = {
@@ -667,7 +712,7 @@ const CAT_LABELS = {
   marketing:"Marketing", consulting:"Consulting", data:"Data & Analytics"
 };
 const CAT_ORDER = ["finance","accounting","tech","marketing","consulting","data"];
-const SOON_CATS = ["accounting","tech","consulting","data"];
+const SOON_CATS = ["tech","consulting","data"];
 
 let activeCat = "finance";
 let activeCity = "all";
@@ -696,9 +741,11 @@ function updateTabCounts() {
   const sq = q.toLowerCase();
   const allCount = JOBS.filter(j => !sq || j.title.toLowerCase().includes(sq)).length;
   const finCount = JOBS.filter(j => j.cat === "finance" && (!sq || j.title.toLowerCase().includes(sq)) && (activeCity === "all" || j.city === activeCity)).length;
+  const accCount = JOBS.filter(j => j.cat === "accounting" && (!sq || j.title.toLowerCase().includes(sq)) && (activeCity === "all" || j.city === activeCity)).length;
   const mktCount = JOBS.filter(j => j.cat === "marketing" && (!sq || j.title.toLowerCase().includes(sq)) && (activeCity === "all" || j.city === activeCity)).length;
   document.getElementById("count-all").textContent = allCount;
   document.getElementById("count-finance").textContent = finCount;
+  document.getElementById("count-accounting").textContent = accCount;
   document.getElementById("count-marketing").textContent = mktCount;
 }
 
