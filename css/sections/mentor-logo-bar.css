@@ -1,0 +1,55 @@
+/* ── MENTOR PAGE HERO ── */
+.mentors-page .page-hero-text p {
+  max-width: 100%;
+}
+
+/* ── MENTOR LOGO CREDIBILITY BAR ── */
+
+@keyframes mentor-logo-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+
+.mentor-logos-label {
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  text-align: center;
+  margin: 0 0 1.5rem;
+}
+
+.mentor-logo-box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1.6rem 2.4rem;
+  border-radius: 20px;
+  padding: 2.2rem 2.5rem;
+  background: linear-gradient(rgba(10,8,4,1), rgba(10,8,4,1)) padding-box,
+              linear-gradient(135deg, #fdf5c4 0%, #c79b3b 40%, #f7d37d 70%, #c08a2d 100%) border-box;
+  border: 2px solid transparent;
+}
+
+.mentor-logo-item {
+  height: 44px;
+  width: auto;
+  max-width: 140px;
+  object-fit: contain;
+  animation: mentor-logo-float 3.6s ease-in-out infinite;
+  animation-delay: var(--float-delay, 0s);
+}
+
+/* Logos with white or light backgrounds — invert so they read on dark */
+.mentor-logo-item--invert {
+  filter: brightness(0) invert(1);
+}
+
+/* Oversized logos that need more room */
+.mentor-logo-item--lg {
+  height: 66px;
+  max-width: 170px;
+}
+
+

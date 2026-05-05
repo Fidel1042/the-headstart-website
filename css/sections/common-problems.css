@@ -1,0 +1,40 @@
+/* Common problems split panels */
+.problem-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+
+.problem-panel {
+  width: 100%;
+}
+
+.problem-copy {
+  background: linear-gradient(140deg, rgba(199,155,59,0.18), rgba(5,5,5,0.78));
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px;
+  width: 100%;
+  padding: 1.4rem 1.5rem;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: rgba(255,255,255,0.92);
+  box-shadow: 0 30px 70px rgba(0,0,0,0.55);
+  text-align: left;
+}
+
+.problem-copy--left {
+  padding-left: 2rem;
+  border-left: 3px solid rgba(199,155,59,0.7);
+}
+
+
+.problem-copy--right {
+  padding-left: 2rem;
+  border-left: 3px solid rgba(199,155,59,0.7);
+}
+
+.problem-copy p {
+  margin: 0;
+}
+

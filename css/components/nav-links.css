@@ -1,0 +1,37 @@
+/* Dividers between nav items */
+.nav-links a + a::before,
+.nav-links a + .nav-more::before {
+  content: "";
+  position: absolute;
+  left: -1.2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 12px;
+  background: rgba(255,255,255,0.15);
+  pointer-events: none;
+}
+
+.nav-links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), #f5d591);
+  border-radius: 999px;
+  transition: width 0.18s ease-out;
+}
+
+.nav-links a:hover {
+  background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.nav-links a:hover::after {
+  width: 100%;
+}
+

@@ -1,0 +1,197 @@
+/* ── More dropdown ── */
+.nav-more {
+  position: relative;
+}
+/* Invisible bridge fills the gap between trigger and menu so hover doesn't break */
+.nav-more::after {
+  content: '';
+  position: absolute;
+  bottom: -0.85rem;
+  left: -0.5rem;
+  right: -0.5rem;
+  height: 0.85rem;
+}
+.nav-more__trigger {
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  font-size: 0.92rem;
+  cursor: pointer;
+  padding: 0;
+  padding-bottom: 0.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  position: relative;
+  transition: color 0.2s ease;
+  white-space: nowrap;
+}
+.nav-more__trigger::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), #f5d591);
+  border-radius: 999px;
+  transition: width 0.18s ease-out;
+}
+.nav-more__arrow {
+  font-size: 0.6rem;
+  transition: transform 0.2s;
+  display: inline-block;
+}
+.nav-more:hover .nav-more__trigger,
+.nav-more.open .nav-more__trigger,
+.nav-more--active .nav-more__trigger {
+  background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.nav-more:hover .nav-more__trigger::after,
+.nav-more.open .nav-more__trigger::after,
+.nav-more--active .nav-more__trigger::after {
+  width: 100%;
+}
+.nav-more:hover .nav-more__arrow,
+.nav-more.open .nav-more__arrow {
+  transform: rotate(180deg);
+}
+.nav-more__menu {
+  position: absolute;
+  top: calc(100% + 0.85rem);
+  right: 0;
+  background: #111;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 0.4rem;
+  min-width: 140px;
+  display: none;
+  flex-direction: column;
+  z-index: 200;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.5);
+}
+.nav-more:hover .nav-more__menu,
+.nav-more.open .nav-more__menu {
+  display: flex;
+}
+.nav-more__menu a {
+  padding: 0.62rem 0.95rem;
+  border-radius: 8px;
+  font-size: 0.87rem;
+  color: rgba(255,255,255,0.8);
+  transition: background 0.15s, color 0.15s;
+  display: block;
+  white-space: nowrap;
+}
+.nav-more__menu a:hover,
+.nav-more__menu a.active {
+  background: rgba(255,255,255,0.07);
+  color: #fff;
+}
+.nav-more__menu a::after { display: none; }
+
+.nav-cta {
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(199,155,59,0.75);
+  font-size: 0.66rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  background: radial-gradient(circle at top left, rgba(199,155,59,0.28), transparent 55%);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.nav-cta:hover {
+  background: radial-gradient(circle at top left, rgba(199,155,59,0.4), transparent 60%);
+  transform: translateY(-1px);
+}
+
+.nav-cta--outline {
+  background: transparent;
+  border: 1px solid rgba(199,155,59,0.6);
+  color: var(--accent);
+}
+
+.nav-cta--outline:hover {
+  background: rgba(199,155,59,0.1);
+  border-color: var(--accent);
+}
+
+.nav-cta--gold {
+  background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
+  color: #2b1b09;
+  font-weight: 800;
+  border: none;
+  box-shadow: 0 10px 24px rgba(255,214,137,0.35);
+}
+
+.nav-cta--gold {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid transparent;
+}
+
+.nav-cta--gold::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  border: 1px solid rgba(199,155,59,0.9);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.nav-cta--gold:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(255,214,137,0.5);
+  color: #fff;
+}
+
+.nav-cta--gold:hover::after {
+  opacity: 1;
+}
+
+.btn-outline-gold {
+  position: relative;
+  border: 1.5px solid rgba(199,155,59,0.75);
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: #f8e8b8;
+  text-transform: uppercase;
+  overflow: hidden;
+}
+
+.btn-outline-gold::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(199,155,59,0.18), rgba(0,0,0,0.9));
+  z-index: -1;
+}
+
+.btn-outline-gold span {
+  background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.btn-outline-gold:hover {
+  border-color: rgba(255,214,137,0.9);
+  box-shadow: 0 0 25px rgba(199,155,59,0.35);
+}
+
+main {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 1rem 5.5rem;
+}
+

@@ -1,0 +1,172 @@
+/* ── Pricing page ──────────────────────────────────── */
+.svc-row__subtitle {
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.6);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.pricing-block {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 20px;
+  padding: 2rem 2rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+}
+
+.pricing-block__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.2rem;
+}
+
+.pricing-tiers {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.2rem;
+  width: 100%;
+}
+
+.pricing-tier {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 1.6rem;
+  border-radius: 16px;
+  position: relative;
+  border: 3px solid transparent;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease-out;
+}
+
+.pricing-tier:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+}
+
+.pricing-free-card {
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease-out;
+}
+
+.pricing-free-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+
+/* Gradient border technique: black inside, gradient frame */
+.pricing-tier--bronze {
+  background: linear-gradient(#0d0d0d, #0d0d0d) padding-box,
+              linear-gradient(160deg, #ffe066 0%, #daa520 40%, #7a5500 100%) border-box;
+}
+
+.pricing-tier--silver {
+  background: linear-gradient(#0d0d0d, #0d0d0d) padding-box,
+              linear-gradient(160deg, #ffe066 0%, #daa520 40%, #7a5500 100%) border-box;
+}
+
+.pricing-tier--gold {
+  background: linear-gradient(#0d0d0d, #0d0d0d) padding-box,
+              linear-gradient(160deg, #ffe066 0%, #daa520 40%, #7a5500 100%) border-box;
+}
+
+.pricing-tier--linkedin {
+  background: linear-gradient(#0d0d0d, #0d0d0d) padding-box,
+              linear-gradient(160deg, #ffe066 0%, #daa520 40%, #7a5500 100%) border-box;
+}
+
+.pricing-tier__name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  min-height: 2rem;
+}
+
+.pricing-tier__badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #fff0a0 0%, #f0c030 50%, #b87800 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  border: 1px solid rgba(218,165,32,0.4);
+  border-radius: 20px;
+  padding: 0.18rem 0.6rem;
+  white-space: nowrap;
+}
+
+.pricing-tier__name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* Gradient text on price number */
+.pricing-tier--bronze .pricing-tier__price-number {
+  background: linear-gradient(135deg, #fff0a0 0%, #f0c030 50%, #b87800 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.pricing-tier--silver .pricing-tier__price-number {
+  background: linear-gradient(135deg, #fff0a0 0%, #f0c030 50%, #b87800 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.pricing-tier--linkedin .pricing-tier__price-number {
+  background: linear-gradient(135deg, #fff0a0 0%, #f0c030 50%, #b87800 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.pricing-tier--gold .pricing-tier__price-number {
+  background: linear-gradient(135deg, #fff0a0 0%, #f0c030 50%, #b87800 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.pricing-tier__price {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1;
+  margin: 0.7rem 0 1rem;
+}
+
+.pricing-tier__price-number {
+  font-size: 2.2rem !important;
+  font-weight: 800 !important;
+  line-height: 1;
+  display: inline-block;
+}
+
+.pricing-tier__price span {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: #ffffff;
+  margin-left: 0.1rem;
+}
+
+.pricing-tier .svc-row__features {
+  border-left: none;
+  padding-left: 0;
+  gap: 0.6rem;
+}
+
+.pricing-tier .svc-row__features li,
+.pricing-free-card .svc-row__features li {
+  color: #ffffff !important;
+  font-size: 0.9rem;
+}
+
+.pricing-free-card .svc-row__features li::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'%3E%3Ccircle cx='10' cy='10' r='9' stroke='%23daa520' stroke-width='1.5'/%3E%3Cpath d='M6 10.5l2.8 2.8 5.2-5.6' stroke='%23daa520' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+

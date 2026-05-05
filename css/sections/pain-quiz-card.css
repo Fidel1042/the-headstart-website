@@ -1,0 +1,198 @@
+/* Pain points quiz */
+#pain-points-quiz {
+  position: relative;
+}
+
+.pain-quiz {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.pain-quiz__head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  text-align: left;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  color: #ffffff;
+}
+
+.pain-quiz__head h2 {
+  margin: 0;
+  font-size: 2.2rem;
+  color: #ffffff;
+}
+
+.pain-quiz__intro {
+  max-width: none;
+  width: 100%;
+  white-space: normal;
+}
+
+.section-label {
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+}
+
+.section-label--muted {
+  color: rgba(255,255,255,0.5);
+}
+
+.pain-quiz__intro {
+  max-width: none;
+  width: 100%;
+  white-space: normal;
+}
+
+.pain-quiz__module {
+  position: relative;
+  border-radius: 36px;
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 2.5rem;
+  background: linear-gradient(140deg, rgba(10,10,10,0.95), rgba(12,12,12,0.9));
+  box-shadow: 0 40px 90px rgba(0,0,0,0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.4rem;
+}
+
+.pain-quiz__card {
+  width: min(540px, 100%);
+  min-height: 160px;
+  background: #0f0f0f;
+  border: 1px solid rgba(199,155,59,0.35);
+  border-radius: 28px;
+  padding: 2.2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  box-shadow: 0 30px 70px rgba(0,0,0,0.65);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.pain-quiz__card:hover {
+  border-color: rgba(255,214,137,0.8);
+  box-shadow: 0 40px 90px rgba(199,155,59,0.25);
+  transform: translateY(-2px);
+}
+
+.pain-quiz__card p {
+  font-size: clamp(1.05rem, 1.5vw, 1.4rem);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.pain-quiz__actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+}
+
+.pain-quiz__btn {
+  min-width: 220px;
+  padding: 0.95rem 1.8rem;
+  border-radius: 999px;
+  font-size: 1rem;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  color: #fff;
+  border: 1px solid rgba(199,155,59,0.55);
+  background: rgba(10,10,10,0.95);
+  box-shadow: none;
+}
+
+.pain-quiz__btn--primary {
+  background: rgba(10,10,10,0.95);
+}
+
+.pain-quiz__progress {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  align-items: center;
+}
+
+.pain-quiz__progress-text {
+  font-size: 0.92rem;
+  color: rgba(255,255,255,0.7);
+}
+
+.pain-quiz__dots {
+  display: flex;
+  gap: 0.45rem;
+}
+
+.pain-quiz__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(199,155,59,0.25);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.pain-quiz__dot.is-active {
+  background: var(--accent);
+  transform: scale(1.1);
+}
+
+.pain-quiz__arrow {
+  position: absolute;
+  bottom: 1.3rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  background: rgba(255,255,255,0.04);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.pain-quiz__arrow:hover {
+  border-color: rgba(255,255,255,0.45);
+  background: rgba(255,255,255,0.15);
+  transform: translateY(-2px);
+}
+
+.pain-quiz__arrow--left {
+  left: 25%;
+}
+
+.pain-quiz__arrow--right {
+  right: 25%;
+}
+
+.pain-quiz__module--complete .pain-quiz__actions,
+.pain-quiz__module--complete .pain-quiz__progress,
+.pain-quiz__module--complete .pain-quiz__arrow {
+  display: none;
+}
+
+.pain-quiz__card--result {
+  border-style: dashed;
+}
+
+.pain-quiz__result {
+  font-size: 1.1rem;
+  max-width: 600px;
+  margin: 0;
+}
+
+.pain-quiz__card .gradient-link {
+  font-size: 1.02em;
+}
+

@@ -1,0 +1,113 @@
+/* Splash (home only) */
+
+#splash {
+  position: fixed;
+  inset: 0;
+  background: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.splash-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.3rem;
+  perspective: 1100px;
+}
+
+.splash-logo-wrap {
+  position: relative;
+}
+
+.splash-logo {
+  width: 220px;
+  height: 220px;
+  animation: logoSpin3D 2s ease-out forwards;
+}
+
+/* Golden finishing line in front of the logo */
+.finish-line {
+  position: absolute;
+  left: 50%;
+  top: 118px;
+  width: 300px;
+  height: 3px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.08), rgba(255,255,255,0.4));
+  overflow: hidden;
+  transform-origin: left center;
+  transform: translateX(-50%) skewX(-10deg);
+}
+
+.finish-line::before {
+  content: none;
+}
+
+.finish-line::after {
+  content: "";
+  position: absolute;
+  left: -40%;
+  top: -2px;
+  width: 40%;
+  height: 7px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), #f5d591);
+  box-shadow: 0 0 18px rgba(199,155,59,0.8);
+  animation: rushFinish 1.8s ease-out forwards;
+}
+
+.splash-tagline {
+  font-size: 0.9rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.8);
+  opacity: 1;
+  transform: none;
+  animation: none;
+}
+
+@keyframes logoSpin3D {
+  0% {
+    transform: rotateY(-45deg) translateY(4px) scale(0.6);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  70% {
+    transform: rotateY(18deg) translateY(0) scale(1.05);
+  }
+  100% {
+    transform: rotateY(0deg) translateY(0) scale(1);
+  }
+}
+
+@keyframes rushFinish {
+  0% { left: -40%; opacity: 0; }
+  20% { opacity: 1; }
+  90% { left: 70%; opacity: 1; }
+  100% { left: 85%; opacity: 0; }
+}
+
+@keyframes taglineIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0px); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; visibility: hidden; }
+}
+
+#main {
+  opacity: 0;
+  transition: opacity 0.6s ease-out;
+}
+
+#main.ready {
+  opacity: 1;
+}
+

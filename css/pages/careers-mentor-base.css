@@ -1,0 +1,225 @@
+/* Careers mentor page */
+.careers-mentor-page main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 4rem;
+}
+
+.careers-mentor-page .section .section-inner,
+.careers-mentor-page .section-alt .section-inner {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.career-hero {
+  padding: 2.5rem 0 0;
+}
+
+.career-hero-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.career-hero-inner h1,
+.career-hero-inner p {
+  text-align: left;
+  margin: 0;
+}
+
+.career-hero-copy {
+  max-width: 640px;
+  line-height: 1.6;
+  color: #ffffff;
+}
+
+.career-hero-criteria {
+  max-width: 640px;
+  margin: 0;
+  padding-left: 1.25rem;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.mentor-role-hero .section-inner.narrow {
+  max-width: 760px;
+}
+
+.mentor-role-hero .career-hero-copy {
+  max-width: 100%;
+  line-height: 1.8;
+}
+
+.mentor-role-hero .career-hero-who-for {
+  font-size: 1.5em;
+  line-height: 1.35;
+}
+
+.mentor-role-hero .career-hero-criteria {
+  max-width: 100%;
+}
+
+.mentor-role-hero .career-hero-inner {
+  gap: 1.05rem;
+}
+
+.career-role-title-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.career-role-title-row .mentors-headline {
+  margin-bottom: 0;
+}
+
+.mentor-role-headline {
+  display: inline-block;
+  background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.role-compact-section {
+  padding-top: 1.1rem;
+}
+
+.role-compact-section .section-title-row {
+  margin-bottom: 0.9rem;
+}
+
+.role-compact-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.9rem;
+}
+
+.role-compact-card {
+  border-radius: 16px;
+  border: 1px solid rgba(199,155,59,0.45);
+  background: rgba(0,0,0,0.55);
+  padding: 0.95rem 1rem;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+  --role-content-size: 0.9rem;
+}
+
+.role-compact-card h3 {
+  font-size: calc(var(--role-content-size) + 1rem);
+  margin-bottom: 0.45rem;
+  font-weight: 700;
+  line-height: 1.2;
+  background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.role-compact-card p {
+  color: rgba(255,255,255,0.88);
+  line-height: 1.45;
+  font-size: var(--role-content-size);
+}
+
+.role-compact-card ul {
+  margin: 0;
+  padding-left: 1.15rem;
+  color: rgba(255,255,255,0.88);
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: var(--role-content-size);
+  line-height: 1.4;
+}
+
+.career-back-link {
+  color: rgba(255,255,255,0.7);
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+}
+
+.career-back-link:hover {
+  color: #ffffff;
+}
+
+.careers-mentor-page #mentor-criteria .section-inner,
+.careers-mentor-page #hiring-process .section-inner,
+.careers-mentor-page #mentor-application .section-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1.2rem;
+}
+
+.careers-mentor-page .criteria-list,
+.careers-mentor-page .timeline-wrapper,
+.careers-mentor-page .timeline {
+  width: 100%;
+}
+
+.careers-mentor-page .criteria-list li,
+.careers-mentor-page .timeline-step {
+  width: 100%;
+  z-index: 1;
+}
+
+.careers-mentor-page .section-title-row {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.careers-mentor-page .section-title-row .section-subtitle {
+  margin-top: 0;
+  max-width: 640px;
+}
+
+.careers-mentor-page #hiring-process .section-title-row h2 {
+  font-size: 2.8rem;
+}
+
+.careers-mentor-page .btn.btn-gold {
+  align-self: flex-start;
+}
+
+.criteria-list {
+  list-style: disc;
+  margin: 0 0 1.5rem;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.criteria-list li {
+  padding: 0;
+  border: none;
+  background: transparent;
+  transition: none;
+}
+
+.criteria-list li:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.btn.btn-gold {
+  background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
+  color: #2b1b09;
+  font-weight: 800;
+  border: none;
+  border-radius: 999px;
+  box-shadow: 0 10px 24px rgba(255,214,137,0.35);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  padding: 0.7rem 1.8rem;
+}

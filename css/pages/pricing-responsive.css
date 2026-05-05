@@ -1,0 +1,20 @@
+@media (max-width: 900px) {
+  .pricing-tiers {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .pricing-tier {
+    width: 100%;
+  }
+
+  .pricing-block {
+    padding: 1.4rem;
+  }
+
+  .pricing-block__header {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+}

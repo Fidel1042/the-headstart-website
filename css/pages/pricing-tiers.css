@@ -1,0 +1,117 @@
+/* Section headings */
+.pricing-section-heading {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 1.5rem 0 0.3rem;
+}
+
+.pricing-section-heading:first-of-type {
+  margin-top: 0;
+}
+
+/* Free consultation card */
+.pricing-free-card {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  background: linear-gradient(#0d0d0d, #0d0d0d) padding-box,
+              linear-gradient(160deg, #ffe066 0%, #daa520 40%, #7a5500 100%) border-box;
+  border: 3px solid transparent;
+  border-radius: 16px;
+  padding: 1.8rem 2rem;
+}
+
+.pricing-free-card__left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 220px;
+}
+
+.pricing-free-card__title {
+  font-size: 1.15rem;
+}
+
+.pricing-tier__badge--free {
+  color: #daa520;
+  background: rgba(218,165,32,0.12);
+  border-color: rgba(218,165,32,0.35);
+}
+
+.pricing-free-card__price {
+  margin: 0.5rem 0 0;
+}
+
+.pricing-tier__price-number--free {
+  background: linear-gradient(135deg, #fff0a0 0%, #f0c030 50%, #b87800 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  font-size: 2.2rem;
+  font-weight: 800;
+}
+
+/* Service price tag on services page */
+.svc-price {
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: linear-gradient(90deg, var(--accent), #f5d591);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-left: 0.5rem;
+  white-space: nowrap;
+}
+
+.pricing-free-card__features {
+  flex: 1;
+  border-left: 1px solid rgba(255,255,255,0.07);
+  padding-left: 2rem;
+  border-right: 1px solid rgba(255,255,255,0.07);
+  padding-right: 2rem;
+}
+
+.pricing-free-card__cta {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .pricing-free-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.2rem;
+    padding: 1.4rem;
+  }
+
+  .pricing-free-card__features {
+    border-left: none;
+    border-right: none;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    padding: 1rem 0 0;
+  }
+
+  .pricing-free-card__cta {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* Per-tier tick circle colours */
+.pricing-tier--bronze .svc-row__features li::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'%3E%3Ccircle cx='10' cy='10' r='9' stroke='%23daa520' stroke-width='1.5'/%3E%3Cpath d='M6 10.5l2.8 2.8 5.2-5.6' stroke='%23daa520' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.pricing-tier--silver .svc-row__features li::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'%3E%3Ccircle cx='10' cy='10' r='9' stroke='%23daa520' stroke-width='1.5'/%3E%3Cpath d='M6 10.5l2.8 2.8 5.2-5.6' stroke='%23daa520' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.pricing-tier--linkedin .svc-row__features li::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'%3E%3Ccircle cx='10' cy='10' r='9' stroke='%23daa520' stroke-width='1.5'/%3E%3Cpath d='M6 10.5l2.8 2.8 5.2-5.6' stroke='%23daa520' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.pricing-tier--gold .svc-row__features li::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'%3E%3Ccircle cx='10' cy='10' r='9' stroke='%23daa520' stroke-width='1.5'/%3E%3Cpath d='M6 10.5l2.8 2.8 5.2-5.6' stroke='%23daa520' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+

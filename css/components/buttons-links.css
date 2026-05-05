@@ -1,0 +1,64 @@
+/* Buttons & links */
+
+button,
+.btn,
+.nav-cta {
+  font-weight: 700;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 1.1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.22);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, rgba(199,155,59,0.18), rgba(0,0,0,0.9));
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, border-color 0.2s ease-out, background 0.2s ease-out;
+}
+
+.btn.secondary {
+  border-style: dashed;
+  border-color: rgba(255,255,255,0.25);
+  background: transparent;
+}
+
+.btn:hover {
+  border-color: rgba(199,155,59,0.85);
+  box-shadow: 0 0 24px rgba(199,155,59,0.45);
+  transform: translateY(-2px) scale(1.02);
+}
+
+.btn:focus-visible {
+  outline: 2px solid rgba(199,155,59,0.9);
+  outline-offset: 3px;
+}
+
+.back-to-top {
+  position: fixed;
+  right: 1.2rem;
+  bottom: 1.2rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(199,155,59,0.7);
+  background: rgba(0,0,0,0.9);
+  color: #fff;
+  font-size: 1.1rem;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+}
+
+.back-to-top.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+

@@ -1,0 +1,121 @@
+/* Live count row */
+.pain-quiz__live {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.38);
+}
+.pain-quiz__live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #c9a84c;
+  flex-shrink: 0;
+  animation: quizLivePulse 1.4s ease-in-out infinite;
+}
+@keyframes quizLivePulse { 0%,100%{opacity:1} 50%{opacity:0.22} }
+
+/* Question number inside card — must beat .pain-quiz__card p specificity */
+.pain-quiz__card .pain-quiz__q-num {
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.28);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 0;
+  line-height: 1;
+}
+
+/* Result bars */
+.pain-quiz__bars {
+  width: min(540px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+.pain-quiz__bar-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.pain-quiz__bar-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.45);
+}
+.pain-quiz__bar-label strong {
+  color: #fff;
+  font-weight: 700;
+}
+.pain-quiz__bar-track {
+  height: 10px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.pain-quiz__bar-fill {
+  height: 100%;
+  width: 0;
+  border-radius: 99px;
+  transition: width 0.85s cubic-bezier(0.25,1,0.5,1);
+}
+.pain-quiz__bar-fill--yes {
+  background: linear-gradient(90deg, #c9a84c, #f7d37d);
+}
+.pain-quiz__bar-fill--no {
+  background: rgba(255,255,255,0.16);
+}
+
+/* Peer insight line */
+.pain-quiz__peer-line {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.38);
+  line-height: 1.6;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  padding-top: 0.8rem;
+  margin: 0;
+  text-align: left;
+}
+.pain-quiz__peer-line strong { color: #c9a84c; }
+
+/* Next button */
+.pain-quiz__next-btn {
+  padding: 0.7rem 1rem;
+  border-radius: 12px;
+  border: none;
+  background: rgba(255,255,255,0.07);
+  color: rgba(255,255,255,0.55);
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  text-align: center;
+}
+.pain-quiz__next-btn:hover {
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+}
+
+/* Progress pips */
+.pain-quiz__pips {
+  display: flex;
+  gap: 6px;
+}
+.pain-quiz__pip {
+  height: 4px;
+  width: 44px;
+  border-radius: 99px;
+  background: rgba(255,255,255,0.1);
+  position: relative;
+  overflow: visible;
+}
+.pain-quiz__pip-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 0;
+  background: #c9a84c;
+  border-radius: 99px;
+}
+

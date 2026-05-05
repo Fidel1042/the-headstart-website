@@ -1,0 +1,84 @@
+
+/* On the home page, story blocks have their own animation system */
+
+/* Sections: reusable padding and container widths */
+.section {
+  padding: 1.3rem 0;
+}
+
+.section-alt {
+  padding: 1.3rem 0;
+  background: rgba(255,255,255,0.02);
+}
+
+.services-hero {
+  padding-top: 0.9rem;
+  padding-bottom: 1.2rem;
+}
+
+.services-hero .page-hero {
+  grid-template-columns: minmax(0, 1fr);
+  padding: 0;
+  margin-bottom: 0.7rem;
+}
+
+.services-hero .page-hero p {
+  max-width: 100%;
+  color: #ffffff;
+  margin-bottom: 0;
+}
+
+.services-core {
+  padding-top: 0.9rem;
+}
+
+/* Give anchored sections breathing room when jumped to via hash */
+#our-story {
+  scroll-margin-top: 140px;
+}
+
+#reviews {
+  scroll-margin-top: 140px;
+}
+
+#pain-points-quiz {
+  scroll-margin-top: 140px;
+}
+
+/* Trim top space on first section of each page */
+.section:first-of-type,
+.section-alt:first-of-type {
+  padding-top: 0.1rem;
+}
+
+.section .section-inner,
+.section-alt .section-inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.section-inner.narrow {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+@media (max-width: 900px) {
+  .section,
+  .section-alt {
+    padding: 4rem 0;
+  }
+  .section .section-inner,
+  .section-alt .section-inner {
+    padding: 0 1.2rem;
+  }
+  .services-hero {
+    padding-top: 1.7rem;
+    padding-bottom: 1.5rem;
+  }
+  .services-core {
+    padding-top: 1.4rem;
+  }
+}
+

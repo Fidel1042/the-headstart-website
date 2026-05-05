@@ -1,0 +1,147 @@
+/* Our story (About) */
+.about-real {
+  padding: 3rem 0 3.5rem;
+  background: linear-gradient(135deg, rgba(255,255,255,0.015), rgba(255,255,255,0.04));
+  --story-flow-progress: 0;
+}
+
+.about-real .section-inner {
+  max-width: 1080px;
+}
+
+.about-real__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-bottom: 2.8rem;
+  max-width: 720px;
+}
+
+.about-real__eyebrow {
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 1.05rem;
+  font-weight: 650;
+  color: #f7d879;
+}
+
+.about-real__header h2 {
+  font-size: 2.6rem;
+  line-height: 1.15;
+}
+
+.about-real__lede {
+  max-width: 720px;
+  color: rgba(255,255,255,0.78);
+  font-size: 1.06rem;
+  line-height: 1.65;
+}
+
+.about-real__divider {
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.28), rgba(255,255,255,0));
+  margin: 1.5rem 0 1rem;
+  opacity: 0.7;
+  transform-origin: left center;
+  transition: transform 0.28s ease-out, opacity 0.28s ease-out;
+}
+
+.about-real__stack {
+  display: grid;
+  gap: 6.5rem;
+}
+
+.about-real__block {
+  max-width: 860px;
+  margin: 0 auto;
+  display: grid;
+  gap: 1.1rem;
+}
+
+
+.about-real__subhead {
+  text-transform: none;
+  letter-spacing: 0.02em;
+  font-size: 2.24rem;
+  font-weight: 750;
+  color: #ffffff;
+}
+
+.about-real__text {
+  max-width: 720px;
+  display: grid;
+  gap: 1.4rem;
+  line-height: 1.75;
+  font-size: 1.04rem;
+}
+
+.about-real__list {
+  list-style: none;
+  display: grid;
+  gap: 0.75rem;
+  padding-left: 0;
+}
+
+.about-real__list li {
+  position: relative;
+  padding-left: 1.5rem;
+  line-height: 1.75;
+}
+
+.about-real__list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.6em;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 10px rgba(199,155,59,0.5);
+  transform: translateY(-50%);
+}
+
+.about-real__block--list {
+  padding: 1.8rem 1.6rem;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  background: rgba(255,255,255,0.02);
+}
+
+.about-real__block--split {
+  max-width: 1080px;
+}
+
+/* Home page "Why Students" blocks — no box, gold left-border accent */
+.home-page .about-real__block--text {
+  padding: 1.6rem 1.8rem 1.6rem 2rem;
+  border-radius: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+  max-width: calc(1080px + 3.6rem);
+  border-left: 3px solid rgba(247, 216, 121, 0.5);
+}
+
+.home-page .about-real__block--text:hover {
+  transform: none;
+  border-color: rgba(247, 216, 121, 0.5);
+  box-shadow: none;
+}
+
+/* Non-home pages keep the original box style */
+.about-real__block--text {
+  padding: 1.6rem 1.8rem;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.02);
+  max-width: calc(1080px + 3.6rem);
+}
+
+.about-real__block--text:hover {
+  transform: translateY(-5px);
+  border-color: rgba(255,255,255,0.16);
+  box-shadow: 0 20px 44px rgba(0,0,0,0.4), 0 0 0 1px rgba(247,216,121,0.12);
+}
+

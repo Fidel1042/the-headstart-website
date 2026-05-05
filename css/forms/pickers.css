@@ -1,0 +1,210 @@
+.search-select-dropdown {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 0.35rem);
+  background: rgba(0,0,0,0.92);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 18px;
+  padding: 0.3rem;
+  box-shadow: 0 18px 36px rgba(0,0,0,0.6);
+  display: none;
+  flex-direction: column;
+  gap: 0.2rem;
+  max-height: 240px;
+  overflow-y: auto;
+  z-index: 200;
+}
+
+.search-select-dropdown.show {
+  display: flex;
+}
+
+.search-select-option {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid transparent;
+  border-radius: 14px;
+  padding: 0.6rem 0.8rem;
+  color: #fff;
+  font-size: 0.95rem;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.search-select-option:hover,
+.search-select-option:focus {
+  border-color: rgba(199,155,59,0.6);
+  background: rgba(199,155,59,0.1);
+}
+
+.checkbox-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.corporate-services {
+  margin-top: 1.2rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 14px;
+  background: rgba(0,0,0,0.28);
+  display: none;
+}
+
+.corporate-services.is-visible {
+  display: block;
+}
+
+.corporate-services > label {
+  display: block;
+  margin-bottom: 1.3rem;
+}
+
+.corporate-services textarea,
+.service-description textarea {
+  margin-top: 0.5rem;
+}
+
+.form-message {
+  position: fixed;
+  left: 50%;
+  bottom: 1.8rem;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.92);
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 0.85rem 1.4rem;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 0.92rem;
+  letter-spacing: 0.04em;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  z-index: 120;
+}
+
+.form-message.is-visible {
+  opacity: 1;
+}
+
+.checkbox-grid label {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.76rem;
+  font-weight: 400;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 1.3rem;
+  cursor: pointer;
+  background: none !important;
+  -webkit-background-clip: initial !important;
+}
+
+.multi-step .checkbox-grid label {
+  align-items: center;
+  font-size: 0.76rem;
+  font-weight: 400 !important;
+  gap: 1.3rem;
+  color: #fff !important;
+  background: none !important;
+}
+
+.checkbox-grid label span {
+  color: #fff;
+}
+
+.checkbox-grid label.inline-other {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.45rem;
+}
+.inline-other-trigger {
+  display: flex;
+  align-items: center;
+  gap: 1.3rem;
+}
+
+.checkbox-grid input[type="text"] {
+  margin-top: 0;
+  font-size: 0.88rem;
+  width: 100%;
+  cursor: text;
+}
+
+.multi-step .checkbox-grid input[type="text"] {
+  flex: none;
+  width: 100%;
+}
+
+.checkbox-grid input[type="checkbox"] {
+  width: 11px;
+  height: 11px;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  border: 1px solid rgba(255,255,255,0.85) !important;
+  border-radius: 2px !important;
+  background: #020202 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.checkbox-grid input[type="checkbox"]::after {
+  content: "";
+  position: absolute;
+  width: 4.4px;
+  height: 7.7px;
+  border: solid #fff;
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg) scale(0);
+  transform-origin: center;
+  transition: transform 0.15s ease;
+}
+
+.checkbox-grid input[type="checkbox"]:checked::after {
+  transform: rotate(45deg) scale(1);
+}
+
+.form-step .checkbox-grid input[type="checkbox"] {
+  width: 11px !important;
+  height: 11px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 2px !important;
+}
+
+.btn.btn-dark-solid {
+  background: #050505;
+  border: 1px solid rgba(255,255,255,0.4);
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  border-radius: 999px;
+  padding: 0.9rem 1.8rem;
+  font-weight: 700;
+  transition: border-color 0.2s, color 0.2s, transform 0.2s;
+}
+
+.btn.btn-dark-solid:hover {
+  border-color: #c9a86a;
+  color: #f5d37d;
+  transform: translateY(-1px);
+}
+
+.thanks-confirmation {
+  min-height: calc(100vh - 280px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1rem;
+}

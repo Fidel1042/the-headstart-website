@@ -1,0 +1,98 @@
+/* Archetype result card */
+.pain-quiz__archetype-type {
+  display: block;
+  font-size: clamp(1.1rem, 1.6vw, 1.45rem);
+  font-weight: 800;
+  color: #c9a84c;
+  margin-bottom: 0.5rem;
+}
+.pain-quiz__archetype-desc {
+  display: block;
+  font-size: clamp(0.9rem, 1.2vw, 1rem);
+  color: rgba(255,255,255,0.7);
+  line-height: 1.65;
+  margin-bottom: 0.9rem;
+}
+.pain-quiz__archetype-cta {
+  display: block;
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.45);
+}
+
+.review-column {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  gap: 1rem;
+  text-align: left;
+}
+
+.review-column__card {
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: linear-gradient(135deg, rgba(199,155,59,0.14), rgba(8,8,8,0.92));
+  padding: 0.9rem 1.3rem;
+  box-shadow: 0 22px 50px rgba(0,0,0,0.55);
+  position: relative;
+  min-height: 312px;
+  min-width: 0;
+  --review-avatar-size: 58px;
+  --review-right-edge: calc(1.3rem + var(--review-avatar-size) + 0.6rem);
+}
+
+.review-column__scroller {
+  --review-columns: 2;
+  --review-gap: 1.2rem;
+  --review-gutter: 3rem;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: calc((100% - (var(--review-gap) * (var(--review-columns) - 1))) / var(--review-columns));
+  gap: var(--review-gap);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 0.2rem var(--review-gutter) 0.8rem;
+  scroll-padding-inline: var(--review-gutter);
+  scrollbar-gutter: stable;
+}
+
+.review-column__card {
+  scroll-snap-align: start;
+}
+
+.review-column__scroller-wrap {
+  position: relative;
+}
+
+.review-column__arrow {
+  position: absolute;
+  top: 50%;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  background: rgba(255,255,255,0.06);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  z-index: 2;
+}
+
+.review-column__arrow:hover {
+  border-color: rgba(255,255,255,0.45);
+  background: rgba(255,255,255,0.16);
+  transform: translateY(-50%) scale(1.03);
+}
+
+.review-column__arrow--left {
+  left: 0.2rem;
+}
+
+.review-column__arrow--right {
+  right: 0.2rem;
+}
+

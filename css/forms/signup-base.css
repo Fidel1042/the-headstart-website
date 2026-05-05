@@ -1,0 +1,192 @@
+/* ── END MENTOR OVERHAUL ── */
+
+.application-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.application-prompt pre {
+  background: rgba(0,0,0,0.45);
+  border-radius: 14px;
+  padding: 1rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  overflow-x: auto;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.signup-form {
+  background: rgba(0,0,0,0.35);
+  border-radius: 22px;
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 2rem;
+  box-shadow: 0 30px 70px rgba(0,0,0,0.55);
+}
+
+.signup-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.2rem 1.6rem;
+}
+
+.multi-step .signup-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-step .form-group .study-level-heading {
+  background: none;
+  -webkit-background-clip: initial;
+  background-clip: initial;
+  color: #f5e7b2;
+  display: inline-block;
+  margin-bottom: 0.4rem;
+}
+
+.study-level-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.study-level-option {
+  display: grid !important;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 18px;
+  border: 1px solid rgba(245,231,178,0.35);
+  background: rgba(0,0,0,0.5);
+  color: #ffffff !important;
+  -webkit-background-clip: initial;
+  background-clip: initial;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left !important;
+  position: relative;
+}
+
+.study-level-option input[type="radio"] {
+  accent-color: #ffffff;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.study-level-option-label {
+  color: #ffffff !important;
+  text-transform: none !important;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  font-size: 0.98rem;
+  line-height: 1.15;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  position: static !important;
+  transform: translateY(-2px) !important;
+  text-align: left !important;
+  min-height: 1.2rem;
+}
+
+@media (max-width: 600px) {
+  .study-level-option {
+    grid-template-columns: auto minmax(0, 1fr);
+    padding: 0.8rem 0.85rem;
+  }
+  .phone-input-group {
+    flex-direction: column;
+  }
+  .phone-input-group input[type="tel"] {
+    flex: 1;
+    max-width: 100%;
+  }
+}
+
+.phone-input-group {
+  display: flex;
+  gap: 0.65rem;
+  align-items: stretch;
+}
+
+.phone-country-field {
+  flex: 0 0 120px;
+}
+
+.phone-country-field .search-select-field {
+  width: 100%;
+}
+
+.phone-country-field input {
+  padding-right: 2.1rem;
+}
+
+.phone-country-field .search-select-dropdown {
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.phone-input-group input[type="tel"] {
+  flex: 0 0 50%;
+  max-width: 50%;
+}
+
+.inline-radio-group {
+  display: flex;
+  gap: 3.2rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.inline-radio-group label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 600;
+  color: #fff;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  padding: 0.2rem 0.35rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.inline-radio-group label span {
+  color: #fff !important;
+  display: inline-block;
+  margin-left: 0;
+  position: static;
+}
+
+.inline-radio-group input[type="radio"] {
+  accent-color: #fff;
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+}
+
+.inline-radio-group label:has(input[type="radio"]:checked) {
+  border-color: rgba(247,211,125,0.82);
+  background: rgba(247,211,125,0.18);
+}
+
+.conditional-field {
+  display: none;
+}
+
+.conditional-field.is-visible {
+  display: block;
+}
+
+.form-group.conditional-field {
+  display: none;
+}

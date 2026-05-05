@@ -1,0 +1,30 @@
+@media (max-width: 720px) {
+  .blog-hero h1 {
+    font-size: clamp(1.85rem, 8vw, 2.45rem);
+  }
+
+  .blog-list-item h2 {
+    font-size: 1.15rem;
+  }
+
+  .blog-post-hero h1 {
+    font-size: clamp(1.75rem, 8vw, 2.3rem);
+  }
+
+  .blog-post-body {
+    max-width: 100%;
+    padding: 0;
+    font-size: 17px;
+  }
+}
+
+@media (max-width: 480px) {
+  .blog-post-body {
+    font-size: 15px;
+  }
+
+  .blog-post-body h2 {
+    font-size: 1.2rem;
+  }
+}
+
