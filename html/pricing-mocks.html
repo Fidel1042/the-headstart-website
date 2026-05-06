@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pricing Mocks - Premium Coffee Chat / Breakthrough / Lock In</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <style>
+    :root {
+      --bg: #000;
+      --card-bg: #0d0d0d;
+      --text: #fff;
+      --muted: rgba(255,255,255,0.65);
+      --line: rgba(255,255,255,0.07);
+      --gold-text: linear-gradient(135deg, #fff0a0 0%, #f0c030 50%, #b87800 100%);
+      --gold-border: linear-gradient(160deg, #ffe066 0%, #daa520 40%, #7a5500 100%);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      padding: 3rem 1.5rem 5rem;
+      line-height: 1.5;
+    }
+
+    .wrap { max-width: 1200px; margin: 0 auto; }
+
+    .page-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.45);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      text-align: center;
+      margin-bottom: 0.4rem;
+    }
+
+    .page-sub {
+      text-align: center;
+      color: rgba(255,255,255,0.4);
+      font-size: 0.85rem;
+      margin-bottom: 4rem;
+    }
+
+    .mock-section { margin-bottom: 5rem; }
+
+    .mock-label {
+      display: inline-block;
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 0.3rem 0.7rem;
+      border-radius: 999px;
+      margin-bottom: 0.8rem;
+    }
+
+    .mock-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      background: var(--gold-text);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 0.4rem;
+    }
+
+    .mock-desc {
+      color: var(--muted);
+      font-size: 0.95rem;
+      max-width: 720px;
+      margin-bottom: 2rem;
+    }
+
+    /* ── Shared tier grid ── */
+    .tiers {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.2rem;
+    }
+
+    @media (max-width: 900px) {
+      .tiers { grid-template-columns: 1fr; max-width: 460px; margin: 0 auto; }
+    }
+
+    .tier {
+      background: linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+                  var(--gold-border) border-box;
+      border: 1px solid transparent;
+      border-radius: 16px;
+      padding: 1.6rem 1.4rem 1.8rem;
+      position: relative;
+    }
+
+    .tier__name-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.4rem;
+      min-height: 2rem;
+    }
+
+    .tier__name {
+      font-size: 1.15rem;
+      font-weight: 700;
+      background: var(--gold-text);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .tier__badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      background: var(--gold-text);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      border: 1px solid rgba(218,165,32,0.4);
+      border-radius: 999px;
+      padding: 0.18rem 0.55rem;
+    }
+
+    .tier__tagline {
+      font-style: italic;
+      color: rgba(255,255,255,0.6);
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-bottom: 0.9rem;
+      min-height: 2.7rem;
+    }
+
+    .tier__price {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1;
+      margin-bottom: 0.2rem;
+    }
+
+    .tier__price-unit {
+      font-size: 0.85rem;
+      font-weight: 400;
+      color: rgba(255,255,255,0.55);
+      margin-left: 0.2rem;
+    }
+
+    .tier__features {
+      list-style: none;
+      margin-top: 1.1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .tier__features li {
+      position: relative;
+      padding-left: 1.6rem;
+      font-size: 0.92rem;
+      color: rgba(255,255,255,0.85);
+      line-height: 1.5;
+      min-height: 2.8em;
+    }
+
+    .tier__features li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.15rem;
+      width: 20px;
+      height: 20px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23fff0a0'/%3E%3Cstop offset='50%25' stop-color='%23f0c030'/%3E%3Cstop offset='100%25' stop-color='%23b87800'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='10' cy='10' r='8.5' stroke='url(%23g)' stroke-width='1.4'/%3E%3Cpath d='M5.8 10.4l2.8 2.8 5.6-5.8' stroke='url(%23g)' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-size: contain;
+      background-repeat: no-repeat;
+    }
+
+    /* ────────────────────────────────────
+       MOCK B - Premium Ladder
+       ──────────────────────────────────── */
+    .mock-b .tier { transition: transform 0.25s ease, box-shadow 0.25s ease; }
+
+    .mock-b .tier--1 {
+      border-width: 1px;
+      box-shadow: 0 8px 22px rgba(0,0,0,0.4);
+    }
+
+    .mock-b .tier--2 {
+      border-width: 1.5px;
+      box-shadow: 0 14px 32px rgba(0,0,0,0.5);
+      padding: 1.7rem 1.5rem 1.9rem;
+    }
+
+    .mock-b .tier--2 .tier__badge {
+      box-shadow: 0 0 14px rgba(218,165,32,0.35) inset;
+    }
+
+    .mock-b .tier--3 {
+      border-width: 2px;
+      box-shadow: 0 22px 50px rgba(0,0,0,0.7), 0 0 30px rgba(199,155,59,0.08);
+      padding: 1.9rem 1.6rem 2.1rem;
+      overflow: hidden;
+    }
+
+    .mock-b .tier--3::before {
+      content: "";
+      position: absolute;
+      top: -40%;
+      left: -10%;
+      width: 70%;
+      height: 80%;
+      background: radial-gradient(closest-side, rgba(218,165,32,0.18), rgba(0,0,0,0));
+      pointer-events: none;
+    }
+
+    .mock-b .tier:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 22px 44px rgba(0,0,0,0.6), 0 0 32px rgba(199,155,59,0.12);
+    }
+
+    .mock-b .tier:hover .tier__name {
+      animation: shimmer 1s ease-out;
+    }
+
+    @keyframes shimmer {
+      0%   { background-position: -150% 0; }
+      100% { background-position: 250% 0; }
+    }
+
+    .mock-b .tier__name {
+      background: linear-gradient(90deg, #b87800 0%, #fff0a0 50%, #b87800 100%);
+      background-size: 200% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    /* ────────────────────────────────────
+       MOCK D - Merged (ascend + glyphs, no taglines)
+       ──────────────────────────────────── */
+    .mock-d .tier { transition: transform 0.25s ease, box-shadow 0.25s ease; }
+
+    .mock-d .tier--1 {
+      border-width: 1px;
+      box-shadow: 0 8px 22px rgba(0,0,0,0.4);
+    }
+
+    .mock-d .tier--2 {
+      border-width: 1.5px;
+      box-shadow: 0 14px 32px rgba(0,0,0,0.5);
+      padding: 1.7rem 1.5rem 1.9rem;
+    }
+
+    .mock-d .tier--2 .tier__badge {
+      box-shadow: 0 0 14px rgba(218,165,32,0.35) inset;
+    }
+
+    .mock-d .tier--3 {
+      border-width: 2px;
+      box-shadow: 0 22px 50px rgba(0,0,0,0.7), 0 0 30px rgba(199,155,59,0.08);
+      padding: 1.9rem 1.6rem 2.1rem;
+      overflow: hidden;
+    }
+
+    .mock-d .tier--3::before {
+      content: "";
+      position: absolute;
+      top: -40%;
+      left: -10%;
+      width: 70%;
+      height: 80%;
+      background: radial-gradient(closest-side, rgba(218,165,32,0.18), rgba(0,0,0,0));
+      pointer-events: none;
+    }
+
+    .mock-d .tier:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 22px 44px rgba(0,0,0,0.6), 0 0 32px rgba(199,155,59,0.12);
+    }
+
+    .mock-d .tier:hover .tier__glyph { animation: pulse 1s ease-in-out; }
+
+    .tier__price-sub {
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.55);
+      margin-top: 0.35rem;
+      margin-bottom: 0.4rem;
+    }
+
+    /* ────────────────────────────────────
+       MOCK C - Personality Forward
+       ──────────────────────────────────── */
+    .mock-c .tier { transition: transform 0.25s ease; }
+    .mock-c .tier:hover { transform: translateY(-4px); }
+    .mock-c .tier:hover .tier__glyph { animation: pulse 1s ease-in-out; }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50%      { transform: scale(1.18); }
+    }
+
+    .tier__glyph {
+      width: 22px;
+      height: 22px;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tier__glyph svg {
+      width: 100%;
+      height: 100%;
+      stroke: url(#goldStroke);
+      fill: none;
+      stroke-width: 1.6;
+    }
+
+    /* fallback gold stroke for browsers that don't support SVG ref gradients */
+    .tier__glyph svg path,
+    .tier__glyph svg circle,
+    .tier__glyph svg rect,
+    .tier__glyph svg line {
+      stroke: #f0c030;
+    }
+  </style>
+</head>
+<body>
+  <!-- shared SVG defs for any gradient strokes -->
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <linearGradient id="goldStroke" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%"   stop-color="#fff0a0"/>
+        <stop offset="50%"  stop-color="#f0c030"/>
+        <stop offset="100%" stop-color="#b87800"/>
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <div class="wrap">
+    <p class="page-title">Pricing Mocks</p>
+    <p class="page-sub">Premium Coffee Chat / Breakthrough / Lock In</p>
+
+    <!-- ───────── MOCK A ───────── -->
+    <section class="mock-section mock-a">
+      <span class="mock-label">Mock A</span>
+      <h2 class="mock-title">Editorial Restraint</h2>
+      <p class="mock-desc">Gold tier names + italic buyer-voice tagline + clean white prices. No icons, no escalation. Trusts the copy to do the work.</p>
+
+      <div class="tiers">
+        <div class="tier tier--1">
+          <div class="tier__name-row">
+            <div class="tier__name">Premium Coffee Chat</div>
+          </div>
+          <p class="tier__tagline">"I just need one good conversation."</p>
+          <div class="tier__price">$110<span class="tier__price-unit">/session</span></div>
+          <ul class="tier__features">
+            <li>Pay as you need</li>
+            <li>No upfront commitment</li>
+            <li>Best for trying out mentoring</li>
+          </ul>
+        </div>
+
+        <div class="tier tier--2">
+          <div class="tier__name-row">
+            <div class="tier__name">Breakthrough</div>
+            <div class="tier__badge">Most popular</div>
+          </div>
+          <p class="tier__tagline">"I'm close. I just can't close."</p>
+          <div class="tier__price">$90<span class="tier__price-unit">/session</span></div>
+          <ul class="tier__features">
+            <li>Lower per-session rate</li>
+            <li>Best for active job hunters</li>
+            <li>Perfect before a big interview</li>
+          </ul>
+        </div>
+
+        <div class="tier tier--3">
+          <div class="tier__name-row">
+            <div class="tier__name">Lock In</div>
+          </div>
+          <p class="tier__tagline">"I'm all in. Walk me to the offer."</p>
+          <div class="tier__price">$2,000<span class="tier__price-unit">/6 months</span></div>
+          <ul class="tier__features">
+            <li>Unlimited sessions with your mentor</li>
+            <li>Ongoing support throughout</li>
+            <li>Final stage interview guaranteed</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── MOCK B ───────── -->
+    <section class="mock-section mock-b">
+      <span class="mock-label">Mock B</span>
+      <h2 class="mock-title">Premium Ladder</h2>
+      <p class="mock-desc">Gold names + white prices + visible weight escalation across tiers + hover shimmer. The cards visually ascend toward Lock In.</p>
+
+      <div class="tiers">
+        <div class="tier tier--1">
+          <div class="tier__name-row">
+            <div class="tier__name">Premium Coffee Chat</div>
+          </div>
+          <div class="tier__price">$110<span class="tier__price-unit">/session</span></div>
+          <ul class="tier__features">
+            <li>Pay as you need</li>
+            <li>No upfront commitment</li>
+            <li>Best for trying out mentoring</li>
+          </ul>
+        </div>
+
+        <div class="tier tier--2">
+          <div class="tier__name-row">
+            <div class="tier__name">Breakthrough</div>
+            <div class="tier__badge">Most popular</div>
+          </div>
+          <div class="tier__price">$90<span class="tier__price-unit">/session</span></div>
+          <p class="tier__price-sub">5 sessions ($450 total)</p>
+          <ul class="tier__features">
+            <li>Lower per-session rate</li>
+            <li>Best for active job hunters</li>
+            <li>Perfect before a big interview</li>
+          </ul>
+        </div>
+
+        <div class="tier tier--3">
+          <div class="tier__name-row">
+            <div class="tier__name">Lock In</div>
+          </div>
+          <div class="tier__price">$2,000<span class="tier__price-unit">/6 months</span></div>
+          <ul class="tier__features">
+            <li>Unlimited sessions with your mentor</li>
+            <li>Ongoing support throughout</li>
+            <li>Final stage interview guaranteed</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── MOCK C ───────── -->
+    <section class="mock-section mock-c">
+      <span class="mock-label">Mock C</span>
+      <h2 class="mock-title">Personality Forward</h2>
+      <p class="mock-desc">Gold names + glyph + italic tagline + white price. Each tier feels like its own product. Equal visual weight on all three so no tier looks like the "lesser" choice.</p>
+
+      <div class="tiers">
+        <div class="tier tier--1">
+          <div class="tier__name-row">
+            <span class="tier__glyph">
+              <svg viewBox="0 0 24 24"><path d="M4 8h12v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V8z"/><path d="M16 10h2a2 2 0 0 1 2 2v0a2 2 0 0 1-2 2h-2"/><path d="M7 4c0 1 1 1 1 2s-1 1-1 2"/><path d="M11 4c0 1 1 1 1 2s-1 1-1 2"/></svg>
+            </span>
+            <div class="tier__name">Premium Coffee Chat</div>
+          </div>
+          <p class="tier__tagline">"I just need one good conversation."</p>
+          <div class="tier__price">$110<span class="tier__price-unit">/session</span></div>
+          <ul class="tier__features">
+            <li>Pay as you need</li>
+            <li>No upfront commitment</li>
+            <li>Best for trying out mentoring</li>
+          </ul>
+        </div>
+
+        <div class="tier tier--2">
+          <div class="tier__name-row">
+            <span class="tier__glyph">
+              <svg viewBox="0 0 24 24"><path d="M13 2L3 14h7l-1 8 11-12h-7l1-8z" stroke-linejoin="round"/></svg>
+            </span>
+            <div class="tier__name">Breakthrough</div>
+            <div class="tier__badge">Most popular</div>
+          </div>
+          <p class="tier__tagline">"I'm close. I just can't close."</p>
+          <div class="tier__price">$90<span class="tier__price-unit">/session</span></div>
+          <ul class="tier__features">
+            <li>Lower per-session rate</li>
+            <li>Best for active job hunters</li>
+            <li>Perfect before a big interview</li>
+          </ul>
+        </div>
+
+        <div class="tier tier--3">
+          <div class="tier__name-row">
+            <span class="tier__glyph">
+              <svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+            </span>
+            <div class="tier__name">Lock In</div>
+          </div>
+          <p class="tier__tagline">"I'm all in. Walk me to the offer."</p>
+          <div class="tier__price">$2,000<span class="tier__price-unit">/6 months</span></div>
+          <ul class="tier__features">
+            <li>Unlimited sessions with your mentor</li>
+            <li>Ongoing support throughout</li>
+            <li>Final stage interview guaranteed</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── MOCK D - MERGED ───────── -->
+    <section class="mock-section mock-d">
+      <span class="mock-label">Mock D / Merged</span>
+      <h2 class="mock-title">Final Direction</h2>
+      <p class="mock-desc">Visual ascend from Mock B + tier glyphs from Mock C. Taglines kept on Tier 1 and Tier 3, simpler wording on Tier 2 for international students. Tier 2 pricing shows both per-session rate and total commitment.</p>
+
+      <div class="tiers">
+        <div class="tier tier--1">
+          <div class="tier__name-row">
+            <span class="tier__glyph">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg>
+            </span>
+            <div class="tier__name">Quick Win</div>
+          </div>
+          <p class="tier__tagline">"I just want advice that's actually applicable to my own situation."</p>
+          <div class="tier__price">$110<span class="tier__price-unit">/session</span></div>
+          <p class="tier__price-sub">Single session, no commitment</p>
+          <ul class="tier__features">
+            <li>1-on-1 with a mentor in your target industry</li>
+            <li>Pay per session, no upfront commitment</li>
+          </ul>
+        </div>
+
+        <div class="tier tier--2">
+          <div class="tier__name-row">
+            <span class="tier__glyph">
+              <svg viewBox="0 0 24 24"><path d="M13 2L3 14h7l-1 8 11-12h-7l1-8z" stroke-linejoin="round"/></svg>
+            </span>
+            <div class="tier__name">Breakthrough</div>
+            <div class="tier__badge">Most popular</div>
+          </div>
+          <p class="tier__tagline">"I get interviews. I don't get offers."</p>
+          <div class="tier__price">$90<span class="tier__price-unit">/session</span></div>
+          <p class="tier__price-sub">5 sessions ($450 total)</p>
+          <ul class="tier__features">
+            <li>Lower per-session rate ($90 vs $110)</li>
+            <li>Best for active job hunters and interview prep</li>
+          </ul>
+        </div>
+
+        <div class="tier tier--3">
+          <div class="tier__name-row">
+            <span class="tier__glyph">
+              <svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+            </span>
+            <div class="tier__name">Lock In</div>
+          </div>
+          <p class="tier__tagline">"I'm all in. Walk me to the offer."</p>
+          <div class="tier__price">$2,000<span class="tier__price-unit">/4 months</span></div>
+          <p class="tier__price-sub">Unlimited sessions across 4 months</p>
+          <ul class="tier__features">
+            <li>Unlimited mentoring sessions with all mentors</li>
+            <li>Final-round interview guaranteed</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

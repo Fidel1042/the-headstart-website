@@ -605,39 +605,60 @@
               <!-- BACK: 3 pricing tiers -->
               <div class="svc-flip-back">
                 <button class="svc-flip-back__close" onclick="flipClose(this)">&larr; Back</button>
-                <div class="pricing-tiers" style="width:100%">
+                <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+                  <defs>
+                    <linearGradient id="goldStroke" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%"   stop-color="#fff0a0"/>
+                      <stop offset="50%"  stop-color="#f0c030"/>
+                      <stop offset="100%" stop-color="#b87800"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <div class="pricing-tiers pricing-tiers--ladder" style="width:100%">
                   <div class="pricing-tier pricing-tier--bronze">
                     <div class="pricing-tier__name-row">
-                      <div class="pricing-tier__name">1 Session</div>
+                      <span class="pricing-tier__glyph">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg>
+                      </span>
+                      <div class="pricing-tier__name">Quick Win</div>
                     </div>
+                    <p class="pricing-tier__tagline">"I just want advice that's actually applicable to my own situation."</p>
                     <div class="pricing-tier__price"><span class="pricing-tier__price-number">$110</span><span>/session</span></div>
+                    <p class="pricing-tier__price-sub">Single session, no commitment</p>
                     <ul class="svc-row__features">
-                      <li>Pay as you need</li>
-                      <li>No upfront commitment</li>
-                      <li>Best for trying out mentoring</li>
+                      <li>1-on-1 with a mentor in your target industry</li>
+                      <li>Pay per session, no upfront commitment</li>
                     </ul>
                   </div>
                   <div class="pricing-tier pricing-tier--silver">
                     <div class="pricing-tier__name-row">
-                      <div class="pricing-tier__name">5 Sessions</div>
+                      <span class="pricing-tier__glyph">
+                        <svg viewBox="0 0 24 24"><path d="M13 2L3 14h7l-1 8 11-12h-7l1-8z" stroke-linejoin="round"/></svg>
+                      </span>
+                      <div class="pricing-tier__name">Breakthrough</div>
                       <div class="pricing-tier__badge">Most popular</div>
                     </div>
+                    <p class="pricing-tier__tagline">"I get interviews. I don't get offers."</p>
                     <div class="pricing-tier__price"><span class="pricing-tier__price-number">$90</span><span>/session</span></div>
+                    <p class="pricing-tier__price-sub">5 sessions ($450 total)</p>
                     <ul class="svc-row__features">
-                      <li>Lower per-session rate</li>
-                      <li>Best for active job hunters</li>
-                      <li>Perfect before a big interview</li>
+                      <li>Lower per-session rate ($90 vs $110)</li>
+                      <li>Best for active job hunters and interview prep</li>
                     </ul>
                   </div>
                   <div class="pricing-tier pricing-tier--gold">
                     <div class="pricing-tier__name-row">
-                      <div class="pricing-tier__name">Unlimited</div>
+                      <span class="pricing-tier__glyph">
+                        <svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+                      </span>
+                      <div class="pricing-tier__name">Lock In</div>
                     </div>
-                    <div class="pricing-tier__price"><span class="pricing-tier__price-number">$2,000</span><span>/6 months</span></div>
+                    <p class="pricing-tier__tagline">"I'm all in. Walk me to the offer."</p>
+                    <div class="pricing-tier__price"><span class="pricing-tier__price-number">$2,000</span><span>/4 months</span></div>
+                    <p class="pricing-tier__price-sub">Unlimited sessions across 4 months</p>
                     <ul class="svc-row__features">
-                      <li>Unlimited sessions with your mentor</li>
-                      <li>Ongoing support throughout</li>
-                      <li>Final stage interview guaranteed</li>
+                      <li>Unlimited mentoring sessions with all mentors</li>
+                      <li>Final-round interview guaranteed</li>
                     </ul>
                   </div>
                 </div>
@@ -709,69 +730,6 @@
                       <li>Detailed annotated feedback</li>
                       <li>Actionable changes to make</li>
                       <li>Cold messaging template included</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          <!-- 03 · Mock Assessment Centre -->
-          <div class="svc-flip reveal" style="--reveal-delay:0s">
-            <div class="svc-flip-inner">
-
-              <!-- FRONT -->
-              <div class="svc-flip-front">
-                <div class="svc-row">
-                  <div class="svc-row__badge">
-                    <div class="svc-row__num">03</div>
-                    <div class="svc-row__icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="3" width="18" height="18" rx="3"/>
-                        <path d="M9 12l2 2 4-4"/>
-                        <path d="M3 9h18"/>
-                      </svg>
-                    </div>
-                  </div>
-                  <div class="svc-row__left">
-                    <h2 class="svc-row__name">Mock Assessment Center</h2>
-                    <button class="img-zoom-wrap" onclick="openLightbox(this)" aria-label="Expand image">
-                      <img class="svc-row__img" src="../images/services/assessment-centre.jpg" alt="Mock assessment centre" loading="lazy" />
-                      <span class="img-zoom-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></span>
-                    </button>
-                  </div>
-                  <div>
-                    <ul class="svc-row__features">
-                      <li>Business Case Study prepared by the Headstart</li>
-                      <li>20 min group analysis</li>
-                      <li>10 min presentation to the judges</li>
-                      <li>10 min Q&amp;A</li>
-                      <li>Detailed individual feedback on your performance</li>
-                    </ul>
-                    <div class="svc-flip-actions">
-                      <button class="svc-flip-trigger" onclick="flipOpen(this)">
-                        <span class="svc-flip-trigger__text">See pricing</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
-                      </button>
-                      <button type="button" class="svc-why-free-btn" onclick="openWhyModal()">Why pay when there are similar mentoring for free?</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- BACK: 1 pricing tier -->
-              <div class="svc-flip-back">
-                <button class="svc-flip-back__close" onclick="flipClose(this)">&larr; Back</button>
-                <div class="pricing-tiers" style="width:100%; max-width:360px; grid-template-columns:1fr">
-                  <div class="pricing-tier pricing-tier--gold">
-                    <div class="pricing-tier__name-row"><div class="pricing-tier__name">Mock Assessment Centre</div></div>
-                    <div class="pricing-tier__price"><span class="pricing-tier__price-number">$499</span><span>/group of 3-6</span></div>
-                    <ul class="svc-row__features">
-                      <li>Business case study prepared by Headstart</li>
-                      <li>Group Assessment Centre simulation</li>
-                      <li>Group Presentation and Q&amp;A</li>
-                      <li>Individual written feedback</li>
                     </ul>
                   </div>
                 </div>
