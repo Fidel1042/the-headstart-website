@@ -511,7 +511,7 @@
         <button class="tab" data-cat="accounting">Accounting</button>
         <button class="tab" data-cat="tech">Tech</button>
         <button class="tab" data-cat="marketing">Marketing</button>
-        <button class="tab soon" data-cat="consulting" title="Coming soon">Consulting <span class="tab-soon-badge">Soon</span></button>
+        <button class="tab" data-cat="consulting">Consulting</button>
         <button class="tab soon" data-cat="data" title="Coming soon">Data &amp; Analytics <span class="tab-soon-badge">Soon</span></button>
       </div>
     </div>
@@ -770,6 +770,33 @@ const JOBS = [
   { title: "Graduate Developer",                                   company: "Blackbook.AI",           city: "Brisbane",  cat: "tech", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/91829219" },
   { title: "Junior IT Support Technician",                         company: "Cromwell Property Group", city: "Brisbane", cat: "tech", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=6c6f0db57e200af2" },
   { title: "Junior Full Stack Developer",                          company: "Give A Grad A Go",       city: "Brisbane",  cat: "tech", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=6f3d454c9e64502f" },
+
+  // ── Consulting · Sydney ──
+  { title: "BCG First Nations Internship and Scholarship 2026",    company: "BCG",                          city: "Sydney",    cat: "consulting", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4407347943/" },
+  { title: "2027 Internship Program EOI",                          company: "Urbis",                        city: "Sydney",    cat: "consulting", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4408388605/" },
+  { title: "2026/2027 Summer Internship – Sydney and Brisbane",    company: "Macquarie Group",              city: "Sydney",    cat: "consulting", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4408973333/" },
+  { title: "Business Intelligence Consultant",                     company: "Ampstek",                      city: "Sydney",    cat: "consulting", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4408944893/" },
+  { title: "Strategy Consultant",                                  company: "Altman Solon",                 city: "Sydney",    cat: "consulting", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=16ae32d3d0862c14" },
+  { title: "Management Consultant",                                company: "Cinc Performance Consulting",  city: "Sydney",    cat: "consulting", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=2944c719cf415fbd" },
+
+  // ── Consulting · Melbourne ──
+  { title: "EOI – Junior Consultants (Software Testing)",          company: "KJR",                          city: "Melbourne", cat: "consulting", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4406771736/" },
+  { title: "Consultant – Strategic Insights & Research",           company: "Resources Group",              city: "Melbourne", cat: "consulting", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4409756919/" },
+  { title: "Employment Consultant",                                company: "APM Employment Services",      city: "Melbourne", cat: "consulting", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4400169407/" },
+  { title: "Consultant, People Solutions",                         company: "Deakin University",            city: "Melbourne", cat: "consulting", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4407656427/" },
+  { title: "Project Coordinator Intern",                           company: "Schweitzer Engineering Laboratories", city: "Melbourne", cat: "consulting", type: "intern",   source: "Seek",     url: "https://au.seek.com/job/91910446" },
+  { title: "Junior SMSF Consultant",                               company: "ESUPERFUND",                   city: "Melbourne", cat: "consulting", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/91890321" },
+  { title: "Business Consultant (Medicinal Cannabis/Peptides)",    company: "HCPA",                         city: "Melbourne", cat: "consulting", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/91927968" },
+  { title: "Technology & Entertainment Sales Consultant",          company: "Harvey Norman",                city: "Melbourne", cat: "consulting", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=fc39d98e719b72e3" },
+  { title: "Customer Service Consultant – Banking",                company: "HAYS",                         city: "Melbourne", cat: "consulting", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=b24721a72f6eb1df" },
+
+  // ── Consulting · Brisbane ──
+  { title: "Consultant – Climate & Nature Advisor",                company: "SLR Consulting",               city: "Brisbane",  cat: "consulting", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4408986139/" },
+  { title: "Employment Consultant – IEA",                          company: "Sureway Employment and Training", city: "Brisbane", cat: "consulting", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4406914362/" },
+  { title: "Employment Consultant",                                company: "APM Employment Services",      city: "Brisbane",  cat: "consulting", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4399726213/" },
+  { title: "Banking Consultant, Contact Centre – Suncorp Bank",    company: "ANZ Banking Group",            city: "Brisbane",  cat: "consulting", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/91941356" },
+  { title: "Junior Consultant",                                    company: "Intuit Technologies",          city: "Brisbane",  cat: "consulting", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/91994111" },
+  { title: "Consultant",                                           company: "BUSY Ability",                 city: "Brisbane",  cat: "consulting", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=5f04dbae42b70b1c" },
 ];
 
 const CAT_LABELS = {
@@ -777,7 +804,7 @@ const CAT_LABELS = {
   marketing:"Marketing", consulting:"Consulting", data:"Data & Analytics"
 };
 const CAT_ORDER = ["finance","accounting","tech","marketing","consulting","data"];
-const SOON_CATS = ["consulting","data"];
+const SOON_CATS = ["data"];
 
 let activeCat = "finance";
 let activeCity = "all";
