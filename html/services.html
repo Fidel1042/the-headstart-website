@@ -407,13 +407,18 @@
       pointer-events: auto;
     }
 
-    /* On mobile, stack pricing tiers vertically so they fit */
+    /* On mobile, swap front/back in normal flow so the page can scroll naturally */
     @media (max-width: 700px) {
       .svc-flip-back {
+        position: relative;
+        inset: auto;
         padding: 3.5rem 1.25rem 1.5rem;
         align-items: flex-start;
-        overflow-y: auto;
+        overflow-y: visible;
+        display: none;
       }
+      .svc-flip-inner.is-flipped .svc-flip-front { display: none; }
+      .svc-flip-inner.is-flipped .svc-flip-back { display: flex; }
       .svc-flip-back .pricing-tiers {
         grid-template-columns: 1fr !important;
       }
@@ -787,13 +792,15 @@
   <script type="module" src="../js/main.js"></script>
   <script>
     function setHeights() {
+      var isMobile = window.innerWidth <= 700;
       document.querySelectorAll('.svc-flip-inner').forEach(function(inner) {
-        var front = inner.querySelector('.svc-flip-front');
-        var back  = inner.querySelector('.svc-flip-back');
-
         // Reset so we measure fresh
         inner.style.height = '';
+        // On mobile the front/back swap in normal flow, so don't pin a height
+        if (isMobile) return;
 
+        var front = inner.querySelector('.svc-flip-front');
+        var back  = inner.querySelector('.svc-flip-back');
         var frontH = front.offsetHeight;
 
         // Pull back into flow temporarily to measure its natural height
@@ -825,16 +832,26 @@
       var inner = btn.closest('.svc-flip-inner');
       var front = inner.querySelector('.svc-flip-front');
       var back  = inner.querySelector('.svc-flip-back');
+      var isMobile = window.innerWidth <= 700;
 
       // Clear any existing timer for this card
       clearTimeout(flipTimers.get(inner));
 
+      inner.classList.add('is-flipped');
       back.classList.add('is-open');
-      gsap.to(front, { opacity: 0, y: -8, duration: 0.25, ease: 'power2.in' });
-      gsap.fromTo(back,
-        { opacity: 0, y: 12 },
-        { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out', delay: 0.2 }
-      );
+
+      if (isMobile) {
+        gsap.fromTo(back,
+          { opacity: 0, y: 8 },
+          { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' }
+        );
+      } else {
+        gsap.to(front, { opacity: 0, y: -8, duration: 0.25, ease: 'power2.in' });
+        gsap.fromTo(back,
+          { opacity: 0, y: 12 },
+          { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out', delay: 0.2 }
+        );
+      }
 
       // Auto-flip back after 20 seconds
       var closeBtn = back.querySelector('[onclick*="flipClose"]');
@@ -849,17 +866,34 @@
       var inner = btn.closest('.svc-flip-inner');
       var front = inner.querySelector('.svc-flip-front');
       var back  = inner.querySelector('.svc-flip-back');
+      var isMobile = window.innerWidth <= 700;
 
       // Cancel the auto-reset timer if the user closes manually
       clearTimeout(flipTimers.get(inner));
 
-      gsap.to(back, { opacity: 0, y: 8, duration: 0.25, ease: 'power2.in',
-        onComplete: function() { back.classList.remove('is-open'); }
-      });
-      gsap.fromTo(front,
-        { opacity: 0, y: -8 },
-        { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out', delay: 0.2 }
-      );
+      if (isMobile) {
+        gsap.to(back, { opacity: 0, y: 4, duration: 0.2, ease: 'power2.in',
+          onComplete: function() {
+            back.classList.remove('is-open');
+            inner.classList.remove('is-flipped');
+            gsap.fromTo(front,
+              { opacity: 0, y: -4 },
+              { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' }
+            );
+          }
+        });
+      } else {
+        gsap.to(back, { opacity: 0, y: 8, duration: 0.25, ease: 'power2.in',
+          onComplete: function() {
+            back.classList.remove('is-open');
+            inner.classList.remove('is-flipped');
+          }
+        });
+        gsap.fromTo(front,
+          { opacity: 0, y: -8 },
+          { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out', delay: 0.2 }
+        );
+      }
     }
 
     // ── Lightbox ──
