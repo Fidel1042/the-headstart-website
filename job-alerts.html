@@ -512,7 +512,7 @@
         <button class="tab" data-cat="tech">Tech</button>
         <button class="tab" data-cat="marketing">Marketing</button>
         <button class="tab" data-cat="consulting">Consulting</button>
-        <button class="tab soon" data-cat="data" title="Coming soon">Data &amp; Analytics <span class="tab-soon-badge">Soon</span></button>
+        <button class="tab" data-cat="data">Data &amp; Analytics</button>
       </div>
     </div>
 
@@ -798,6 +798,44 @@ const JOBS = [
   { title: "Banking Consultant, Contact Centre – Suncorp Bank",    company: "ANZ Banking Group",            city: "Brisbane",  cat: "consulting", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/91941356" },
   { title: "Junior Consultant",                                    company: "Intuit Technologies",          city: "Brisbane",  cat: "consulting", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/91994111" },
   { title: "Consultant",                                           company: "BUSY Ability",                 city: "Brisbane",  cat: "consulting", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=5f04dbae42b70b1c" },
+
+  // ── Data & Analytics · Sydney · Intern ──
+  { title: "Workplace Risk Intern",                                company: "WTW",                          city: "Sydney",    cat: "data", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4408730498/" },
+  { title: "Diploma Student / Intern",                             company: "SAP",                          city: "Sydney",    cat: "data", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4408811271/" },
+  { title: "Machine Learning Engineer Intern – Data Trust & Safety 2026", company: "TikTok",                city: "Sydney",    cat: "data", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4262549092/" },
+  { title: "Summer Analyst Program – Commercial Banking 2026",     company: "Citi",                         city: "Sydney",    cat: "data", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4407018625/" },
+  { title: "Global Payments Solutions Summer Analyst 2026/27",     company: "Bank of America",              city: "Sydney",    cat: "data", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4372341921/" },
+
+  // ── Data & Analytics · Sydney · Graduate ──
+  { title: "Graduate Brand Analyst – Amazon Vendor Services",      company: "Amazon",                       city: "Sydney",    cat: "data", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4371277682/" },
+  { title: "Graduate Client Services Analyst",                     company: "SS&C Technologies",            city: "Sydney",    cat: "data", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4408226890/" },
+  { title: "Junior Analyst",                                       company: "Pure Fishing",                 city: "Sydney",    cat: "data", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/91990736" },
+  { title: "Group Insurance Analyst (Graduates Welcome)",          company: "Australian Group Insurances",  city: "Sydney",    cat: "data", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/92015004" },
+  { title: "Junior Analyst",                                       company: "Sharp & Carter",               city: "Sydney",    cat: "data", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/92018783" },
+  { title: "Graduate Data Science and Analytics",                  company: "GFG Alliance",                 city: "Sydney",    cat: "data", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/91849918" },
+  { title: "Actuarial Analyst – Modelling & Insights",             company: "QBE",                          city: "Sydney",    cat: "data", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/91995767" },
+  { title: "Analyst – Economics & Data Analytics",                 company: "WSP",                          city: "Sydney",    cat: "data", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=ac5bdface9472387" },
+  { title: "Machine Learning, AI and Data Analyst",                company: "Room-Res.com",                 city: "Sydney",    cat: "data", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=278be29457068d77" },
+  { title: "Data and Statistical Analyst",                         company: "NSW Health",                   city: "Sydney",    cat: "data", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=6792b73454de1ba7" },
+  { title: "Data Analyst",                                         company: "Blue Light Card",              city: "Sydney",    cat: "data", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=c2f0448e8b6d9895" },
+
+  // ── Data & Analytics · Melbourne · Graduate ──
+  { title: "Insights Analyst",                                     company: "Meltwater",                    city: "Melbourne", cat: "data", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4407935759/" },
+  { title: "Media Search Analyst",                                 company: "TELUS Digital AI Data Solutions", city: "Melbourne", cat: "data", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4409797289/" },
+  { title: "Business Analyst",                                     company: "Sorbent Paper Company",        city: "Melbourne", cat: "data", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4407649249/" },
+  { title: "Strategy Analyst",                                     company: "RMIT University",              city: "Melbourne", cat: "data", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4406781869/" },
+  { title: "Graduate Reporting Analyst",                           company: "La Trobe Financial",           city: "Melbourne", cat: "data", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/91968447" },
+  { title: "Disputes & Investigations Analyst (Valuations)",       company: "Alvarez & Marsal",             city: "Melbourne", cat: "data", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4379176179/" },
+
+  // ── Data & Analytics · Brisbane · Graduate ──
+  { title: "Data Analyst",                                         company: "Davidson",                     city: "Brisbane",  cat: "data", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4411866435/" },
+  { title: "Student Fees and Progression Analyst",                 company: "QUT",                          city: "Brisbane",  cat: "data", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4407660145/" },
+  { title: "State Funding Analyst",                                company: "Goodstart Early Learning",     city: "Brisbane",  cat: "data", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4413285010/" },
+  { title: "Strategy & Business Analyst – High Growth Company",    company: "Morgan Young",                 city: "Brisbane",  cat: "data", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4413402603/" },
+  { title: "Junior Business Analyst",                              company: "Followmont Transport",         city: "Brisbane",  cat: "data", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/91805858" },
+  { title: "Data Analyst",                                         company: "Department of Housing and Public Works", city: "Brisbane", cat: "data", type: "graduate", source: "Seek", url: "https://au.seek.com/job/91924327" },
+  { title: "Data Analyst (Funding)",                               company: "Queensland Government",        city: "Brisbane",  cat: "data", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=9425b070895b1386" },
+  { title: "Business Data Analyst",                                company: "HAYS",                         city: "Brisbane",  cat: "data", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=e21af523cbfb999e" },
 ];
 
 const CAT_LABELS = {
@@ -805,7 +843,7 @@ const CAT_LABELS = {
   marketing:"Marketing", consulting:"Consulting", data:"Data & Analytics"
 };
 const CAT_ORDER = ["finance","accounting","tech","marketing","consulting","data"];
-const SOON_CATS = ["data"];
+const SOON_CATS = [];
 
 let activeCat = "finance";
 let activeCity = "all";

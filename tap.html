@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Fidel Hon | Headstart Mentoring</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="description" content="Career mentor for international students in Australia." />
+  <meta name="robots" content="noindex, follow" />
+  <link rel="icon" href="images/website-logo.png" />
+  <link rel="apple-touch-icon" href="images/website-logo.png" />
+
+  <meta property="og:title" content="Fidel Hon | Headstart Mentoring" />
+  <meta property="og:description" content="Career mentor for international students in Australia." />
+  <meta property="og:image" content="images/Mentors/fidel-tap.jpg" />
+  <meta property="og:type" content="profile" />
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #000000;
+      --text: #ffffff;
+      --muted: rgba(255, 255, 255, 0.55);
+      --gold-1: #f3d27a;
+      --gold-2: #d9a94a;
+      --gold-3: #a87923;
+      --gold-grad: linear-gradient(135deg, var(--gold-1) 0%, var(--gold-2) 50%, var(--gold-3) 100%);
+      --card: rgba(255, 255, 255, 0.04);
+      --card-hover: rgba(255, 255, 255, 0.08);
+      --border: rgba(255, 255, 255, 0.1);
+      --border-gold: rgba(217, 169, 74, 0.55);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      height: 100%;
+      overflow-x: hidden;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100dvh;
+      position: relative;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .bg-glow {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(243, 210, 122, 0.18), transparent 55%),
+        radial-gradient(circle at 80% 100%, rgba(168, 121, 35, 0.12), transparent 50%);
+      opacity: 0;
+    }
+
+    .grain {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0;
+      mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    }
+
+    .particles {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+      overflow: hidden;
+    }
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--gold-grad);
+      opacity: 0;
+      box-shadow: 0 0 10px rgba(243, 210, 122, 0.7);
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 10;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 32px 24px 24px;
+      max-width: 440px;
+      margin: 0 auto;
+      perspective: 1200px;
+    }
+
+    .photo-wrap {
+      position: relative;
+      width: 140px;
+      height: 140px;
+      margin-bottom: 18px;
+      transform-style: preserve-3d;
+    }
+    .photo-ring {
+      position: absolute;
+      inset: -10px;
+      transform: rotate(0deg);
+      opacity: 0;
+    }
+    .photo-ring svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+      filter: drop-shadow(0 0 8px rgba(243, 210, 122, 0.45));
+    }
+    .photo-ring circle {
+      fill: none;
+      stroke: url(#goldStroke);
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-dasharray: 540;
+      stroke-dashoffset: 540;
+    }
+    .photo {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      object-fit: cover;
+      object-position: center 15%;
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      background: #111;
+      opacity: 0;
+      display: block;
+      filter: blur(20px);
+    }
+
+    .name {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      text-align: center;
+      display: flex;
+      gap: 0.02em;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .name .char {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(60px) rotateX(-90deg);
+      transform-origin: 50% 100%;
+    }
+    .name .char.space { width: 0.25em; }
+
+    .role {
+      margin-top: 12px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .role-line {
+      font-size: 13px;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      font-weight: 600;
+      display: inline-flex;
+      gap: 0.02em;
+      justify-content: center;
+    }
+    .role-line .char {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .role-line .char.space { width: 0.32em; }
+    .role-line.white .char { color: var(--text); }
+    .role-line.gold {
+      font-size: 12px;
+      letter-spacing: 0.22em;
+      font-weight: 800;
+    }
+    .role-line.gold .char {
+      background: var(--gold-grad);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .brand-logo {
+      width: auto;
+      height: 128px;
+      margin-bottom: 20px;
+      opacity: 0;
+      mix-blend-mode: screen;
+      filter: drop-shadow(0 2px 14px rgba(243, 210, 122, 0.25));
+    }
+
+    .cta-stack {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 28px;
+    }
+
+    .cta {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      width: 100%;
+      padding: 18px 20px;
+      border-radius: 18px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      text-decoration: none;
+      overflow: hidden;
+      transition: background 0.25s ease, border-color 0.25s ease;
+      opacity: 0;
+      transform: translateY(60px) scale(0.9);
+      cursor: pointer;
+      will-change: transform;
+    }
+
+    .cta::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent 30%, rgba(243, 210, 122, 0.22) 50%, transparent 70%);
+      transform: translateX(-100%);
+      transition: transform 0.7s ease;
+      pointer-events: none;
+    }
+
+    .cta:hover, .cta:active {
+      background: var(--card-hover);
+      border-color: var(--border-gold);
+    }
+    .cta:hover::before, .cta:active::before {
+      transform: translateX(100%);
+    }
+
+    .cta-icon {
+      flex: 0 0 44px;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--gold-grad);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #0a0a0a;
+      box-shadow: 0 6px 18px rgba(217, 169, 74, 0.25);
+    }
+    .cta-icon svg { width: 22px; height: 22px; }
+
+    .cta-body { flex: 1; min-width: 0; }
+    .cta-title {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 3px;
+    }
+    .cta-sub {
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .cta-arrow {
+      flex: 0 0 auto;
+      color: var(--muted);
+      transition: transform 0.25s ease;
+    }
+    .cta:hover .cta-arrow, .cta:active .cta-arrow {
+      transform: translateX(4px);
+    }
+    .cta-arrow svg { display: block; }
+    .cta-arrow path { stroke: url(#arrowStroke); }
+
+    @media (max-width: 360px) {
+      .name { font-size: 28px; }
+      .photo, .photo-wrap { width: 122px; height: 122px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.001s !important;
+        transition-duration: 0.001s !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <linearGradient id="goldStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#f3d27a" />
+        <stop offset="50%" stop-color="#d9a94a" />
+        <stop offset="100%" stop-color="#a87923" />
+      </linearGradient>
+      <linearGradient id="arrowStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#f3d27a" />
+        <stop offset="100%" stop-color="#a87923" />
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <div class="bg-glow"></div>
+  <div class="grain"></div>
+  <div class="particles" id="particles"></div>
+
+  <main class="wrap">
+    <img class="brand-logo" src="images/Headstart%20Italicised%20Logo.png" alt="Headstart Mentoring" />
+
+    <div class="photo-wrap">
+      <div class="photo-ring">
+        <svg viewBox="0 0 172 172">
+          <circle cx="86" cy="86" r="85" />
+        </svg>
+      </div>
+      <img class="photo" src="images/Mentors/fidel-tap.jpg" alt="" />
+    </div>
+
+    <h1 class="name" data-split>Fidel</h1>
+    <div class="role">
+      <div class="role-line white" data-split>Career Mentor</div>
+      <div class="role-line gold" data-split>For International Students</div>
+    </div>
+
+    <div class="cta-stack">
+      <a class="cta" href="https://www.linkedin.com/in/fidel-hon-353b4326a" target="_blank" rel="noopener" data-cta>
+        <div class="cta-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 3A2 2 0 0 1 21 5V19A2 2 0 0 1 19 21H5A2 2 0 0 1 3 19V5A2 2 0 0 1 5 3H19M18.5 18.5V13.2A3.26 3.26 0 0 0 15.24 9.94C14.39 9.94 13.4 10.46 12.92 11.24V10.13H10.13V18.5H12.92V13.57C12.92 12.8 13.54 12.17 14.31 12.17A1.4 1.4 0 0 1 15.71 13.57V18.5H18.5M6.88 8.56A1.68 1.68 0 0 0 8.56 6.88C8.56 5.95 7.81 5.19 6.88 5.19A1.69 1.69 0 0 0 5.19 6.88C5.19 7.81 5.95 8.56 6.88 8.56M8.27 18.5V10.13H5.5V18.5H8.27Z" />
+          </svg>
+        </div>
+        <div class="cta-body">
+          <div class="cta-title">Connect with me on LinkedIn</div>
+          <div class="cta-sub">Weekly career tips</div>
+        </div>
+        <span class="cta-arrow">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+      </a>
+
+      <a class="cta" href="/job-alerts" data-cta>
+        <div class="cta-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22a2 2 0 0 0 2-2H10a2 2 0 0 0 2 2zM18 16v-5a6 6 0 0 0-4-5.66V4a2 2 0 1 0-4 0v1.34A6 6 0 0 0 6 11v5l-2 2h16l-2-2z" />
+          </svg>
+        </div>
+        <div class="cta-body">
+          <div class="cta-title">Grad Job / Internship Alert</div>
+          <div class="cta-sub">Weekly, according to your major</div>
+        </div>
+        <span class="cta-arrow">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+      </a>
+    </div>
+  </main>
+
+  <script>
+    // Split text into per-character spans (no premium plugin)
+    document.querySelectorAll('[data-split]').forEach((el) => {
+      const text = el.textContent;
+      el.textContent = '';
+      [...text].forEach((c) => {
+        const s = document.createElement('span');
+        s.className = c === ' ' ? 'char space' : 'char';
+        s.textContent = c === ' ' ? ' ' : c;
+        el.appendChild(s);
+      });
+    });
+
+    // Generate particles
+    (function () {
+      const layer = document.getElementById('particles');
+      const frag = document.createDocumentFragment();
+      for (let i = 0; i < 22; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = Math.random() * 100 + '%';
+        p.style.top = Math.random() * 100 + '%';
+        p.style.width = p.style.height = (2 + Math.random() * 3) + 'px';
+        frag.appendChild(p);
+      }
+      layer.appendChild(frag);
+    })();
+
+    window.addEventListener('load', () => {
+      const nameChars = document.querySelectorAll('.name .char');
+      const roleWhiteChars = document.querySelectorAll('.role-line.white .char');
+      const roleGoldChars = document.querySelectorAll('.role-line.gold .char');
+
+      // Ambient layers come in immediately (no curtain, no burst)
+      gsap.to('.bg-glow', { opacity: 1, duration: 1.5, ease: 'power2.out' });
+      gsap.to('.grain', { opacity: 0.04, duration: 1.5, ease: 'power2.out' });
+      gsap.to('.brand-logo', { opacity: 1, duration: 0.8, ease: 'power2.out' });
+
+      const tl = gsap.timeline({ defaults: { ease: 'power3.out' }, delay: 0.2 });
+
+      // STEP 1 — Face: photo + ring + name come in together
+      tl.fromTo('.photo',
+          { scale: 1.8, opacity: 0, filter: 'blur(16px)' },
+          { scale: 1, opacity: 1, filter: 'blur(0px)', duration: 1.0, ease: 'power4.out' })
+        .to('.photo-ring', { opacity: 1, duration: 0.2 }, '<')
+        .fromTo('.photo-ring',
+          { scale: 1.4 },
+          { scale: 1, duration: 0.9, ease: 'power3.out' },
+        '<')
+        .to('.photo-ring circle', { strokeDashoffset: 0, duration: 1.0, ease: 'power2.inOut' }, '<')
+        .to(nameChars, {
+          opacity: 1,
+          y: 0,
+          rotateX: 0,
+          duration: 0.6,
+          stagger: 0.04,
+          ease: 'back.out(2)',
+        }, '-=0.5')
+
+        // STEP 2 — Role reveals as one motion (both lines together)
+        .to('.role-line', {
+          opacity: 1,
+          duration: 0.01,
+        }, '+=0.1')
+        .to([...roleWhiteChars, ...roleGoldChars], {
+          opacity: 1,
+          y: 0,
+          duration: 0.7,
+          ease: 'power3.out',
+        }, '<')
+
+        // STEP 3 — CTA buttons cascade up
+        .to('.cta', {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.7,
+          stagger: 0.18,
+          ease: 'back.out(1.7)',
+        }, '+=0.15');
+
+      // Continuous slow ring rotation
+      gsap.to('.photo-ring', { rotation: '+=360', duration: 30, repeat: -1, ease: 'none', delay: 2 });
+
+      // Particles burst from center then drift
+      gsap.utils.toArray('.particle').forEach((p, i) => {
+        const angle = (i / 22) * Math.PI * 2;
+        const distance = 80 + Math.random() * 220;
+        gsap.set(p, {
+          x: 0,
+          y: 0,
+          left: '50%',
+          top: '50%',
+          opacity: 0,
+        });
+        gsap.timeline({ delay: 0.6 })
+          .to(p, {
+            x: Math.cos(angle) * distance,
+            y: Math.sin(angle) * distance,
+            opacity: 0.8,
+            duration: 1.2,
+            ease: 'power3.out',
+          })
+          .to(p, {
+            x: '+=' + ((Math.random() - 0.5) * 80),
+            y: '-=' + (30 + Math.random() * 60),
+            duration: 6 + Math.random() * 6,
+            repeat: -1,
+            yoyo: true,
+            ease: 'sine.inOut',
+          })
+          .to(p, {
+            opacity: 0.2,
+            duration: 3 + Math.random() * 2,
+            repeat: -1,
+            yoyo: true,
+            ease: 'sine.inOut',
+          }, '<');
+      });
+    });
+
+    // 3D tilt on CTAs
+    document.querySelectorAll('[data-cta]').forEach((btn) => {
+      btn.addEventListener('pointermove', (e) => {
+        const rect = btn.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width - 0.5) * 6;
+        const y = ((e.clientY - rect.top) / rect.height - 0.5) * 6;
+        gsap.to(btn, { rotateY: x, rotateX: -y, duration: 0.4, ease: 'power2.out', transformPerspective: 800 });
+      });
+      btn.addEventListener('pointerleave', () => {
+        gsap.to(btn, { rotateY: 0, rotateX: 0, duration: 0.5, ease: 'power3.out' });
+      });
+      btn.addEventListener('pointerdown', () => {
+        gsap.to(btn, { scale: 0.97, duration: 0.15, ease: 'power2.out' });
+      });
+      btn.addEventListener('pointerup', () => {
+        gsap.to(btn, { scale: 1, duration: 0.25, ease: 'back.out(1.6)' });
+      });
+    });
+  </script>
+</body>
+</html>
