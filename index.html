@@ -593,6 +593,12 @@
     .home-page .headline-standalone__title {
       font-size: clamp(2rem, 4.6vw, 4rem);
     }
+    /* Mobile override — small enough that the longest pain ("Unfortunately...") fits on 2 lines on iPhone SE (320px) and up */
+    @media (max-width: 540px) {
+      .home-page .headline-standalone__title {
+        font-size: clamp(1.25rem, 5.5vw, 1.9rem);
+      }
+    }
     /* Eyebrow line above the rotating pain */
     .hero-eyebrow-line {
       font-size: clamp(1.1rem, 1.5vw, 1.5rem);
@@ -608,12 +614,13 @@
         margin-bottom: 1rem;
       }
     }
-    /* Mobile hero — push content down so it sits around the 65% mark of the viewport */
+    /* Mobile hero — sized to the SMALLEST visible viewport (svh) so Instagram/LinkedIn in-app browser chrome doesn't crop content */
     @media (max-width: 600px) {
       .home-page .headline-standalone {
-        min-height: 100vh;
-        padding: 45vh 0 1.5rem;
-        justify-content: flex-start;
+        min-height: 88vh;            /* fallback for old browsers */
+        min-height: 88svh;            /* small viewport height — accounts for URL bar + bottom share buttons in IG/LinkedIn in-app browsers */
+        padding: 1.5rem 0 1.5rem;
+        justify-content: center;
       }
     }
 
@@ -694,8 +701,11 @@
       .home-sec-head h2 { font-size: 1.8rem; }
     }
     @media (max-width: 600px) {
-      .home-sec-head h2 { font-size: 1.6rem; }
+      .home-sec-head h2 { font-size: 1.45rem; line-height: 1.2; text-wrap: balance; }
       .home-sec-head__desc { font-size: 0.94rem; }
+    }
+    @media (max-width: 400px) {
+      .home-sec-head h2 { font-size: 1.3rem; }
     }
     @media (max-width: 600px) {
       .cost-calc { padding: 1.5rem; }
@@ -729,6 +739,9 @@
       line-height: 1.15;
       margin: 0 0 0.85rem;
       text-wrap: balance;
+    }
+    @media (max-width: 540px) {
+      .mentoring-title { font-size: clamp(1.4rem, 5vw, 1.8rem); }
     }
     .mentoring-desc {
       color: #b8b8b8;
@@ -1455,6 +1468,15 @@
     // ── Splash timing ──
     const prefersReducedMotion =
       window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    function _scrollToHashIfPresent() {
+      if (!window.location.hash) return;
+      var target = document.querySelector(window.location.hash);
+      if (!target) return;
+      // Defer one tick so layout is final
+      setTimeout(function () {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 50);
+    }
     window.addEventListener("load", function () {
       var splash = document.getElementById("splash");
       var main   = document.getElementById("main");
@@ -1463,13 +1485,17 @@
         splash.style.display = "none";
         main.classList.add("ready");
         if (window._playHeroAnimations) window._playHeroAnimations();
+        _scrollToHashIfPresent();
         return;
       }
       setTimeout(function () {
         splash.style.animation = "fadeOut 0.6s ease-out forwards";
         main.classList.add("ready");
         if (window._playHeroAnimations) window._playHeroAnimations();
-        setTimeout(function () { splash.style.display = "none"; }, 650);
+        setTimeout(function () {
+          splash.style.display = "none";
+          _scrollToHashIfPresent();
+        }, 650);
       }, 800);
     });
 
@@ -1656,7 +1682,7 @@
       "100 jobs applied<br>But 0 interviews?",
       "Getting Auto-rejected<br>because of visa status?",
       "Graduating soon<br>without an offer?",
-      "“Unfortunately, we will not be<br>moving forward…”"
+      "“Unfortunately, we will<br>not be moving forward…”"
     ];
     var painEl = document.getElementById("painType");
     if (painEl) {

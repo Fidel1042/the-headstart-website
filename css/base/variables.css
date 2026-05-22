@@ -6,9 +6,19 @@
   --accent-soft: rgba(199,155,59,0.22);
 }
 
-/* Bump root font-size 10% so all rem-based text scales up sitewide */
+/* Root font-size: bigger on desktop, smaller on mobile so big text doesn't overflow on narrow screens */
 html {
   font-size: 110%;
+}
+@media (max-width: 700px) {
+  html {
+    font-size: 95%;
+  }
+}
+@media (max-width: 400px) {
+  html {
+    font-size: 90%;
+  }
 }
 
 *,

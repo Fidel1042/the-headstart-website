@@ -158,9 +158,11 @@ html[lang="zh-Hans"] .headline-standalone .hero-ctas .btn {
 }
 
 .page-hero-text h1 {
-  font-size: 2.2rem;
+  font-size: clamp(1.5rem, 4.5vw, 2.2rem);
   font-weight: 650;
   margin-bottom: 1rem;
+  line-height: 1.18;
+  text-wrap: balance;
 }
 
 .discovery-page .section {
