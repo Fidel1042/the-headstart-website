@@ -7,7 +7,6 @@ import { gsapReady } from "./utils/motion.js";
 import { init as initLocalRouteRewrites } from "./modules/local-route-rewrites.js";
 import { init as initFooterYear }         from "./modules/footer-year.js";
 import { init as initInsightsCta }        from "./modules/insights-cta.js";
-import { init as initHomeHashReset }      from "./modules/home-hash-reset.js";
 import { init as initNavScroll }          from "./modules/nav-scroll.js";
 import { init as initNavMoreDropdown }    from "./modules/nav-more-dropdown.js";
 import { init as initBackToTop }          from "./modules/back-to-top.js";
@@ -30,7 +29,6 @@ const bootstrap = () => {
   initFooterYear();
   initLocalRouteRewrites();
   initInsightsCta();
-  initHomeHashReset();
   initNavScroll();
   initNavMoreDropdown();
   initBackToTop();

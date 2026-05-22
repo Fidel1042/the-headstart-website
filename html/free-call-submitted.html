@@ -10,12 +10,58 @@
     gtag("js", new Date());
     gtag("config", "G-SMH2KVMJT2");
   </script>
-  <title>Your Free Mentoring Call is Booked | Headstart Mentoring</title>
+  <title>Book Your Free Career Call | Headstart Mentoring</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <link rel="preconnect" href="https://calendly.com" crossorigin />
+  <link rel="preconnect" href="https://assets.calendly.com" crossorigin />
+  <link rel="dns-prefetch" href="//calendly.com" />
+  <link rel="dns-prefetch" href="//assets.calendly.com" />
+  <link rel="preload" as="script" href="https://assets.calendly.com/assets/external/widget.js" />
+  <link rel="preload" as="style" href="https://assets.calendly.com/assets/external/widget.css" />
   <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="https://assets.calendly.com/assets/external/widget.css" />
   <style>
+    .thanks-confirmation {
+      flex-direction: column;
+      gap: 2rem;
+      padding: 3rem 1rem 4rem;
+    }
     .thanks-headline h1 { font-size: clamp(1.8rem, 3.5vw, 2.6rem); }
+    .thanks-label.thanks-label--gold {
+      background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .booking-embed-wrap {
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .calendly-inline-widget {
+      min-width: 320px;
+      width: 100%;
+      height: 720px;
+      border-radius: 18px;
+      overflow: hidden;
+    }
+    .booking-loading {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.6);
+      font-size: 0.95rem;
+      letter-spacing: 0.05em;
+      pointer-events: none;
+    }
+    .booking-loading.is-hidden { display: none; }
+    @media (max-width: 640px) {
+      .calendly-inline-widget { height: 1080px; }
+    }
   </style>
 </head>
 <body>
@@ -50,18 +96,16 @@
     <section class="section thanks-confirmation">
       <div class="thanks-inner">
         <div class="thanks-copy">
-          <span class="thanks-label">Booking Submitted</span>
+          <span class="thanks-label thanks-label--gold">One Last Step</span>
           <div class="thanks-headline">
-            <h1>Thank you. We will call you within 24 hours.</h1>
-          </div>
-          <p class="career-hero-copy">
-            Congratulations for making your first step to actually getting hired in Australia! We look forward to talking to you and understanding YOUR journey.
-          </p>
-          <div class="thanks-actions">
-            <a class="btn btn-compact" href="/mentors">Meet the mentors</a>
-            <a class="btn btn-ghost" href="/#mentoring">View services</a>
+            <h1>Pick a time for your free career call.</h1>
           </div>
         </div>
+      </div>
+
+      <div class="booking-embed-wrap">
+        <div id="calendlyEmbed" class="calendly-inline-widget" data-url="https://calendly.com/fidelhon/30min"></div>
+        <div class="booking-loading" id="bookingLoading">Loading calendar...</div>
       </div>
     </section>
   </main>
@@ -70,6 +114,37 @@
     <span>&copy; <span id="year"></span> Headstart Mentoring. All rights reserved.</span>
     <span>Contact: <a href="mailto:theuniheadstart@gmail.com">theuniheadstart@gmail.com</a></span>
   </footer>
+  <script>
+    (function () {
+      var embed = document.getElementById('calendlyEmbed');
+      if (!embed) return;
+      var base = embed.getAttribute('data-url') || '';
+      var name = '';
+      var email = '';
+      try {
+        name = sessionStorage.getItem('hs_booking_name') || '';
+        email = sessionStorage.getItem('hs_booking_email') || '';
+      } catch (e) {}
+      var params = [];
+      if (name) params.push('name=' + encodeURIComponent(name));
+      if (email) params.push('email=' + encodeURIComponent(email));
+      if (params.length) {
+        var sep = base.indexOf('?') === -1 ? '?' : '&';
+        embed.setAttribute('data-url', base + sep + params.join('&'));
+      }
+      var loading = document.getElementById('bookingLoading');
+      if (loading && 'MutationObserver' in window) {
+        var observer = new MutationObserver(function () {
+          if (embed.querySelector('iframe')) {
+            loading.classList.add('is-hidden');
+            observer.disconnect();
+          }
+        });
+        observer.observe(embed, { childList: true, subtree: true });
+      }
+    })();
+  </script>
+  <script src="https://assets.calendly.com/assets/external/widget.js" async></script>
   <script type="module" src="../js/main.js"></script>
   <script src="../js/nav-hamburger.js" defer></script>
 </body>

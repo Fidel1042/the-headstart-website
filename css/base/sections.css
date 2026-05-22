@@ -33,15 +33,11 @@
 }
 
 /* Give anchored sections breathing room when jumped to via hash */
-#our-story {
-  scroll-margin-top: 140px;
-}
-
-#reviews {
-  scroll-margin-top: 140px;
-}
-
-#pain-points-quiz {
+#our-story,
+#reviews,
+#pain-points-quiz,
+#pricing,
+#mentoring {
   scroll-margin-top: 140px;
 }
 

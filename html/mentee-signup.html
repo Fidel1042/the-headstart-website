@@ -183,5 +183,13 @@
   </footer>
   <script type="module" src="../js/main.js"></script>
   <script src="../js/nav-hamburger.js" defer></script>
+  <script>
+    document.querySelector('form.signup-form')?.addEventListener('submit', function () {
+      try {
+        sessionStorage.setItem('hs_booking_name', document.getElementById('name')?.value || '');
+        sessionStorage.setItem('hs_booking_email', document.getElementById('email')?.value || '');
+      } catch (e) {}
+    });
+  </script>
 </body>
 </html>
