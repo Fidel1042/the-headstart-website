@@ -13,7 +13,84 @@
   <title>Internship &amp; Grad Job Search Help in Australia | Headstart Mentoring</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
-  <meta name="description" content="Whether you're job hunting, adapting to Uni life, building a business, or just figuring out life after graduating, we have mentors who've lived it, and can guide you through it." />
+  <meta name="description" content="Headstart Mentoring is 1-on-1 online mentoring for international students in Australia. Our mentors have lived the same job hunt, visa stress, and uni-to-work transition, and now guide students through it." />
+  <meta name="keywords" content="international student mentor Australia, graduate job mentor, internship mentor Australia, career mentoring international students, online mentoring Australia" />
+  <meta name="author" content="Headstart Mentoring" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+  <link rel="canonical" href="https://theheadstartmentoring.com/" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Headstart Mentoring" />
+  <meta property="og:url" content="https://theheadstartmentoring.com/" />
+  <meta property="og:title" content="1-on-1 Mentoring for International Students in Australia | Headstart Mentoring" />
+  <meta property="og:description" content="Headstart Mentoring pairs international students in Australia with mentors who have lived the same job hunt, internship search, and visa pressure, and now guide students through it." />
+  <meta property="og:image" content="https://theheadstartmentoring.com/images/website-logo.png" />
+  <meta property="og:locale" content="en_AU" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="1-on-1 Mentoring for International Students in Australia | Headstart Mentoring" />
+  <meta name="twitter:description" content="Mentors who have lived the international student job hunt in Australia. Internships, graduate roles, visa transition, and uni life, guided 1-on-1." />
+  <meta name="twitter:image" content="https://theheadstartmentoring.com/images/website-logo.png" />
+
+  <!-- Organization + Service schema for AI search and rich results -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://theheadstartmentoring.com/#organization",
+        "name": "Headstart Mentoring",
+        "alternateName": "The Headstart Mentoring",
+        "url": "https://theheadstartmentoring.com/",
+        "logo": "https://theheadstartmentoring.com/images/website-logo.png",
+        "image": "https://theheadstartmentoring.com/images/website-logo.png",
+        "description": "1-on-1 online mentoring for international students in Australia. Mentors who have lived the same job hunt, visa stress, and uni-to-work transition.",
+        "areaServed": {
+          "@type": "Country",
+          "name": "Australia"
+        },
+        "founder": [
+          {
+            "@type": "Person",
+            "name": "Fidel Hon"
+          },
+          {
+            "@type": "Person",
+            "name": "Koko"
+          }
+        ],
+        "sameAs": [
+          "https://www.linkedin.com/company/the-headstart-mentoring/",
+          "https://www.instagram.com/headstartmentoring/"
+        ]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://theheadstartmentoring.com/#website",
+        "url": "https://theheadstartmentoring.com/",
+        "name": "Headstart Mentoring",
+        "publisher": { "@id": "https://theheadstartmentoring.com/#organization" },
+        "inLanguage": "en-AU"
+      },
+      {
+        "@type": "Service",
+        "@id": "https://theheadstartmentoring.com/#service",
+        "serviceType": "Career mentoring for international students",
+        "provider": { "@id": "https://theheadstartmentoring.com/#organization" },
+        "areaServed": { "@type": "Country", "name": "Australia" },
+        "audience": {
+          "@type": "Audience",
+          "audienceType": "International students in Australia (final-year business and tech students seeking internships and graduate jobs)"
+        },
+        "description": "1-on-1 mentoring covering job search strategy, internships, graduate roles, resume and LinkedIn review, interviews, networking, and life and career adjustment for international students in Australia."
+      }
+    ]
+  }
+  </script>
+
   <link rel="stylesheet" href="style.css" />
   <style>
     /* ── Comparison split ── */
@@ -376,6 +453,7 @@
     .cost-calc__control input[type="range"] {
       width: 100%;
       -webkit-appearance: none;
+      appearance: none;
       height: 4px;
       border-radius: 2px;
       outline: none;
@@ -475,6 +553,14 @@
         padding-bottom: 4rem;
       }
     }
+    @media (max-width: 600px) {
+      #why-headstart,
+      #pain-points-quiz,
+      #graduation-calc {
+        padding-top: 2.5rem;
+        padding-bottom: 2.5rem;
+      }
+    }
 
     /* GSAP start states */
     .gsap-fade { opacity: 0; }
@@ -502,6 +588,487 @@
     @media (max-width: 900px) {
       .home-sec-head h2 { font-size: 2rem; }
     }
+
+    /* ── Hero typography (bigger for desktop) ── */
+    .home-page .headline-standalone__title {
+      font-size: clamp(2rem, 4.6vw, 4rem);
+    }
+    /* Eyebrow line above the rotating pain */
+    .hero-eyebrow-line {
+      font-size: clamp(1.1rem, 1.5vw, 1.5rem);
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      color: #ffffff;
+      line-height: 1.4;
+      margin: 0 0 1.2rem;
+    }
+    @media (max-width: 600px) {
+      .hero-eyebrow-line {
+        font-size: 1.02rem;
+        margin-bottom: 1rem;
+      }
+    }
+    /* Mobile hero — push content down so it sits around the 65% mark of the viewport */
+    @media (max-width: 600px) {
+      .home-page .headline-standalone {
+        min-height: 100vh;
+        padding: 45vh 0 1.5rem;
+        justify-content: flex-start;
+      }
+    }
+
+    /* ── Rotating pain headline ── */
+    .hero-rotating-title {
+      min-height: 2.4em;
+      line-height: 1.1;
+    }
+    .hero-rotating-title #painType {
+      background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: inline-block;
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+    .hero-rotating-title #painType.is-out {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+
+    /* Primary hero CTA */
+    .hero-primary-cta {
+      margin: 1.6rem auto 0;
+      display: flex;
+      justify-content: center;
+    }
+    .btn-hero-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #ffffff;
+      /* Dark fill + gold-gradient border via double-background trick */
+      background:
+        linear-gradient(#161616, #161616) padding-box,
+        linear-gradient(135deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%) border-box;
+      border: 1.5px solid transparent;
+      border-radius: 999px;
+      padding: clamp(1rem, 1.3vw, 1.25rem) clamp(2rem, 2.8vw, 2.8rem);
+      font-size: clamp(1rem, 1.2vw, 1.2rem);
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-decoration: none;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-hero-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 26px rgba(0,0,0,0.6), 0 0 0 4px rgba(199,155,59,0.12);
+      color: #ffffff;
+    }
+    .btn-hero-primary__arrow {
+      background: linear-gradient(135deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+      font-weight: 800;
+      display: inline-block;
+      transition: transform 0.2s ease;
+    }
+    .btn-hero-primary:hover .btn-hero-primary__arrow {
+      transform: translateY(-3px);
+    }
+    @media (max-width: 540px) {
+      .btn-hero-primary {
+        font-size: 0.92rem;
+        padding: 0.92rem 1.6rem;
+        width: 100%;
+        max-width: 340px;
+        justify-content: center;
+      }
+      .hero-primary-cta { margin-top: 1.4rem; }
+    }
+
+
+    @media (max-width: 700px) {
+      .home-sec-head h2 { font-size: 1.8rem; }
+    }
+    @media (max-width: 600px) {
+      .home-sec-head h2 { font-size: 1.6rem; }
+      .home-sec-head__desc { font-size: 0.94rem; }
+    }
+    @media (max-width: 600px) {
+      .cost-calc { padding: 1.5rem; }
+      .cost-calc__row--salary { padding: 0.85rem 0.9rem; margin: 0 -0.9rem; }
+    }
+    @media (max-width: 480px) {
+      .cost-calc { padding: 1.2rem; }
+      .cost-calc__row--salary { padding: 0.8rem 0.8rem; margin: 0 -0.8rem; }
+      .cost-calc__row--salary .cost-calc__row-value { font-size: 1.2rem; }
+      .cost-calc__total-value { font-size: 1.1rem; }
+      .cost-calc__multiplier { font-size: 1.05rem; }
+      .cost-calc__note { font-size: 0.88rem; }
+    }
+
+    /* ── Mentoring section (journey track + pricing) ── */
+    .mentoring-head {
+      max-width: 900px;
+      margin: 0 auto 2.5rem;
+    }
+    .mentoring-eyebrow {
+      font-size: 1.05rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #f7d879;
+      font-weight: 650;
+      margin: 0 0 0.85rem;
+    }
+    .mentoring-title {
+      font-size: clamp(1.8rem, 3vw, 2.5rem);
+      font-weight: 700;
+      line-height: 1.15;
+      margin: 0 0 0.85rem;
+      text-wrap: balance;
+    }
+    .mentoring-desc {
+      color: #b8b8b8;
+      font-size: clamp(1rem, 1.25vw, 1.1rem);
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    /* Journey track with floating badge */
+    .journey-wrap {
+      position: relative;
+      max-width: 920px;
+      margin: 0 auto;
+      padding-top: 1.5rem;
+    }
+    .journey-floater { display: none; }
+    .journey-floater:after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: calc(50% + var(--arrow-offset, 0px));
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 9px solid #c79b3b;
+      transition: left 0.65s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+    @keyframes journeyBob {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50%      { transform: translateX(-50%) translateY(-6px); }
+    }
+    .journey-floater.is-paused { animation: none; }
+    .journey-wrap:has(.journey-floater.is-paused) .journey-node.is-active .journey-dot:after {
+      animation: none;
+      opacity: 0;
+    }
+    .journey-track {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      align-items: start;
+    }
+    .journey-line {
+      position: absolute;
+      top: 14px;
+      left: 7.143%;
+      right: 7.143%;
+      height: 2px;
+      background: #2a2a2a;
+      z-index: 0;
+    }
+    .journey-line-fill {
+      position: absolute;
+      top: 14px;
+      left: 7.143%;
+      height: 2px;
+      background: linear-gradient(to right, #c9a84c, #f7d37d);
+      z-index: 0;
+      width: 0%;
+      transition: width 0.65s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+    .journey-node {
+      position: relative;
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      color: inherit;
+      font-family: inherit;
+      z-index: 1;
+    }
+    .journey-dot {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #161616;
+      border: 2px solid #3a3a3a;
+      position: relative;
+      transition: border-color 0.3s, background 0.3s, transform 0.3s;
+    }
+    .journey-label {
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #888;
+      transition: color 0.3s;
+    }
+    .journey-node:hover .journey-dot { border-color: #c9a84c; }
+    .journey-node:hover .journey-label { color: #ddd; }
+    .journey-node.is-active .journey-dot {
+      background: linear-gradient(135deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
+      border-color: #c9a84c;
+      transform: scale(1.15);
+      box-shadow: 0 0 0 6px rgba(199,155,59,0.12);
+    }
+    .journey-node.is-active .journey-label { color: #fff; }
+    .journey-node.is-active .journey-dot:after {
+      content: '';
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      border: 2px solid rgba(199,155,59,0.55);
+      animation: journeyPulse 1.6s ease-out infinite;
+    }
+    @keyframes journeyPulse {
+      0%   { opacity: 1; transform: scale(0.85); }
+      100% { opacity: 0; transform: scale(1.9); }
+    }
+    .journey-detail {
+      max-width: 900px;
+      margin: 2.2rem auto 3rem;
+      background: #0a0a0a;
+      border: 1px solid #2a2a2a;
+      border-radius: 16px;
+      padding: 1.8rem 2rem;
+      text-align: center;
+      min-height: 130px;
+    }
+    .journey-detail__inner { transition: opacity 0.22s ease; }
+    .journey-detail.is-swapping .journey-detail__inner { opacity: 0; }
+    .journey-detail__title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin: 0 0 0.6rem;
+      text-wrap: balance;
+      background: linear-gradient(135deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .journey-detail__desc {
+      color: #c8c8c8;
+      font-size: 0.98rem;
+      line-height: 1.6;
+      margin: 0 auto;
+      max-width: 760px;
+    }
+    @media (max-width: 760px) {
+      .journey-wrap { padding-top: 1rem; }
+      .journey-label { font-size: 0.62rem; letter-spacing: 0.04em; }
+      .journey-dot { width: 24px; height: 24px; }
+      .journey-line, .journey-line-fill { top: 11px; }
+      .journey-node { gap: 0.55rem; }
+      .journey-detail { padding: 1.4rem 1.2rem; margin-top: 1.8rem; }
+      .journey-detail__title { font-size: 1.1rem; }
+      .journey-detail__desc { font-size: 0.92rem; line-height: 1.55; }
+    }
+    @media (max-width: 540px) {
+      .journey-wrap { padding-top: 0.8rem; }
+      .journey-node { gap: 0.35rem; padding-bottom: 1.5rem; position: relative; }
+      .journey-label {
+        position: absolute;
+        top: calc(100% - 1.2rem);
+        left: 50%;
+        transform: translateX(-50%);
+        white-space: nowrap;
+        opacity: 0;
+        font-size: 0.66rem;
+        transition: opacity 0.3s;
+      }
+      .journey-node.is-active .journey-label { opacity: 1; }
+      .journey-dot { width: 20px; height: 20px; border-width: 2px; }
+      .journey-line, .journey-line-fill { top: 9px; }
+      .journey-detail { margin-top: 1.4rem; min-height: 110px; }
+    }
+    @media (max-width: 380px) {
+      .journey-dot { width: 16px; height: 16px; }
+      .journey-line, .journey-line-fill { top: 7px; }
+      .journey-wrap { padding-top: 0.6rem; }
+    }
+
+    /* Pricing section — eyebrow above the grid, aligned to grid's left edge */
+    .pricing-section { padding-top: 4rem; }
+    @media (max-width: 600px) {
+      .pricing-section { padding-top: 2.5rem; }
+    }
+
+    /* More breathing room between sections on desktop only */
+    @media (min-width: 900px) {
+      .home-page main > section,
+      .home-page main > .section,
+      .home-page main > .section-alt,
+      .home-page main > .ms-section,
+      .home-page main > .pricing-section {
+        padding-top: 7rem;
+        padding-bottom: 7rem;
+      }
+    }
+    .pricing-head {
+      max-width: 900px;
+      margin: 0 auto 1.5rem;
+    }
+    /* "Meet our mentors" line below the pricing boxes */
+    .pricing-meet-mentors {
+      max-width: 900px;
+      margin: 1.8rem auto 0;
+      text-align: center;
+      color: #aaa;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+    .pricing-meet-mentors a {
+      background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-decoration: none;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(199,155,59,0.45);
+      padding-bottom: 1px;
+      transition: border-color 0.2s;
+    }
+    .pricing-meet-mentors a:hover { border-color: #f5d591; }
+
+    /* Pricing two-box grid */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.2rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    @media (max-width: 760px) {
+      .pricing-grid { grid-template-columns: 1fr; }
+    }
+    .pricing-box {
+      background: #0a0a0a;
+      border: 1px solid #2a2a2a;
+      border-radius: 20px;
+      padding: 2.2rem 1.9rem;
+      display: flex;
+      flex-direction: column;
+    }
+    @media (max-width: 480px) {
+      .pricing-box { padding: 1.7rem 1.3rem; border-radius: 16px; }
+      .pricing-box__title { font-size: 1.35rem; }
+      .pricing-box__sub { font-size: 0.9rem; min-height: 0; margin-bottom: 1.4rem; }
+      .pricing-box__amount { font-size: 2.5rem; }
+      .pricing-box__cta { padding: 0.78rem 1.2rem; font-size: 0.88rem; }
+      .pricing-box__list li { font-size: 0.88rem; padding-left: 1.5rem; }
+    }
+    .pricing-box__eyebrow {
+      align-self: flex-start;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #c9a84c;
+      padding: 0.3rem 0.7rem;
+      border: 1px solid rgba(199,155,59,0.35);
+      border-radius: 999px;
+      margin-bottom: 0.9rem;
+    }
+    .pricing-box__title {
+      font-size: 1.55rem;
+      font-weight: 700;
+      margin: 0 0 0.45rem;
+      line-height: 1.2;
+      text-wrap: balance;
+    }
+    .pricing-box__sub {
+      color: #a8a8a8;
+      font-size: 0.95rem;
+      line-height: 1.55;
+      margin: 0 0 1.8rem;
+      min-height: 2.9em;
+      text-wrap: balance;
+    }
+    .pricing-box__price {
+      display: flex;
+      align-items: baseline;
+      gap: 0.3rem;
+      margin-bottom: 1.4rem;
+    }
+    .pricing-box__amount {
+      font-size: 2.2rem;
+      font-weight: 800;
+      line-height: 1;
+      background: linear-gradient(135deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .pricing-box__unit {
+      font-size: 0.95rem;
+      color: #a8a8a8;
+      font-weight: 500;
+    }
+    .pricing-box__cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      background: #161616;
+      border: 1px solid #333;
+      color: #fff;
+      border-radius: 999px;
+      padding: 0.85rem 1.5rem;
+      font-size: 0.92rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-decoration: none;
+      margin-bottom: 1.6rem;
+      transition: background 0.2s, border-color 0.2s, transform 0.2s;
+    }
+    .pricing-box__cta:hover {
+      background: #1f1f1f;
+      border-color: #c9a84c;
+      transform: translateY(-1px);
+    }
+    .pricing-box__list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .pricing-box__list li {
+      font-size: 0.93rem;
+      line-height: 1.55;
+      color: #d4d4d4;
+      padding-left: 1.55rem;
+      position: relative;
+      margin-bottom: 0.7rem;
+    }
+    .pricing-box__list li:before {
+      content: "\2713";
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: #c9a84c;
+      font-weight: 700;
+      font-size: 1rem;
+      line-height: 1.55;
+    }
   </style>
 </head>
 <body class="home-page">
@@ -509,10 +1076,10 @@
   <div id="splash">
     <div class="splash-inner">
       <div class="splash-logo-wrap">
-        <img src="images/intro-logo.png" width="500" height="500" decoding="async" alt="Headstart Mentoring icon" class="splash-logo" />
-        <div class="finish-line"></div>
+        <img src="images/headstart-italic-logo.png" decoding="async" alt="Headstart Mentoring icon" class="splash-logo" />
       </div>
-      <div class="splash-tagline">WINNING AT THE STARTING LINE</div>
+      <div class="finish-line"></div>
+      <div class="splash-tagline">GET YOUR FIRST OFFER WITH US</div>
     </div>
   </div>
 
@@ -521,27 +1088,27 @@
   <header>
     <div class="nav">
       <a href="/" class="nav-left nav-home">
-        <img src="images/intro-logo.png" width="500" height="500" decoding="async" alt="Headstart Mentoring logo" class="nav-logo-icon" />
-        <div class="nav-brand-text">
-          <span>Headstart Mentoring</span>
-          <span>Mentors for Entry Level Roles / Internship</span>
-        </div>
+        <img src="images/headstart-italic-logo.png" decoding="async" alt="Headstart Mentoring logo" class="nav-logo-icon" />
       </a>
-      <nav class="nav-links">
-        <a href="/">Home</a>
-        <a href="/services">Services</a>
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+      </button>
+      <nav class="nav-links" id="navLinks">
         <a href="/mentors">Mentors</a>
+        <a href="/#pricing">Pricing</a>
         <a href="/reviews">Reviews</a>
         <a href="/job-alerts">Job Alerts</a>
         <div class="nav-more">
-          <button class="nav-more__trigger">More <span class="nav-more__arrow">▾</span></button>
+          <button class="nav-more__trigger" type="button">More <span class="nav-more__arrow">▾</span></button>
           <div class="nav-more__menu">
             <a href="/blog">Blog</a>
             <a href="/careers">Careers</a>
           </div>
         </div>
       </nav>
-      <a href="/discovery-call" class="nav-cta nav-cta--gold">Book a free call</a>
+      <a href="/discovery-call" class="nav-cta nav-cta--gold">Free Career Call</a>
     </div>
   </header>
 
@@ -550,17 +1117,117 @@
       <!-- ── Hero ── -->
       <section class="section">
         <div class="section-inner headline-standalone">
-          <h1 class="headline-standalone__title reveal reveal--up">
-            Build your career with <span class="headline-standalone__highlight">Headstart Mentoring</span>
+          <p class="hero-eyebrow-line reveal reveal--up">1-on-1 Mentoring from Mentors already in your target industry</p>
+          <h1 class="headline-standalone__title hero-rotating-title reveal reveal--up" aria-live="polite" style="--reveal-delay: 0.1s">
+            <span class="headline-standalone__highlight pain-rotating" id="painType">100 jobs applied<br>But 0 interviews?</span>
           </h1>
-          <p class="headline-standalone__subtitle reveal reveal--up" style="--reveal-delay: 0.1s">
-            <span class="headline-standalone__line">1:1 mentoring with mentors in your target industry in Australia</span>
-          </p>
-          <div class="hero-ctas reveal reveal--up" style="--reveal-delay: 0.2s">
-            <a href="#why-headstart" class="btn btn-compact" data-scroll-to="#why-headstart">Why Students choose us</a>
-            <a href="#pain-points-quiz" class="btn btn-compact" data-scroll-to="#pain-points-quiz">International Student Struggles</a>
-            <a href="#graduation-calc" class="btn btn-compact" data-scroll-to="#graduation-calc">Are you graduating soon?</a>
+          <div class="hero-primary-cta reveal reveal--up" style="--reveal-delay: 0.2s">
+            <a href="#mentoring" class="btn-hero-primary" data-scroll-to="#mentoring">See How We Fix That <span class="btn-hero-primary__arrow">&darr;</span></a>
           </div>
+        </div>
+      </section>
+
+      <!-- ── How Our Mentoring Works ── -->
+      <section class="section ms-section" id="mentoring">
+        <div class="section-inner">
+          <div class="mentoring-head reveal reveal--up">
+            <p class="mentoring-eyebrow">Our mentoring</p>
+            <h2 class="mentoring-title">Which part of job search can we help?</h2>
+            <p class="mentoring-desc">All stages! Mentors went through the exact same pain, and know how to navigate them.</p>
+          </div>
+
+          <div class="journey-wrap reveal">
+            <div class="journey-floater" id="journeyFloater">
+              <span class="journey-floater__long">We jump in here</span>
+              <span class="journey-floater__short">Here</span>
+            </div>
+
+            <div class="journey-track">
+              <div class="journey-line"></div>
+              <div class="journey-line-fill" id="journeyFill"></div>
+              <button class="journey-node is-active" type="button" data-idx="0" onclick="journeyJump(0)">
+                <span class="journey-dot"></span>
+                <span class="journey-label">Direction</span>
+              </button>
+              <button class="journey-node" type="button" data-idx="1" onclick="journeyJump(1)">
+                <span class="journey-dot"></span>
+                <span class="journey-label">Resume</span>
+              </button>
+              <button class="journey-node" type="button" data-idx="2" onclick="journeyJump(2)">
+                <span class="journey-dot"></span>
+                <span class="journey-label">LinkedIn</span>
+              </button>
+              <button class="journey-node" type="button" data-idx="3" onclick="journeyJump(3)">
+                <span class="journey-dot"></span>
+                <span class="journey-label">Network</span>
+              </button>
+              <button class="journey-node" type="button" data-idx="4" onclick="journeyJump(4)">
+                <span class="journey-dot"></span>
+                <span class="journey-label">Application</span>
+              </button>
+              <button class="journey-node" type="button" data-idx="5" onclick="journeyJump(5)">
+                <span class="journey-dot"></span>
+                <span class="journey-label">Interview</span>
+              </button>
+              <button class="journey-node" type="button" data-idx="6" onclick="journeyJump(6)">
+                <span class="journey-dot"></span>
+                <span class="journey-label">Offer</span>
+              </button>
+            </div>
+
+            <div class="journey-detail" id="journeyDetail">
+              <div class="journey-detail__inner">
+                <h3 class="journey-detail__title" id="journeyTitle">Career direction</h3>
+                <p class="journey-detail__desc" id="journeyDesc">Map your skills to specific grad roles and understand what realistic options you have.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ── Pricing ── -->
+      <section class="section pricing-section" id="pricing">
+        <div class="section-inner">
+          <div class="pricing-head reveal reveal--up">
+            <p class="mentoring-eyebrow">Pricing</p>
+          </div>
+          <div class="pricing-grid">
+            <div class="pricing-box reveal" style="--reveal-delay:0s">
+              <span class="pricing-box__eyebrow">Step 1</span>
+              <h3 class="pricing-box__title">Initial Consultation</h3>
+              <p class="pricing-box__sub">A free call to understand where you're stuck and match you with a mentor.</p>
+              <div class="pricing-box__price">
+                <span class="pricing-box__amount">Free</span>
+              </div>
+              <a class="pricing-box__cta" href="/discovery-call">Book a free call &rarr;</a>
+              <ul class="pricing-box__list">
+                <li>20-minute online call with a co-founder</li>
+                <li>Walk through your current approach</li>
+                <li>Match with the right mentor for you</li>
+                <li>No commitment to continue after</li>
+              </ul>
+            </div>
+
+            <div class="pricing-box reveal reveal--right" style="--reveal-delay:0.1s">
+              <span class="pricing-box__eyebrow">Step 2</span>
+              <h3 class="pricing-box__title">Ongoing Mentoring</h3>
+              <p class="pricing-box__sub">After the consultation, regular 1-on-1 sessions with your matched mentor.</p>
+              <div class="pricing-box__price">
+                <span class="pricing-box__amount">$30</span><span class="pricing-box__unit">/session</span>
+              </div>
+              <a class="pricing-box__cta" href="/discovery-call">Book a free call &rarr;</a>
+              <ul class="pricing-box__list">
+                <li>40-minute online sessions, 1-on-1 with your mentor</li>
+                <li>Mentor working in your target industry</li>
+                <li>Change mentors at no extra cost</li>
+              </ul>
+            </div>
+          </div>
+
+          <p class="pricing-meet-mentors reveal reveal--up">
+            Want to see who you'll be mentored by? <a href="/mentors">Meet our mentors &rarr;</a>
+          </p>
         </div>
       </section>
 
@@ -569,8 +1236,9 @@
         <div class="section-inner">
 
           <div class="home-sec-head gsap-up">
+            <p class="mentoring-eyebrow">Why pay when you can get it for free?</p>
             <h2>Specialised for International Students</h2>
-            <p class="home-sec-head__desc">There are PLENTY of free career mentoring services out there. Why do students pay for Headstart Mentoring?</p>
+            <p class="home-sec-head__desc">With plenty of free career mentoring services out there. Why do students pay for Headstart Mentoring?</p>
           </div>
 
           <div class="why-split" style="margin-top:2.5rem;">
@@ -622,8 +1290,8 @@
                 <div class="hs-point">
                   <div class="hs-point__num">3</div>
                   <div>
-                    <div class="hs-point__title">Flexible payment</div>
-                    <div class="hs-point__desc">Charged per session with no long-term commitment. Bundle deals available for a better rate.</div>
+                    <div class="hs-point__title">Flat $30 per session</div>
+                    <div class="hs-point__desc">Pay per session, no upfront commitment, no lock-in. Walk away any time.</div>
                   </div>
                 </div>
               </div>
@@ -702,7 +1370,7 @@
               <span class="cost-calc__total-label">Total cost of staying stuck</span>
               <span class="cost-calc__total-value" id="home-calc-grand">$13,600+</span>
             </div>
-            <p class="cost-calc__note">Our 5-session package is $450. <span id="home-calc-note-months">2 months</span> without a job costs you roughly <strong class="cost-calc__multiplier" id="home-calc-multiplier">20x</strong> that in salary alone.</p>
+            <p class="cost-calc__note">Our sessions are $30 each. <span id="home-calc-note-months">2 months</span> without a job costs you roughly <strong class="cost-calc__multiplier" id="home-calc-multiplier">300x</strong> that in salary alone.</p>
           </div>
         </div>
       </section>
@@ -780,6 +1448,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script type="module" src="js/main.js"></script>
+  <script src="js/nav-hamburger.js" defer></script>
   <script>
     gsap.registerPlugin(ScrollTrigger);
 
@@ -933,7 +1602,7 @@
     // ── Calculator ──
     var HOME_SALARY = 4500;
     var HOME_VISA   = 4600;
-    var homeCalcState  = { salary: 9000, grand: 13600, mult: 20 };
+    var homeCalcState  = { salary: 9000, grand: 13600, mult: 300 };
     var homeActiveTweens = {};
 
     function homeTween(key, el, toVal, prefix, suffix) {
@@ -964,7 +1633,7 @@
       if (noteEl) noteEl.textContent = monthLabel;
       var newSal   = Math.round(HOME_SALARY * months);
       var newGrand = newSal + HOME_VISA;
-      var newMult  = Math.round(newSal / 450);
+      var newMult  = Math.round(newSal / 30);
       homeTween("salary", document.getElementById("home-calc-salary"), newSal,   "", "");
       homeTween("grand",  document.getElementById("home-calc-grand"),  newGrand, "", "+");
       // Tween multiplier
@@ -981,6 +1650,131 @@
     }
 
     homeUpdateSlider(document.getElementById("home-calc-months"));
+
+    // ── Rotating pain headline (fade in / out) ──
+    var HERO_PAINS = [
+      "100 jobs applied<br>But 0 interviews?",
+      "Getting Auto-rejected<br>because of visa status?",
+      "Graduating soon<br>without an offer?",
+      "“Unfortunately, we will not be<br>moving forward…”"
+    ];
+    var painEl = document.getElementById("painType");
+    if (painEl) {
+      var painIdx = 0;
+      var painHoldMs = 3800;   // how long each pain stays on screen
+      var painFadeMs = 450;    // matches the CSS transition
+
+      function painCycle() {
+        // Hold the current pain, then fade it out
+        setTimeout(function() {
+          painEl.classList.add("is-out");
+          setTimeout(function() {
+            painIdx = (painIdx + 1) % HERO_PAINS.length;
+            painEl.innerHTML = HERO_PAINS[painIdx];
+            painEl.classList.remove("is-out");
+            painCycle();
+          }, painFadeMs);
+        }, painHoldMs);
+      }
+      // Seed text + kick off the cycle
+      painEl.innerHTML = HERO_PAINS[0];
+      painCycle();
+    }
+
+    // ── Journey track auto-cycle ──
+    var JOURNEY_STAGES = [
+      { title: 'Career direction',      desc: 'Map your skills to specific grad roles and understand what realistic options you have.' },
+      { title: 'Resume sharpening',     desc: 'Feedback on your resume to make sure it passes the screening on your applications.' },
+      { title: 'LinkedIn optimisation', desc: 'Headline, About section, and all the necessary components of your profile to make you stand out.' },
+      { title: 'Networking & outreach', desc: 'Learn the types of people you should connect with, how to message them, and how to act in coffee chats.' },
+      { title: 'Application strategy',  desc: 'Tailor each application to the role, know which jobs to prioritise, and stand out from the 400 other resumes in the pile.' },
+      { title: 'Interview practice',    desc: 'Mock behavioural, technical, and case interviews with live feedback from mentors who have sat on the other side.' },
+      { title: 'Offer & negotiation',   desc: 'Compare offers, decide which to take, and negotiate the package up before you sign.' }
+    ];
+    var journeyCurrent = 0;
+    var journeyPauseUntil = 0;
+    var journeyTimer = null;
+
+    function journeyPositionFloater(idx) {
+      var floater = document.getElementById('journeyFloater');
+      if (!floater) return;
+      var wrap = floater.parentElement;
+      if (!wrap) return;
+      var nodes = wrap.querySelectorAll('.journey-node');
+      var node = nodes[idx];
+      if (!node) return;
+      var dot = node.querySelector('.journey-dot');
+      if (!dot) return;
+      var wrapRect = wrap.getBoundingClientRect();
+      var dotRect = dot.getBoundingClientRect();
+      var wrapW = wrapRect.width;
+      var floaterW = floater.offsetWidth;
+      var dotCenterPx = (dotRect.left + dotRect.width / 2) - wrapRect.left;
+      var halfFloater = floaterW / 2;
+      var bodyPx = Math.max(halfFloater, Math.min(wrapW - halfFloater, dotCenterPx));
+      var arrowOffset = dotCenterPx - bodyPx;
+      floater.style.left = bodyPx + 'px';
+      floater.style.setProperty('--arrow-offset', arrowOffset + 'px');
+    }
+
+    function journeyRender(idx) {
+      journeyCurrent = idx;
+      var nodes = document.querySelectorAll('.journey-node');
+      nodes.forEach(function(n, i) { n.classList.toggle('is-active', i === idx); });
+      journeyPositionFloater(idx);
+      var fill = document.getElementById('journeyFill');
+      if (fill) {
+        var trackInnerWidth = 100 - (100 / JOURNEY_STAGES.length);
+        var fillW = (idx / (JOURNEY_STAGES.length - 1)) * trackInnerWidth;
+        fill.style.width = fillW + '%';
+      }
+      var detail = document.getElementById('journeyDetail');
+      if (!detail) return;
+      detail.classList.add('is-swapping');
+      setTimeout(function() {
+        document.getElementById('journeyTitle').textContent = JOURNEY_STAGES[idx].title;
+        document.getElementById('journeyDesc').textContent  = JOURNEY_STAGES[idx].desc;
+        detail.classList.remove('is-swapping');
+      }, 200);
+    }
+
+    var journeyResizeTimer;
+    window.addEventListener('resize', function() {
+      clearTimeout(journeyResizeTimer);
+      journeyResizeTimer = setTimeout(function() { journeyPositionFloater(journeyCurrent); }, 100);
+    });
+
+    function journeyJump(idx) {
+      journeyPauseUntil = Number.MAX_SAFE_INTEGER;
+      if (journeyTimer) {
+        clearInterval(journeyTimer);
+        journeyTimer = null;
+      }
+      var floater = document.getElementById('journeyFloater');
+      if (floater) floater.classList.add('is-paused');
+      journeyRender(idx);
+    }
+
+    function journeyTick() {
+      if (Date.now() < journeyPauseUntil) return;
+      var next = (journeyCurrent + 1) % JOURNEY_STAGES.length;
+      journeyRender(next);
+    }
+
+    var journeyStarted = false;
+    function journeyMaybeStart() {
+      if (journeyStarted) return;
+      var section = document.getElementById('mentoring');
+      if (!section) return;
+      var rect = section.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        journeyStarted = true;
+        journeyRender(0);
+        journeyTimer = setInterval(journeyTick, 6000);
+      }
+    }
+    window.addEventListener('scroll', journeyMaybeStart, { passive: true });
+    window.addEventListener('load', journeyMaybeStart);
   </script>
 </body>
 </html>

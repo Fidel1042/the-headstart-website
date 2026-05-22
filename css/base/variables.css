@@ -6,6 +6,11 @@
   --accent-soft: rgba(199,155,59,0.22);
 }
 
+/* Bump root font-size 10% so all rem-based text scales up sitewide */
+html {
+  font-size: 110%;
+}
+
 *,
 *::before,
 *::after {

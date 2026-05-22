@@ -1,4 +1,4 @@
-/* Subtle grain overlay */
+/* Subtle grain overlay (fine speckles) */
 body::before {
   content: "";
   position: fixed;
@@ -13,6 +13,32 @@ body::before {
   mix-blend-mode: screen;
   z-index: 0;
 }
+
+/*
+ * Black marble background image — uses /images/textures/black-marble.jpg
+ * Will sit fixed under all content, slightly darkened so text stays readable.
+ * Falls back to plain black background if file not present.
+ */
+body {
+  background-image: url("/images/textures/black-marble.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-color: #000;
+}
+/* Dark veil over the marble so text contrast stays high */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: rgba(0,0,0,0.55);
+  z-index: 0;
+}
+
+/* Make sure page content sits above the texture layers */
+body > * { position: relative; z-index: 1; }
 
 a {
   color: inherit;

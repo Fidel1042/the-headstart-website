@@ -13,7 +13,53 @@
   <title>Internship &amp; Grad Role Mentors in Australia | Headstart Mentoring</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
-  <meta name="description" content="Be mentored by recent graduates who have just landed an entry-level role. The HeadStart matches you with mentors who know the most up-todate hiring process because they've won it themselves." />
+  <meta name="description" content="Headstart Mentoring matches international students in Australia with recent graduates who have just landed entry-level roles. Our mentors know the current hiring process because they have just won it themselves." />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+  <link rel="canonical" href="https://theheadstartmentoring.com/mentors" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Headstart Mentoring" />
+  <meta property="og:url" content="https://theheadstartmentoring.com/mentors" />
+  <meta property="og:title" content="Mentors for Internships and Graduate Roles in Australia | Headstart Mentoring" />
+  <meta property="og:description" content="Be mentored by recent graduates in Australia who have just won entry-level roles. Mentors who lived the international student job hunt and know the current process." />
+  <meta property="og:image" content="https://theheadstartmentoring.com/images/website-logo.png" />
+  <meta property="og:locale" content="en_AU" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Mentors for Internships and Graduate Roles in Australia | Headstart Mentoring" />
+  <meta name="twitter:description" content="Recent graduates in Australia who have just won entry-level roles, now mentoring international students through the same process." />
+  <meta name="twitter:image" content="https://theheadstartmentoring.com/images/website-logo.png" />
+
+  <!-- Schema: page is a list of mentors (Person) offered by the Organization -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "url": "https://theheadstartmentoring.com/mentors",
+    "name": "Headstart Mentoring Mentors",
+    "description": "Mentors at Headstart Mentoring are recent graduates and early-career professionals in Australia who guide international students through internships, graduate roles, resume and LinkedIn review, interviews, and networking.",
+    "isPartOf": { "@id": "https://theheadstartmentoring.com/#website" },
+    "about": {
+      "@type": "Service",
+      "serviceType": "1-on-1 career mentoring for international students in Australia",
+      "provider": {
+        "@type": "Organization",
+        "name": "Headstart Mentoring",
+        "url": "https://theheadstartmentoring.com/"
+      }
+    },
+    "breadcrumb": {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://theheadstartmentoring.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Mentors", "item": "https://theheadstartmentoring.com/mentors" }
+      ]
+    }
+  }
+  </script>
+
   <link rel="stylesheet" href="../style.css" />
 </head>
 <body class="mentors-page">
@@ -21,16 +67,16 @@
   <header>
     <div class="nav">
       <a href="/" class="nav-left nav-home">
-        <img src="../images/intro-logo.png" width="500" height="500" decoding="async" alt="Headstart Mentoring logo" class="nav-logo-icon" />
-        <div class="nav-brand-text">
-          <span>Headstart Mentoring</span>
-          <span>Mentors for Entry Level Roles / Internship</span>
-        </div>
+        <img src="../images/headstart-italic-logo.png" decoding="async" alt="Headstart Mentoring logo" class="nav-logo-icon" />
       </a>
-      <nav class="nav-links">
-        <a href="/">Home</a>
-        <a href="/services">Services</a>
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+      </button>
+      <nav class="nav-links" id="navLinks">
         <a href="/mentors" class="active">Mentors</a>
+        <a href="/#pricing">Pricing</a>
         <a href="/reviews">Reviews</a>
         <a href="/job-alerts">Job Alerts</a>
         <div class="nav-more">
@@ -41,7 +87,7 @@
           </div>
         </div>
       </nav>
-      <a href="/discovery-call" class="nav-cta nav-cta--gold">Book a free call</a>
+      <a href="/discovery-call" class="nav-cta nav-cta--gold">Free Career Call</a>
     </div>
   </header>
 
@@ -51,7 +97,7 @@
         <div class="page-hero single-column">
           <div class="page-hero-text reveal">
             <div class="hero-tagline">Mentors</div>
-            <h1>Mentors who have been through exactly what you're facing</h1>
+            <h1>We have exactly been through what you're facing</h1>
             <p>
               We are all hirable. But what we lack is our ability to convey that. We are here to help international students explain it in a way that can impress the local hiring managers
             </p>
@@ -300,6 +346,7 @@
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/Flip.min.js"></script>
   <script type="module" src="../js/main.js"></script>
+  <script src="../js/nav-hamburger.js" defer></script>
   <script>
     if (typeof gsap !== "undefined" && typeof Flip !== "undefined") {
       gsap.registerPlugin(Flip);

@@ -19,8 +19,9 @@
 
 .nav-links {
   display: flex;
-  gap: 2.4rem;
-  font-size: 0.92rem;
+  gap: 2.6rem;
+  font-size: 1.15rem;
+  font-weight: 500;
 }
 
 .nav-links a {
@@ -28,5 +29,6 @@
   padding-bottom: 0.2rem;
   transition: color 0.2s ease;
   white-space: nowrap;
+  font-weight: 500;
 }
 

@@ -24,6 +24,7 @@
 @import url("css/components/nav-brand.css");
 @import url("css/components/nav-links.css");
 @import url("css/components/nav-more.css");
+@import url("css/components/nav-hamburger.css");
 
 /* ── About spacing (home about section) ── */
 @import url("css/pages/about-spacing.css");

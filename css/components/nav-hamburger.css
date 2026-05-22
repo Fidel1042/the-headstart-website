@@ -1,0 +1,120 @@
+/* ── Mobile / narrow-desktop hamburger nav (≤960px) ── */
+.nav-toggle { display: none; }
+
+@media (max-width: 960px) {
+  .nav {
+    position: relative;
+    flex-wrap: nowrap !important;
+    padding-inline: 1.1rem;
+    gap: 0.7rem;
+  }
+  /* Override the shared 720px rule that forces nav-left to 100% width on small screens */
+  .nav-left {
+    flex: 0 1 auto !important;
+    min-width: 0;
+    justify-content: flex-start !important;
+  }
+  /* Order: logo (auto) → CTA → hamburger */
+  .nav-cta {
+    order: 2;
+    margin-left: auto;
+    font-size: 0.75rem;
+    padding: 0.6rem 1.05rem;
+    flex-shrink: 0;
+  }
+  .nav-toggle {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 50px;
+    height: 50px;
+    padding: 0;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 11px;
+    cursor: pointer;
+    order: 3;
+    flex-shrink: 0;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .nav-toggle:hover,
+  .nav-toggle[aria-expanded="true"] {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(199,155,59,0.5);
+  }
+  .nav-toggle__bar {
+    display: block;
+    width: 26px;
+    height: 2.5px;
+    background: #fff;
+    border-radius: 2px;
+    margin: 0 auto;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+  .nav-toggle[aria-expanded="true"] .nav-toggle__bar:nth-child(1) {
+    transform: translateY(7.5px) rotate(45deg);
+  }
+  .nav-toggle[aria-expanded="true"] .nav-toggle__bar:nth-child(2) {
+    opacity: 0;
+  }
+  .nav-toggle[aria-expanded="true"] .nav-toggle__bar:nth-child(3) {
+    transform: translateY(-7.5px) rotate(-45deg);
+  }
+
+  .nav-links {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    margin-top: 0.5rem;
+    flex-direction: column;
+    gap: 0;
+    background: #111;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    padding: 0.5rem;
+    z-index: 50;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.55);
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: max-height 0.3s ease, opacity 0.2s ease, padding 0.25s ease;
+  }
+  .nav-links.is-open {
+    max-height: 480px;
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .nav-links a {
+    display: block;
+    padding: 0.85rem 1rem;
+    font-size: 0.95rem;
+    color: #fff;
+    border-radius: 8px;
+    text-decoration: none;
+  }
+  .nav-links a:hover,
+  .nav-links a:focus-visible {
+    background: rgba(199,155,59,0.1);
+    color: #fff;
+  }
+  .nav-links a::after,
+  .nav-links a::before { display: none !important; }
+
+  /* Flatten the "More" dropdown on mobile — Blog and Careers sit inline */
+  .nav-links .nav-more { display: contents; }
+  .nav-links .nav-more__trigger { display: none; }
+  .nav-links .nav-more__menu {
+    position: static;
+    display: contents;
+    background: none;
+    border: none;
+    padding: 0;
+    box-shadow: none;
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+  }
+}

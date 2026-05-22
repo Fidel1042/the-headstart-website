@@ -61,8 +61,9 @@
   }
 
   .nav-logo-icon {
-    width: 56px;
-    height: 56px;
+    width: auto;
+    height: 80px;
+    max-width: 240px;
   }
 
   .nav-brand-text {
@@ -91,6 +92,11 @@
     padding: 2.2rem 1.2rem 6.2rem;
   }
 
+  .services-group-eyebrow {
+    font-size: 0.9rem;
+    margin-bottom: 1.1rem;
+  }
+
   .home-page .headline-standalone {
     min-height: 58vh;
     padding: 2.5rem 0 2.6rem;
@@ -111,13 +117,15 @@
   }
 
   .headline-standalone .hero-ctas .btn {
-    flex: 1 1 100%;
+    flex: 0 1 calc(50% - 0.45rem);
+    max-width: calc(50% - 0.45rem);
+    text-align: center;
   }
 
   .hero-ctas .btn {
-    font-size: 0.7rem;
-    padding: 0.55rem 0.9rem;
-    letter-spacing: 0.06em;
+    font-size: 0.66rem;
+    padding: 0.5rem 0.7rem;
+    letter-spacing: 0.05em;
   }
 
   .headline-standalone .hero-ctas .btn.hero-cta-book-call {
@@ -166,6 +174,10 @@
 }
 
 @media (max-width: 480px) {
+  .home-page main {
+    padding-bottom: 4rem;
+  }
+
   .headline-standalone__title {
     font-size: clamp(1.65rem, 8vw, 2.2rem);
   }

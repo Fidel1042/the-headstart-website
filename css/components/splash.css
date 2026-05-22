@@ -24,22 +24,22 @@
 }
 
 .splash-logo {
-  width: 220px;
-  height: 220px;
+  width: auto;
+  height: clamp(110px, 18vw, 180px);
+  max-width: 80vw;
+  object-fit: contain;
+  display: block;
   animation: logoSpin3D 2s ease-out forwards;
 }
 
-/* Golden finishing line in front of the logo */
+/* Golden finishing line beneath the logo */
 .finish-line {
-  position: absolute;
-  left: 50%;
-  top: 118px;
-  width: 300px;
+  position: relative;
+  width: min(300px, 70vw);
   height: 3px;
   background: linear-gradient(90deg, rgba(255,255,255,0.08), rgba(255,255,255,0.4));
   overflow: hidden;
-  transform-origin: left center;
-  transform: translateX(-50%) skewX(-10deg);
+  transform: skewX(-10deg);
 }
 
 .finish-line::before {

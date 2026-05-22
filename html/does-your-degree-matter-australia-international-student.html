@@ -90,16 +90,16 @@
   <header>
     <div class="nav">
       <a href="/" class="nav-left nav-home">
-        <img src="../images/intro-logo.png" width="500" height="500" decoding="async" alt="Headstart Mentoring logo" class="nav-logo-icon" />
-        <div class="nav-brand-text">
-          <span>Headstart Mentoring</span>
-          <span>Mentors for Entry Level Roles / Internship</span>
-        </div>
+        <img src="../images/headstart-italic-logo.png" decoding="async" alt="Headstart Mentoring logo" class="nav-logo-icon" />
       </a>
-      <nav class="nav-links">
-        <a href="/">Home</a>
-        <a href="/services">Services</a>
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+      </button>
+      <nav class="nav-links" id="navLinks">
         <a href="/mentors">Mentors</a>
+        <a href="/#pricing">Pricing</a>
         <a href="/reviews">Reviews</a>
         <a href="/job-alerts">Job Alerts</a>
         <div class="nav-more nav-more--active">
@@ -110,7 +110,7 @@
           </div>
         </div>
       </nav>
-      <a href="/discovery-call" class="nav-cta nav-cta--gold">Book a free call</a>
+      <a href="/discovery-call" class="nav-cta nav-cta--gold">Free Career Call</a>
     </div>
   </header>
 
@@ -130,7 +130,7 @@
 
           <div class="blog-post-body reveal">
             <p>Over 60% of Australians aged 25 to 34 hold a tertiary qualification. When you graduate, your degree puts you in the same pile as everyone else. It gets you considered. It does not get you hired.</p>
-            <p>The graduates landing roles are not always the ones with the highest WAM. They are the ones who have at least two of the following five traits. These are the same areas we work through in <a class="gradient-link" href="/services">our 1-on-1 mentoring sessions</a>.</p>
+            <p>The graduates landing roles are not always the ones with the highest WAM. They are the ones who have at least two of the following five traits. These are the same areas we work through in <a class="gradient-link" href="/#mentoring">our 1-on-1 mentoring sessions</a>.</p>
 
             <h2>The five traits that actually get international students hired in Australia</h2>
 
@@ -183,5 +183,6 @@
   </div>
   <button class="back-to-top" type="button" aria-label="Back to top">↑</button>
   <script type="module" src="../js/main.js"></script>
+  <script src="../js/nav-hamburger.js" defer></script>
 </body>
 </html>

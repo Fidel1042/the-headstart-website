@@ -12,7 +12,7 @@ header {
 .nav {
   max-width: 1120px;
   margin: 0 auto;
-  padding: 0 0.8rem;
+  padding: 1.4rem 0.8rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -20,7 +20,7 @@ header {
 }
 
 .nav.shrunk {
-  padding: 0 0.5rem;
+  padding: 0.9rem 0.5rem;
   transition: padding 0.2s ease, background 0.2s ease;
   background: rgba(0, 0, 0, 0.92);
 }
@@ -40,13 +40,16 @@ header {
 }
 
 .nav-logo-icon {
-  width: 80px;
-  height: 80px;
-  border-radius: 12px;
-  transition: transform 0.2s ease, width 0.2s ease, height 0.2s ease;
+  width: auto;
+  height: 102px;
+  max-width: 310px;
+  border-radius: 6px;
+  object-fit: contain;
+  display: block;
+  transition: transform 0.2s ease, height 0.2s ease;
 }
 
 .nav.shrunk .nav-logo-icon {
-  transform: scale(0.9);
+  transform: scale(0.92);
 }
 

@@ -93,16 +93,16 @@
   <header>
     <div class="nav">
       <a href="/" class="nav-left nav-home">
-        <img src="../images/intro-logo.png" width="500" height="500" decoding="async" alt="Headstart Mentoring logo" class="nav-logo-icon" />
-        <div class="nav-brand-text">
-          <span>Headstart Mentoring</span>
-          <span>Mentors for Entry Level Roles / Internship</span>
-        </div>
+        <img src="../images/headstart-italic-logo.png" decoding="async" alt="Headstart Mentoring logo" class="nav-logo-icon" />
       </a>
-      <nav class="nav-links">
-        <a href="/">Home</a>
-        <a href="/services">Services</a>
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+      </button>
+      <nav class="nav-links" id="navLinks">
         <a href="/mentors">Mentors</a>
+        <a href="/#pricing">Pricing</a>
         <a href="/reviews">Reviews</a>
         <a href="/job-alerts">Job Alerts</a>
         <div class="nav-more nav-more--active">
@@ -113,7 +113,7 @@
           </div>
         </div>
       </nav>
-      <a href="/discovery-call" class="nav-cta nav-cta--gold">Book a free call</a>
+      <a href="/discovery-call" class="nav-cta nav-cta--gold">Free Career Call</a>
     </div>
   </header>
 
@@ -155,7 +155,7 @@
             <p>Ask a graduate who landed a role in 2015 or 2016 how many applications they sent. Most will say somewhere between 20 and 60.</p>
             <p>Ask a 2024 graduate the same question and you'll often hear numbers in the hundreds.</p>
             <p>Part of that is because applying on LinkedIn takes 10 seconds. Part of it is that applicant-to-role ratios have genuinely increased in competitive industries. But a big part of it is strategy. If each individual application is generic and untailored, you send more of them to compensate. It doesn't work.</p>
-            <p>The graduates landing roles right now are sending fewer, better applications and spending the rest of their time having direct conversations with people in their target industry. That's what the data supports, and what we see in practice through <a class="gradient-link" href="/services">our 1-on-1 mentoring sessions</a>.</p>
+            <p>The graduates landing roles right now are sending fewer, better applications and spending the rest of their time having direct conversations with people in their target industry. That's what the data supports, and what we see in practice through <a class="gradient-link" href="/#mentoring">our 1-on-1 mentoring sessions</a>.</p>
 
             <h2>The honest answer</h2>
             <p>Yes, it's harder than 2022 and 2023. No, it's not harder than it was before the boom.</p>
@@ -185,5 +185,6 @@
   </div>
   <button class="back-to-top" type="button" aria-label="Back to top">↑</button>
   <script type="module" src="../js/main.js"></script>
+  <script src="../js/nav-hamburger.js" defer></script>
 </body>
 </html>

@@ -26,6 +26,88 @@
   <meta name="twitter:title" content="Student Mentoring Reviews Australia | Headstart Mentoring" />
   <meta name="twitter:description" content="Real reviews from international students in Australia who landed internships and graduate roles through Headstart Mentoring." />
   <meta name="twitter:image" content="https://theheadstartmentoring.com/images/website-logo.png" />
+
+  <!-- Schema: reviews collection of the mentoring service -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "url": "https://theheadstartmentoring.com/reviews/",
+    "name": "Headstart Mentoring Reviews",
+    "description": "Reviews from international students in Australia who used Headstart Mentoring to land internships and graduate roles.",
+    "isPartOf": { "@id": "https://theheadstartmentoring.com/#website" },
+    "breadcrumb": {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://theheadstartmentoring.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Reviews", "item": "https://theheadstartmentoring.com/reviews/" }
+      ]
+    },
+    "mainEntity": {
+      "@type": "Service",
+      "name": "Headstart Mentoring",
+      "serviceType": "1-on-1 career mentoring for international students in Australia",
+      "provider": {
+        "@type": "Organization",
+        "name": "Headstart Mentoring",
+        "url": "https://theheadstartmentoring.com/"
+      },
+      "review": [
+        {
+          "@type": "Review",
+          "author": { "@type": "Person", "name": "Amy" },
+          "reviewBody": "I've tried free mentoring programs before, but mentors were rarely committed or tailored in their advice. Koko was the opposite, every piece of advice was specific to my situation and actually actionable."
+        },
+        {
+          "@type": "Review",
+          "author": { "@type": "Person", "name": "Jordan" },
+          "reviewBody": "Having a mentor that just did the same interview 2 years ago in the same company is the reason why I got this role."
+        },
+        {
+          "@type": "Review",
+          "author": { "@type": "Person", "name": "Shreya" },
+          "reviewBody": "I like the flexible lessons, compared to other career programs that are way more expensive. I have gotten my first ever in person final interview."
+        },
+        {
+          "@type": "Review",
+          "author": { "@type": "Person", "name": "Daniel" },
+          "reviewBody": "The reason I passed the individual case study for my current role is because he gave me a PowerPoint template that's professional and impressed the interviewers."
+        },
+        {
+          "@type": "Review",
+          "author": { "@type": "Person", "name": "Kyra" },
+          "reviewBody": "I thought 'being unique to stand out' was a buzzword until I realised it was the main reason I got my current role."
+        },
+        {
+          "@type": "Review",
+          "author": { "@type": "Person", "name": "Ken" },
+          "reviewBody": "My mentor worked in my target firm, so I think it will be helpful in the interview process for me."
+        },
+        {
+          "@type": "Review",
+          "author": { "@type": "Person", "name": "Mary" },
+          "reviewBody": "I have no formal internship experience and was feeling quite behind. I got paired with a mentor who landed a full time job with no internships either, I feel more calm about my situation."
+        },
+        {
+          "@type": "Review",
+          "author": { "@type": "Person", "name": "Joe" },
+          "reviewBody": "I book sessions ad hoc when I want to ask someone who has done it. Its faster than researching on my own. Life admin no one talks about: visa, tax, investing, which job sites actually reply."
+        },
+        {
+          "@type": "Review",
+          "author": { "@type": "Person", "name": "Mohit" },
+          "reviewBody": "I heard about Headstart through a USYD society event and decided to give it a go. After one 45-minute session, I had a much clearer picture of where I should be heading."
+        },
+        {
+          "@type": "Review",
+          "author": { "@type": "Person", "name": "Ash" },
+          "reviewBody": "I kept seeing Headstart on Instagram and decided to check it out. Before this, I was mass applying with no idea what I was doing wrong. After 3 sessions, I finally passed my first online recorded interview."
+        }
+      ]
+    }
+  }
+  </script>
+
   <link rel="stylesheet" href="../style.css" />
   <style>
     .review-grid {
@@ -129,16 +211,16 @@
   <header>
     <div class="nav">
       <a href="/" class="nav-left nav-home">
-        <img src="../images/intro-logo.png" width="500" height="500" decoding="async" alt="Headstart Mentoring logo" class="nav-logo-icon" />
-        <div class="nav-brand-text">
-          <span>Headstart Mentoring</span>
-          <span>Mentors for Entry Level Roles / Internship</span>
-        </div>
+        <img src="../images/headstart-italic-logo.png" decoding="async" alt="Headstart Mentoring logo" class="nav-logo-icon" />
       </a>
-      <nav class="nav-links">
-        <a href="/">Home</a>
-        <a href="/services">Services</a>
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+      </button>
+      <nav class="nav-links" id="navLinks">
         <a href="/mentors">Mentors</a>
+        <a href="/#pricing">Pricing</a>
         <a href="/reviews" class="active">Reviews</a>
         <a href="/job-alerts">Job Alerts</a>
         <div class="nav-more">
@@ -149,7 +231,7 @@
           </div>
         </div>
       </nav>
-      <a href="/discovery-call" class="nav-cta nav-cta--gold">Book a free call</a>
+      <a href="/discovery-call" class="nav-cta nav-cta--gold">Free Career Call</a>
     </div>
   </header>
 
@@ -313,6 +395,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
   <script type="module" src="../js/main.js"></script>
+  <script src="../js/nav-hamburger.js" defer></script>
   <script>
     document.querySelectorAll('.mentor-filter-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {

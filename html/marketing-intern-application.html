@@ -21,21 +21,21 @@
   <header>
     <div class="nav">
       <a href="/" class="nav-left nav-home">
-        <img src="../images/intro-logo.png" width="500" height="500" decoding="async" alt="Headstart Mentoring logo" class="nav-logo-icon" />
-        <div class="nav-brand-text">
-          <span>Headstart Mentoring</span>
-          <span>Mentors for Entry Level Roles / Internship</span>
-        </div>
+        <img src="../images/headstart-italic-logo.png" decoding="async" alt="Headstart Mentoring logo" class="nav-logo-icon" />
       </a>
-      <nav class="nav-links">
-        <a href="/">Home</a>
-        <a href="/services">Services</a>
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+      </button>
+      <nav class="nav-links" id="navLinks">
         
         <a href="/mentors">Mentors</a>
+        <a href="/#pricing">Pricing</a>
         <a href="/reviews">Reviews</a>
         <a href="/careers">Careers</a>
       </nav>
-      <a href="/discovery-call" class="nav-cta nav-cta--gold">Book a free call</a>
+      <a href="/discovery-call" class="nav-cta nav-cta--gold">Free Career Call</a>
     </div>
   </header>
 
@@ -128,5 +128,6 @@
   </div>
   <button class="back-to-top" type="button" aria-label="Back to top">↑</button>
   <script type="module" src="../js/main.js"></script>
+  <script src="../js/nav-hamburger.js" defer></script>
 </body>
 </html>
