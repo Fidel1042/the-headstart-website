@@ -614,12 +614,13 @@
         margin-bottom: 1rem;
       }
     }
-    /* Mobile hero — sized to the SMALLEST visible viewport (svh) so Instagram/LinkedIn in-app browser chrome doesn't crop content */
+    /* Mobile hero — sized to the SMALLEST visible viewport (svh) so Instagram/LinkedIn in-app browser chrome doesn't crop content. Asymmetric bottom padding shifts the centered content up ~10% of viewport. */
     @media (max-width: 600px) {
       .home-page .headline-standalone {
         min-height: 88vh;            /* fallback for old browsers */
         min-height: 88svh;            /* small viewport height — accounts for URL bar + bottom share buttons in IG/LinkedIn in-app browsers */
-        padding: 1.5rem 0 1.5rem;
+        padding: 1.5rem 0 20vh;
+        padding: 1.5rem 0 20svh;
         justify-content: center;
       }
     }
@@ -1086,16 +1087,6 @@
 </head>
 <body class="home-page">
 
-  <div id="splash">
-    <div class="splash-inner">
-      <div class="splash-logo-wrap">
-        <img src="images/headstart-italic-logo.png" decoding="async" alt="Headstart Mentoring icon" class="splash-logo" />
-      </div>
-      <div class="finish-line"></div>
-      <div class="splash-tagline">GET YOUR FIRST OFFER WITH US</div>
-    </div>
-  </div>
-
   <div id="main">
 
   <header>
@@ -1465,38 +1456,11 @@
   <script>
     gsap.registerPlugin(ScrollTrigger);
 
-    // ── Splash timing ──
-    const prefersReducedMotion =
-      window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    function _scrollToHashIfPresent() {
-      if (!window.location.hash) return;
-      var target = document.querySelector(window.location.hash);
-      if (!target) return;
-      // Defer one tick so layout is final
-      setTimeout(function () {
-        target.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 50);
-    }
-    window.addEventListener("load", function () {
-      var splash = document.getElementById("splash");
-      var main   = document.getElementById("main");
-      if (!splash || !main) return;
-      if (prefersReducedMotion) {
-        splash.style.display = "none";
-        main.classList.add("ready");
-        if (window._playHeroAnimations) window._playHeroAnimations();
-        _scrollToHashIfPresent();
-        return;
-      }
-      setTimeout(function () {
-        splash.style.animation = "fadeOut 0.6s ease-out forwards";
-        main.classList.add("ready");
-        if (window._playHeroAnimations) window._playHeroAnimations();
-        setTimeout(function () {
-          splash.style.display = "none";
-          _scrollToHashIfPresent();
-        }, 650);
-      }, 800);
+    // Make #main visible immediately (no splash) and fire hero animations on load
+    document.addEventListener("DOMContentLoaded", function () {
+      var main = document.getElementById("main");
+      if (main) main.classList.add("ready");
+      if (window._playHeroAnimations) window._playHeroAnimations();
     });
 
     // ── GSAP scroll animations ──

@@ -102,12 +102,5 @@
   to { opacity: 0; visibility: hidden; }
 }
 
-#main {
-  opacity: 0;
-  transition: opacity 0.6s ease-out;
-}
-
-#main.ready {
-  opacity: 1;
-}
+/* Splash removed — #main shows immediately, no fade gating */
 
