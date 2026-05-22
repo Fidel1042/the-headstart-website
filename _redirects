@@ -6,7 +6,6 @@
 /job-application /html/job-application.html 200
 /mentor-role /html/mentor-role.html 200
 /mentor-application /html/mentor-application.html 200
-/mentee-signup /html/mentee-signup.html 200
 /mentee-agreement /html/mentee-agreement.html 200
 /mentee-agreement-popup /html/mentee-agreement-popup.html 200
 /mentee-agreement-submitted /html/mentee-agreement-submitted.html 200
@@ -41,7 +40,6 @@
 /job-application.html /job-application 301
 /mentor-role.html /mentor-role 301
 /mentor-application.html /mentor-application 301
-/mentee-signup.html /mentee-signup 301
 /mentee-agreement.html /mentee-agreement 301
 /mentee-agreement-popup.html /mentee-agreement-popup 301
 /mentee-agreement-submitted.html /mentee-agreement-submitted 301

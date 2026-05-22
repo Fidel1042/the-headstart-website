@@ -27,6 +27,12 @@
   <meta name="twitter:description" content="Graduate and internship job alerts for international students in Australia. Entry-level roles across Sydney, Melbourne, and Brisbane, updated weekly." />
   <meta name="twitter:image" content="https://theheadstartmentoring.com/images/website-logo.png" />
   <link rel="stylesheet" href="../style.css" />
+  <link rel="preconnect" href="https://calendly.com" crossorigin />
+  <link rel="preconnect" href="https://assets.calendly.com" crossorigin />
+  <link rel="dns-prefetch" href="//calendly.com" />
+  <link rel="dns-prefetch" href="//assets.calendly.com" />
+  <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet" />
+  <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
   <style>
     /* ── HERO DESCRIPTION ── */
     .job-alerts-desc {
@@ -480,6 +486,11 @@
       transition: opacity 0.18s;
     }
     .consult-submit:hover { opacity: 0.88; }
+    .consult-submit:disabled { opacity: 0.6; cursor: progress; }
+    .consult-success a.consult-submit {
+      display: inline-block; text-decoration: none;
+      text-align: center; margin-top: 0.9rem; width: auto; padding: 0.7rem 1.4rem;
+    }
     .consult-success {
       display: none;
       padding: 1.4rem 1.5rem;
@@ -1268,17 +1279,85 @@ document.getElementById("emailForm").addEventListener("submit", function(e) {
   setTimeout(openConsultModal, 350);
 });
 
-// Consult form → post to Netlify as mentee-signup, show success
+// Consult form → post to Netlify as mentee-signup, then open Calendly popup
+var CALENDLY_URL = "https://calendly.com/fidelhon/30min";
+
 document.getElementById("consultForm").addEventListener("submit", function(e) {
   e.preventDefault();
-  var data = new FormData(this);
-  fetch("/", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams(data).toString()
-  }).catch(function() {});
-  this.style.display = "none";
-  document.getElementById("consultSuccess").style.display = "block";
-  // Auto-close the modal a few seconds after success
-  setTimeout(closeConsultModal, 3500);
+
+  var form = this;
+  var submitBtn = form.querySelector(".consult-submit");
+  if (submitBtn && submitBtn.disabled) return;
+
+  var originalLabel = submitBtn ? submitBtn.innerHTML : "";
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = "Opening calendar...";
+  }
+
+  var prefillName = (document.getElementById("consultName").value || "").trim();
+  var prefillEmail = (document.getElementById("consultEmail").value || "").trim();
+
+  // Save the lead to Netlify in the background; never block the user on it
+  try {
+    var data = new FormData(form);
+    fetch("/", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams(data).toString()
+    }).catch(function() {});
+  } catch (err) { /* lead save failed silently */ }
+
+  function buildFallbackUrl() {
+    var params = [];
+    if (prefillName) params.push("name=" + encodeURIComponent(prefillName));
+    if (prefillEmail) params.push("email=" + encodeURIComponent(prefillEmail));
+    return params.length ? CALENDLY_URL + "?" + params.join("&") : CALENDLY_URL;
+  }
+
+  function showFallback() {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalLabel;
+    }
+    form.style.display = "none";
+    var success = document.getElementById("consultSuccess");
+    success.innerHTML =
+      '<p><strong>You\'re in.</strong><br>Click below to pick a time for your free career call.</p>' +
+      '<a href="' + buildFallbackUrl() + '" target="_blank" rel="noopener" class="consult-submit">Pick a time</a>';
+    success.style.display = "block";
+  }
+
+  function tryOpenCalendly() {
+    if (typeof Calendly === "undefined" || !Calendly || typeof Calendly.initPopupWidget !== "function") return false;
+    try {
+      closeConsultModal();
+      form.style.display = "none";
+      Calendly.initPopupWidget({
+        url: CALENDLY_URL,
+        prefill: { name: prefillName, email: prefillEmail }
+      });
+      return true;
+    } catch (err) {
+      // Calendly threw mid-call; restore form so user can see the fallback
+      form.style.display = "";
+      return false;
+    }
+  }
+
+  if (tryOpenCalendly()) return;
+
+  // Widget script hasn't finished loading yet; poll up to ~4s
+  var tries = 0;
+  var poll = setInterval(function() {
+    tries++;
+    if (tryOpenCalendly()) {
+      clearInterval(poll);
+    } else if (tries > 40) {
+      clearInterval(poll);
+      showFallback();
+    }
+  }, 100);
 });
 
 render();

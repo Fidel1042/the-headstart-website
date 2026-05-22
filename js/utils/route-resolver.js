@@ -11,7 +11,6 @@ const routeToFileMap = {
   "/job-application": "html/job-application.html",
   "/mentor-role": "html/mentor-role.html",
   "/mentor-application": "html/mentor-application.html",
-  "/mentee-signup": "html/mentee-signup.html",
   "/mentee-agreement": "html/mentee-agreement.html",
   "/mentee-agreement-popup": "html/mentee-agreement-popup.html",
   "/mentee-agreement-submitted": "html/mentee-agreement-submitted.html",

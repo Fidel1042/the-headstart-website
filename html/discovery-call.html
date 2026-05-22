@@ -328,6 +328,67 @@
       inp.addEventListener('change', syncPulse);
     });
 
+    // ── Form submit: AJAX to Netlify, then navigate to Calendly page ──
+    // We bypass Netlify's native action-redirect because it can land users on
+    // the default "Thank you" page when form metadata gets out of sync.
+    (function () {
+      var form = document.querySelector('form.signup-form');
+      if (!form) return;
+      var submitBtn = form.querySelector('.discovery-submit-btn');
+      var originalLabel = submitBtn ? submitBtn.innerHTML : '';
+
+      // If the browser is missing modern APIs we need, fall back to native form
+      // submission (Netlify's action attribute will handle the redirect).
+      if (typeof fetch !== 'function' || typeof URLSearchParams !== 'function' || typeof FormData !== 'function') return;
+
+      form.addEventListener('submit', function (e) {
+        if (submitBtn && submitBtn.disabled) { e.preventDefault(); return; }
+        e.preventDefault();
+
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = 'Submitting...';
+        }
+
+        // Carry name + email forward for Calendly prefill on the next page
+        try {
+          var nameEl = document.getElementById('contact-name');
+          var emailEl = document.getElementById('contact-email');
+          sessionStorage.setItem('hs_booking_name', nameEl ? nameEl.value : '');
+          sessionStorage.setItem('hs_booking_email', emailEl ? emailEl.value : '');
+        } catch (err) { /* sessionStorage blocked; Calendly will just load empty */ }
+
+        // Send the lead to Netlify with keepalive so the POST survives navigation
+        try {
+          var data = new FormData(form);
+          fetch('/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams(data).toString(),
+            keepalive: true
+          }).catch(function () {});
+        } catch (err) { /* save failed; still send user to Calendly */ }
+
+        // Failsafe: if navigation hasn't happened in 4s, restore the button
+        var failsafe = setTimeout(function () {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalLabel;
+          }
+        }, 4000);
+
+        try {
+          window.location.href = '/free-call-submitted';
+        } catch (err) {
+          clearTimeout(failsafe);
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalLabel;
+          }
+        }
+      });
+    })();
+
   </script>
 </body>
 </html>
