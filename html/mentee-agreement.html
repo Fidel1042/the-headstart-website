@@ -294,18 +294,21 @@
       const agreementOpenError = document.getElementById("agreement-open-error");
       let agreementWasOpened = false;
       if (popupTrigger) {
-        popupTrigger.addEventListener("click", (event) => {
-          event.preventDefault();
-          const isMobileViewport = window.matchMedia("(max-width: 768px)").matches;
-          if (isMobileViewport) {
-            const mobileTab = window.open(popupTrigger.href, "_blank", "noopener");
-            if (mobileTab) {
-              agreementWasOpened = true;
-              if (agreementOpenError) agreementOpenError.textContent = "";
-            }
-            return;
-          }
+        const markAgreementOpened = () => {
+          agreementWasOpened = true;
+          if (agreementOpenError) agreementOpenError.textContent = "";
+        };
 
+        popupTrigger.addEventListener("click", (event) => {
+          markAgreementOpened();
+
+          const isModifiedClick = event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button === 1;
+          if (isModifiedClick) return;
+
+          const isMobileViewport = window.matchMedia("(max-width: 768px)").matches;
+          if (isMobileViewport) return;
+
+          event.preventDefault();
           const maxWidth = Math.max(360, window.screen.availWidth - 24);
           const maxHeight = Math.max(520, window.screen.availHeight - 24);
           const width = Math.min(maxWidth, Math.max(560, Math.round(window.screen.availWidth * 0.55)));
@@ -315,13 +318,16 @@
           const features = `popup=yes,width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`;
           const popup = window.open(popupTrigger.href, "headstartMenteeAgreementPopup", features);
           if (popup && !popup.closed) {
-            agreementWasOpened = true;
-            if (agreementOpenError) agreementOpenError.textContent = "";
             popup.focus();
           } else {
             window.open(popupTrigger.href, "_blank", "noopener");
           }
         });
+
+        popupTrigger.addEventListener("auxclick", (event) => {
+          if (event.button === 1) markAgreementOpened();
+        });
+        popupTrigger.addEventListener("contextmenu", markAgreementOpened);
       }
 
       const form = document.getElementById("mentee-agreement-form");

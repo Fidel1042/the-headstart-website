@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>LinkedIn: Annotated Profile Guide</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    --ink: #111;
+    --muted: #555;
+    --line: #e5e5e5;
+    --accent: #c79b3b;
+    --accent-soft: #fff4dc;
+    --card-bg: #fafafa;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    background: #fff;
+    color: var(--ink);
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    background: #fff;
+    border-bottom: 1px solid var(--line);
+    padding: 14px 28px;
+  }
+  .topbar h1 {
+    font-size: 15px; font-weight: 700; margin: 0; letter-spacing: .2px;
+  }
+  .topbar .sub {
+    font-size: 12px; color: var(--muted); margin-top: 2px;
+  }
+
+  .layout {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 32px 28px 80px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 40px;
+    align-items: start;
+  }
+
+  /* Image stage */
+  .stage {
+    position: relative;
+    background: var(--card-bg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 24px;
+  }
+  .stage img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+  }
+
+  /* Markers overlaid on image */
+  .marker {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,.25), 0 0 0 3px #fff;
+    cursor: pointer;
+    transition: transform .15s ease;
+  }
+  .marker:hover, .marker.active {
+    transform: scale(1.15);
+  }
+
+  /* Marker positions, relative to the image inside .stage.
+     The .stage has 24px padding, so positions reference the image area. */
+  .marker-wrap {
+    position: relative;
+  }
+  .m1 { top: 38%; left: 16%; }   /* Profile picture (inside circle) */
+  .m2 { top: 55%; left: 43%; }   /* Headline (after "Marketing Intern @ Headstart Mentoring") */
+  .m3 { top: 22%; left: 55%; }   /* Cover photo (inside cover) */
+  .m4 { top: 60%; left: 23%; }   /* 500+ connections (right next to text) */
+
+  /* Annotation panel */
+  .annotations {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .ann {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    padding: 16px 18px;
+    transition: box-shadow .15s ease, border-color .15s ease;
+  }
+  .ann.active {
+    box-shadow: 0 6px 18px rgba(199,155,59,.18);
+    background: var(--accent-soft);
+  }
+  .ann-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+  .ann-num {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .ann-title {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--ink);
+  }
+  .ann p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
+  .ann p + p { margin-top: 6px; }
+  .ann .rule {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 12.5px;
+    background: #f3f3f3;
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: var(--ink);
+  }
+
+  /* Mobile */
+  @media (max-width: 880px) {
+    .layout {
+      grid-template-columns: 1fr;
+      gap: 28px;
+      padding: 20px 16px 60px;
+    }
+    .marker { width: 26px; height: 26px; font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>LinkedIn: Annotated Landing Page</h1>
+  <div class="sub">Worked example. Hover or tap a number on the image to see what it means.</div>
+</div>
+
+<div class="layout">
+
+  <div class="stage">
+    <div class="marker-wrap">
+      <img src="images/Alex LinkedIn Annotation.png" alt="Alex Kong LinkedIn landing page" />
+      <div class="marker m1" data-target="ann-1">1</div>
+      <div class="marker m2" data-target="ann-2">2</div>
+      <div class="marker m3" data-target="ann-3">3</div>
+      <div class="marker m4" data-target="ann-4">4</div>
+    </div>
+  </div>
+
+  <div class="annotations">
+
+    <div class="ann" id="ann-1">
+      <div class="ann-head">
+        <div class="ann-num">1</div>
+        <div class="ann-title">Profile picture</div>
+      </div>
+      <p>Clear professional picture of yourself. Not an angled selfie.</p>
+    </div>
+
+    <div class="ann" id="ann-2">
+      <div class="ann-head">
+        <div class="ann-num">2</div>
+        <div class="ann-title">Description under your name</div>
+      </div>
+      <p>Clear role of internship or society.</p>
+      <p>Format: <span class="rule">[Role] @ [Company]</span></p>
+    </div>
+
+    <div class="ann" id="ann-3">
+      <div class="ann-head">
+        <div class="ann-num">3</div>
+        <div class="ann-title">Cover photo</div>
+      </div>
+      <p>Something related to the city you are in.</p>
+      <p>Or design a poster that includes your name, uni, and a backdrop of your city.</p>
+    </div>
+
+    <div class="ann" id="ann-4">
+      <div class="ann-head">
+        <div class="ann-num">4</div>
+        <div class="ann-title">Connections</div>
+      </div>
+      <p>Have at least 100 connections.</p>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  document.querySelectorAll('.marker').forEach(m => {
+    const id = m.dataset.target;
+    const card = document.getElementById(id);
+    const setActive = (on) => {
+      m.classList.toggle('active', on);
+      card.classList.toggle('active', on);
+    };
+    m.addEventListener('mouseenter', () => setActive(true));
+    m.addEventListener('mouseleave', () => setActive(false));
+    m.addEventListener('click', () => {
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setActive(true);
+      setTimeout(() => setActive(false), 1400);
+    });
+  });
+</script>
+
+</body>
+</html>
