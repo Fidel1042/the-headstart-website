@@ -1,0 +1,9 @@
+{
+  "name": "headstart-mentoring-website",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Headstart Mentoring website with Netlify Functions",
+  "dependencies": {
+    "stripe": "^17.5.0"
+  }
+}

@@ -1,34 +1,54 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
-  <title>Mentor Resource Hub | Headstart Mentoring</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="robots" content="noindex, nofollow" />
-  <link rel="icon" href="../images/website-logo.png" />
+  <title>Mentor Portal – The Headstart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Private mentor portal for The Headstart mentoring platform." />
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
   <style>
     :root {
+      /* Theme tokens — dark (default) */
       --bg: #000000;
-      --bg-elev: #0d0d0d;
-      --bg-card: #141414;
+      --bg-card: rgba(255,255,255,0.04);
+      --bg-card-hover: rgba(255,255,255,0.065);
       --text: #ffffff;
-      --text-dim: #b8b8b8;
-      --text-muted: #888888;
+      --line: rgba(255,255,255,0.1);
+      --line-soft: rgba(255,255,255,0.07);
       --accent: #c79b3b;
-      --accent-soft: rgba(199, 155, 59, 0.18);
-      --accent-line: rgba(199, 155, 59, 0.35);
-      --border: rgba(255, 255, 255, 0.08);
-      --border-strong: rgba(255, 255, 255, 0.18);
-      --sidebar-w: 280px;
+      --accent-bright: #f0c75c;
+      --accent-soft: rgba(199,155,59,0.22);
+      --accent-line: rgba(199,155,59,0.4);
+      --gold-gradient: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
+      --shadow-card: 0 12px 32px rgba(0,0,0,0.4);
+      --shadow-glow: 0 0 28px rgba(199,155,59,0.25);
+      --grain-opacity: 0.42;
+      --grain-blend: screen;
     }
 
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+    [data-theme="light"] {
+      --bg: #ffffff;
+      --bg-card: rgba(0,0,0,0.025);
+      --bg-card-hover: rgba(0,0,0,0.05);
+      --text: #000000;
+      --line: rgba(0,0,0,0.1);
+      --line-soft: rgba(0,0,0,0.06);
+      --accent: #a07a1d;
+      --accent-bright: #c79b3b;
+      --accent-soft: rgba(199,155,59,0.14);
+      --accent-line: rgba(199,155,59,0.45);
+      --gold-gradient: linear-gradient(90deg, #8a6210 0%, #b88820 35%, #a07a1d 68%, #c79b3b 100%);
+      --shadow-card: 0 6px 18px rgba(0,0,0,0.08);
+      --shadow-glow: 0 0 24px rgba(199,155,59,0.18);
+      --grain-opacity: 0;
+      --grain-blend: normal;
     }
 
-    html { font-size: 16px; scroll-behavior: smooth; scroll-padding-top: 24px; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { font-size: 110%; scroll-behavior: smooth; }
+    @media (max-width: 700px) { html { font-size: 95%; } }
 
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -36,1423 +56,562 @@
       color: var(--text);
       line-height: 1.6;
       min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      transition: background 0.25s ease, color 0.25s ease;
     }
 
-    /* Layout */
-    .layout {
-      display: grid;
-      grid-template-columns: var(--sidebar-w) 1fr;
-      max-width: 1400px;
-      margin: 0 auto;
+    /* Grain overlay (dark mode only) */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(rgba(255,255,255,0.055) 1px, transparent 0),
+        radial-gradient(rgba(255,255,255,0.03) 1px, transparent 0);
+      background-size: 3px 3px, 5px 5px;
+      background-position: 0 0, 1px 1px;
+      opacity: var(--grain-opacity);
+      mix-blend-mode: var(--grain-blend);
+      z-index: 0;
     }
 
-    /* Sidebar */
-    aside.toc {
+    /* ── Sticky top nav ── */
+    .top-nav {
       position: sticky;
       top: 0;
-      height: 100vh;
-      overflow-y: auto;
-      border-right: 1px solid var(--border);
-      padding: 32px 20px 32px 28px;
+      z-index: 100;
       background: var(--bg);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line);
     }
-    aside.toc .brand {
+    .top-nav-inner {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 1rem 1.5rem;
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding-bottom: 18px;
-      margin-bottom: 18px;
-      border-bottom: 1px solid var(--border);
+      gap: 0.9rem;
     }
-    aside.toc .brand img { height: 30px; width: auto; }
-    aside.toc .brand .label {
-      font-size: 0.72rem;
-      letter-spacing: 0.14em;
+    .top-nav img {
+      height: 40px;
+      width: auto;
+      flex-shrink: 0;
+    }
+    .top-nav-text { display: flex; flex-direction: column; gap: 0.1rem; }
+    .top-nav-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      color: var(--text);
+    }
+    .top-nav-subtitle {
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
       color: var(--accent);
-      font-weight: 600;
+      font-weight: 700;
     }
-    aside.toc h3 {
-      font-size: 0.7rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin: 20px 0 8px;
-      font-weight: 600;
+    .theme-toggle {
+      margin-left: auto;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--accent);
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.15s, background 0.15s, transform 0.15s;
     }
-    aside.toc h3:first-of-type { margin-top: 4px; }
-    aside.toc ul { list-style: none; }
-    aside.toc li { margin: 2px 0; }
-    aside.toc a {
-      display: block;
-      color: var(--text-dim);
-      text-decoration: none;
-      font-size: 0.9rem;
-      padding: 6px 10px;
-      border-radius: 6px;
-      border-left: 2px solid transparent;
-      transition: all 0.15s ease;
+    .theme-toggle:hover {
+      border-color: var(--accent-line);
+      background: var(--accent-soft);
+      transform: rotate(15deg);
     }
-    aside.toc a:hover { color: var(--text); background: var(--accent-soft); border-left-color: var(--accent); }
+    .theme-toggle:focus-visible {
+      outline: 2px solid var(--accent-bright);
+      outline-offset: 3px;
+    }
 
-    /* Main content */
+    /* ── Main wrap ── */
     main {
-      padding: 56px 64px 120px;
-      max-width: 920px;
+      position: relative;
+      z-index: 1;
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 3.5rem 1.5rem 6rem;
+      display: flex;
+      flex-direction: column;
     }
 
-    .page-header {
-      margin-bottom: 56px;
-      padding-bottom: 32px;
-      border-bottom: 1px solid var(--border);
+    /* ── Hero ── */
+    .hero {
+      margin-bottom: 3rem;
+      max-width: 720px;
     }
-    .page-header .eyebrow {
+    .hero-eyebrow {
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 4.5vw, 2.8rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+      margin-bottom: 1rem;
+      background: var(--gold-gradient);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      font-size: 1.1rem;
+      line-height: 1.65;
+      color: var(--text);
+    }
+
+    /* ── Section labels (gold, never grey) ── */
+    .section-label {
       font-size: 0.75rem;
       letter-spacing: 0.18em;
       text-transform: uppercase;
       color: var(--accent);
-      font-weight: 600;
-      margin-bottom: 12px;
-    }
-    .page-header h1 {
-      font-size: 2.4rem;
       font-weight: 700;
-      letter-spacing: -0.01em;
-      line-height: 1.15;
-      margin-bottom: 14px;
+      margin: 0 0 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
     }
-    .page-header p {
-      color: var(--text-dim);
-      font-size: 1.05rem;
-      max-width: 680px;
-    }
-
-    section.chapter {
-      margin-bottom: 72px;
-      scroll-margin-top: 24px;
-    }
-    section.chapter > h2 {
-      font-size: 1.75rem;
-      font-weight: 700;
-      letter-spacing: -0.01em;
-      color: var(--text);
-      padding-bottom: 14px;
-      margin-bottom: 24px;
-      border-bottom: 2px solid var(--accent);
-      display: inline-block;
+    .section-label::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--accent-line);
+      opacity: 0.4;
     }
 
-    section.chapter h3 {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: var(--accent);
-      margin: 32px 0 12px;
-      letter-spacing: -0.005em;
-    }
-    section.chapter h4 {
-      font-size: 1.02rem;
-      font-weight: 600;
-      color: var(--text);
-      margin: 22px 0 8px;
-    }
-    section.chapter h5 {
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: var(--text-dim);
-      margin: 16px 0 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
+    section.portal-section { margin-bottom: 3rem; }
 
-    section.chapter p { margin: 0 0 12px; color: var(--text); }
-    section.chapter p.lead { color: var(--text-dim); font-size: 1.02rem; }
-    section.chapter strong { color: var(--accent); font-weight: 600; }
-    section.chapter em { font-style: italic; color: var(--text-dim); }
+    /* ── Ordering: onboarding flips between top and bottom ── */
+    main { display: flex; flex-direction: column; }
+    .section-onboarding { order: 1; }
+    .section-log         { order: 2; }
+    .section-resources   { order: 3; }
+    [data-onboarded="true"] .section-onboarding { order: 99; }
+    [data-onboarded="true"] .section-log        { order: 1; }
+    [data-onboarded="true"] .section-resources  { order: 2; }
 
-    section.chapter ul, section.chapter ol {
-      margin: 0 0 16px 22px;
-      color: var(--text);
-    }
-    section.chapter li { margin: 6px 0; }
-    section.chapter li::marker { color: var(--accent); }
+    /* Onboarding incomplete vs complete states */
+    .onboarding-incomplete { display: block; }
+    .onboarding-complete { display: none; }
+    [data-onboarded="true"] .onboarding-incomplete { display: none; }
+    [data-onboarded="true"] .onboarding-complete { display: block; }
 
-    /* Callouts */
-    .callout {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-left: 3px solid var(--accent);
-      padding: 18px 22px;
-      border-radius: 6px;
-      margin: 18px 0;
-    }
-    .callout-title {
-      font-size: 0.78rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--accent);
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-
-    /* Tables */
-    .table-wrap { overflow-x: auto; margin: 18px 0; }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.92rem;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 6px;
+    /* ── Primary card (Log Session + featured Onboarding) ── */
+    .primary-card {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 2rem;
+      align-items: center;
+      padding: 2rem 2.2rem;
+      border-radius: 18px;
+      border: 1px solid var(--accent-line);
+      background:
+        radial-gradient(circle at top right, var(--accent-soft), transparent),
+        rgba(199,155,59,0.04);
+      position: relative;
       overflow: hidden;
     }
-    th, td {
-      padding: 12px 16px;
-      text-align: left;
-      vertical-align: top;
-      border-bottom: 1px solid var(--border);
+    .primary-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(800px 200px at -100px 50%, var(--accent-soft), transparent);
+      pointer-events: none;
+      opacity: 0.5;
     }
-    th {
-      background: rgba(199, 155, 59, 0.08);
-      color: var(--accent);
-      font-weight: 600;
-      letter-spacing: 0.03em;
-      font-size: 0.82rem;
+    .primary-card-content { position: relative; }
+    .primary-card-eyebrow {
+      font-size: 0.7rem;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
+      color: var(--accent-bright);
+      font-weight: 700;
+      margin-bottom: 0.6rem;
     }
-    tr:last-child td { border-bottom: none; }
+    .primary-card h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      line-height: 1.25;
+      letter-spacing: -0.005em;
+      margin-bottom: 0.55rem;
+      color: var(--text);
+    }
+    .primary-card p {
+      font-size: 0.98rem;
+      line-height: 1.6;
+      color: var(--text);
+      max-width: 460px;
+    }
+    .primary-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.95rem 1.6rem;
+      border-radius: 999px;
+      border: 1px solid var(--accent-line);
+      background: linear-gradient(135deg, rgba(199,155,59,0.4), rgba(199,155,59,0.12));
+      color: var(--text);
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s, background 0.18s;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .primary-cta:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent-bright);
+      box-shadow: 0 0 32px rgba(199,155,59,0.35);
+      background: linear-gradient(135deg, rgba(199,155,59,0.55), rgba(199,155,59,0.2));
+    }
+    .primary-cta:focus-visible {
+      outline: 2px solid var(--accent-bright);
+      outline-offset: 3px;
+    }
+    .primary-cta .arrow { transition: transform 0.18s; }
+    .primary-cta:hover .arrow { transform: translateX(3px); }
 
-    /* Templates / blockquotes */
-    .template {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 18px 22px;
-      margin: 14px 0;
-      font-family: ui-monospace, "SF Mono", Menlo, monospace;
-      font-size: 0.9rem;
-      color: var(--text-dim);
-      line-height: 1.65;
-      white-space: pre-wrap;
+    /* Mark-as-completed link below the onboarding card */
+    .mark-link-wrap {
+      margin-top: 1rem;
+      text-align: right;
     }
-    .template-label {
-      display: block;
-      font-family: system-ui, sans-serif;
-      font-size: 0.72rem;
+    .mark-link {
+      background: none;
+      border: none;
+      color: var(--accent);
+      font-size: 0.78rem;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      padding: 0.4rem 0.6rem;
+      border-radius: 6px;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      font-family: inherit;
+      transition: color 0.15s, background 0.15s;
+    }
+    .mark-link:hover { color: var(--accent-bright); background: var(--accent-soft); }
+
+    /* Compact completed card (onboarding once marked done) */
+    .completed-card {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.3rem;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: var(--bg-card);
+    }
+    .completed-check {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      flex-shrink: 0;
+      border: 1px solid var(--accent-line);
+    }
+    .completed-card .text { flex: 1; }
+    .completed-card .label {
+      font-size: 0.7rem;
       letter-spacing: 0.14em;
       text-transform: uppercase;
       color: var(--accent);
-      font-weight: 600;
-      margin-bottom: 10px;
-    }
-
-    /* Question cards */
-    .question {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-left: 3px solid var(--accent-line);
-      border-radius: 6px;
-      padding: 18px 22px;
-      margin: 14px 0;
-    }
-    .question .q-head {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 10px;
-      flex-wrap: wrap;
-    }
-    .question .q-title {
-      font-weight: 600;
-      color: var(--text);
-      font-size: 1rem;
-    }
-    .commonality {
-      font-size: 0.72rem;
       font-weight: 700;
-      padding: 2px 10px;
-      border-radius: 999px;
-      letter-spacing: 0.08em;
-      flex-shrink: 0;
+      margin-bottom: 0.15rem;
     }
-    .commonality.A { background: rgba(199, 155, 59, 0.2); color: var(--accent); border: 1px solid var(--accent-line); }
-    .commonality.B { background: rgba(255, 255, 255, 0.08); color: var(--text); border: 1px solid var(--border-strong); }
-    .commonality.C { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
-    .question .q-label {
-      font-size: 0.78rem;
+    .completed-card .title {
+      font-size: 0.98rem;
+      color: var(--text);
       font-weight: 600;
-      color: var(--text-dim);
-      margin: 10px 0 4px;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
     }
-    .question ul { margin: 4px 0 0 20px; font-size: 0.95rem; color: var(--text-dim); }
+    .completed-card a.review {
+      color: var(--accent);
+      font-size: 0.8rem;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      margin-right: 0.6rem;
+    }
+    .completed-card a.review:hover { color: var(--accent-bright); }
 
-    /* Images */
-    .figure {
-      margin: 20px 0;
+    /* ── Resource grid ── */
+    .resource-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.2rem;
+    }
+    .resource-card {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      padding: 1.6rem 1.7rem 1.7rem;
+      border-radius: 14px;
+      border: 1px solid var(--line);
       background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 14px;
+      color: var(--text);
+      text-decoration: none;
+      position: relative;
+      transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s, background 0.18s;
+      min-height: 200px;
     }
-    .figure img {
-      max-width: 100%;
-      height: auto;
-      border-radius: 4px;
-      display: block;
+    .resource-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--accent-line);
+      background: var(--bg-card-hover);
+      box-shadow: var(--shadow-card), var(--shadow-glow);
     }
-    .figure-caption {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-top: 8px;
-      text-align: center;
-      font-style: italic;
+    .resource-card:focus-visible {
+      outline: 2px solid var(--accent-bright);
+      outline-offset: 3px;
     }
-
-    /* Sub-sub chapter */
-    .subchapter { margin-top: 28px; }
-
-    /* Subsection groups within a chapter */
-    .group-label {
-      font-size: 0.75rem;
+    .resource-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .resource-num {
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      background: var(--accent-soft);
+      padding: 0.25rem 0.55rem;
+      border-radius: 5px;
+    }
+    .resource-ext {
+      font-size: 0.62rem;
+      font-weight: 700;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: var(--text-muted);
-      font-weight: 600;
-      margin: 28px 0 8px;
-      padding-top: 8px;
-      border-top: 1px dashed var(--border);
-    }
-
-    a.inline {
       color: var(--accent);
-      text-decoration: underline;
-      text-decoration-color: var(--accent-line);
-      text-underline-offset: 3px;
+      border: 1px solid var(--accent-line);
+      border-radius: 4px;
+      padding: 0.18em 0.5em;
     }
-    a.inline:hover { text-decoration-color: var(--accent); }
-
-    /* Mobile */
-    .menu-toggle {
-      display: none;
-      position: fixed;
-      top: 16px;
-      right: 16px;
-      z-index: 100;
-      background: var(--bg-elev);
-      border: 1px solid var(--border-strong);
+    .resource-card h3 {
+      font-size: 1.18rem;
+      font-weight: 700;
+      line-height: 1.3;
+      letter-spacing: -0.005em;
       color: var(--text);
-      padding: 10px 14px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      font-weight: 600;
+    }
+    .resource-card p {
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: var(--text);
+      flex: 1;
+    }
+    .resource-arrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      margin-top: 0.4rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      transition: color 0.18s;
+    }
+    .resource-card:hover .resource-arrow { color: var(--accent-bright); }
+    .resource-arrow .arrow-icon { transition: transform 0.18s; display: inline-block; }
+    .resource-card:hover .arrow-icon { transform: translateX(4px); }
+
+    /* ── Footer ── */
+    .footer-note {
+      order: 100;
+      margin-top: 4rem;
+      padding-top: 1.4rem;
+      border-top: 1px solid var(--line-soft);
+      font-size: 0.78rem;
+      color: var(--accent);
+      letter-spacing: 0.04em;
+      text-align: center;
     }
 
-    @media (max-width: 900px) {
-      .layout { grid-template-columns: 1fr; }
-      aside.toc {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 100vh;
-        width: 100%;
-        z-index: 90;
-        transform: translateX(-100%);
-        transition: transform 0.25s ease;
-        max-width: 320px;
-      }
-      aside.toc.open { transform: translateX(0); }
-      main { padding: 70px 22px 80px; }
-      .page-header h1 { font-size: 1.85rem; }
-      section.chapter > h2 { font-size: 1.45rem; }
-      .menu-toggle { display: block; }
-    }
-
-    /* Print */
-    @media print {
-      aside.toc, .menu-toggle { display: none; }
-      .layout { grid-template-columns: 1fr; }
-      main { padding: 0; max-width: 100%; }
-      body { background: white; color: black; }
-      .callout, .template, .question, .figure { break-inside: avoid; }
+    @media (max-width: 700px) {
+      main { padding: 2.5rem 1.2rem 4rem; }
+      .primary-card { grid-template-columns: 1fr; gap: 1.2rem; padding: 1.5rem 1.5rem 1.7rem; }
+      .primary-cta { width: 100%; justify-content: center; }
+      .hero { margin-bottom: 2.2rem; }
     }
   </style>
 </head>
 <body>
-  <button class="menu-toggle" onclick="document.querySelector('aside.toc').classList.toggle('open')">Menu</button>
 
-  <div class="layout">
-    <aside class="toc">
-      <div class="brand">
-        <img src="../images/website-logo.png" alt="Headstart" />
-        <span class="label">Mentor Hub</span>
+  <header class="top-nav">
+    <div class="top-nav-inner">
+      <img src="../images/headstart-italic-logo.png" alt="The Headstart" />
+      <div class="top-nav-text">
+        <span class="top-nav-title">Mentor Portal</span>
+        <span class="top-nav-subtitle">Internal use only</span>
+      </div>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle light/dark mode" title="Toggle light/dark mode">
+        <span id="theme-icon">&#9788;</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+
+    <section class="hero">
+      <div class="hero-eyebrow">Headstart Mentoring</div>
+      <h1>Welcome to Headstart Mentor Portal</h1>
+      <p>Everything you need to run a session, log it, and keep your mentee on track. Bookmark this page and the session log form.</p>
+    </section>
+
+    <!-- ONBOARDING (top before completion, bottom after) -->
+    <section class="portal-section section-onboarding">
+      <div class="onboarding-incomplete">
+        <h2 class="section-label">Start here, before your first session</h2>
+        <div class="primary-card">
+          <div class="primary-card-content">
+            <div class="primary-card-eyebrow">Step 1 &middot; do this once</div>
+            <h2>Complete your mentor onboarding</h2>
+            <p>Three short modules: professional standards, how Headstart works, and session logs &amp; payment. Read these before you take your first mentee.</p>
+          </div>
+          <a class="primary-cta" href="../html/mentor-onboarding.html">
+            Start Onboarding <span class="arrow">&rarr;</span>
+          </a>
+        </div>
+        <div class="mark-link-wrap">
+          <button class="mark-link" id="mark-complete" type="button">I&rsquo;ve finished onboarding &mdash; mark as completed</button>
+        </div>
       </div>
 
-      <h3>Session Framework</h3>
-      <ul>
-        <li><a href="#session-flow">Session Flow</a></li>
-        <li><a href="#how-to-start">How to Start</a></li>
-      </ul>
-
-      <h3>Application Materials</h3>
-      <ul>
-        <li><a href="#resume">Resume</a></li>
-        <li><a href="#linkedin">LinkedIn</a></li>
-        <li><a href="#cover-letter">Cover Letter</a></li>
-      </ul>
-
-      <h3>Job Search Strategy</h3>
-      <ul>
-        <li><a href="#where-to-find-roles">Where to Find Roles</a></li>
-        <li><a href="#networking-playbook">Networking Playbook</a></li>
-        <li><a href="#who-to-connect">Who to Connect</a></li>
-        <li><a href="#coffee-chat">Coffee Chat</a></li>
-      </ul>
-
-      <h3>Interview Resource</h3>
-      <ul>
-        <li><a href="#interview-foundations">Interview Foundations</a></li>
-        <li><a href="#answer-structures">Answer Structures</a></li>
-        <li><a href="#question-bank">Question Bank</a></li>
-        <li><a href="#questions-to-ask">Questions to Ask</a></li>
-      </ul>
-
-      <h3>Other Assessment Types</h3>
-      <ul>
-        <li><a href="#recorded-interviews">Recorded Interviews</a></li>
-        <li><a href="#psychometric">Psychometric Tests</a></li>
-        <li><a href="#screening-calls">Screening Calls</a></li>
-        <li><a href="#assessment-centres">Assessment Centres</a></li>
-        <li><a href="#individual-case">Individual Case Study</a></li>
-      </ul>
-    </aside>
-
-    <main>
-      <div class="page-header">
-        <div class="eyebrow">Headstart Mentoring</div>
-        <h1>Mentor Resource Hub</h1>
-        <p>Everything you need to guide a student from confused to hired. Session frameworks, application templates, networking scripts, and the full interview question bank.</p>
+      <div class="onboarding-complete">
+        <h2 class="section-label">Completed</h2>
+        <div class="completed-card">
+          <div class="completed-check">&#10003;</div>
+          <div class="text">
+            <div class="label">Onboarding done</div>
+            <div class="title">Mentor onboarding complete</div>
+          </div>
+          <a class="review" href="../html/mentor-onboarding.html">Review</a>
+          <button class="mark-link" id="mark-incomplete" type="button">Undo</button>
+        </div>
       </div>
+    </section>
 
-      <!-- ========== SESSION FLOW ========== -->
-      <section class="chapter" id="session-flow">
-        <h2>Session Flow</h2>
-        <p class="lead">A baseline 3-session structure to get a student from resume to active job search. Adapt to the student's pace.</p>
-
-        <h3>Session 1: Understanding their circumstance</h3>
-        <p>Use the left side of the "How to Stand Out" framework to assess where they are. Review their resume live and showcase the resources available.</p>
-        <p><em>(Optional: depending on how much they know about their industry or pathway, walk them through it.)</em></p>
-        <p>Ask them to prepare a story of their timeline since high school: any unique experiences, events that shaped them, funny or interesting stories worth telling.</p>
-        <h5>To finish before next session</h5>
-        <ul>
-          <li>Resume fine-tune</li>
-          <li>Timeline and unique fact preparation</li>
-        </ul>
-
-        <h3>Session 2: Build a more solid basis</h3>
-        <p>Mark up their resume, give further feedback so they can perfect it. Ask them to walk through their timeline.</p>
-        <p>Cover letter prep and LinkedIn check. If you have time, this can be done in the first session.</p>
-        <h5>To finish before next session</h5>
-        <ul>
-          <li>Finalise resume changes</li>
-          <li>Update LinkedIn</li>
-          <li>Prepare cover letter draft</li>
-        </ul>
-
-        <h3>Session 3: Networking and outreach</h3>
-        <ul>
-          <li>LinkedIn and cover letter feedback</li>
-          <li>Dive into who to connect with</li>
-          <li>Split into proactive and reactive connection</li>
-        </ul>
-        <div class="callout">
-          <div class="callout-title">Definitions</div>
-          <p><strong>Proactive connection:</strong> create a list of target companies, then connect.</p>
-          <p><strong>Reactive connection:</strong> see a hiring post, then connect.</p>
+    <!-- LOG SESSION (primary daily action) -->
+    <section class="portal-section section-log">
+      <h2 class="section-label">After every session</h2>
+      <div class="primary-card">
+        <div class="primary-card-content">
+          <div class="primary-card-eyebrow">Within 24 hours &middot; required</div>
+          <h2>Log your session</h2>
+          <p>Submit the Airtable form within 24 hours of every session. This is the only record Fidel uses to calculate your payment.</p>
         </div>
-      </section>
-
-      <!-- ========== HOW TO START ========== -->
-      <section class="chapter" id="how-to-start">
-        <h2>How to Start</h2>
-        <p class="lead">A few prompting questions to understand if the student is committed to their current direction. The goal is to introduce different roles within the industry they want to join.</p>
-
-        <ul>
-          <li>Uni major analysis: what do you like and what don't you like about your major?</li>
-          <li>Is there something beyond your major that you are open to?</li>
-          <li>What are the roles in your chosen industry? Build a spreadsheet with a short intro for each.</li>
-          <li>How does the market look based on the jobs listed?</li>
-          <li>Do you have prior internship experience and want to continue down the same route?</li>
-        </ul>
-
-        <p>These few questions are enough to understand whether they are settled on the route or still exploring.</p>
-      </section>
-
-      <!-- ========== RESUME ========== -->
-      <section class="chapter" id="resume">
-        <h2>Resume</h2>
-        <p class="lead">Reference examples for resume structure and formatting.</p>
-
-        <div class="figure">
-          <img src="images/image5.png" alt="Resume example" />
-          <div class="figure-caption">Resume example 1</div>
-        </div>
-
-        <div class="figure">
-          <img src="images/image2.png" alt="Resume example" />
-          <div class="figure-caption">Resume example 2</div>
-        </div>
-      </section>
-
-      <!-- ========== LINKEDIN ========== -->
-      <section class="chapter" id="linkedin">
-        <h2>LinkedIn</h2>
-        <p class="lead">The key of a LinkedIn profile is to show recruiters in your desired industry that you are a good candidate.</p>
-
-        <p>You have to:</p>
-        <ul>
-          <li>Make it clear which industry you are targeting (make up your mind)</li>
-          <li>Show why you stand out vs other candidates</li>
-        </ul>
-
-        <p>There are no fixed formulas, but here are recommendations to help fulfil the above two objectives.</p>
-
-        <h3>Landing page</h3>
-        <div class="figure">
-          <img src="images/image4.png" alt="LinkedIn landing page example" />
-        </div>
-        <ul>
-          <li>Clear professional picture of yourself (not an angled selfie)</li>
-          <li>Clear role of internship or society in the description under your name</li>
-          <li>Cover photo: something related to the city you are in, or a custom poster that includes your name, uni, and a city backdrop</li>
-          <li>At least 100 connections</li>
-        </ul>
-
-        <h3>About section</h3>
-        <p>Structure the content like this:</p>
-        <ul>
-          <li>Intro about yourself (country, your subject)</li>
-          <li>Interested industry you are getting into, and why</li>
-          <li>Fun or interesting fact about yourself relevant to your desired industry</li>
-          <li>Short description of your most proud achievement relevant to that industry</li>
-        </ul>
-        <p>Each section separated by 1 blank line. Keep each section to no more than 2 lines.</p>
-
-        <h3>Experience</h3>
-        <p>Put direct and relevant experience into the Experience section. Society experience can go here if it is directly relevant to the role.</p>
-        <p>If you have no internship experience and only minimal society experience, you can include a part-time retail job.</p>
-        <p>If you have at least 2 relevant experiences, you can drop the part-time retail role.</p>
-        <p>Put your most impressive 1 to 2 points into the description (especially anything with quantifiable impact).</p>
-        <p>For society experience that is less relevant, put it under Voluntary.</p>
-
-        <h3>Education</h3>
-        <ul>
-          <li>List uni. If you have impressive high school grades that translate to ATAR, include them too.</li>
-          <li>List all competitions and societies you are part of (being a member alone doesn't count).</li>
-          <li>List uni grades only if they are Distinction or above.</li>
-        </ul>
-
-        <h3>Honors and Awards</h3>
-        <p>List all relevant awards.</p>
-
-        <h3>Testimonials</h3>
-        <p>Ask for testimonials from previous managers, or teammates in case competitions, where relevant.</p>
-
-        <h3>Nice-to-haves</h3>
-        <ul>
-          <li>Creative portfolio as a link</li>
-          <li>Posts related to the industry you want to get into</li>
-          <li>Website version of a resume</li>
-        </ul>
-      </section>
-
-      <!-- ========== COVER LETTER ========== -->
-      <section class="chapter" id="cover-letter">
-        <h2>Cover Letter</h2>
-        <p class="lead">The truth about cover letters is that at least 60% of the time they won't be read by a recruiter. But on the chance they do, how can we impress them and stand out?</p>
-
-        <div class="callout">
-          <div class="callout-title">AI Prompt for Cover Letter</div>
-          <p>Give the AI:</p>
-          <ul>
-            <li>My resume</li>
-            <li>1 unique fact about me</li>
-            <li>Job description</li>
-          </ul>
-          <p style="margin-top: 12px;">Then ask it to write a cover letter using the structure below.</p>
-        </div>
-
-        <div class="template">
-<span class="template-label">Cover Letter Structure</span>Hi Sir/Madam,
-
-1st Paragraph: Quick intro + purpose of writing
-- 1 line on the purpose of this letter (to apply for the role), max 15 words
-- 1 to 2 lines about the unique fact and how it links to the job
-- "Here's what I can bring to the role"
-
-2nd and 3rd Paragraph: Why I am good for this role
-Write 2 paragraphs covering 2 different skills.
-- Firstly, [1 line of a key skill that matches the JD, max 12 words, bold the key skill]
-- [1 to 2 lines of what you did in your role that showcases that skill]
-- [1 line of impact (quantifiable) based on your contribution, bold the impact]
-
-4th paragraph: Ending
-- 1 line showing keenness for a quick call to understand the hiring process
-
-Phone number | Gmail
-Best Regards,
-[Name]
-        </div>
-
-        <p><strong>Rules:</strong> no em dashes. Cannot be more than 200 words. Make paragraphs coherent, linking 1 to the next. "Insert 1 line" is high-level guidance, not a literal limit.</p>
-      </section>
-
-      <!-- ========== WHERE TO FIND ROLES ========== -->
-      <section class="chapter" id="where-to-find-roles">
-        <h2>Where to Find Roles</h2>
-        <p class="lead">Where to apply reactively.</p>
-
-        <h3>Online platforms</h3>
-        <ul>
-          <li>LinkedIn</li>
-          <li>Seek</li>
-          <li>Indeed</li>
-          <li>Prosple</li>
-          <li>Seekgrad</li>
-          <li>University job portal</li>
-          <li>Headstart website</li>
-        </ul>
-      </section>
-
-      <!-- ========== NETWORKING PLAYBOOK ========== -->
-      <section class="chapter" id="networking-playbook">
-        <h2>Networking Playbook</h2>
-        <p class="lead">How to build connections before any job is posted.</p>
-
-        <h3>Step 1: Use AI to build your target company list</h3>
-        <p>Paste this prompt into AI:</p>
-
-        <div class="template">
-<span class="template-label">Prompt 1: First 25 Companies</span>Industry & Interest
-- Industry: [insert industry]
-- What interests me about the roles: [insert specific aspects]
-- Preferred location: [insert location, can be Australia-wide]
-
-Part 1: Consultancy vs In-House
-Before the list, explain the difference between consultancy and in-house roles in this field. Use 2-3 bullet points covering the key points of difference.
-Note: if consultancy vs in-house isn't a meaningful split in this industry, tell me and suggest a better way to split the roles (e.g. agency vs client-side, product vs services, etc).
-
-Part 2: First Half of Company List
-Give me a categorised list of 25 companies in [insert location]. All companies MUST be based in or have a strong presence in [insert location].
-
-Categories (minimum 8 companies per category, 25 total):
-- Large corporates
-- Medium and small corporates
-- Start-ups
-
-Requirements:
-- Prioritise consultancy firms (or the equivalent split you recommended above) that specialise in this field
-- Verify via online search that each company actually fits the size category listed. Do not guess. Take your time. Accuracy over speed.
-- Flag any company where you're unsure of the size category
-
-Part 3: CSV Output
-Format the list as a downloadable CSV with these exact headers:
-- Company
-- Size
-- Intro (populate, max 8 words)
-- Location
-- Progress (leave blank)
-
-At the end of your response, confirm you've covered 25 and are ready for the second batch.
-        </div>
-
-        <div class="template">
-<span class="template-label">Prompt 2: Next 25 Companies</span>Continue from your previous response. Generate the next 25 companies for the same industry, interest, and location I gave you earlier.
-
-Rules:
-- Do NOT repeat any company from the first list
-- Keep the same 3 categories (large corp, medium/small corp, start-ups), minimum 8 per category, 25 total
-- Same verification standard: online search to confirm size category, flag any uncertainty
-- Same CSV format and headers as before
-- Lean towards companies that are less obvious than the first batch (the well-known names should already be in list 1)
-
-At the end, give me one combined CSV with all 50 companies merged into a single downloadable file.
-        </div>
-
-        <h3>Step 2: Mass connect</h3>
-        <ul>
-          <li>Mass connect to the 3 personas in <a href="#who-to-connect" class="inline">"Who to Connect"</a></li>
-          <li>Send a message to everyone who accepts the connection. <strong>Never use AI on this part.</strong></li>
-        </ul>
-      </section>
-
-      <!-- ========== WHO TO CONNECT ========== -->
-      <section class="chapter" id="who-to-connect">
-        <h2>Who to Connect (Proactively)</h2>
-        <p class="lead">3 different types of people, listed in order of priority.</p>
-
-        <h3>1. People directly in the team or adjacent teams you are going for</h3>
-        <p>How to find them: look at the role being advertised, the listing usually has info on the team. Find them and connect.</p>
-
-        <h3>2. Directors / CEOs of the firm with influence</h3>
-        <p>Connect to all director-level employees and ask them for a chat.</p>
-
-        <h3>3. Recruiters / Talent Acquisition</h3>
-        <p>Directly responsible for the initial rounds of hiring. Often too busy, so reach out before a job post is out.</p>
-
-        <h3>Outreach templates</h3>
-        <p class="lead">Never copy and paste verbatim, always tweak the wording.</p>
-
-        <div class="template">
-<span class="template-label">To Directors / CEOs (make them feel respected and looked up to)</span>Hi xxxx,
-
-It's my honour to connect with the CEO of [describe the firm in your own words]! I'm xxx, a soon-to-graduate student with experiences [insert max 12 words on your credentials and experience].
-
-I can only imagine how busy you are, but it would mean a lot to have a chance to chat about your road to success and advice for me to thrive in the industry, and potentially even in [company].
-
-If you are keen, let me know what time works for you! Thank you.
-
-Best Regards,
-[Name]
-        </div>
-
-        <div class="template">
-<span class="template-label">To people in your future team or department (offer them an incentive: a coffee)</span>Hi xxxx,
-
-Appreciate the connection! I'm xxx, a soon-to-graduate student with experiences [insert max 12 words on your credentials and experience].
-
-I know you are probably very busy, but I would love to buy you a coffee sometime next week and ask a few questions on your journey to become [their role] in [their company].
-
-If you are keen, let me know what time works for you! Thank you.
-
-Best Regards,
-[Name]
-        </div>
-
-        <div class="template">
-<span class="template-label">To Talent Acquisition (only when there is a grad program or specific role hiring)</span>Hi xxxx,
-
-Appreciate the connection! I know you probably receive hundreds of connections every day, so I just want to take 10 minutes of your time to understand [insert certain role] / [certain graduate program].
-
-If you are available, do you have any time this or next week for me to buy you a coffee?
-Alternatively, happy to do a quick meet here: [insert Google Meet invite link].
-
-Best Regards,
-[Name]
-        </div>
-      </section>
-
-      <!-- ========== COFFEE CHAT ========== -->
-      <section class="chapter" id="coffee-chat">
-        <h2>Coffee Chat</h2>
-
-        <h3>What's the purpose of the coffee chat?</h3>
-        <ul>
-          <li>Build a connection so you can ask for favours, like referrals</li>
-          <li>Understand the role and industry landscape better</li>
-          <li>Gain advice on how to approach job searching</li>
-          <li>Coffee</li>
-        </ul>
-
-        <h3>To truly build a connection</h3>
-        <ul>
-          <li>Make them feel good about sharing advice with you</li>
-          <li>Make them feel respected and accomplished because they sense you look up to them</li>
-          <li>Showcase your passion for the field they are in</li>
-        </ul>
-
-        <h3>How to achieve that</h3>
-        <p>Prepare 5 to 6 questions:</p>
-        <ul>
-          <li>2 to 3 questions about their specific journey, so you understand how they got there and they get to talk about themselves</li>
-          <li>2 to 3 questions about the role they currently do and their company</li>
-          <li>1 to 2 questions on advice for job searching</li>
-        </ul>
-        <p>The questions must be curated after you do research on the company and role. Don't ask simple questions about basic job tasks, they will tell you themselves.</p>
-
-        <h3>Extra tips</h3>
-        <ul>
-          <li>ALWAYS wear at least semi-formal</li>
-          <li>Always thank them if they are buying you a coffee</li>
-          <li>Bring a notebook to jot notes</li>
-          <li>Prepare your resume to send if they are interested in helping you</li>
-          <li>Feel free to ask them what they do outside of work</li>
-          <li>Be yourself and just enjoy the coffee</li>
-        </ul>
-
-        <h3>What to do after the chat</h3>
-        <ul>
-          <li>Send a follow-up message to thank them</li>
-          <li>Don't ask for another coffee chat</li>
-          <li>Thank them for their time and tell them 1 thing you found most useful. Keep it short and simple.</li>
-        </ul>
-      </section>
-
-      <!-- ========== INTERVIEW FOUNDATIONS ========== -->
-      <section class="chapter" id="interview-foundations">
-        <h2>Interview Foundations</h2>
-
-        <h3>What Interviews Actually Test</h3>
-        <p>Interviews are not about knowledge. They test these things, ordered by importance:</p>
-        <ul>
-          <li><strong>Competence and Confidence</strong>: are you good at what you do? Can you show that confidently in an interview?</li>
-          <li><strong>Energy and likability</strong>: would they enjoy working with you? Would they remember you after interviewing 20 candidates?</li>
-          <li><strong>Self-awareness and transparency</strong>: do you know your strengths and weaknesses? Can you show interviewers you are speaking the truth?</li>
-        </ul>
-
-        <h3>The 6 Types of Interview Questions</h3>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr><th>Category</th><th>Description</th><th>Example</th><th>Key</th></tr>
-            </thead>
-            <tbody>
-              <tr><td><strong>Intro</strong></td><td>Who you are, what you're about</td><td>"Tell me about yourself"</td><td>Provide 1 UNIQUE story about how you relate to the role or company</td></tr>
-              <tr><td><strong>Motivation</strong></td><td>Why you want us</td><td>"Why this company?"</td><td>Be clear on what drives and motivates you</td></tr>
-              <tr><td><strong>Behavioural</strong></td><td>Past actions predict future actions</td><td>"Tell me about a time…"</td><td>Use the answer structure in 2.2 plus further extension per question</td></tr>
-              <tr><td><strong>Strengths / Weaknesses</strong></td><td>Fit and maturity</td><td>"What's your biggest weakness?"</td><td>MUST describe how you have been working on weaknesses</td></tr>
-              <tr><td><strong>Technical / Role-based</strong></td><td>Foundations for the job</td><td>"Walk me through your analysis…"</td><td>Don't go too specific. They don't care about your numbers unless they are hyper-relevant.</td></tr>
-              <tr><td><strong>Fit + Questions</strong></td><td>Culture alignment</td><td>"What questions do you have for us?"</td><td>Treat it like a conversation. Be interested in the interviewers and ask about their journey.</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <h3>Interview Golden Rules</h3>
-        <ul>
-          <li>Be impressive, not arrogant</li>
-          <li>Professional but personable</li>
-          <li>Evidence beats adjectives ("I improved X by Y%" beats "I'm hardworking")</li>
-          <li>1 to 2 minutes per answer</li>
-          <li>Show ownership, reflection, and impact (number)</li>
-          <li>If you have a choice or better options, don't use uni projects as your examples</li>
-          <li>Build your persona and answers with a general theme: able to integrate and fit the team, willing to learn, communicative, can do the job, and showcase your own strength</li>
-        </ul>
-      </section>
-
-      <!-- ========== ANSWER STRUCTURES ========== -->
-      <section class="chapter" id="answer-structures">
-        <h2>Answer Structures</h2>
-
-        <h3>Tell Me About Yourself: the "DU" strategy</h3>
-
-        <h4>"Due Diligence" introduction (max 30 seconds)</h4>
-        <p>Everyone literally has the same information here.</p>
-        <ul>
-          <li>Background (degree, year)</li>
-          <li>Relevant experience: your role, key responsibilities, transferable skills</li>
-        </ul>
-
-        <h4>One unique fact about yourself, relevant to the company (max 45 seconds)</h4>
-        <p>The key to stand out from the bunch.</p>
-        <ul>
-          <li>How to find the unique fact? It has to be fun and memorable.</li>
-          <li>Run an exercise with the student to dig this out.</li>
-        </ul>
-
-        <h4>End the intro (max 10 seconds)</h4>
-        <p>"Excited to be here."</p>
-
-        <h3>Behavioural Answer Structure</h3>
-        <ul>
-          <li><strong>Background</strong>: clear situation and your task (high level). <em>Common mistake: people over-explain the background, interviewers don't care that much.</em></li>
-          <li><strong>Action</strong>: clear steps on how to achieve it</li>
-          <li><strong>Result</strong>: quantifiable or specific</li>
-          <li><strong>Learning</strong>: personal insight</li>
-        </ul>
-      </section>
-
-      <!-- ========== QUESTION BANK ========== -->
-      <section class="chapter" id="question-bank">
-        <h2>Question Bank</h2>
-        <p class="lead">Every question is rated by how often it appears in real interviews. Focus on <strong>A</strong> first, then <strong>B</strong>, then <strong>C</strong>. The "keys to answering well" are suggestions, not a checklist. Pick the ones that fit your real story.</p>
-
-        <h3>Motivational Questions</h3>
-
-        <div class="question">
-          <div class="q-head"><span class="q-title">How do you see yourself in 5 years?</span><span class="commonality A">A</span></div>
-          <div class="q-label">What the interviewer is looking for</div>
-          <p>If you have even thought about your own ambition and whether you can articulate it well.</p>
-          <div class="q-label">Keys to answering well</div>
-          <ul>
-            <li>Talk about how you have plans to reach them one day</li>
-            <li>Talk professionally, then a bit about personal goals to showcase your personality</li>
-          </ul>
-        </div>
-
-        <div class="question">
-          <div class="q-head"><span class="q-title">Why are you interested in this role?</span><span class="commonality A">A</span></div>
-          <div class="q-label">What the interviewer is looking for</div>
-          <p>If the content of the role is interesting to you, and why.</p>
-          <div class="q-label">Keys to answering well</div>
-          <ul>
-            <li>Describe how your past experience doing something similar gives you fulfilment or satisfaction</li>
-            <li>Must pinpoint what part of the role gives you satisfaction</li>
-          </ul>
-        </div>
-
-        <div class="question">
-          <div class="q-head"><span class="q-title">Why are you interested in the company?</span><span class="commonality A">A</span></div>
-          <div class="q-label">What the interviewer is looking for</div>
-          <p>See if you have done the research on the company.</p>
-          <div class="q-label">Keys to answering well</div>
-          <ul>
-            <li>Link company values to your own values</li>
-            <li>Describe the company's recent achievements sourced from their website</li>
-            <li>Describe the company's culture after networking with someone inside the company. <em>Caveat: you have to reach out to someone in the company first.</em></li>
-          </ul>
-        </div>
-
-        <div class="question">
-          <div class="q-head"><span class="q-title">Top 3 important things in your job</span><span class="commonality B">B</span></div>
-          <div class="q-label">What the interviewer is looking for</div>
-          <p>Understand your motivations, see if they align with the team to determine fit.</p>
-          <div class="q-label">Keys to answering well</div>
-          <ul>
-            <li>Be authentic, give examples</li>
-            <li>See if your own values can be linked to the company values</li>
-          </ul>
-        </div>
-
-        <div class="question">
-          <div class="q-head"><span class="q-title">What is something you are genuinely passionate about?</span><span class="commonality B">B</span></div>
-          <div class="q-label">What the interviewer is looking for</div>
-          <p>What brings you joy, whether you are an interesting person in general.</p>
-          <div class="q-label">Keys to answering well</div>
-          <ul>
-            <li>Opportunity to flex about a hobby or skill you are good at</li>
-            <li>Provide a brief backstory of when and why you started</li>
-            <li>Explain why doing this thing gives you joy and satisfaction</li>
-          </ul>
-        </div>
-
-        <!-- Behavioural -->
-        <h3>Behavioural Questions</h3>
-
-        <div class="group-label">Category A · Teamwork, People & Communication</div>
-
-        <div class="question">
-          <div class="q-head"><span class="q-title">Working as a group or in teams</span><span class="commonality A">A</span></div>
-          <div class="q-label">What the interviewer is looking for</div>
-          <p>How well you can work with teams.</p>
-          <div class="q-label">Keys to answering well</div>
-          <ul>
-            <li>Don't mistake this for being a leader. Everyone says how they led uni project groups, doing task assignment based on strengths etc.</li>
-            <li>Find a unique role that you actually play inside a team: organiser of meetings, note taker and meeting summariser, vibes person, includer who treasures everyone's opinion</li>
-            <li>Describe how you made the group better and what result it drove</li>
-          </ul>
-        </div>
-
-        <div class="question">
-          <div class="q-head"><span class="q-title">Working with someone who wasn't cooperative</span><span class="commonality A">A</span></div>
-          <div class="q-label">What the interviewer is looking for</div>
-          <p>What you would do when working with difficult people. Realistic situation in a workplace.</p>
-          <div class="q-label">Keys to answering well</div>
-          <ul>
-            <li>Before you judge the uncooperative person, try to see things from their perspective and see if they are facing any challenges</li>
-            <li>Key is communication, whether directly to the person or through your manager or colleague</li>
-          </ul>
-        </div>
-
-        <div class="question">
-          <div class="q-head"><span class="q-title">How do you explain a complex concept to someone?</span><span class="commonality A">A/B</span></div>
-          <div class="q-label">What the interviewer is looking for</div>
-          <p>Ability to translate complex concepts to other teams.</p>
-          <div class="q-label">Keys to answering well</div>
-          <ul>
-            <li>Have a specific method that you use to translate concepts (e.g. use examples in daily terms, ask AI to help make a no-jargon version of your email)</li>
-          </ul>
-        </div>
-
-        <div class="question">
-          <div class="q-head"><span class="q-title">Solving a conflict</span><span class="commonality B">B</span></div>
-          <div class="q-label">What the interviewer is looking for</div>
-          <p>If you have the ability to work well with teams, if you have any leadership skills, if you know how to empathise.</p>
-          <div class="q-label">Keys to answering well</div>
-          <ul>
-            <li>Must be an interesting story if possible, don't say uni project</li>
-            <li>Key learning can be how to see things from other people's perspectives</li>
-            <li>Focus most of the time on describing the exact actions you took that solved the conflict. Don't over-explain the story.</li>
-          </ul>
-        </div>
-
-        <div class="question">
-          <div class="q-head"><span class="q-title">Being a leader</span><span class="commonality B">B</span></div>
-          <div class="q-label">What the interviewer is looking for</div>
-          <p>What kind of leader are you?</p>
-          <div class="q-label">Keys to answering well</div>
-          <ul>
-            <li>Find key traits of being a leader and use that to brainstorm the story, e.g.:
-              <ul>
-                <li>Communicative: setting communication and workload expectations to everyone in the team</li>
-                <li>Inclusive: treasure other people's opinions and listen to different viewpoints</li>
-                <li>Flexible: being able to cater your communication to different team members</li>
-              </ul>
-            </li>
-          </ul>
-        </div>
-
-        <div class="question">
-          <div class="q-head"><span class="q-title">A time where you had to influence someone</span><span class="commonality C">C</span></div>
-          <div class="q-label">What the interviewer is looking for</div>
-          <p>See if you have the ability to be a leader.</p>
-          <div class="q-label">Keys to answering well</div>
-          <ul>
-            <li>Highlight the methods and means you took clearly. For example, you use data to persuade a friend to go out with you, you understand their pain point and solve a problem for them first</li>
-            <li>Don't just say "I managed to persuade them". You are not answering the question.</li>
-          </ul>
-        </div>
-
-        <div class="group-label">Category B · Pressure, Mistakes & Ambiguity</div>
-
-        <div class="question">
-          <div class="q-head"><span class="q-title">Facing a difficult situation / situation that has not gone to plan</span><span class="commonality A">A</span></div>
-          <div class="q-label">What the interviewer is looking for</div>
-          <p>How do you deal with changes.</p>
-          <div class="q-label">Keys to answering well</div>
-          <ul>
-            <li>Portray the difficult situation well (rare instance where the background context can be longer than usual)</li>
-            <li>Break down the exact steps you took to deal with that challenging situation very clearly</li>
-          </ul>
-        </div>
-
-        <div class="question">
-          <div class="q-head"><span class="q-title">You made a mistake / one time you failed at something</span><span class="commonality A">A</span></div>
-          <div class="q-label">What the interviewer is looking for</div>
-          <p>Some key lessons you have learnt and how you deal with failure.</p>
-          <div class="q-label">Keys to answering well</div>
-          <ul>
-            <li>The mistake must be real</li>
-            <li>You must have a change of action since making that mistake, which you should mention</li>
-          </ul>
-        </div>
-
-        <div class="question">
-          <div class="q-head"><span class="q-title">Handling tight deadlines</span><span class="commonality A">A</span></div>
-          <div class="q-label">What the interviewer is looking for</div>
-          <p>Your ability to prioritise and how well you communicate with stakeholders to manage their expectations.</p>
-          <div class="q-label">Keys to answering well</div>
-          <ul>
-            <li>Can say you like to plan ahead and forecast to make sure the tight deadline is manageable</li>
-            <li>Can say you aren't scared to sacrifice rest time to do everything well</li>
-            <li>Can say you are communicative with stakeholders to change the schedule of something to handle the tight deadline</li>
-            <li>Whatever your approach is in real life</li>
-          </ul>
-        </div>
-
-        <div class="question">
-          <div class="q-head"><span class="q-title">How to deal with missing information</span><span class="commonality B">B</span></div>
-          <div class="q-label">What the interviewer is looking for</div>
-          <p>How you are resourceful despite limited resources, how you deal with challenges that arise.</p>
-          <div class="q-label">Keys to answering well</div>
-          <ul>
-            <li>Explain what measures you took and how you ensure your work is still up to quality and doesn't cause disappointment</li>
-            <li>Can talk about being open and communicative with the people checking your work to manage their expectations</li>
-          </ul>
-        </div>
-
-        <div class="question">
-          <div class="q-head"><span class="q-title">A time you used data to complete work</span><span class="commonality B">B</span></div>
-          <div class="q-label">What the interviewer is looking for</div>
-          <p>What is your current approach to data analysis.</p>
-          <div class="q-label">Keys to answering well</div>
-          <ul>
-            <li>Explain the tool well, and 1 specific example of how you used it, with a clear step-by-step of handling the data</li>
-          </ul>
-        </div>
-
-        <div class="question">
-          <div class="q-head"><span class="q-title">How do you use AI in daily life?</span><span class="commonality B">B</span></div>
-          <div class="q-label">What the interviewer is looking for</div>
-          <p>Whether you are using AI efficiently and are not overly dependent on it.</p>
-          <div class="q-label">Keys to answering well</div>
-          <ul>
-            <li>Show that you have a specific way of using AI and how you get the most results using that specific way, or in a specific area of work</li>
-            <li>Make it interesting and create an edge for yourself</li>
-          </ul>
-        </div>
-
-        <div class="question">
-          <div class="q-head"><span class="q-title">How would you organise your workday?</span><span class="commonality C">C</span></div>
-          <div class="q-label">What the interviewer is looking for</div>
-          <p>How strong your organisational skills are, how you work as an individual, whether your working style fits the team.</p>
-          <div class="q-label">Keys to answering well</div>
-          <ul>
-            <li>Showcase your own practices on how you manage your uni day</li>
-            <li>Show that you are flexible most of the time to work around meetings</li>
-          </ul>
-        </div>
-
-        <div class="group-label">Category C · Growth & Self-awareness</div>
-
-        <div class="question">
-          <div class="q-head"><span class="q-title">Improving a process</span><span class="commonality A">A</span></div>
-          <div class="q-label">What the interviewer is looking for</div>
-          <p>How can you bring initiative to improve the team as a young person.</p>
-          <div class="q-label">Keys to answering well</div>
-          <ul>
-            <li>How you identified a process that needs changing and how you actually made the change</li>
-            <li>Must include results</li>
-          </ul>
-        </div>
-
-        <div class="question">
-          <div class="q-head"><span class="q-title">How do you take feedback?</span><span class="commonality A">A</span></div>
-          <div class="q-label">What the interviewer is looking for</div>
-          <p>How you can improve and how well you take feedback.</p>
-          <div class="q-label">Keys to answering well</div>
-          <ul>
-            <li>1 specific example</li>
-            <li>Depending on your real way of receiving feedback, mention specific techniques or tricks you use, e.g. jot them all down in a book</li>
-          </ul>
-        </div>
-
-        <div class="question">
-          <div class="q-head"><span class="q-title">Learning a new skill</span><span class="commonality B">B</span></div>
-          <div class="q-label">What the interviewer is looking for</div>
-          <p>If you are able to learn things quickly on the job.</p>
-          <div class="q-label">Keys to answering well</div>
-          <ul>
-            <li>Talk about the reason why you wanted to learn this skill</li>
-            <li>Mention exact methods you used to achieve it</li>
-          </ul>
-        </div>
-
-        <div class="question">
-          <div class="q-head"><span class="q-title">Going above and beyond</span><span class="commonality B">B</span></div>
-          <div class="q-label">What the interviewer is looking for</div>
-          <p>If you are passionate in general and always love to do more than the bare minimum.</p>
-          <div class="q-label">Keys to answering well</div>
-          <ul>
-            <li>Explain why you went above and beyond, what your motives are</li>
-            <li>Finding a similar experience would be crucial, since they'd be able to see your exact motivations to go above and beyond the job</li>
-          </ul>
-        </div>
-
-        <div class="question">
-          <div class="q-head"><span class="q-title">What did you learn in [your past role]?</span><span class="commonality A">A</span></div>
-          <div class="q-label">What the interviewer is looking for</div>
-          <p>See if you can further explain what you listed on your resume.</p>
-          <div class="q-label">Keys to answering well</div>
-          <ul>
-            <li>Clearly list out 2 to 3 things you have learnt. Can be any skill.</li>
-            <li>They must be realistic, as interviewers will know if you are faking it</li>
-          </ul>
-        </div>
-
-        <!-- Strengths / Weaknesses -->
-        <h3>Strength / Weakness Questions</h3>
-
-        <div class="question">
-          <div class="q-head"><span class="q-title">Biggest strength</span><span class="commonality A">A</span></div>
-          <div class="q-label">What the interviewer is looking for</div>
-          <p>Understand what you are good at, see if the team needs this strength.</p>
-          <div class="q-label">Keys to answering well</div>
-          <ul>
-            <li>Explain how this strength of yours allowed you to achieve something you are proud of, something that people are objectively impressed by</li>
-          </ul>
-        </div>
-
-        <div class="question">
-          <div class="q-head"><span class="q-title">Biggest weakness</span><span class="commonality A">A</span></div>
-          <div class="q-label">What the interviewer is looking for</div>
-          <p>See if you are self-aware of your own flaws.</p>
-          <div class="q-label">Keys to answering well</div>
-          <ul>
-            <li>Mention how you identify the flaws</li>
-            <li>How you have made the effort to improve them</li>
-          </ul>
-        </div>
-
-        <!-- Technical -->
-        <h3>Technical / Role-based / Past Experience</h3>
-
-        <div class="question">
-          <div class="q-head"><span class="q-title">What is your experience using [certain technical software / skill]?</span><span class="commonality A">A</span></div>
-          <div class="q-label">What the interviewer is looking for</div>
-          <p>Direct experience to understand if you can do the job.</p>
-          <div class="q-label">Keys to answering well</div>
-          <ul>
-            <li>Mention exact types of work</li>
-            <li>Prepare 1 example</li>
-            <li>Talk about impact or results from your work</li>
-          </ul>
-        </div>
-
-        <div class="group-label">Sales / Client-facing Roles</div>
-
-        <div class="question">
-          <div class="q-head"><span class="q-title">A time you dealt with a difficult client</span><span class="commonality A">A</span></div>
-          <div class="q-label">What the interviewer is looking for</div>
-          <p>How would you react and act when the client is difficult.</p>
-          <div class="q-label">Keys to answering well</div>
-          <ul>
-            <li>Mention exact poor behaviour</li>
-            <li>Showcase how you show empathy</li>
-            <li>How you deal with it</li>
-          </ul>
-        </div>
-
-        <div class="group-label">Finance Roles</div>
-        <p style="color: var(--text-muted); font-style: italic;">[To fill]</p>
-
-        <div class="group-label">Accounting Roles</div>
-        <p style="color: var(--text-muted); font-style: italic;">[To fill]</p>
-
-        <div class="group-label">Software Engineering Roles</div>
-        <p style="color: var(--text-muted); font-style: italic;">[To fill]</p>
-      </section>
-
-      <!-- ========== QUESTIONS TO ASK ========== -->
-      <section class="chapter" id="questions-to-ask">
-        <h2>What Questions to Ask After an Interview</h2>
-        <p class="lead">Before the examples, the purpose of asking questions is to:</p>
-        <ul>
-          <li>Show you have the passion and motivation to improve and fit in quickly</li>
-          <li>Let interviewers have a chance to talk about themselves</li>
-          <li>Understand if it is a company you want to work for</li>
-        </ul>
-
-        <h3>Example questions</h3>
-        <ul>
-          <li>What are the few key things you want me to achieve in the first 3 months of the role?</li>
-          <li>What makes a grad stand out? What practical things do they do that impress you?</li>
-          <li>What is one thing that makes you like the company?</li>
-          <li>How would the company help with my development to grow and progress?</li>
-          <li>What managerial style do you have?</li>
-        </ul>
-      </section>
-
-      <!-- ========== RECORDED INTERVIEWS ========== -->
-      <section class="chapter" id="recorded-interviews">
-        <h2>Recorded Interviews</h2>
-        <p class="lead">Usually 3 to 5 questions. Some have time limits, some don't.</p>
-
-        <h3>Settings before starting</h3>
-        <ul>
-          <li>Good wifi connection</li>
-          <li>Absolutely no one coming into your room, no interruptions</li>
-          <li>Good lighting</li>
-          <li>Eye contact to the screen</li>
-          <li>Formal upper wear</li>
-          <li>Camera must show full face</li>
-        </ul>
-
-        <h3>Question preparation</h3>
-        <p>Ideally the interview question guide is filled ahead of the interview practising stage. If not, must prepare questions include:</p>
-        <ul>
-          <li>Tell me about yourself</li>
-          <li>Why this company → check the <a href="#question-bank" class="inline">question bank</a> for that question</li>
-          <li>Why this role / what's your preferred rotation for the grad program?</li>
-          <li>Top 3 things you value the most in terms of a job</li>
-          <li>Your own strength and weakness</li>
-          <li>Working as a team</li>
-          <li>Improving a process</li>
-        </ul>
-
-        <div class="callout">
-          <div class="callout-title">Expectation setting</div>
-          <p>You will always have moments of "unsmoothness". Don't restart every time you use a filler word.</p>
-        </div>
-
-        <h3>Keys to do well</h3>
-        <ul>
-          <li>Don't talk about the background context too much. Make it even sharper and shorter, since interviewers have minimal attention span on a screen.</li>
-          <li>You don't need to use the full time limit. If you finish earlier, that's fine.</li>
-          <li>Don't read off a script</li>
-        </ul>
-      </section>
-
-      <!-- ========== PSYCHOMETRIC ========== -->
-      <section class="chapter" id="psychometric">
-        <h2>Psychometric Tests</h2>
-
-        <h3>What a psychometric test is</h3>
-        <p>Standardised assessment used by employers during grad and internship recruitment to objectively measure skills and traits linked to workplace performance. Often paired with the application or resume to filter candidates. Some employers set minimum cut-off scores to progress.</p>
-
-        <h3>The main types</h3>
-
-        <h4>Cognitive / Aptitude (right vs wrong answers)</h4>
-        <ul>
-          <li><strong>Verbal reasoning</strong>: read a passage, draw conclusions. Answers must be based only on the information given.</li>
-        </ul>
-        <div class="figure"><img src="images/image1.png" alt="Verbal reasoning example" /></div>
-
-        <ul>
-          <li><strong>Numerical reasoning</strong>: interpret tables, graphs, percentages, ratios. Watch scales, units, labels.</li>
-        </ul>
-        <div class="figure"><img src="images/image6.png" alt="Numerical reasoning example" /></div>
-
-        <ul>
-          <li><strong>Abstract reasoning</strong>: spot patterns and relationships between shapes, symbols, pictures.</li>
-        </ul>
-        <div class="figure"><img src="images/image3.png" alt="Abstract reasoning example" /></div>
-
-        <h4>Behavioural (no right or wrong answers)</h4>
-        <ul>
-          <li><strong>Personality tests</strong>: measure workplace style and traits. Tests are built to catch candidates who try to "game" socially desirable answers, so answer honestly.</li>
-        </ul>
-        <div class="figure"><img src="images/image7.png" alt="Personality test example" /></div>
-
-        <h3>How they're delivered</h3>
-        <ul>
-          <li>Usually online via a link from the recruiter, done at home</li>
-          <li>Sometimes at an assessment centre or interview</li>
-          <li>Multiple choice, true or false, or gamified</li>
-        </ul>
-
-        <h3>Preparation tips</h3>
-        <ul>
-          <li>Read instructions carefully (calculator allowed? negative marking? time limit?)</li>
-          <li>Verbal: only use info from the passage, don't add outside knowledge</li>
-          <li>Numerical: check scales, units, labels before calculating</li>
-          <li>Skip hard questions and come back, don't burn time</li>
-          <li>Personality: be honest. Consistency checks will catch faking.</li>
-          <li>Find yourself a quiet space</li>
-          <li>Always prep a pen and paper</li>
-        </ul>
-
-        <h3>Free and useful practice resources</h3>
-        <p>Paid but have free trials (enough to get a taste):</p>
-        <ul>
-          <li><a class="inline" href="https://www.psychometrictests.org/sign-up?package=numerical-reasoning-tests" target="_blank" rel="noopener">psychometrictests.org</a></li>
-          <li><a class="inline" href="https://www.practicereasoningtests.com/psychometric-tests" target="_blank" rel="noopener">practicereasoningtests.com</a></li>
-          <li><a class="inline" href="https://www.practiceaptitudetests.com/" target="_blank" rel="noopener">practiceaptitudetests.com</a></li>
-          <li>Check your uni resources</li>
-        </ul>
-      </section>
-
-      <!-- ========== SCREENING CALLS ========== -->
-      <section class="chapter" id="screening-calls">
-        <h2>Screening Calls</h2>
-        <p class="lead">There are 2 types of screening calls.</p>
-
-        <div class="callout">
-          <div class="callout-title">General rule</div>
-          <p>They will always call you at a random time, so it is recommended you suggest they call back at their next convenient time. That way you can research the company better.</p>
-        </div>
-
-        <h3>Type 1: Recruiters / HR inside a company</h3>
-        <ul>
-          <li>They don't know the exact details of the role. Most of the time they are just jotting notes for the hiring manager (your real manager if hired).</li>
-          <li>They themselves don't care about the role content too much. They usually ask 2 to 3 questions, like:
-            <ul>
-              <li>A self-introduction</li>
-              <li>Why do you want to work for the company</li>
-              <li>What about the role interests you</li>
-            </ul>
-          </li>
-          <li>They seldom ask behavioural questions</li>
-          <li>They will ask logistical questions</li>
-          <li>When asked about visa status, say you have unlimited work rights (if you are graduating soon). Don't mention the 2-year deadline unless they ask for more information.</li>
-        </ul>
-
-        <h4>Tips on how to do well</h4>
-        <ul>
-          <li>Showcase the research you have done on the company when asked about why this company or role</li>
-          <li>Talk like a real person, ask questions at the end about the company</li>
-          <li>If there's a chance, engage in small talk and ask about their day, extending it to a normal conversation. Recruiters call countless people a day and a lot of candidates just want to sell themselves but aren't interested in actually talking. This is a golden opportunity to be different.</li>
-        </ul>
-
-        <h3>Type 2: Recruiting agency</h3>
-        <ul>
-          <li>They are more familiar with the roles they are hiring since they usually work for similar clients in similar industries</li>
-          <li>Companies hire them to locate talent efficiently, and trust them to bring forward 3 to 5 candidates for the role</li>
-        </ul>
-        <p>They will usually tell you about the role, give you a detailed job description, and ask if you are interested. The key is to showcase relevant experiences that align with the job and be a real person.</p>
-        <p>Same as recruiters, they call people for a living, and they have more incentive to move things quickly because they receive commission based on the hire.</p>
-        <p>Chat to them like a real person or friend, so you give them a reason to like you and move you forward.</p>
-      </section>
-
-      <!-- ========== ASSESSMENT CENTRES ========== -->
-      <section class="chapter" id="assessment-centres">
-        <h2>Assessment Centres</h2>
-
-        <h3>What is an assessment centre?</h3>
-        <p>Mainly for grad programs or grad roles. You have 2 main assessment sessions plus break time to wait for your turn for individual interviews.</p>
-
-        <h3>Group Case Study</h3>
-        <p><strong>Format:</strong> 3 to 6 people in a group, around 30 minutes of discussion time, 10 minutes of presentation time.</p>
-
-        <h4>What kinds of case study?</h4>
-        <p>Mostly broad topics within the industry or role you are applying for. In terms of difficulty and knowledge, they are not going to be like a uni exam.</p>
-
-        <h4>What interviewers are observing</h4>
-        <ul>
-          <li>Whether you are collaborating well with teammates</li>
-          <li>Whether you can lead the team forward while displaying quality</li>
-          <li>Whether you have the knowledge or thinking to answer questions well</li>
-        </ul>
-
-        <h4>Practical quick wins against other candidates</h4>
-        <ul>
-          <li>Bring a stack of paper and highlighters for everyone</li>
-          <li>Offer to time-keep and suggest presentation role allocation before time runs out</li>
-          <li>Offer to write down notes for the team during discussion</li>
-        </ul>
-
-        <h4>Keys to stand out during the discussion</h4>
-        <ul>
-          <li>Based on the notes you jot down, offer a summary after every question to ensure everyone is aligned</li>
-          <li>When you disagree with someone's idea, find ways to be respectful, e.g. compliment their thinking first</li>
-          <li>Practise case studies with easy business frameworks so you always have ideas to propose</li>
-          <li>Try to give the quiet students a chance to speak</li>
-          <li>Never cut someone off when they are speaking</li>
-          <li>Think from business frameworks to guide the conversations (see below)</li>
-        </ul>
-
-        <h4>Keys to stand out during the presentation</h4>
-        <ul>
-          <li>Engage with the audience, e.g. start with a question to grab the attention of the interviewers so they have a chance to think</li>
-          <li>When handing off the speech to the next teammate, mention their name. Show you care about your teammates too.</li>
-        </ul>
-
-        <h3>Face-to-face interview</h3>
-        <p>Refer to <a href="#interview-foundations" class="inline">Interview Foundations</a> and the rest of the interview resource.</p>
-
-        <h3>Break time / downtime</h3>
-        <p>Don't overlook this.</p>
-        <ul>
-          <li>Talk to the interviewers, or people who were in the room viewing the case study presentation</li>
-          <li>Find interviewers who are crowded by fewer people. Ask them 1 to 2 questions about their role and how they find the company.</li>
-          <li>Extend the talk to ask more about their life and hobbies. Have a genuine chat if possible. See if anything from you is relatable to them.</li>
-        </ul>
-
-        <h3>Business case frameworks</h3>
-        <p>Helpful for idea generation, though often other group members may not listen or use a certain framework.</p>
-        <ul>
-          <li><strong>PESTLE</strong> (Political, Economic, Social, Technological, Legal, Environmental): for any external environment analysis</li>
-          <li><strong>4Cs</strong> (Customer, Competition, Company, Context): for any internal analysis</li>
-        </ul>
-        <p>Don't over-study them. They are good-to-haves and something to help you think through business questions.</p>
-      </section>
-
-      <!-- ========== INDIVIDUAL CASE STUDY ========== -->
-      <section class="chapter" id="individual-case">
-        <h2>Individual Case Study</h2>
-        <p class="lead">For some junior roles, you'll carry an individual task as part of the recruitment process. The content is role-dependent, so we can't help with the deep technicality. Here are tips for different scenarios.</p>
-
-        <h3>If you're struggling to answer something</h3>
-        <p>Be honest. Tell them what methods you have tried but explain that you don't know. Ask for direct guidance on the spot if the interviewers have time. This showcases that you are willing to learn and admit when you don't know, rather than pretending and giving an answer that is completely wrong.</p>
-
-        <h3>Share your method, not just the answer</h3>
-        <p>Rather than just presenting your answers, share the method you used to arrive at them, to showcase that you actually know how to do it and to show your thinking. Don't just read out the answer and move on to the next question.</p>
-      </section>
-
-    </main>
-  </div>
+        <a class="primary-cta" href="https://airtable.com/appkQCJeB0bs92FN8/pag6PDCggrmdFd2VU/form" target="_blank" rel="noopener">
+          Open Form <span class="arrow">&rarr;</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- RESOURCES -->
+    <section class="portal-section section-resources">
+      <h2 class="section-label">Run your sessions</h2>
+      <div class="resource-grid">
+        <a class="resource-card" href="../html/tutor-resources.html">
+          <div class="resource-meta">
+            <span class="resource-num">01</span>
+          </div>
+          <h3>Mentor Resource Hub</h3>
+          <p>Resume, LinkedIn, cover letter, networking, coffee chats, and the full interview question bank. Share specific sections with mentees as needed.</p>
+          <span class="resource-arrow">Open hub <span class="arrow-icon">&rarr;</span></span>
+        </a>
+
+        <a class="resource-card" href="https://docs.google.com/document/d/1D_OHsA1uESXiiDrlh8nydSpFhxg8RlTP17M97_UWejM/edit?usp=sharing" target="_blank" rel="noopener">
+          <div class="resource-meta">
+            <span class="resource-num">02</span>
+            <span class="resource-ext">Google Doc</span>
+          </div>
+          <h3>Stand Out &amp; Break In Tracker</h3>
+          <p>Per-mentee progress tracker. Copy this doc for each new mentee, fill it in together, and revisit every session.</p>
+          <span class="resource-arrow">Open tracker <span class="arrow-icon">&rarr;</span></span>
+        </a>
+      </div>
+    </section>
+
+    <p class="footer-note">Private to Headstart mentors &middot; Do not share outside the team</p>
+
+  </main>
 
   <script>
-    // Close sidebar on mobile after clicking a link
-    document.querySelectorAll('aside.toc a').forEach(a => {
-      a.addEventListener('click', () => {
-        if (window.innerWidth <= 900) {
-          document.querySelector('aside.toc').classList.remove('open');
-        }
+    (function () {
+      var root = document.documentElement;
+
+      /* ── Theme persistence ── */
+      var THEME_KEY = 'headstart_theme';
+      var themeBtn = document.getElementById('theme-toggle');
+      var themeIcon = document.getElementById('theme-icon');
+
+      function applyTheme(theme) {
+        root.setAttribute('data-theme', theme);
+        themeIcon.innerHTML = theme === 'dark' ? '&#9788;' : '&#9790;';
+        themeBtn.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+        try { localStorage.setItem(THEME_KEY, theme); } catch (e) {}
+      }
+      var savedTheme = 'dark';
+      try { savedTheme = localStorage.getItem(THEME_KEY) || 'dark'; } catch (e) {}
+      applyTheme(savedTheme);
+      themeBtn.addEventListener('click', function () {
+        var current = root.getAttribute('data-theme') || 'dark';
+        applyTheme(current === 'dark' ? 'light' : 'dark');
       });
-    });
+
+      /* ── Onboarding completion persistence ── */
+      var ONB_KEY = 'headstart_onboarded';
+      function applyOnboarded(done) {
+        if (done) {
+          root.setAttribute('data-onboarded', 'true');
+        } else {
+          root.removeAttribute('data-onboarded');
+        }
+        try { localStorage.setItem(ONB_KEY, done ? 'true' : 'false'); } catch (e) {}
+      }
+      var savedOnboarded = false;
+      try { savedOnboarded = localStorage.getItem(ONB_KEY) === 'true'; } catch (e) {}
+      applyOnboarded(savedOnboarded);
+
+      document.getElementById('mark-complete').addEventListener('click', function () {
+        applyOnboarded(true);
+      });
+      document.getElementById('mark-incomplete').addEventListener('click', function () {
+        applyOnboarded(false);
+      });
+    })();
   </script>
+
 </body>
 </html>

@@ -13,6 +13,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex,nofollow" />
   <title>Mentee Agreement | Headstart Mentoring</title>
+  <script src="https://js.stripe.com/v3/"></script>
   <style>
     :root {
       --bg: #000000;
@@ -170,6 +171,47 @@
       left: -9999px;
     }
 
+    .card-section {
+      margin-top: 0.2rem;
+    }
+
+    .card-section-title {
+      display: block;
+      margin: 0 0 0.45rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    #card-element {
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.24);
+      background: #060606;
+      padding: 0.85rem 0.9rem;
+      transition: border-color 120ms ease, box-shadow 120ms ease;
+    }
+
+    #card-element.StripeElement--focus {
+      border-color: rgba(247,211,125,0.88);
+      box-shadow: 0 0 0 2px rgba(247,211,125,0.2);
+    }
+
+    #card-element.StripeElement--invalid {
+      border-color: rgba(255,182,182,0.6);
+    }
+
+    .card-trust {
+      margin: 0.55rem 0 0;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      color: #ffffff;
+    }
+
+    .agreement-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
     @media (max-width: 768px) {
       .agreement-shell {
         width: min(980px, 94vw);
@@ -255,7 +297,7 @@
         action="/mentee-agreement-submitted"
       >
         <input type="hidden" name="form-name" value="mentee-agreement" />
-        <input type="hidden" name="agreement_version" value="v1.0 (17/03/2026)" />
+        <input type="hidden" name="agreement_version" value="v1.1 (27/05/2026)" />
         <input type="hidden" name="signature" id="signature-value" />
 
         <p class="honeypot">
@@ -283,13 +325,24 @@
           <span>I have read, understood, and agree to the Mentee Agreement</span>
         </label>
 
-        <button class="agreement-submit" type="submit">Submit Agreement</button>
+        <div class="card-section">
+          <label class="card-section-title" for="card-element">Save your payment method (required)</label>
+          <div id="card-element"></div>
+          <p class="field-error" id="card-error" aria-live="polite"></p>
+          <p class="card-trust">You're not being charged today. Your card is stored securely by Stripe, and we only charge after each session is delivered.</p>
+        </div>
+
+        <input type="hidden" name="stripe_customer_id" id="stripe-customer-id" />
+
+        <button class="agreement-submit" id="agreement-submit-btn" type="submit">Submit Agreement</button>
       </form>
     </section>
   </main>
 
   <script>
     (function () {
+      const STRIPE_PUBLISHABLE_KEY = "pk_test_51TbWpNFGmCxRA41JkIUNNXQaUyqoGAO0fieT139u4T2fL3EnyB4PrzJYYoUbCzrlbvmL7ToWPue030ARNYeu1RvX00IQ1WWbab";
+
       const popupTrigger = document.getElementById("open-agreement-popup");
       const agreementOpenError = document.getElementById("agreement-open-error");
       let agreementWasOpened = false;
@@ -343,26 +396,104 @@
       const signatureValue = document.getElementById("signature-value");
       const typedField = document.getElementById("signature-typed");
       const errorField = document.getElementById("signature-error");
+      const cardErrorField = document.getElementById("card-error");
+      const submitBtn = document.getElementById("agreement-submit-btn");
+      const customerIdField = document.getElementById("stripe-customer-id");
 
-      form.addEventListener("submit", (event) => {
+      const stripe = window.Stripe ? window.Stripe(STRIPE_PUBLISHABLE_KEY) : null;
+      let cardElement = null;
+      if (stripe) {
+        const elements = stripe.elements();
+        cardElement = elements.create("card", {
+          style: {
+            base: {
+              fontSize: "16px",
+              color: "#ffffff",
+              fontFamily: '"Segoe UI", Arial, sans-serif',
+              "::placeholder": { color: "rgba(255,255,255,0.5)" },
+              iconColor: "#f7d37d",
+            },
+            invalid: { color: "#ffb6b6", iconColor: "#ffb6b6" },
+          },
+        });
+        cardElement.mount("#card-element");
+        cardElement.on("change", (event) => {
+          if (cardErrorField) cardErrorField.textContent = event.error ? event.error.message : "";
+        });
+      } else if (cardErrorField) {
+        cardErrorField.textContent = "Payment form failed to load. Please refresh and try again.";
+      }
+
+      let isSubmitting = false;
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        if (isSubmitting) return;
+
         if (!agreementWasOpened) {
-          event.preventDefault();
           if (agreementOpenError) agreementOpenError.textContent = "Please open the agreement by clicking \"here\" before submitting.";
           if (popupTrigger) popupTrigger.focus();
           return;
         }
 
         if (errorField) errorField.textContent = "";
+        if (cardErrorField) cardErrorField.textContent = "";
 
         const validSignature = (typedField.value || "").trim();
         if (!validSignature) {
-          event.preventDefault();
           if (errorField) errorField.textContent = "Please type your signature before submitting.";
           typedField.focus();
           return;
         }
-
         signatureValue.value = validSignature;
+
+        if (!stripe || !cardElement) {
+          if (cardErrorField) cardErrorField.textContent = "Payment form is not ready. Please refresh and try again.";
+          return;
+        }
+
+        const fullName = (document.getElementById("full-name").value || "").trim();
+        if (!fullName) return;
+
+        isSubmitting = true;
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Saving...";
+        }
+
+        try {
+          const setupRes = await fetch("/.netlify/functions/create-stripe-setup", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: fullName }),
+          });
+
+          const setupData = await setupRes.json();
+          if (!setupRes.ok || !setupData.client_secret) {
+            throw new Error(setupData.error || "Could not start payment setup");
+          }
+
+          const confirmResult = await stripe.confirmCardSetup(setupData.client_secret, {
+            payment_method: {
+              card: cardElement,
+              billing_details: { name: fullName },
+            },
+          });
+
+          if (confirmResult.error) {
+            throw new Error(confirmResult.error.message);
+          }
+
+          if (customerIdField) customerIdField.value = setupData.customer_id;
+          form.submit();
+        } catch (err) {
+          isSubmitting = false;
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Submit Agreement";
+          }
+          if (cardErrorField) cardErrorField.textContent = err.message || "Could not save your card. Please try again.";
+        }
       });
     })();
   </script>
