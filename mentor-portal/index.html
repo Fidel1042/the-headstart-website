@@ -7,6 +7,18 @@
   <meta name="description" content="Private mentor portal for The Headstart mentoring platform." />
   <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <style id="auth-gate">html:not(.auth-ok) body { visibility: hidden; }</style>
+  <script type="module">
+    import { requireAuth, bindSignOutButton } from "./auth.js";
+    requireAuth((session) => {
+      const chip = document.getElementById("user-chip");
+      if (chip && session?.user?.email) {
+        chip.textContent = session.user.email;
+        chip.hidden = false;
+      }
+      bindSignOutButton("#signout-btn");
+    });
+  </script>
   <style>
     :root {
       /* Theme tokens — dark (default) */
@@ -89,7 +101,7 @@
       border-bottom: 1px solid var(--line);
     }
     .top-nav-inner {
-      max-width: 1080px;
+      max-width: 1280px;
       margin: 0 auto;
       padding: 1rem 1.5rem;
       display: flex;
@@ -97,9 +109,27 @@
       gap: 0.9rem;
     }
     .top-nav img {
-      height: 40px;
+      height: 56px;
       width: auto;
+      max-width: 180px;
+      object-fit: contain;
       flex-shrink: 0;
+      display: block;
+    }
+    @media (max-width: 700px) {
+      .top-nav img { height: 44px; max-width: 140px; }
+    }
+    .logo-home {
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: opacity 0.15s, transform 0.15s;
+    }
+    .logo-home:hover { opacity: 0.82; transform: translateY(-1px); }
+    .logo-home:focus-visible {
+      outline: 2px solid var(--accent-bright);
+      outline-offset: 4px;
     }
     .top-nav-text { display: flex; flex-direction: column; gap: 0.1rem; }
     .top-nav-title {
@@ -115,8 +145,49 @@
       color: var(--accent);
       font-weight: 700;
     }
-    .theme-toggle {
+    .top-nav-actions {
       margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .user-chip {
+      font-size: 0.8rem;
+      color: var(--text);
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--bg-card);
+      max-width: 240px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    @media (max-width: 700px) { .user-chip { display: none; } }
+    .signout-btn {
+      padding: 0.45rem 0.95rem;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s, color 0.15s;
+    }
+    .signout-btn:hover {
+      border-color: var(--accent-line);
+      background: var(--accent-soft);
+      color: var(--accent-bright);
+    }
+    .signout-btn:focus-visible {
+      outline: 2px solid var(--accent-bright);
+      outline-offset: 3px;
+    }
+    .theme-toggle {
       width: 38px;
       height: 38px;
       border-radius: 50%;
@@ -144,17 +215,17 @@
     main {
       position: relative;
       z-index: 1;
-      max-width: 1080px;
+      max-width: 1280px;
       margin: 0 auto;
-      padding: 3.5rem 1.5rem 6rem;
+      padding: 3.5rem 2rem 6rem;
       display: flex;
       flex-direction: column;
     }
 
     /* ── Hero ── */
     .hero {
-      margin-bottom: 3rem;
-      max-width: 720px;
+      margin-bottom: 3.5rem;
+      max-width: 980px;
     }
     .hero-eyebrow {
       font-size: 0.72rem;
@@ -165,11 +236,11 @@
       margin-bottom: 1rem;
     }
     .hero h1 {
-      font-size: clamp(2rem, 4.5vw, 2.8rem);
+      font-size: clamp(2.2rem, 4.2vw, 3rem);
       font-weight: 800;
       line-height: 1.1;
-      letter-spacing: -0.01em;
-      margin-bottom: 1rem;
+      letter-spacing: -0.015em;
+      margin-bottom: 1.1rem;
       background: var(--gold-gradient);
       -webkit-background-clip: text;
       background-clip: text;
@@ -177,9 +248,10 @@
       -webkit-text-fill-color: transparent;
     }
     .hero p {
-      font-size: 1.1rem;
+      font-size: 1.15rem;
       line-height: 1.65;
       color: var(--text);
+      max-width: 760px;
     }
 
     /* ── Section labels (gold, never grey) ── */
@@ -223,10 +295,10 @@
     .primary-card {
       display: grid;
       grid-template-columns: 1fr auto;
-      gap: 2rem;
+      gap: 2.5rem;
       align-items: center;
-      padding: 2rem 2.2rem;
-      border-radius: 18px;
+      padding: 2.3rem 2.6rem;
+      border-radius: 20px;
       border: 1px solid var(--accent-line);
       background:
         radial-gradient(circle at top right, var(--accent-soft), transparent),
@@ -252,18 +324,18 @@
       margin-bottom: 0.6rem;
     }
     .primary-card h2 {
-      font-size: 1.5rem;
+      font-size: 1.65rem;
       font-weight: 700;
       line-height: 1.25;
-      letter-spacing: -0.005em;
-      margin-bottom: 0.55rem;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.7rem;
       color: var(--text);
     }
     .primary-card p {
-      font-size: 0.98rem;
-      line-height: 1.6;
+      font-size: 1.02rem;
+      line-height: 1.65;
       color: var(--text);
-      max-width: 460px;
+      max-width: 560px;
     }
     .primary-cta {
       display: inline-flex;
@@ -367,22 +439,22 @@
     /* ── Resource grid ── */
     .resource-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.2rem;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 1.4rem;
     }
     .resource-card {
       display: flex;
       flex-direction: column;
-      gap: 0.85rem;
-      padding: 1.6rem 1.7rem 1.7rem;
-      border-radius: 14px;
+      gap: 0.95rem;
+      padding: 1.9rem 2rem 2rem;
+      border-radius: 16px;
       border: 1px solid var(--line);
       background: var(--bg-card);
       color: var(--text);
       text-decoration: none;
       position: relative;
       transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s, background 0.18s;
-      min-height: 200px;
+      min-height: 220px;
     }
     .resource-card:hover {
       transform: translateY(-3px);
@@ -419,15 +491,15 @@
       padding: 0.18em 0.5em;
     }
     .resource-card h3 {
-      font-size: 1.18rem;
+      font-size: 1.3rem;
       font-weight: 700;
       line-height: 1.3;
-      letter-spacing: -0.005em;
+      letter-spacing: -0.01em;
       color: var(--text);
     }
     .resource-card p {
-      font-size: 0.92rem;
-      line-height: 1.6;
+      font-size: 0.98rem;
+      line-height: 1.65;
       color: var(--text);
       flex: 1;
     }
@@ -471,23 +543,28 @@
 
   <header class="top-nav">
     <div class="top-nav-inner">
-      <img src="../images/headstart-italic-logo.png" alt="The Headstart" />
+      <a href="./" class="logo-home" aria-label="Mentor portal home">
+        <img src="../images/headstart-italic-logo.png" alt="The Headstart" />
+      </a>
       <div class="top-nav-text">
         <span class="top-nav-title">Mentor Portal</span>
         <span class="top-nav-subtitle">Internal use only</span>
       </div>
-      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle light/dark mode" title="Toggle light/dark mode">
-        <span id="theme-icon">&#9788;</span>
-      </button>
+      <div class="top-nav-actions">
+        <span class="user-chip" id="user-chip" hidden></span>
+        <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle light/dark mode" title="Toggle light/dark mode">
+          <span id="theme-icon">&#9788;</span>
+        </button>
+        <button class="signout-btn" id="signout-btn" type="button" title="Sign out">Sign out</button>
+      </div>
     </div>
   </header>
 
   <main>
 
     <section class="hero">
-      <div class="hero-eyebrow">Headstart Mentoring</div>
       <h1>Welcome to Headstart Mentor Portal</h1>
-      <p>Everything you need to run a session, log it, and keep your mentee on track. Bookmark this page and the session log form.</p>
+      <p>This portal holds your onboarding module and all mentor resources. Bookmark it in your browser for quick access.</p>
     </section>
 
     <!-- ONBOARDING (top before completion, bottom after) -->

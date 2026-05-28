@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Case Study: Cup Above Coffee</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #e8e8e8;
+      font-family: 'Inter', sans-serif;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .print-btn {
+      margin-bottom: 20px;
+      background: #1a1a1a;
+      color: #c79b3b;
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 10px 28px;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+
+    .print-btn:hover { background: #333; }
+
+    @media print {
+      @page {
+        size: A4;
+        margin: 0;
+      }
+
+      .print-btn { display: none; }
+
+      body {
+        background: #fff;
+        padding: 0;
+        display: block;
+      }
+
+      .page {
+        width: 210mm;
+        min-height: 297mm;
+        padding: 18mm 20mm;
+        page-break-after: always;
+        box-shadow: none;
+        border-top: none !important;
+      }
+
+      .page + .page {
+        border-top: none;
+      }
+    }
+
+    .page {
+      width: 794px;
+      background: #ffffff;
+      padding: 52px 56px;
+    }
+
+    .page + .page {
+      border-top: 3px solid #e8e8e8;
+    }
+
+    .doc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 28px;
+      padding-bottom: 18px;
+      border-bottom: 2px solid #1a1a1a;
+    }
+
+    .doc-eyebrow {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #c79b3b;
+      margin-bottom: 6px;
+    }
+
+    .doc-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #1a1a1a;
+      line-height: 1.2;
+    }
+
+    .doc-subtitle {
+      font-size: 12px;
+      color: #555;
+      margin-top: 5px;
+      font-weight: 500;
+    }
+
+    .doc-header-right {
+      text-align: right;
+      font-size: 10px;
+      color: #888;
+      line-height: 1.8;
+    }
+
+    .doc-header-right strong {
+      color: #1a1a1a;
+      font-weight: 600;
+    }
+
+    .section-title {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #c79b3b;
+      margin-bottom: 8px;
+      margin-top: 22px;
+    }
+
+    p {
+      font-size: 11.5px;
+      line-height: 1.75;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    p:last-child { margin-bottom: 0; }
+    strong { color: #1a1a1a; font-weight: 600; }
+
+    .fact-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 18px 0;
+    }
+
+    .fact-box {
+      background: #f7f7f7;
+      border-left: 3px solid #c79b3b;
+      padding: 12px 14px;
+      border-radius: 0 4px 4px 0;
+    }
+
+    .fact-box__num {
+      font-size: 22px;
+      font-weight: 800;
+      color: #1a1a1a;
+      line-height: 1;
+    }
+
+    .fact-box__num span {
+      font-size: 13px;
+      font-weight: 700;
+      color: #c79b3b;
+    }
+
+    .fact-box__label {
+      font-size: 9.5px;
+      color: #666;
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+
+    .charts-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 20px 0;
+    }
+
+    .chart-box--wide {
+      grid-column: 1 / -1;
+    }
+
+    .chart-box {
+      background: #f9f9f9;
+      border-radius: 6px;
+      padding: 14px 14px 10px;
+    }
+
+    .chart-box__title {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 6px;
+    }
+
+    .chart-box__note {
+      font-size: 9px;
+      color: #c79b3b;
+      font-weight: 600;
+      margin-top: 6px;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #e8e8e8;
+      margin: 20px 0;
+    }
+
+    .q-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 10px;
+    }
+
+    .q-item {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .q-badge {
+      background: #1a1a1a;
+      color: #c79b3b;
+      font-size: 10px;
+      font-weight: 800;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .q-text {
+      font-size: 11.5px;
+      line-height: 1.65;
+      color: #222;
+    }
+
+    .q-type {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #c79b3b;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .doc-footer {
+      margin-top: 28px;
+      padding-top: 14px;
+      border-top: 1px solid #e8e8e8;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .doc-footer span { font-size: 9px; color: #aaa; letter-spacing: 0.08em; }
+    .doc-footer strong { color: #c79b3b; font-size: 9px; }
+
+    .page2-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 22px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #e8e8e8;
+    }
+
+    .page2-header span {
+      font-size: 9px;
+      color: #aaa;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+  </style>
+  <style id="auth-gate">html:not(.auth-ok) body { visibility: hidden; }</style>
+  <script type="module" src="/mentor-portal/guard.js"></script>
+
+</head>
+<body>
+
+  <button class="print-btn" onclick="window.print()">Print / Save as PDF</button>
+
+  <!-- PAGE 1 -->
+  <div class="page">
+
+    <div class="doc-header">
+      <div>
+        <div class="doc-eyebrow">Mock Assessment Centre: Case Study</div>
+        <div class="doc-title">Cup Above Coffee:<br>The Quiet Squeeze</div>
+        <div class="doc-subtitle">25 min group discussion &nbsp;|&nbsp; 10 min presentation</div>
+      </div>
+      <div class="doc-header-right">
+        <img src="../../images/intro-logo.png" alt="Headstart Mentoring" style="width:48px; height:48px; object-fit:contain; display:block; margin-left:auto; margin-bottom:6px;" />
+        <div><strong>Headstart Mentoring</strong></div>
+        <div>Internal coaching material</div>
+        <div>May 2026</div>
+      </div>
+    </div>
+
+    <div class="section-title">The Company</div>
+    <p>
+      <strong>Cup Above Coffee</strong> is a Brisbane-based specialty coffee chain founded in 2019. It runs <strong>8 stores</strong> across the inner suburbs, employs around 85 people, and has built a loyal following on locally roasted beans and a small but high-quality food menu. For its first 5 years the business grew steadily and stores were consistently busy.
+    </p>
+
+    <div class="section-title">The Situation</div>
+    <p>
+      Over the past 18 months, <strong>revenue has held roughly flat</strong> but <strong>net profit has dropped 28%</strong>. Operating costs (wages, rent, ingredients) have risen faster than the team can absorb, and margins are getting squeezed every quarter. The founder knows something needs to change but is not sure where to focus first.
+    </p>
+    <p>
+      The three charts below show what the team has pulled together so far: how customer behaviour has shifted, how the 8 stores compare on monthly revenue, and what customers themselves are flagging in recent surveys.
+    </p>
+
+    <div class="fact-row">
+      <div class="fact-box">
+        <div class="fact-box__num">8<span> stores</span></div>
+        <div class="fact-box__label">All in inner Brisbane suburbs</div>
+      </div>
+      <div class="fact-box">
+        <div class="fact-box__num">85<span> staff</span></div>
+        <div class="fact-box__label">Baristas, store managers, head office</div>
+      </div>
+      <div class="fact-box">
+        <div class="fact-box__num">28<span>% drop</span></div>
+        <div class="fact-box__label">Net profit decline over 18 months</div>
+      </div>
+    </div>
+
+    <div class="charts-row">
+      <div class="chart-box">
+        <div class="chart-box__title">Customers &amp; Average Spend (18 months)</div>
+        <canvas id="lineChart" height="130"></canvas>
+        <div class="chart-box__note">Fewer customers, but each spends more</div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-box__title">Monthly Revenue by Store ($000)</div>
+        <canvas id="barChart" height="130"></canvas>
+        <div class="chart-box__note">Top store earns ~4x the bottom store</div>
+      </div>
+      <div class="chart-box chart-box--wide">
+        <div class="chart-box__title">Why Customers Say They Come Less Often</div>
+        <canvas id="hbarChart" height="70"></canvas>
+        <div class="chart-box__note">No single dominant reason</div>
+      </div>
+    </div>
+
+    <div class="doc-footer">
+      <span>Cup Above Coffee: Confidential Case Study</span>
+      <strong>Page 1 of 2</strong>
+    </div>
+
+  </div>
+
+
+  <!-- PAGE 2 -->
+  <div class="page">
+
+    <div class="page2-header">
+      <span>Cup Above Coffee: Discussion Guide (cont.)</span>
+      <span>Headstart Mentoring &nbsp;|&nbsp; Internal Resource &nbsp;|&nbsp; May 2026</span>
+    </div>
+
+    <hr class="divider" />
+
+    <div class="section-title">Discussion Questions</div>
+    <div class="q-list">
+
+      <div class="q-item">
+        <div class="q-badge">1</div>
+        <div class="q-text">
+          The founder knows something is off but is not sure where to look. What is your initial read on what is actually going on, and where would you start digging? Talk through what feels most likely versus what might be hiding under the surface.
+        </div>
+      </div>
+
+      <div class="q-item">
+        <div class="q-badge">2</div>
+        <div class="q-text">
+          Each chart shows a different angle on the business. What story do they tell when you look at them together, and which one do you think matters most? Is there anything that surprises you, or anything that does not quite add up?
+        </div>
+      </div>
+
+      <div class="q-item">
+        <div class="q-badge">3</div>
+        <div class="q-text">
+          The founder has some cash to invest but limited time and attention. What are the realistic ways they could respond? Push past the obvious answers and consider both quick fixes and bigger plays.
+        </div>
+      </div>
+
+      <div class="q-item">
+        <div class="q-badge">4</div>
+        <div class="q-text">
+          If you had to give the founder one clear direction to take, what would it be and why? What makes your answer better than the alternatives the group considered?
+        </div>
+      </div>
+
+    </div>
+
+    <div class="doc-footer">
+      <span>Prepared by The Headstart Mentoring &nbsp;|&nbsp; Not for distribution</span>
+      <strong>Page 2 of 2</strong>
+    </div>
+
+  </div>
+
+
+  <script>
+    // Chart 1: dual-axis line - customers and average spend over 18 months
+    new Chart(document.getElementById('lineChart'), {
+      type: 'line',
+      data: {
+        labels: ['Nov 24', 'Feb 25', 'May 25', 'Aug 25', 'Nov 25', 'Feb 26', 'May 26'],
+        datasets: [
+          {
+            label: 'Customers per month (per store)',
+            data: [12200, 11800, 11500, 11100, 10800, 10500, 10300],
+            borderColor: '#1a1a1a',
+            backgroundColor: 'rgba(26,26,26,0.05)',
+            borderWidth: 2,
+            pointRadius: 3,
+            pointBackgroundColor: '#1a1a1a',
+            yAxisID: 'y',
+            tension: 0.3,
+            fill: false
+          },
+          {
+            label: 'Average spend per customer ($)',
+            data: [7.20, 7.40, 7.60, 7.90, 8.10, 8.30, 8.50],
+            borderColor: '#c79b3b',
+            backgroundColor: 'rgba(199,155,59,0.08)',
+            borderWidth: 2,
+            pointRadius: 3,
+            pointBackgroundColor: '#c79b3b',
+            yAxisID: 'y1',
+            tension: 0.3,
+            fill: false
+          }
+        ]
+      },
+      options: {
+        plugins: {
+          legend: {
+            display: true,
+            position: 'bottom',
+            labels: { font: { size: 8 }, color: '#555', padding: 6, boxWidth: 9 }
+          }
+        },
+        scales: {
+          y: {
+            position: 'left',
+            min: 9500,
+            max: 13000,
+            ticks: { font: { size: 8.5 }, color: '#888', callback: v => (v/1000).toFixed(1) + 'k' },
+            grid: { color: 'rgba(0,0,0,0.05)' }
+          },
+          y1: {
+            position: 'right',
+            min: 6,
+            max: 10,
+            ticks: { font: { size: 8.5 }, color: '#c79b3b', callback: v => '$' + v.toFixed(1) },
+            grid: { display: false }
+          },
+          x: {
+            ticks: { font: { size: 8.5 }, color: '#888' },
+            grid: { display: false }
+          }
+        }
+      }
+    });
+
+    // Chart 2: bar chart - monthly revenue by store ($000)
+    new Chart(document.getElementById('barChart'), {
+      type: 'bar',
+      data: {
+        labels: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'],
+        datasets: [{
+          data: [128, 115, 98, 90, 80, 62, 46, 34],
+          backgroundColor: '#c79b3b',
+          borderRadius: 3,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: {
+          y: {
+            max: 140,
+            ticks: { font: { size: 8.5 }, color: '#888', callback: v => '$' + v + 'k' },
+            grid: { color: 'rgba(0,0,0,0.05)' }
+          },
+          x: {
+            ticks: { font: { size: 8.5 }, color: '#888' },
+            grid: { display: false },
+            title: { display: true, text: 'Store', font: { size: 8.5 }, color: '#888' }
+          }
+        }
+      },
+      plugins: [{
+        afterDatasetsDraw(chart) {
+          const ctx = chart.ctx;
+          const meta = chart.getDatasetMeta(0);
+          meta.data.forEach((bar, index) => {
+            const value = chart.data.datasets[0].data[index];
+            ctx.save();
+            ctx.font = '700 9px Inter, sans-serif';
+            ctx.fillStyle = '#333';
+            ctx.textAlign = 'center';
+            ctx.fillText('$' + value + 'k', bar.x, bar.y - 5);
+            ctx.restore();
+          });
+        }
+      }]
+    });
+
+    // Chart 3: horizontal bar - customer survey themes
+    new Chart(document.getElementById('hbarChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Wait times too long', 'Prices have crept up', 'Menu feels boring', 'Parking is hard', 'Other reasons'],
+        datasets: [{
+          data: [32, 28, 19, 12, 9],
+          backgroundColor: ['#c79b3b', '#1a1a1a', '#888', '#bbb', '#ddd'],
+          borderRadius: 3,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        plugins: { legend: { display: false } },
+        scales: {
+          x: {
+            max: 40,
+            ticks: { font: { size: 8.5 }, color: '#888', callback: v => v + '%' },
+            grid: { color: 'rgba(0,0,0,0.05)' }
+          },
+          y: {
+            ticks: { font: { size: 9 }, color: '#444' },
+            grid: { display: false }
+          }
+        }
+      },
+      plugins: [{
+        afterDatasetsDraw(chart) {
+          const ctx = chart.ctx;
+          const meta = chart.getDatasetMeta(0);
+          meta.data.forEach((bar, index) => {
+            const value = chart.data.datasets[0].data[index];
+            ctx.save();
+            ctx.font = '700 9px Inter, sans-serif';
+            ctx.fillStyle = '#333';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(value + '%', bar.x + 5, bar.y);
+            ctx.restore();
+          });
+        }
+      }]
+    });
+  </script>
+
+</body>
+</html>

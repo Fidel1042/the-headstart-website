@@ -67,7 +67,7 @@
     --grain-blend: normal;
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { font-size: 105%; scroll-behavior: smooth; scroll-padding-top: 80px; }
+  html { font-size: 110%; scroll-behavior: smooth; scroll-padding-top: 80px; }
   @media (max-width: 900px) { html { font-size: 100%; } }
   @media (max-width: 500px) { html { font-size: 95%; } }
   html, body {
@@ -111,10 +111,25 @@
     gap: 0.85rem;
   }
   .site-header img.logo {
-    width: 38px;
-    height: 38px;
+    height: 44px;
+    width: auto;
+    max-width: 150px;
+    object-fit: contain;
     border-radius: 8px;
     flex-shrink: 0;
+    display: block;
+  }
+  .site-header .logo-home {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: opacity 0.15s, transform 0.15s;
+  }
+  .site-header .logo-home:hover { opacity: 0.82; transform: translateY(-1px); }
+  .site-header .logo-home:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
   }
   .site-header .header-text {
     display: flex;
@@ -314,6 +329,16 @@
   }
   strong { color: var(--text); font-weight: 700; }
   em { color: var(--text); font-style: italic; }
+
+  /* Inline gold-gradient text (for parenthetical asides, callouts in body) */
+  .gold-text {
+    background: var(--gold-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    font-weight: 600;
+  }
 
   /* Top-of-page "top up" remark */
   .top-up-note {
@@ -665,11 +690,16 @@
     .site-header { padding: 14px 20px; }
   }
 </style>
+  <style id="auth-gate">html:not(.auth-ok) body { visibility: hidden; }</style>
+  <script type="module" src="/mentor-portal/guard.js"></script>
+
 </head>
 <body>
 
 <header class="site-header">
-  <img class="logo" src="../images/headstart-italic-logo.png" alt="The Headstart logo" />
+  <a href="../mentor-portal/" class="logo-home" aria-label="Mentor portal home">
+    <img class="logo" src="../images/headstart-italic-logo.png" alt="The Headstart logo" />
+  </a>
   <div class="header-text">
     <h1>Mentor Resource Hub</h1>
     <span class="sub">Internal &middot; Share with mentees as needed</span>
@@ -1258,7 +1288,7 @@ Name</div>
       </ul>
       <p><strong>One unique fact about yourself, relevant to the company (max 45 seconds):</strong> the key to stand out from the bunch.</p>
       <ul>
-        <li>How to find the unique fact? It has to be fun and memorable.</li>
+        <li>How to find the unique fact? Extract it by talking to them and understanding them <span class="gold-text">(Fidel will further explain in the onboarding call)</span>.</li>
         <li>Exercise the tutor can do with the student.</li>
       </ul>
       <p><strong>End the intro (max 10 seconds):</strong></p>
@@ -1285,7 +1315,7 @@ Name</div>
       <div class="subhead">Motivational Questions</div>
 
       <div class="q">
-        <div class="q-head"><div class="q-title">How do you see yourself in 5 years?</div><span class="q-tag q-tag-a">Commonality: A</span></div>
+        <div class="q-head"><div class="q-title">How do you see yourself in 5 years?</div><span class="q-tag q-tag-b">Commonality: B</span></div>
         <div class="label">What the interviewer is looking for</div>
         <ul><li>If you have even thought about your own ambition and whether you can articulate it well.</li></ul>
         <div class="label">Keys to answering well</div>
@@ -1823,6 +1853,15 @@ Name</div>
         <li>Talk to the interviewers or the people who were in the room viewing the case study presentation.</li>
         <li>Find interviewers who are crowded by fewer people, ask them 1 to 2 questions about their roles and how they find the company.</li>
         <li>Extend the talk to asking more about their lives and hobbies. Have a genuine chat if possible, and see if anything about you is relatable to them.</li>
+      </ul>
+
+      <h3>Example case studies</h3>
+      <p>Practice cases you can run with a mentee, each with a fictional company brief and prompts:</p>
+      <ul>
+        <li><a class="gold-text" href="case-studies/case-study-coffee.html" target="_blank" rel="noopener">Cup Above Coffee</a> &mdash; FMCG, retail expansion</li>
+        <li><a class="gold-text" href="case-studies/case-study-fitness.html" target="_blank" rel="noopener">FlexFit Studios</a> &mdash; services, subscription model</li>
+        <li><a class="gold-text" href="case-studies/case-study-grocery.html" target="_blank" rel="noopener">GreenGo Grocer</a> &mdash; grocery, sustainability and pricing</li>
+        <li><a class="gold-text" href="case-studies/case-study-outdoor.html" target="_blank" rel="noopener">Summit Edge Outdoors</a> &mdash; retail, market entry</li>
       </ul>
 
       <h3>Business case frameworks</h3>

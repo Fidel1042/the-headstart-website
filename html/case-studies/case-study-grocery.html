@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Case Study: GreenGo Grocer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #e8e8e8;
+      font-family: 'Inter', sans-serif;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .print-btn {
+      margin-bottom: 20px;
+      background: #1a1a1a;
+      color: #c79b3b;
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 10px 28px;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+
+    .print-btn:hover { background: #333; }
+
+    @media print {
+      @page { size: A4; margin: 0; }
+      .print-btn { display: none; }
+      body { background: #fff; padding: 0; display: block; }
+      .page {
+        width: 210mm;
+        min-height: 297mm;
+        padding: 18mm 20mm;
+        page-break-after: always;
+        box-shadow: none;
+        border-top: none !important;
+      }
+      .page + .page { border-top: none; }
+    }
+
+    .page { width: 794px; background: #ffffff; padding: 52px 56px; }
+    .page + .page { border-top: 3px solid #e8e8e8; }
+
+    .doc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 28px;
+      padding-bottom: 18px;
+      border-bottom: 2px solid #1a1a1a;
+    }
+
+    .doc-eyebrow {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #c79b3b;
+      margin-bottom: 6px;
+    }
+
+    .doc-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #1a1a1a;
+      line-height: 1.2;
+    }
+
+    .doc-subtitle {
+      font-size: 12px;
+      color: #555;
+      margin-top: 5px;
+      font-weight: 500;
+    }
+
+    .doc-header-right {
+      text-align: right;
+      font-size: 10px;
+      color: #888;
+      line-height: 1.8;
+    }
+
+    .doc-header-right strong { color: #1a1a1a; font-weight: 600; }
+
+    .section-title {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #c79b3b;
+      margin-bottom: 8px;
+      margin-top: 22px;
+    }
+
+    p {
+      font-size: 11.5px;
+      line-height: 1.75;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    p:last-child { margin-bottom: 0; }
+    strong { color: #1a1a1a; font-weight: 600; }
+
+    .fact-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 18px 0;
+    }
+
+    .fact-box {
+      background: #f7f7f7;
+      border-left: 3px solid #c79b3b;
+      padding: 12px 14px;
+      border-radius: 0 4px 4px 0;
+    }
+
+    .fact-box__num {
+      font-size: 22px;
+      font-weight: 800;
+      color: #1a1a1a;
+      line-height: 1;
+    }
+
+    .fact-box__num span {
+      font-size: 13px;
+      font-weight: 700;
+      color: #c79b3b;
+    }
+
+    .fact-box__label {
+      font-size: 9.5px;
+      color: #666;
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+
+    .charts-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 20px 0;
+    }
+
+    .chart-box--wide { grid-column: 1 / -1; }
+
+    .chart-box {
+      background: #f9f9f9;
+      border-radius: 6px;
+      padding: 14px 14px 10px;
+    }
+
+    .chart-box__title {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 6px;
+    }
+
+    .chart-box__note {
+      font-size: 9px;
+      color: #c79b3b;
+      font-weight: 600;
+      margin-top: 6px;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #e8e8e8;
+      margin: 20px 0;
+    }
+
+    .q-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 10px;
+    }
+
+    .q-item {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .q-badge {
+      background: #1a1a1a;
+      color: #c79b3b;
+      font-size: 10px;
+      font-weight: 800;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .q-text {
+      font-size: 11.5px;
+      line-height: 1.65;
+      color: #222;
+    }
+
+    .doc-footer {
+      margin-top: 28px;
+      padding-top: 14px;
+      border-top: 1px solid #e8e8e8;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .doc-footer span { font-size: 9px; color: #aaa; letter-spacing: 0.08em; }
+    .doc-footer strong { color: #c79b3b; font-size: 9px; }
+
+    .page2-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 22px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #e8e8e8;
+    }
+
+    .page2-header span {
+      font-size: 9px;
+      color: #aaa;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+  </style>
+  <style id="auth-gate">html:not(.auth-ok) body { visibility: hidden; }</style>
+  <script type="module" src="/mentor-portal/guard.js"></script>
+
+</head>
+<body>
+
+  <button class="print-btn" onclick="window.print()">Print / Save as PDF</button>
+
+  <!-- PAGE 1 -->
+  <div class="page">
+
+    <div class="doc-header">
+      <div>
+        <div class="doc-eyebrow">Mock Assessment Centre: Case Study</div>
+        <div class="doc-title">GreenGo Grocer:<br>The New Player on the Block</div>
+        <div class="doc-subtitle">25 min group discussion &nbsp;|&nbsp; 10 min presentation</div>
+      </div>
+      <div class="doc-header-right">
+        <img src="../../images/intro-logo.png" alt="Headstart Mentoring" style="width:48px; height:48px; object-fit:contain; display:block; margin-left:auto; margin-bottom:6px;" />
+        <div><strong>Headstart Mentoring</strong></div>
+        <div>Internal coaching material</div>
+        <div>May 2026</div>
+      </div>
+    </div>
+
+    <div class="section-title">The Company</div>
+    <p>
+      <strong>GreenGo</strong> is a Sydney-based online grocery delivery service founded in 2022. It focuses on premium, organic, and locally sourced products with a <strong>2-hour delivery window</strong>. Average basket size is $45 and the team handles around 8,000 orders per week. The 60-person team includes drivers, warehouse staff, and a small head office.
+    </p>
+
+    <div class="section-title">The Situation</div>
+    <p>
+      Eight weeks ago, <strong>FreshDash</strong>, a US grocery delivery giant backed by $200M in venture funding, launched in Sydney. They offer <strong>30-minute delivery</strong>, prices around 30% lower than GreenGo's, and roughly 3x the product range. GreenGo's weekly orders have dropped 23% since the launch.
+    </p>
+    <p>
+      The founder team has 30 days to decide how to respond before investor reporting season. The data below was put together over the weekend.
+    </p>
+
+    <div class="fact-row">
+      <div class="fact-box">
+        <div class="fact-box__num">4<span> years</span></div>
+        <div class="fact-box__label">Founded 2022, Sydney-only</div>
+      </div>
+      <div class="fact-box">
+        <div class="fact-box__num">8,000<span> orders</span></div>
+        <div class="fact-box__label">Weekly orders pre-FreshDash launch</div>
+      </div>
+      <div class="fact-box">
+        <div class="fact-box__num">23<span>% drop</span></div>
+        <div class="fact-box__label">Decline in weekly orders over 8 weeks</div>
+      </div>
+    </div>
+
+    <div class="charts-row">
+      <div class="chart-box">
+        <div class="chart-box__title">Weekly Orders (Past 8 Weeks)</div>
+        <canvas id="lineChart" height="130"></canvas>
+        <div class="chart-box__note">Sharp drop from week 4 (FreshDash launch)</div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-box__title">GreenGo vs FreshDash (Score 0-10)</div>
+        <canvas id="barChart" height="130"></canvas>
+        <div class="chart-box__note">GreenGo wins on quality only</div>
+      </div>
+      <div class="chart-box chart-box--wide">
+        <div class="chart-box__title">What Sydney Shoppers Value Most in Grocery Delivery</div>
+        <canvas id="hbarChart" height="70"></canvas>
+        <div class="chart-box__note">Speed and price lead, quality is fourth</div>
+      </div>
+    </div>
+
+    <div class="doc-footer">
+      <span>GreenGo Grocer: Confidential Case Study</span>
+      <strong>Page 1 of 2</strong>
+    </div>
+
+  </div>
+
+
+  <!-- PAGE 2 -->
+  <div class="page">
+
+    <div class="page2-header">
+      <span>GreenGo Grocer: Discussion Guide (cont.)</span>
+      <span>Headstart Mentoring &nbsp;|&nbsp; Internal Resource &nbsp;|&nbsp; May 2026</span>
+    </div>
+
+    <hr class="divider" />
+
+    <div class="section-title">Discussion Questions</div>
+    <div class="q-list">
+
+      <div class="q-item">
+        <div class="q-badge">1</div>
+        <div class="q-text">
+          FreshDash arrived eight weeks ago and the impact has been immediate. What is your initial read on GreenGo's position: do they have a real fight on their hands, or is this already lost? Be honest about what the situation actually looks like.
+        </div>
+      </div>
+
+      <div class="q-item">
+        <div class="q-badge">2</div>
+        <div class="q-text">
+          GreenGo cannot beat FreshDash at everything. Where do they have a genuine edge they can build on, and where are they most exposed? Use the charts to back up your view.
+        </div>
+      </div>
+
+      <div class="q-item">
+        <div class="q-badge">3</div>
+        <div class="q-text">
+          The founder team has been weighing several options this week: lower prices, narrow the range, lean into quality, partner with a major retailer, or even sell to FreshDash. What are the realistic ways they could respond, and which one is the most promising? Reach a position as a group.
+        </div>
+      </div>
+
+      <div class="q-item">
+        <div class="q-badge">4</div>
+        <div class="q-text">
+          What is your group's recommendation, and what is it asking the founder to bet on? How would you justify that bet to investors at the next board meeting?
+        </div>
+      </div>
+
+    </div>
+
+    <div class="doc-footer">
+      <span>Prepared by The Headstart Mentoring &nbsp;|&nbsp; Not for distribution</span>
+      <strong>Page 2 of 2</strong>
+    </div>
+
+  </div>
+
+
+  <script>
+    // Chart 1: weekly orders line, sharp drop from week 4
+    new Chart(document.getElementById('lineChart'), {
+      type: 'line',
+      data: {
+        labels: ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4', 'Wk 5', 'Wk 6', 'Wk 7', 'Wk 8'],
+        datasets: [{
+          data: [8400, 8200, 8000, 7700, 7200, 6900, 6700, 6450],
+          borderColor: '#c79b3b',
+          backgroundColor: 'rgba(199,155,59,0.08)',
+          borderWidth: 2,
+          pointRadius: 3,
+          pointBackgroundColor: '#c79b3b',
+          fill: true,
+          tension: 0.3
+        }]
+      },
+      options: {
+        plugins: {
+          legend: { display: false },
+          annotation: { }
+        },
+        scales: {
+          y: {
+            min: 6000,
+            max: 9000,
+            ticks: { font: { size: 8.5 }, color: '#888', callback: v => (v/1000).toFixed(1) + 'k' },
+            grid: { color: 'rgba(0,0,0,0.05)' }
+          },
+          x: { ticks: { font: { size: 8.5 }, color: '#888' }, grid: { display: false } }
+        }
+      },
+      plugins: [{
+        afterDatasetsDraw(chart) {
+          const ctx = chart.ctx;
+          chart.data.datasets.forEach((dataset, i) => {
+            const meta = chart.getDatasetMeta(i);
+            meta.data.forEach((point, index) => {
+              const value = dataset.data[index];
+              ctx.save();
+              ctx.font = '600 8px Inter, sans-serif';
+              ctx.fillStyle = '#555';
+              ctx.textAlign = 'center';
+              ctx.fillText((value/1000).toFixed(1) + 'k', point.x, point.y - 6);
+              ctx.restore();
+            });
+          });
+          // FreshDash launch marker between week 3 and week 4
+          const meta = chart.getDatasetMeta(0);
+          if (meta.data.length >= 4) {
+            const x1 = meta.data[2].x;
+            const x2 = meta.data[3].x;
+            const xMark = (x1 + x2) / 2;
+            const yTop = chart.scales.y.top;
+            const yBot = chart.scales.y.bottom;
+            ctx.save();
+            ctx.setLineDash([3, 3]);
+            ctx.strokeStyle = '#1a1a1a';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(xMark, yTop);
+            ctx.lineTo(xMark, yBot);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.font = '700 8px Inter, sans-serif';
+            ctx.fillStyle = '#1a1a1a';
+            ctx.textAlign = 'center';
+            ctx.fillText('FreshDash launches', xMark, yTop + 10);
+            ctx.restore();
+          }
+        }
+      }]
+    });
+
+    // Chart 2: grouped bar - GreenGo vs FreshDash on 4 metrics
+    new Chart(document.getElementById('barChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Price', 'Speed', 'Range', 'Quality'],
+        datasets: [
+          {
+            label: 'GreenGo',
+            data: [5, 5, 4, 9],
+            backgroundColor: '#c79b3b',
+            borderRadius: 3,
+            borderSkipped: false
+          },
+          {
+            label: 'FreshDash',
+            data: [8, 9, 9, 6],
+            backgroundColor: '#1a1a1a',
+            borderRadius: 3,
+            borderSkipped: false
+          }
+        ]
+      },
+      options: {
+        plugins: {
+          legend: {
+            display: true,
+            position: 'bottom',
+            labels: { font: { size: 8 }, color: '#555', padding: 6, boxWidth: 9 }
+          }
+        },
+        scales: {
+          y: {
+            max: 10,
+            ticks: { font: { size: 8.5 }, color: '#888' },
+            grid: { color: 'rgba(0,0,0,0.05)' }
+          },
+          x: { ticks: { font: { size: 8.5 }, color: '#888' }, grid: { display: false } }
+        }
+      }
+    });
+
+    // Chart 3: what shoppers value, horizontal bar
+    new Chart(document.getElementById('hbarChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Speed of delivery', 'Price', 'Product range', 'Quality', 'Reliability', 'Other'],
+        datasets: [{
+          data: [28, 25, 18, 17, 8, 4],
+          backgroundColor: ['#c79b3b', '#1a1a1a', '#888', '#999', '#bbb', '#ddd'],
+          borderRadius: 3,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        plugins: { legend: { display: false } },
+        scales: {
+          x: {
+            max: 35,
+            ticks: { font: { size: 8.5 }, color: '#888', callback: v => v + '%' },
+            grid: { color: 'rgba(0,0,0,0.05)' }
+          },
+          y: { ticks: { font: { size: 9 }, color: '#444' }, grid: { display: false } }
+        }
+      },
+      plugins: [{
+        afterDatasetsDraw(chart) {
+          const ctx = chart.ctx;
+          const meta = chart.getDatasetMeta(0);
+          meta.data.forEach((bar, index) => {
+            const value = chart.data.datasets[0].data[index];
+            ctx.save();
+            ctx.font = '700 9px Inter, sans-serif';
+            ctx.fillStyle = '#333';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(value + '%', bar.x + 5, bar.y);
+            ctx.restore();
+          });
+        }
+      }]
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Case Study: FlexFit Studios</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #e8e8e8;
+      font-family: 'Inter', sans-serif;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .print-btn {
+      margin-bottom: 20px;
+      background: #1a1a1a;
+      color: #c79b3b;
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 10px 28px;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+
+    .print-btn:hover { background: #333; }
+
+    @media print {
+      @page { size: A4; margin: 0; }
+      .print-btn { display: none; }
+      body { background: #fff; padding: 0; display: block; }
+      .page {
+        width: 210mm;
+        min-height: 297mm;
+        padding: 18mm 20mm;
+        page-break-after: always;
+        box-shadow: none;
+        border-top: none !important;
+      }
+      .page + .page { border-top: none; }
+    }
+
+    .page { width: 794px; background: #ffffff; padding: 52px 56px; }
+    .page + .page { border-top: 3px solid #e8e8e8; }
+
+    .doc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 28px;
+      padding-bottom: 18px;
+      border-bottom: 2px solid #1a1a1a;
+    }
+
+    .doc-eyebrow {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #c79b3b;
+      margin-bottom: 6px;
+    }
+
+    .doc-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #1a1a1a;
+      line-height: 1.2;
+    }
+
+    .doc-subtitle {
+      font-size: 12px;
+      color: #555;
+      margin-top: 5px;
+      font-weight: 500;
+    }
+
+    .doc-header-right {
+      text-align: right;
+      font-size: 10px;
+      color: #888;
+      line-height: 1.8;
+    }
+
+    .doc-header-right strong { color: #1a1a1a; font-weight: 600; }
+
+    .section-title {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #c79b3b;
+      margin-bottom: 8px;
+      margin-top: 22px;
+    }
+
+    p {
+      font-size: 11.5px;
+      line-height: 1.75;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    p:last-child { margin-bottom: 0; }
+    strong { color: #1a1a1a; font-weight: 600; }
+
+    .fact-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 18px 0;
+    }
+
+    .fact-box {
+      background: #f7f7f7;
+      border-left: 3px solid #c79b3b;
+      padding: 12px 14px;
+      border-radius: 0 4px 4px 0;
+    }
+
+    .fact-box__num {
+      font-size: 22px;
+      font-weight: 800;
+      color: #1a1a1a;
+      line-height: 1;
+    }
+
+    .fact-box__num span {
+      font-size: 13px;
+      font-weight: 700;
+      color: #c79b3b;
+    }
+
+    .fact-box__label {
+      font-size: 9.5px;
+      color: #666;
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+
+    .charts-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 20px 0;
+    }
+
+    .chart-box--wide { grid-column: 1 / -1; }
+
+    .chart-box {
+      background: #f9f9f9;
+      border-radius: 6px;
+      padding: 14px 14px 10px;
+    }
+
+    .chart-box__title {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 6px;
+    }
+
+    .chart-box__note {
+      font-size: 9px;
+      color: #c79b3b;
+      font-weight: 600;
+      margin-top: 6px;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #e8e8e8;
+      margin: 20px 0;
+    }
+
+    .q-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 10px;
+    }
+
+    .q-item {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .q-badge {
+      background: #1a1a1a;
+      color: #c79b3b;
+      font-size: 10px;
+      font-weight: 800;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .q-text {
+      font-size: 11.5px;
+      line-height: 1.65;
+      color: #222;
+    }
+
+    .doc-footer {
+      margin-top: 28px;
+      padding-top: 14px;
+      border-top: 1px solid #e8e8e8;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .doc-footer span { font-size: 9px; color: #aaa; letter-spacing: 0.08em; }
+    .doc-footer strong { color: #c79b3b; font-size: 9px; }
+
+    .page2-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 22px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #e8e8e8;
+    }
+
+    .page2-header span {
+      font-size: 9px;
+      color: #aaa;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+  </style>
+  <style id="auth-gate">html:not(.auth-ok) body { visibility: hidden; }</style>
+  <script type="module" src="/mentor-portal/guard.js"></script>
+
+</head>
+<body>
+
+  <button class="print-btn" onclick="window.print()">Print / Save as PDF</button>
+
+  <!-- PAGE 1 -->
+  <div class="page">
+
+    <div class="doc-header">
+      <div>
+        <div class="doc-eyebrow">Mock Assessment Centre: Case Study</div>
+        <div class="doc-title">FlexFit Studios:<br>The Price Question</div>
+        <div class="doc-subtitle">25 min group discussion &nbsp;|&nbsp; 10 min presentation</div>
+      </div>
+      <div class="doc-header-right">
+        <img src="../../images/intro-logo.png" alt="Headstart Mentoring" style="width:48px; height:48px; object-fit:contain; display:block; margin-left:auto; margin-bottom:6px;" />
+        <div><strong>Headstart Mentoring</strong></div>
+        <div>Internal coaching material</div>
+        <div>May 2026</div>
+      </div>
+    </div>
+
+    <div class="section-title">The Company</div>
+    <p>
+      <strong>FlexFit</strong> is a Sydney-based boutique fitness chain founded in 2019. It runs 14 studios offering HIIT, strength, and reformer pilates classes. Members pay <strong>$220/month for unlimited access</strong> or $35 per class as a drop-in. The brand sits clearly in the premium boutique tier of the market.
+    </p>
+
+    <div class="section-title">The Situation</div>
+    <p>
+      Member growth has stalled and <strong>monthly churn has nearly doubled to 14%</strong> over the past 18 months. The leadership team is split. One camp wants to drop prices to win back members. Another wants to raise prices to protect the premium positioning. A third wants to restructure the offer entirely (tiers, off-peak pricing, class packs).
+    </p>
+    <p>
+      A decision is needed in the next 6 weeks before the next marketing campaign launches. The data below was put together by the operations lead.
+    </p>
+
+    <div class="fact-row">
+      <div class="fact-box">
+        <div class="fact-box__num">14<span> studios</span></div>
+        <div class="fact-box__label">Across Sydney metro</div>
+      </div>
+      <div class="fact-box">
+        <div class="fact-box__num">4,800<span> members</span></div>
+        <div class="fact-box__label">Active monthly subscribers</div>
+      </div>
+      <div class="fact-box">
+        <div class="fact-box__num">14<span>% churn</span></div>
+        <div class="fact-box__label">Monthly, up from 8% 18 months ago</div>
+      </div>
+    </div>
+
+    <div class="charts-row">
+      <div class="chart-box">
+        <div class="chart-box__title">Member Count &amp; Monthly Churn (18 months)</div>
+        <canvas id="lineChart" height="130"></canvas>
+        <div class="chart-box__note">Members down, churn up</div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-box__title">Monthly Unlimited Price vs Competitors</div>
+        <canvas id="barChart" height="130"></canvas>
+        <div class="chart-box__note">FlexFit sits in the upper-middle of premium tier</div>
+      </div>
+      <div class="chart-box chart-box--wide">
+        <div class="chart-box__title">Why Members Cancel (Exit Survey)</div>
+        <canvas id="hbarChart" height="70"></canvas>
+        <div class="chart-box__note">Price is the top reason, but not the only one</div>
+      </div>
+    </div>
+
+    <div class="doc-footer">
+      <span>FlexFit Studios: Confidential Case Study</span>
+      <strong>Page 1 of 2</strong>
+    </div>
+
+  </div>
+
+
+  <!-- PAGE 2 -->
+  <div class="page">
+
+    <div class="page2-header">
+      <span>FlexFit Studios: Discussion Guide (cont.)</span>
+      <span>Headstart Mentoring &nbsp;|&nbsp; Internal Resource &nbsp;|&nbsp; May 2026</span>
+    </div>
+
+    <hr class="divider" />
+
+    <div class="section-title">Discussion Questions</div>
+    <div class="q-list">
+
+      <div class="q-item">
+        <div class="q-badge">1</div>
+        <div class="q-text">
+          Churn has nearly doubled in 18 months and no one is fully sure why. What is your initial read on what is driving it, and what is the first thing you would want to understand? Compare and challenge each other's initial views before settling on a likely cause.
+        </div>
+      </div>
+
+      <div class="q-item">
+        <div class="q-badge">2</div>
+        <div class="q-text">
+          The leadership team thinks this is a pricing problem. Is it really, or is something else going on? Look across the three charts and make the case either way.
+        </div>
+      </div>
+
+      <div class="q-item">
+        <div class="q-badge">3</div>
+        <div class="q-text">
+          The leadership team is split between three camps: drop prices, raise prices, or restructure the offer entirely. What are the realistic pricing moves on the table, and which one actually fits FlexFit's situation? If a stronger option sits outside these three, make the case for it.
+        </div>
+      </div>
+
+      <div class="q-item">
+        <div class="q-badge">4</div>
+        <div class="q-text">
+          What is your group's final recommendation on pricing, and what is the biggest thing that could go wrong with it? How would you protect against that risk?
+        </div>
+      </div>
+
+    </div>
+
+    <div class="doc-footer">
+      <span>Prepared by The Headstart Mentoring &nbsp;|&nbsp; Not for distribution</span>
+      <strong>Page 2 of 2</strong>
+    </div>
+
+  </div>
+
+
+  <script>
+    // Chart 1: dual-axis line - members and monthly churn over 18 months
+    new Chart(document.getElementById('lineChart'), {
+      type: 'line',
+      data: {
+        labels: ['Nov 24', 'Feb 25', 'May 25', 'Aug 25', 'Nov 25', 'Feb 26', 'May 26'],
+        datasets: [
+          {
+            label: 'Active members',
+            data: [5400, 5300, 5200, 5050, 4950, 4870, 4800],
+            borderColor: '#1a1a1a',
+            backgroundColor: 'rgba(26,26,26,0.05)',
+            borderWidth: 2,
+            pointRadius: 3,
+            pointBackgroundColor: '#1a1a1a',
+            yAxisID: 'y',
+            tension: 0.3,
+            fill: false
+          },
+          {
+            label: 'Monthly churn (%)',
+            data: [8, 9, 10, 11, 12, 13, 14],
+            borderColor: '#c79b3b',
+            backgroundColor: 'rgba(199,155,59,0.08)',
+            borderWidth: 2,
+            pointRadius: 3,
+            pointBackgroundColor: '#c79b3b',
+            yAxisID: 'y1',
+            tension: 0.3,
+            fill: false
+          }
+        ]
+      },
+      options: {
+        plugins: {
+          legend: {
+            display: true,
+            position: 'bottom',
+            labels: { font: { size: 8 }, color: '#555', padding: 6, boxWidth: 9 }
+          }
+        },
+        scales: {
+          y: {
+            position: 'left',
+            min: 4500,
+            max: 5600,
+            ticks: { font: { size: 8.5 }, color: '#888' },
+            grid: { color: 'rgba(0,0,0,0.05)' }
+          },
+          y1: {
+            position: 'right',
+            min: 0,
+            max: 20,
+            ticks: { font: { size: 8.5 }, color: '#c79b3b', callback: v => v + '%' },
+            grid: { display: false }
+          },
+          x: { ticks: { font: { size: 8.5 }, color: '#888' }, grid: { display: false } }
+        }
+      }
+    });
+
+    // Chart 2: bar chart - monthly unlimited price vs competitors
+    new Chart(document.getElementById('barChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Big chain', '24-hr chain', 'Mid-tier', 'FlexFit', 'Premium HIIT', 'Boutique'],
+        datasets: [{
+          data: [80, 99, 130, 220, 290, 330],
+          backgroundColor: ['#bbb', '#bbb', '#888', '#c79b3b', '#1a1a1a', '#1a1a1a'],
+          borderRadius: 3,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: {
+          y: {
+            max: 380,
+            ticks: { font: { size: 8.5 }, color: '#888', callback: v => '$' + v },
+            grid: { color: 'rgba(0,0,0,0.05)' }
+          },
+          x: { ticks: { font: { size: 8.5 }, color: '#888' }, grid: { display: false } }
+        }
+      },
+      plugins: [{
+        afterDatasetsDraw(chart) {
+          const ctx = chart.ctx;
+          const meta = chart.getDatasetMeta(0);
+          meta.data.forEach((bar, index) => {
+            const value = chart.data.datasets[0].data[index];
+            ctx.save();
+            ctx.font = '700 9px Inter, sans-serif';
+            ctx.fillStyle = '#333';
+            ctx.textAlign = 'center';
+            ctx.fillText('$' + value, bar.x, bar.y - 5);
+            ctx.restore();
+          });
+        }
+      }]
+    });
+
+    // Chart 3: exit survey horizontal bar
+    new Chart(document.getElementById('hbarChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Too expensive', 'Found cheaper alternative', 'Stopped attending regularly', 'Bad class times / locations', 'Other'],
+        datasets: [{
+          data: [32, 22, 18, 14, 14],
+          backgroundColor: ['#c79b3b', '#1a1a1a', '#888', '#bbb', '#ddd'],
+          borderRadius: 3,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        plugins: { legend: { display: false } },
+        scales: {
+          x: {
+            max: 40,
+            ticks: { font: { size: 8.5 }, color: '#888', callback: v => v + '%' },
+            grid: { color: 'rgba(0,0,0,0.05)' }
+          },
+          y: { ticks: { font: { size: 9 }, color: '#444' }, grid: { display: false } }
+        }
+      },
+      plugins: [{
+        afterDatasetsDraw(chart) {
+          const ctx = chart.ctx;
+          const meta = chart.getDatasetMeta(0);
+          meta.data.forEach((bar, index) => {
+            const value = chart.data.datasets[0].data[index];
+            ctx.save();
+            ctx.font = '700 9px Inter, sans-serif';
+            ctx.fillStyle = '#333';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(value + '%', bar.x + 5, bar.y);
+            ctx.restore();
+          });
+        }
+      }]
+    });
+  </script>
+
+</body>
+</html>

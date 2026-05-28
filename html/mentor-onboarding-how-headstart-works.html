@@ -25,6 +25,17 @@
       --accent-soft: rgba(199,155,59,0.22);
     }
 
+    /* Root font-size: bigger on desktop, smaller on mobile so big text doesn't overflow */
+    html {
+      font-size: 110%;
+    }
+    @media (max-width: 700px) {
+      html { font-size: 95%; }
+    }
+    @media (max-width: 400px) {
+      html { font-size: 90%; }
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
@@ -67,10 +78,13 @@
     }
 
     .logo-bar img {
-      width: 42px;
-      height: 42px;
-      border-radius: 10px;
+      height: 48px;
+      width: auto;
+      max-width: 160px;
+      object-fit: contain;
+      border-radius: 8px;
       flex-shrink: 0;
+      display: block;
     }
 
     .logo-bar a {
@@ -125,7 +139,7 @@
     }
 
     h3 {
-      font-size: 0.97rem;
+      font-size: 1.05rem;
       font-weight: 700;
       color: rgba(255,255,255,0.75);
       margin-bottom: 0.6rem;
@@ -134,8 +148,8 @@
 
     p, li {
       color: var(--text);
-      line-height: 1.8;
-      font-size: 1rem;
+      line-height: 1.7;
+      font-size: 1.075rem;
     }
 
     p + p { margin-top: 0.65rem; }
@@ -223,8 +237,8 @@
       border: 1px solid rgba(255,255,255,0.06);
       background: rgba(255,255,255,0.02);
       transition: background 0.15s, border-color 0.15s;
-      font-size: 0.97rem;
-      line-height: 1.5;
+      font-size: 1.02rem;
+      line-height: 1.55;
       color: var(--text);
       user-select: none;
     }
@@ -361,16 +375,36 @@
       background: rgba(199,155,59,0.35);
       margin-left: 17px;
     }
+  
+    .logo-home {
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: opacity 0.15s, transform 0.15s;
+    }
+    .logo-home:hover { opacity: 0.82; transform: translateY(-1px); }
+    .logo-home:focus-visible {
+      outline: 2px solid rgba(199,155,59,0.8);
+      outline-offset: 4px;
+    }
+    .logo-bar__breadcrumb {
+      text-decoration: none;
+      color: inherit;
+      transition: opacity 0.15s;
+    }
+    .logo-bar__breadcrumb:hover { opacity: 0.78; }
   </style>
+  <style id="auth-gate">html:not(.auth-ok) body { visibility: hidden; }</style>
+  <script type="module" src="/mentor-portal/guard.js"></script>
+
 </head>
 <body>
   <main class="wrap">
 
     <div class="logo-bar">
-      <a href="mentor-onboarding.html">
-        <img src="../images/headstart-italic-logo.png" alt="The Headstart" />
-        <span class="logo-bar__title">Mentor Onboarding <span>&rsaquo;</span> Module 2</span>
-      </a>
+      <a href="../mentor-portal/" class="logo-home" aria-label="Mentor portal home"><img src="../images/headstart-italic-logo.png" alt="The Headstart" /></a>
+        <a href="mentor-onboarding.html" class="logo-bar__breadcrumb"><span class="logo-bar__title">Mentor Onboarding <span>&rsaquo;</span> Module 2</span></a>
     </div>
 
     <p class="eyebrow">Module 2 of 3</p>

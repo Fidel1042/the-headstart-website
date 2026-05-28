@@ -25,6 +25,17 @@
       --accent-soft: rgba(199,155,59,0.22);
     }
 
+    /* Root font-size: bigger on desktop, smaller on mobile so big text doesn't overflow */
+    html {
+      font-size: 110%;
+    }
+    @media (max-width: 700px) {
+      html { font-size: 95%; }
+    }
+    @media (max-width: 400px) {
+      html { font-size: 90%; }
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
@@ -68,10 +79,13 @@
     }
 
     .logo-bar img {
-      width: 42px;
-      height: 42px;
-      border-radius: 10px;
+      height: 48px;
+      width: auto;
+      max-width: 160px;
+      object-fit: contain;
+      border-radius: 8px;
       flex-shrink: 0;
+      display: block;
     }
 
     .logo-bar__text h1 {
@@ -206,13 +220,37 @@
       background: rgba(199,155,59,0.1);
       border-color: rgba(199,155,59,0.9);
     }
+  
+    .logo-home {
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: opacity 0.15s, transform 0.15s;
+    }
+    .logo-home:hover { opacity: 0.82; transform: translateY(-1px); }
+    .logo-home:focus-visible {
+      outline: 2px solid rgba(199,155,59,0.8);
+      outline-offset: 4px;
+    }
+    .logo-bar__breadcrumb {
+      text-decoration: none;
+      color: inherit;
+      transition: opacity 0.15s;
+    }
+    .logo-bar__breadcrumb:hover { opacity: 0.78; }
   </style>
+  <style id="auth-gate">html:not(.auth-ok) body { visibility: hidden; }</style>
+  <script type="module" src="/mentor-portal/guard.js"></script>
+
 </head>
 <body>
   <main class="wrap">
 
     <div class="logo-bar">
-      <img src="../images/headstart-italic-logo.png" alt="The Headstart logo" />
+      <a href="../mentor-portal/" class="logo-home" aria-label="Mentor portal home">
+        <img src="../images/headstart-italic-logo.png" alt="The Headstart logo" />
+      </a>
       <div class="logo-bar__text">
         <h1>Mentor Onboarding</h1>
       </div>

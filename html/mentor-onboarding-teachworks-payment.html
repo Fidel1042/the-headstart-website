@@ -25,6 +25,17 @@
       --accent-soft: rgba(199,155,59,0.22);
     }
 
+    /* Root font-size: bigger on desktop, smaller on mobile so big text doesn't overflow */
+    html {
+      font-size: 110%;
+    }
+    @media (max-width: 700px) {
+      html { font-size: 95%; }
+    }
+    @media (max-width: 400px) {
+      html { font-size: 90%; }
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
@@ -65,7 +76,7 @@
       border-bottom: 1px solid var(--line);
     }
 
-    .logo-bar img { width: 42px; height: 42px; border-radius: 10px; flex-shrink: 0; }
+    .logo-bar img { height: 48px; width: auto; max-width: 160px; object-fit: contain; border-radius: 8px; flex-shrink: 0; display: block; }
 
     .logo-bar a { display: flex; align-items: center; gap: 0.85rem; text-decoration: none; }
 
@@ -104,7 +115,7 @@
       margin-bottom: 1rem;
     }
 
-    p, li { color: var(--text); line-height: 1.8; font-size: 1rem; }
+    p, li { color: var(--text); line-height: 1.7; font-size: 1.075rem; }
 
     p + p { margin-top: 0.65rem; }
 
@@ -162,8 +173,8 @@
       border: 1px solid rgba(255,255,255,0.06);
       background: rgba(255,255,255,0.02);
       transition: background 0.15s, border-color 0.15s;
-      font-size: 0.97rem;
-      line-height: 1.5;
+      font-size: 1.02rem;
+      line-height: 1.55;
       color: var(--text);
       user-select: none;
     }
@@ -241,7 +252,7 @@
     .btn-gold:hover { background: rgba(199,155,59,0.1); border-color: rgba(199,155,59,0.9); }
 
     h3 {
-      font-size: 0.97rem;
+      font-size: 1.05rem;
       font-weight: 700;
       color: rgba(255,255,255,0.75);
       margin-bottom: 0.6rem;
@@ -256,16 +267,146 @@
     }
 
     .sub-section p + p { margin-top: 0.65rem; }
+
+    /* ── Part 2 (book a call with Fidel) ── */
+    .part-2-card {
+      border-radius: 20px;
+      border: 1px solid rgba(199,155,59,0.5);
+      background: radial-gradient(circle at top left, rgba(199,155,59,0.22), #050505);
+      padding: 1.8rem 2rem 2rem;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.7);
+      margin-bottom: 1.4rem;
+    }
+    .part-2-eyebrow {
+      font-size: 0.78rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #f0c75c;
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+    }
+    .part-2-card h2 { margin-bottom: 0.8rem; }
+
+    /* Contact display block (for manual typing) */
+    .contact-block {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 1.2rem;
+      padding: 1rem 1.2rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+      flex-wrap: wrap;
+    }
+    .contact-meta { display: flex; flex-direction: column; gap: 0.2rem; }
+    .contact-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.55);
+      font-weight: 700;
+    }
+    .contact-number {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #f5f5f5;
+      letter-spacing: 0.02em;
+      font-family: ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace;
+      user-select: all;
+    }
+    .copy-btn {
+      margin-left: auto;
+      padding: 0.55rem 1.1rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.22);
+      background: transparent;
+      color: #f5f5f5;
+      font-family: inherit;
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s, color 0.15s;
+    }
+    .copy-btn:hover {
+      border-color: rgba(199,155,59,0.7);
+      background: rgba(199,155,59,0.08);
+      color: #f0c75c;
+    }
+    .copy-btn.copied {
+      background: rgba(100,220,100,0.18);
+      border-color: rgba(100,220,100,0.6);
+      color: rgba(100,220,100,1);
+    }
+
+    /* Save buttons */
+    .part-2-cta-row {
+      display: flex;
+      gap: 0.6rem;
+      margin-top: 1.1rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .part-2-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.95rem 1.6rem;
+      border-radius: 999px;
+      border: 1px solid rgba(199,155,59,0.7);
+      background: linear-gradient(135deg, rgba(199,155,59,0.4), rgba(199,155,59,0.15));
+      color: #f5f5f5;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: transform 0.18s, background 0.18s, box-shadow 0.18s, border-color 0.18s;
+    }
+    .part-2-cta:hover {
+      transform: translateY(-2px);
+      border-color: rgba(199,155,59,1);
+      background: linear-gradient(135deg, rgba(199,155,59,0.55), rgba(199,155,59,0.22));
+      box-shadow: 0 0 28px rgba(199,155,59,0.32);
+    }
+    .part-2-cta .arrow { transition: transform 0.18s; }
+    .part-2-cta:hover .arrow { transform: translateX(3px); }
+    .part-2-cta-hint {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.55);
+    }
+  
+    .logo-home {
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: opacity 0.15s, transform 0.15s;
+    }
+    .logo-home:hover { opacity: 0.82; transform: translateY(-1px); }
+    .logo-home:focus-visible {
+      outline: 2px solid rgba(199,155,59,0.8);
+      outline-offset: 4px;
+    }
+    .logo-bar__breadcrumb {
+      text-decoration: none;
+      color: inherit;
+      transition: opacity 0.15s;
+    }
+    .logo-bar__breadcrumb:hover { opacity: 0.78; }
   </style>
+  <style id="auth-gate">html:not(.auth-ok) body { visibility: hidden; }</style>
+  <script type="module" src="/mentor-portal/guard.js"></script>
+
 </head>
 <body>
   <main class="wrap">
 
     <div class="logo-bar">
-      <a href="mentor-onboarding.html">
-        <img src="../images/headstart-italic-logo.png" alt="The Headstart" />
-        <span class="logo-bar__title">Mentor Onboarding <span>&rsaquo;</span> Module 3</span>
-      </a>
+      <a href="../mentor-portal/" class="logo-home" aria-label="Mentor portal home"><img src="../images/headstart-italic-logo.png" alt="The Headstart" /></a>
+        <a href="mentor-onboarding.html" class="logo-bar__breadcrumb"><span class="logo-bar__title">Mentor Onboarding <span>&rsaquo;</span> Module 3</span></a>
     </div>
 
     <p class="eyebrow">Module 3 of 3</p>
@@ -302,27 +443,13 @@
       <h2>2. Payment</h2>
 
       <div class="sub-section">
-        <h3>2.1 &nbsp;Your Pay Structure</h3>
-        <p>Headstart sources the mentee, runs the consultation, and matches them to you. You receive your agreed per-session rate. Your contract covers the full terms, this is a quick refresher.</p>
-
-        <h3 style="margin-top: 1.2rem;">What's Included</h3>
-        <p>The infrastructure that stands behind you on every mentee:</p>
-        <ul style="padding-left: 1.2rem; margin-top: 0.6rem;">
-          <li><strong>Operations handled.</strong> Payments are calculated and paid bi-weekly. Rescheduling, cancellations, and awkward client conversations go through Fidel, not you.</li>
-          <li><strong>Founder backup on difficult cases.</strong> Mentees who push back, ghost, demand refunds, or behave inappropriately get escalated to Fidel and Koko. You are not carrying that weight alone.</li>
-          <li><strong>Brand credibility.</strong> You get to operate under the Headstart name on LinkedIn, in content, and in conversations with prospective mentees.</li>
-          <li><strong>Inbound pipeline.</strong> Headstart's marketing (LinkedIn, Instagram, SEO, referrals) brings in mentees you would not have reached on your own.</li>
-        </ul>
-      </div>
-
-      <div class="sub-section">
-        <h3>2.2 &nbsp;How You Get Paid</h3>
+        <h3>2.1 &nbsp;How You Get Paid</h3>
         <p>Payments are managed manually by Fidel on a bi-weekly basis. He uses the Airtable form submissions to confirm which sessions have been logged, then calculates and sends each mentor's payment directly.</p>
         <p>If you have any questions about a payment, message Fidel on WhatsApp.</p>
       </div>
 
       <div class="sub-section">
-        <h3>2.3 &nbsp;ABN Setup</h3>
+        <h3>2.2 &nbsp;ABN Setup</h3>
         <p>You are paid as a contractor, not an employee. You need an Australian Business Number (ABN) to receive payment legally.</p>
         <ol class="steps">
           <li><span class="step-num">1</span> Go to abr.gov.au and click "Apply for an ABN"</li>
@@ -336,10 +463,20 @@
       </div>
 
       <div class="sub-section">
-        <h3>2.4 &nbsp;Tax</h3>
+        <h3>2.3 &nbsp;Tax</h3>
         <p>As a contractor, you are responsible for your own tax. Headstart pays you the full agreed amount without withholding tax, provided your ABN is on file.</p>
         <p>Set aside a portion of your earnings for tax and lodge your own return at the end of the financial year. Visit ato.gov.au for guidance on sole trader tax obligations.</p>
       </div>
+    </div>
+
+    <!-- SECTION 3: MENTOR RESOURCE HUB INTRO -->
+    <div class="card-box">
+      <h2>3. Mentor Resource Hub</h2>
+      <p>Before our Part 2 call, please skim the Mentor Resource Hub. It's the master reference you'll pull from during sessions: resume, LinkedIn, cover letter, networking, coffee chats, and the full interview question bank.</p>
+      <p>You don't need to memorise it. Just know what's in there so you can find the right section quickly when a mentee asks.</p>
+      <p style="margin-top: 1.2rem;">
+        <a class="btn btn-gold" href="tutor-resources.html" target="_blank" rel="noopener">Open the Mentor Resource Hub &rarr;</a>
+      </p>
     </div>
 
     <div class="card-box">
@@ -347,16 +484,38 @@
       <ul class="checklist" id="checklist">
         <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I have saved the Airtable session log form as a bookmark</li>
         <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I will submit the form within 24 hours after every session</li>
-        <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I understand my per-session pay structure for mentees Headstart matches to me</li>
         <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I understand payments are managed manually by Fidel on a bi-weekly basis</li>
         <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I have or will register my ABN before my first session</li>
+        <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I have skimmed the <a href="tutor-resources.html" target="_blank" rel="noopener" style="color: inherit; text-decoration: underline;">Mentor Resource Hub</a></li>
       </ul>
       <div class="congrats" id="congrats">
         <div class="congrats__text">
           <div class="congrats__title">All modules complete!</div>
-          <div class="congrats__sub">Great work. Your onboarding call with Fidel/Koko will be the final step.</div>
+          <div class="congrats__sub">Great work. Part 2 is just below &mdash; save Fidel&rsquo;s contact and reach out to lock in your call.</div>
         </div>
         <a class="btn-congrats" href="mentor-onboarding.html">Back to Overview &rarr;</a>
+      </div>
+    </div>
+
+    <!-- PART 2: save Fidel's contact (manual or auto) -->
+    <div class="part-2-card">
+      <p class="part-2-eyebrow">Part 2 of onboarding</p>
+      <h2>Final step: book your onboarding call</h2>
+      <p>You've finished all three modules. The last step is a short call with Fidel and Koko to answer your questions and confirm you're ready to take your first mentee.</p>
+
+      <div class="contact-block">
+        <div class="contact-meta">
+          <span class="contact-label">Fidel Hon &middot; WhatsApp</span>
+          <span class="contact-number" id="fidel-number">+61 402 238 701</span>
+        </div>
+        <button class="copy-btn" type="button" id="copy-fidel" data-copy="+61402238701">Copy</button>
+      </div>
+
+      <div class="part-2-cta-row">
+        <a class="part-2-cta" href="../fidel.vcf" download="Fidel-Hon-Headstart.vcf">
+          Save automatically <span class="arrow">&rarr;</span>
+        </a>
+        <span class="part-2-cta-hint">Best on mobile &mdash; opens the contact prompt. On computer, copy the number above instead.</span>
       </div>
     </div>
 
@@ -376,6 +535,43 @@
           document.getElementById('congrats').classList.remove('visible');
         }
       }
+
+      // Copy-to-clipboard for Fidel's number
+      (function () {
+        var btn = document.getElementById('copy-fidel');
+        if (!btn) return;
+        btn.addEventListener('click', function () {
+          var text = btn.getAttribute('data-copy');
+          var done = function () {
+            var original = 'Copy';
+            btn.classList.add('copied');
+            btn.textContent = 'Copied!';
+            setTimeout(function () {
+              btn.classList.remove('copied');
+              btn.textContent = original;
+            }, 1500);
+          };
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(done).catch(function () {
+              // Fallback below
+              fallbackCopy(text); done();
+            });
+          } else {
+            fallbackCopy(text); done();
+          }
+        });
+        function fallbackCopy(text) {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.setAttribute('readonly', '');
+          ta.style.position = 'absolute';
+          ta.style.left = '-9999px';
+          document.body.appendChild(ta);
+          ta.select();
+          try { document.execCommand('copy'); } catch (e) {}
+          document.body.removeChild(ta);
+        }
+      })();
     </script>
 
   </main>
