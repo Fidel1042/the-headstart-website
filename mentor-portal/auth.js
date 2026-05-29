@@ -14,7 +14,15 @@ export const SUPABASE_ANON_KEY = "sb_publishable_aW85xzuqmyaGZYk__UxI0Q_VD-jcsWD
 // Add new mentors here as you onboard them. Lowercase, no spaces.
 export const ALLOWED_MENTOR_EMAILS = [
   "fidelhon@gmail.com",
-  // "koko@example.com",
+  "kokoro.araki1015@gmail.com",
+  "angelicagrace160272@gmail.com",
+  "aidanmwibrata@gmail.com",
+  "samuelkember1@gmail.com",
+  "wooheehan3@gmail.com",
+  "edrickkoda@gmail.com",
+  "laljimkf@gmail.com",
+  "dhulipatideepika@gmail.com",
+  "raunaqrsa@gmail.com",
 ];
 
 // ─── CLIENT ───────────────────────────────────────────────────────────────────

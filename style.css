@@ -32,6 +32,7 @@
 /* ── Hero CTAs + cards/grids ── */
 @import url("css/components/hero-buttons.css");
 @import url("css/components/cards.css");
+@import url("css/components/author-card.css");
 
 /* ── Service rows + blog + common problems ── */
 @import url("css/sections/service-rows.css");

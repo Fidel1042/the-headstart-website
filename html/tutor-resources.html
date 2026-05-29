@@ -368,15 +368,15 @@
   .note p:last-child { margin-bottom: 0; }
 
   .template {
-    background: var(--code-bg);
-    border: 1px solid var(--line);
+    background: #ffffff;
+    border: 1px solid rgba(0,0,0,0.12);
     padding: 1.1rem 1.3rem;
     margin: 0.9rem 0 1.2rem 0;
     font-size: 0.88rem;
     font-family: ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace;
     white-space: pre-wrap;
     line-height: 1.7;
-    color: var(--text);
+    color: #000000;
     border-radius: 10px;
   }
 
@@ -890,53 +890,145 @@
       </ul>
 
       <h3>Proactive approach</h3>
-      <p>Gather a list of companies they want to enter that take international students. Insert the 2 prompts below into an AI of your choice.</p>
-      <p>After gathering a list of companies, move to the <a href="#networking-playbook">Networking Playbook</a> to learn how to connect with industry professionals to build a network and future referrals.</p>
+      <p>Gather a customised list of 60 target Australian companies (30 agencies/firms + 30 in-house) using the 4-prompt sequence below. Run each prompt in order in the same Claude chat.</p>
+      <p><strong>Use Claude only</strong> (claude.ai with web search enabled). Other AI tools (ChatGPT, Gemini, Perplexity) don't produce reliable results for this task at the required depth of verification. If a mentee is already using another tool, ask them to switch to Claude and start fresh from Prompt 1.</p>
+      <p>After gathering the list, move to the <a href="#networking-playbook">Networking Playbook</a> to learn how to connect with industry professionals to build a network and future referrals.</p>
 
-      <h4>AI prompt 1: First half of company list</h4>
-      <div class="template">Industry &amp; Interest
-- Industry: [insert industry]
-- What interests me about the roles: [insert specific aspects that interest you]
-- Preferred location: [insert location, can be Australia-wide]
+      <h4>AI prompt 1: Context Understanding</h4>
+      <div class="template">You are a careers research assistant helping me build a target list of 60 Australian employers (30 agencies/firms + 30 in-house companies) tailored to me. We'll work through 4 prompts in this order: (1) Context, (2) Education + Brand discovery, (3) Agencies/Firms list, (4) In-house list.
 
-Part 1: Consultancy vs In-House
-Before the list, explain the difference between consultancy and in-house roles in this field. Use 2 to 3 bullet points covering the key points of difference.
-Note: if consultancy vs in-house isn't a meaningful split in this industry, tell me and suggest a better way to split the roles (e.g. agency vs client-side, product vs services, etc).
+In this prompt, I will give you my context. Do not move on or generate anything until I have answered all 4 questions clearly. If any answer is vague or missing, push back and ask for specifics.
 
-Part 2: First Half of Company List
-Give me a categorised list of 25 companies in [insert location]. All companies MUST be based in or have a strong presence in [insert location].
+Please ask me these 4 questions:
 
-Categories (minimum 8 companies per category, 25 total):
-- Large corporates
-- Medium and small corporates
-- Start-ups
+1. My major (e.g. Marketing, Accounting, Finance, Data Analytics, Consulting)
+2. The city or region in Australia I want to work in (e.g. Sydney, Melbourne, Brisbane, Australia-wide)
+3. Whether I'm looking for an Internship OR a Graduate/Junior role
+4. Whether I am an International student in Australia, OR a local (Australian Citizen, PR, or New Zealand Citizen)
 
-Requirements:
-- Prioritise consultancy firms (or the equivalent split you recommended above) that specialise in this field.
-- Verify via online search that each company actually fits the size category listed. Do not guess. Take your time. Accuracy over speed.
-- Flag any company where you're unsure of the size category.
+After I answer, briefly play my answers back to me to confirm you've understood, then tell me to run Prompt 2.</div>
 
-Part 3: CSV Output
-Format the list as a downloadable CSV with these exact headers:
-- Company
-- Size
-- Intro (populate, max 8 words)
-- Location
-- Progress (leave blank)
+      <h4>AI prompt 2: Education + Brand Discovery</h4>
+      <div class="template">We're now in Prompt 2. Use my answers from Prompt 1.
 
-At the end of your response, confirm you've covered 25 and are ready for the second batch.</div>
+STEP 1: Educate me on agency-side vs in-house-side employment for my major.
 
-      <h4>AI prompt 2: Second batch</h4>
-      <div class="template">Continue from your previous response. Generate the next 25 companies for the same industry, interest, and location I gave you earlier.
+Use the correct terminology for my major:
+- Marketing: "agency" vs "in-house marketing team"
+- Accounting: "accounting firm" or "practice" vs "in-house finance team"
+- Finance: "investment bank or advisory firm" vs "in-house finance/treasury team"
+- Data Analytics: "data consultancy" vs "in-house data team"
+- Consulting: "consultancy" vs "in-house strategy team"
 
-Rules:
-- Do NOT repeat any company from the first list.
-- Keep the same 3 categories (large corp, medium/small corp, start-ups), minimum 8 per category, 25 total.
-- Same verification standard: online search to confirm size category, flag any uncertainty.
-- Same CSV format and headers as before.
-- Lean towards companies that are less obvious than the first batch (the well-known names should already be in list 1).
+Format strictly:
+- 2 lines total. One line for agency/firm side, one line for in-house side.
+- Each line must be under 20 words.
+- Each line includes 1 to 2 example company names from Australia.
 
-At the end, give me one combined CSV with all 50 companies merged into a single downloadable file.</div>
+STEP 2: Clarify the difference between my MAJOR and the INDUSTRY where my major sits.
+
+- My major is the function I get hired into (e.g. marketing, accounting).
+- The industry is the sector where that function is applied (e.g. beauty, FMCG, fintech, sport, hospitality, tech).
+- A marketing major could do marketing in beauty, in alcohol, in tech, in sport, or in any sector.
+- Don't confuse "industries that interest me" with my major. We want to know which industries I want to apply my major in.
+
+STEP 3: Ask me this question and do not proceed to Prompt 3 until I give a substantive answer:
+
+1. 2 to 3 industries I'm genuinely drawn to.
+2. (Optional) Any industries or brand types I'd actively avoid. Skip if I don't have a strong view.
+
+REJECT vague answers on question 1. Examples to reject and ask me to redo:
+- "All tech": too broad. Ask which kind of tech (consumer, B2B SaaS, fintech, gaming, etc.)
+- "Any FMCG": too broad. Ask which sub-category (food, beverage, beauty, household, etc.)
+- "Big brands": meaningless. Ask for specific industries.
+
+After I give specific, concrete answers, infer the likely reasons behind my preferences yourself and use them to tailor Prompts 3 and 4. Confirm my answers back to me, then tell me to run Prompt 3.</div>
+
+      <h4>AI prompt 3: Agencies / Firms List (30 companies)</h4>
+      <div class="template">We're now in Prompt 3. Use my answers from Prompts 1 and 2.
+
+Build me a list of exactly 30 agencies/firms in Australia in my major, tailored to my stated industries and preferences. Use the correct terminology for my major (agency / firm / consultancy / practice).
+
+CRITICAL RULES: read before you generate anything.
+
+1. NO LAZY PATTERN MATCHING. Do not assume "global brand = international-friendly" or "well-known company = hires juniors openly." Many global and well-known brands have explicit PR/Citizen-only requirements at junior level in Australia. Confirmed examples to NEVER assume as international-friendly without direct verification: Mondelez, Procter &amp; Gamble, Nestlé NextGen, Mars, Kraft Heinz, Macquarie Group, and the big 4 AU banks (CBA, NAB, ANZ, Westpac). Verify each company individually before including.
+
+2. VERIFY VIA REAL JOB POSTS. For each company you include, find 1 to 2 current junior/graduate job listings on Seek, LinkedIn, or the company's careers page. Read the work-rights wording on those listings. Look for: "full Australian work rights" or "open to 485 visa holders" (= international-friendly), versus "Australian Citizen or PR" or "no visa sponsorship" (= excluded).
+
+3. IF I AM A LOCAL STUDENT (per my Prompt 1 answer), SKIP THE INTERNATIONAL-FRIENDLINESS VERIFICATION. Focus only on company quality, junior/grad hiring pipeline, and fit to my stated interests.
+
+4. MIX SIZES. Include large (network agencies, Big 4 firms, major consultancies), mid-sized, and small/boutique firms. Do not give me only the biggest names. A balanced list ideally has roughly 40% large, 40% mid, 20% small.
+
+5. MATCH TO MY INTERESTS. Where possible, prioritise firms whose client portfolio or specialisation aligns with my stated industries (e.g. for a marketing mentee who loves beauty, prioritise creative agencies with beauty clients).
+
+6. HIT 30 ENTRIES. If you can find fewer than 30 firms that perfectly match my stated industries, expand to adjacent industries or use your best judgment to fill to 30 with quality firms in my major. Never deliver fewer than 30.
+
+7. CONFIDENCE RATING (only ever use HIGH, MEDIUM, or LOW; never use "Skip" or "Unverified" or any other label):
+   - HIGH = I verified via a current job post that explicitly accepts international students (e.g. 485 visa, "full Australian work rights" wording).
+   - MEDIUM = I confirmed they hire juniors/grads in this function but the specific visa wording was not visible on the post I found.
+   - LOW = I couldn't fully verify; included based on general signal that they hire juniors in the function.
+   - If I verified a company is PR/Citizen only at junior level, EXCLUDE it entirely. Do not mark it Skip. Do not show it in the list.
+
+8. OUTPUT FORMAT. After your verification work, output a CSV in a fenced code block (inline in your reply, NOT as an artifact yet) with exactly these columns in this order:
+
+Company,Size,Type,Location,Why it matches,Confidence,Connected?
+
+Rules for each column:
+- Size: Large / Mid / Small
+- Type: the agency/firm terminology for my major
+- Location: AU city of office
+- Why it matches: max 10 words, reference my stated industries/brands/preferences
+- Confidence: High / Medium / Low (no other values)
+- Connected?: leave blank
+
+9. DO NOT CREATE AN ARTIFACT YET. Keep this CSV inline in the chat. The full combined list (60 companies) will be packaged into one artifact at the end of Prompt 4.
+
+10. After the CSV, tell me to run Prompt 4.</div>
+
+      <h4>AI prompt 4: In-house Companies List (30 companies)</h4>
+      <div class="template">We're now in Prompt 4. Use my answers from Prompts 1 and 2.
+
+Quick recap: "in-house" means working inside a company on their own brand or internal function (e.g. a marketing major doing marketing for Canva, or an accounting major doing finance for Telstra). This is different from Prompt 3 which covered the agency/firm side that services external clients.
+
+Build me a list of exactly 30 in-house companies in Australia where my major would sit as an internal function, tailored to my stated industries.
+
+CRITICAL RULES: same discipline as Prompt 3.
+
+1. NO LAZY PATTERN MATCHING. Verify each company. Confirmed examples to NEVER include without direct verification of international acceptance: Mondelez, Procter &amp; Gamble, Nestlé NextGen, Mars, Kraft Heinz, Macquarie Group, the big 4 AU banks (CBA, NAB, ANZ, Westpac). These have explicit PR/Citizen-only requirements at junior level in Australia.
+
+2. VERIFY VIA REAL JOB POSTS. For each company you include, find 1 to 2 current junior/grad job listings in the function relevant to my major (e.g. marketing roles for a marketing major, finance roles for a finance major). Read the work-rights wording.
+
+3. IF I AM A LOCAL STUDENT, SKIP THE INTERNATIONAL-FRIENDLINESS VERIFICATION. Focus on company quality and fit.
+
+4. SPLIT 30 ACROSS MY STATED INDUSTRIES. If I named 3 industries, deliver roughly 10 per industry. If I named 2, roughly 15 per. If I named 1, all 30 in that industry (and adjacent).
+
+5. IF YOU CAN'T FILL 30 in my stated industries, expand to adjacent industries or use your best judgment. Never deliver fewer than 30.
+
+6. MIX SIZES. Include large corporates, mid-size businesses, and scaleups. Don't give me only ASX 200 names.
+
+7. CONFIDENCE RATING: same as Prompt 3 (only HIGH, MEDIUM, LOW). Exclude verified PR/Citizen only companies entirely.
+
+8. OUTPUT FORMAT. After your verification work for Prompt 4, combine your Prompt 3 list (30 agencies) and this Prompt 4 list (30 in-house) into ONE single CSV with all 60 companies. Render this combined list as an ARTIFACT (so I can download it cleanly). Use exactly these columns in this order:
+
+Company,Size,Type,Industry,Location,Why it matches,Confidence,Connected?
+
+Rules for each column:
+- Size: Large / Mid / Small
+- Type: "in-house" for Prompt 4 rows, or the agency/firm terminology from Prompt 3 for those rows
+- Industry: which of my stated industries this falls under (for agency rows from Prompt 3, leave Industry blank since agencies service multiple industries)
+- Location: AU city
+- Why it matches: max 10 words, reference my stated industries/preferences
+- Confidence: High / Medium / Low only
+- Connected?: leave blank
+
+9. After the artifact, give me a one-line instruction: "Download the artifact above as a CSV or open it in Google Sheets."
+
+10. After Prompt 4 is complete, give me this closing summary:
+- "Your target list is now 60 companies: 30 agencies/firms and 30 in-house."
+- "Start your outreach with HIGH confidence companies first. They're verified to hire people with your work-rights status."
+- "Use the 'Connected?' column to track LinkedIn outreach and replies."
+
+Now go and build the list.</div>
     </section>
 
     <!-- 4. RESUME -->
