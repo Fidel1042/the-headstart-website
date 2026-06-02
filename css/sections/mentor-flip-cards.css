@@ -1,4 +1,4 @@
-/* ── MENTOR NEW CARDS ── */
+/* ── MENTOR CARDS (horizontal layout, no flip) ── */
 
 .mentor-filter-bar {
   display: flex;
@@ -37,178 +37,386 @@
 
 .mentor-new-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 1.2rem;
   margin-top: 1.5rem;
 }
 
-/* 3D flip card container */
 .mentor-new-card {
-  perspective: 1000px;
-  cursor: pointer;
-  border-radius: 20px;
-  height: 420px; /* explicit height so absolute children have something to fill */
+  cursor: default;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  height: 100%;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.mentor-new-card:hover {
+  border-color: rgba(199,155,59,0.35);
+  background: rgba(255,255,255,0.035);
 }
 
 .mentor-new-card__inner {
   position: relative;
   width: 100%;
-  height: 100%;
-  transform-style: preserve-3d;
-  will-change: transform;
-}
-
-/* Front and back share the same space */
-.mentor-new-card__front,
-.mentor-new-card__back {
-  position: absolute;
-  inset: 0;
-  border-radius: 20px;
-  border: 1px solid rgba(255,255,255,0.1);
-  background: rgba(255,255,255,0.02);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  overflow: hidden;
-}
-
-/* Front face */
-.mentor-new-card__front {
   display: flex;
-  flex-direction: column;
+  flex: 1;
+}
+
+/* Back face from the old flip card is no longer rendered — bio + CTA are
+   cloned out of it by JS and placed into the front grid. */
+.mentor-new-card__back { display: none; }
+
+.mentor-new-card__front {
+  display: grid;
+  grid-template-columns: 88px 1fr;
+  grid-template-rows: auto 1fr auto auto;
+  grid-template-areas:
+    "photo info"
+    "bio   bio"
+    "more  more"
+    "cta   cta";
+  column-gap: 1.15rem;
+  row-gap: 0.65rem;
+  padding: 1.4rem 1.5rem 1.55rem;
+  align-items: start;
+  overflow: visible;
+  border-radius: 0;
+  border: none;
+  background: none;
+  width: 100%;
+  flex: 1;
 }
 
 .mentor-new-card__photo {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  overflow: hidden;
+  grid-area: photo;
+  width: 88px;
+  height: 88px;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  overflow: visible;
+  border: 1px solid rgba(199,155,59,0.35);
+  position: relative;
+}
+
+.mentor-new-card__photo > img {
+  border-radius: 50%;
+}
+
+/* Photo itself is the zoom target — cursor signals it's clickable */
+.mentor-new-card__photo {
+  cursor: zoom-in;
+}
+
+
+/* Mentor photo modal */
+.mentor-photo-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.86);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 1.5rem;
+  animation: mentorPhotoModalIn 0.22s ease-out;
+}
+.mentor-photo-modal[hidden] { display: none; }
+
+@keyframes mentorPhotoModalIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.mentor-photo-modal__inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  max-width: 100%;
+}
+
+.mentor-photo-modal__img {
+  max-width: min(520px, 92vw);
+  max-height: 75vh;
+  border-radius: 18px;
+  border: 1px solid rgba(199,155,59,0.45);
+  box-shadow: 0 30px 80px -20px rgba(0,0,0,0.9);
+  object-fit: cover;
+  display: block;
+}
+
+.mentor-photo-modal__caption {
+  color: rgba(255,255,255,0.9);
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  text-align: center;
+  margin: 0;
+}
+
+.mentor-photo-modal__close {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, border-color 0.15s;
+}
+.mentor-photo-modal__close:hover {
+  background: rgba(255,255,255,0.18);
+  border-color: rgba(199,155,59,0.55);
 }
 
 .mentor-new-card__photo img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center top;
+  object-position: center 18%;
   display: block;
 }
 
-.mentor-new-card__photo--placeholder {
-  background: linear-gradient(135deg, rgba(199,155,59,0.15), rgba(10,10,10,0.9));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.mentor-new-card__photo-initials {
-  font-size: 4rem;
-  font-weight: 700;
-  color: rgba(247,216,121,0.6);
-  user-select: none;
-}
-
 .mentor-new-card__info {
-  padding: 1.3rem 1.5rem 1.8rem;
+  grid-area: info;
+  padding: 0;
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
-}
-
-.mentor-new-card__hint {
-  font-size: 0.78rem;
-  color: rgba(255,255,255,0.3);
-  margin: 0.6rem 0 0;
-  letter-spacing: 0.05em;
-}
-
-/* Back face — starts rotated so it's hidden */
-.mentor-new-card__back {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 0.8rem;
-  padding: 2rem 1.8rem;
-  transform: rotateY(180deg);
-  background: rgba(199,155,59,0.08);
-  border-color: rgba(199,155,59,0.25);
-}
-
-.mentor-new-card__back .btn {
-  margin-top: auto;
-  align-self: flex-start;
+  align-self: center;
 }
 
 .mentor-new-card__role {
-  font-size: 0.85rem;
-  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
+  line-height: 1.25;
   background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  margin: 0;
-  min-height: 2.4em;
-  display: flex;
-  align-items: flex-start;
+  margin: 0 0 0.2rem;
+  min-height: 0;
+  text-wrap: balance;
 }
 
 .mentor-new-card__name {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #ffffff;
-  margin: 0.2rem 0 0;
-  letter-spacing: -0.02em;
-}
-
-.mentor-new-card__bio {
-  font-size: 1rem;
-  line-height: 1.65;
-  color: rgba(255,255,255,0.75);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.7);
   margin: 0;
+  letter-spacing: -0.01em;
 }
 
+/* "Tap to read more" hint replaced by the read-more control */
+.mentor-new-card__hint { display: none; }
+
+/* Bio + read-more + CTA are injected by JS as siblings of .photo + .info
+   so the grid-template-areas can place them as full-width rows. */
+.mentor-new-card__bio-mobile {
+  grid-area: bio;
+  position: relative;
+  font-size: 1.12rem;
+  line-height: 1.35;
+  color: #ffffff;
+  margin: 0.55rem 0 0;
+  padding: 0.1rem 0 0.1rem 0.85rem;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  text-wrap: balance;
+  transition: font-weight 0.15s ease, font-size 0.15s ease, color 0.15s ease;
+}
+
+.mentor-new-card__bio-mobile::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.25em;
+  bottom: 0.25em;
+  width: 3px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 70%, #ffeb9f 100%);
+}
+
+/* When the long paragraph is expanded via Read more, drop the bold + size
+   so it reads as a normal body paragraph instead of a giant headline. */
+.mentor-new-card.is-expanded .mentor-new-card__bio-mobile {
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: rgba(255,255,255,0.82);
+  line-height: 1.55;
+  letter-spacing: 0;
+}
+
+.mentor-new-card__read-more {
+  grid-area: more;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  color: #f5d591;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  font-family: inherit;
+  justify-self: start;
+}
+
+.mentor-new-card__read-more::after {
+  content: " \203A";
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.mentor-new-card.is-expanded .mentor-new-card__read-more::after {
+  transform: rotate(90deg);
+}
+
+.mentor-new-card__cta-mobile {
+  grid-area: cta;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 48px;
+  margin-top: 0.5rem;
+  padding: 0 1.2rem;
+  border-radius: 999px;
+  /* Gold gradient frame, solid black interior */
+  background:
+    linear-gradient(#0a0a0a, #0a0a0a) padding-box,
+    linear-gradient(135deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 70%, #ffeb9f 100%) border-box;
+  border: 2px solid transparent;
+  color: #f7d37d;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.mentor-new-card__cta-mobile:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+/* ── Logos bar (kept from old file) ── */
 @media (max-width: 900px) {
-  .mentor-logo-box {
-    gap: 1.4rem 2rem;
-  }
-
-  .mentor-logo-item {
-    height: 36px;
-    max-width: 110px;
-  }
-}
-
-@media (max-width: 600px) {
-  .mentor-logo-box {
-    gap: 1.4rem 1.8rem;
-    padding: 1.8rem 1.5rem;
-  }
-
-  /* Force 2 per row on mobile so logos wrap into more rows */
-  .mentor-logo-item {
-    flex: 0 0 calc(50% - 2rem);
-    max-width: 120px;
-    height: 34px;
-  }
+  .mentor-logo-box { gap: 1.4rem 2rem; }
+  .mentor-logo-item { height: 36px; max-width: 110px; }
 }
 
 @media (max-width: 700px) {
-  .mentor-new-grid {
-    grid-template-columns: repeat(2, 1fr);
+  /* ── Logo box: 2-row horizontal swipe grid on mobile ── */
+  .mentor-logo-box {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-rows: repeat(2, auto);
+    grid-auto-columns: max-content;
+    column-gap: 2rem;
+    row-gap: 1rem;
+    align-items: center;
+    justify-content: start;
+    flex-wrap: nowrap;
+    padding: 1.2rem 1.4rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    mask-image: linear-gradient(90deg,
+      transparent 0,
+      #000 22px,
+      #000 calc(100% - 22px),
+      transparent 100%);
+    -webkit-mask-image: linear-gradient(90deg,
+      transparent 0,
+      #000 22px,
+      #000 calc(100% - 22px),
+      transparent 100%);
+  }
+  .mentor-logo-box::-webkit-scrollbar { display: none; }
+
+  .mentor-logo-item {
+    flex: 0 0 auto;
+    width: auto;
+    max-width: 110px;
+    height: 36px;
+    scroll-snap-align: center;
+    animation: none;
+  }
+
+  .mentor-logo-item--lg {
+    height: 48px;
+    max-width: 130px;
+  }
+
+  /* ── Filter bar: 2 rows × 3 columns grid, all 6 visible at once ── */
+  .mentor-filter-bar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: 1fr;
+    gap: 0.5rem;
+    margin: 1.4rem 0 0;
+    padding: 0;
+    overflow: visible;
   }
 
   .mentor-filter-btn {
-    padding: 0.6rem 1rem;
-    font-size: 0.8rem;
-    min-height: 44px;
-  }
-
-  .mentor-filter-bar {
-    gap: 0.5rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .mentor-new-grid {
-    grid-template-columns: 1fr;
+    width: 100%;
+    padding: 0.55rem 0.45rem;
+    font-size: 0.78rem;
+    line-height: 1.2;
+    min-height: 46px;
+    text-align: center;
+    white-space: normal;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 
+/* ── Card sizing tweaks per viewport ── */
+@media (max-width: 700px) {
+  .mentor-new-grid { grid-template-columns: 1fr; gap: 1rem; }
+
+  .mentor-new-card__front {
+    grid-template-columns: 60px 1fr;
+    column-gap: 0.95rem;
+    row-gap: 0.55rem;
+    padding: 1.05rem 1.1rem 1.15rem;
+  }
+
+  .mentor-new-card__photo { width: 60px; height: 60px; }
+  .mentor-new-card__role { font-size: 11px; letter-spacing: 0.1em; margin: 0 0 0.15rem; line-height: 1.2; }
+  .mentor-new-card__name { font-size: 0.95rem; font-weight: 600; color: rgba(255,255,255,0.7); }
+  .mentor-new-card__bio-mobile {
+    font-size: 15px;
+    line-height: 1.32;
+    margin: 0.4rem 0 0;
+    padding-left: 0.7rem;
+  }
+  .mentor-new-card__bio-mobile::before { width: 2.5px; }
+  .mentor-new-card.is-expanded .mentor-new-card__bio-mobile {
+    font-size: 13px;
+    line-height: 1.55;
+  }
+  .mentor-new-card__read-more { font-size: 12px; }
+  .mentor-new-card__cta-mobile { font-size: 13px; min-height: 44px; padding: 0 1rem; }
+}

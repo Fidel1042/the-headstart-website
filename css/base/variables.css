@@ -4,6 +4,17 @@
   --text: #ffffff;
   --accent: #c79b3b;
   --accent-soft: rgba(199,155,59,0.22);
+
+  /* ── 8pt spacing scale (mobile-first) ── */
+  --space-1: 0.25rem;   /* 4px  - hairline */
+  --space-2: 0.5rem;    /* 8px  - tight */
+  --space-3: 0.75rem;   /* 12px - small */
+  --space-4: 1rem;      /* 16px - base / paragraph gap */
+  --space-5: 1.5rem;    /* 24px - headline > body, card padding */
+  --space-6: 2rem;      /* 32px - card to card */
+  --space-7: 3rem;      /* 48px - mobile section padding */
+  --space-8: 4rem;      /* 64px - tablet section padding */
+  --space-9: 6rem;      /* 96px - desktop hero */
 }
 
 /* Root font-size: bigger on desktop, smaller on mobile so big text doesn't overflow on narrow screens */

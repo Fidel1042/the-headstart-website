@@ -1,0 +1,79 @@
+/* ── Section spacing rhythm ──
+   Standardises vertical padding across every section on every page so
+   the scroll feels even instead of "some sections breathe, some don't".
+
+   Mobile  : 3rem  top + bottom (--space-7)
+   Tablet  : 4rem  top + bottom (--space-8)
+   Desktop : 5rem  top + bottom (clamp ceiling)
+
+   Fluid clamp() avoids stair-step media queries. The first section of
+   <main> gets a smaller top so the hero sits close to the nav.
+
+   This file loads LAST in style.css so it wins over the older per-page
+   padding rules. Internal section content keeps its existing styles —
+   we only normalise the outer rhythm. */
+
+main > section,
+main > .section,
+main > .section-alt,
+main > .ms-section,
+main > .pricing-section,
+main > .services-hero,
+main > .services-core,
+.home-page main > section,
+.home-page main > .section,
+.home-page main > .section-alt,
+.home-page main > .ms-section,
+.home-page main > .pricing-section {
+  padding-top:    clamp(2rem, 4vw, 3.25rem) !important;
+  padding-bottom: clamp(2rem, 4vw, 3.25rem) !important;
+}
+
+/* First section trims top so the hero hugs the nav.
+   Also trim its bottom: the hero is a short headline, doesn't need 52px below. */
+main > section:first-of-type,
+main > .section:first-of-type,
+main > .section-alt:first-of-type {
+  padding-top:    clamp(0.6rem, 1.6vw, 1.2rem) !important;
+  padding-bottom: clamp(0.8rem, 1.8vw, 1.4rem) !important;
+}
+
+/* The section immediately after the hero also gets a tighter top — the hero
+   above is already small, no need for a giant cushion below it. */
+main > section:first-of-type + section,
+main > .section:first-of-type + .section,
+main > .section:first-of-type + .section-alt,
+main > .section-alt:first-of-type + .section,
+main > .section-alt:first-of-type + .section-alt {
+  padding-top: clamp(1rem, 2.2vw, 1.8rem) !important;
+}
+
+/* Headline → first body element gap inside a section */
+.section-inner > .section-title-row,
+.section-inner > .mentoring-head,
+.section-inner > .home-sec-head,
+.section-inner > .pricing-head,
+.section-inner .page-hero-text {
+  margin-bottom: var(--space-5);
+}
+
+/* Hero block trims its internal bottom space — the section padding handles
+   the gap to the next block; no need for extra bottom inside .page-hero. */
+.section-inner > .page-hero,
+.page-hero {
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* Eyebrow → headline gap */
+.mentoring-eyebrow,
+.about-real__eyebrow,
+.pricing-box__eyebrow {
+  margin-bottom: var(--space-2);
+}
+
+/* Footer breathing room */
+footer {
+  padding-top: var(--space-7);
+  padding-bottom: var(--space-7);
+}

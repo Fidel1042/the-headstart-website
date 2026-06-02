@@ -581,7 +581,7 @@
         transform: translateX(-50%);
         white-space: nowrap;
         opacity: 0;
-        font-size: 0.66rem;
+        font-size: 11px;
         transition: opacity 0.3s;
       }
       .journey-node.is-active .journey-label { opacity: 1; }
@@ -593,6 +593,49 @@
       .journey-dot { width: 16px; height: 16px; }
       .journey-line, .journey-line-fill { top: 7px; }
       .journey-wrap { padding-top: 0.6rem; }
+    }
+
+    /* Swipe affordance for the journey track on mobile */
+    .journey-wrap { touch-action: pan-y; }
+    .journey-detail { user-select: none; -webkit-user-select: none; }
+    .journey-swipe-hint {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.55rem;
+      margin: 0.9rem auto 0;
+      color: #888;
+      font-size: 13px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .journey-swipe-hint__arrow {
+      display: inline-block;
+      color: #c9a84c;
+      animation: journeySwipeArrow 1.6s ease-in-out infinite;
+    }
+    .journey-swipe-hint__arrow--left {
+      animation-name: journeySwipeArrowL;
+    }
+    .journey-swipe-hint__label--mouse { display: none; }
+    .journey-detail.is-swiping .journey-detail__inner { transform: scale(0.985); transition: transform 0.18s ease; }
+    @media (hover: hover) and (pointer: fine) {
+      .journey-swipe-hint__label--touch { display: none; }
+      .journey-swipe-hint__label--mouse { display: inline; }
+      .journey-detail { cursor: grab; }
+      .journey-detail:active { cursor: grabbing; }
+    }
+    @media (max-width: 600px) {
+      .journey-swipe-hint { font-size: 11px; margin-top: 0.6rem; }
+    }
+    @keyframes journeySwipeArrow {
+      0%, 100% { transform: translateX(0); }
+      50%      { transform: translateX(5px); }
+    }
+    @keyframes journeySwipeArrowL {
+      0%, 100% { transform: translateX(0); }
+      50%      { transform: translateX(-5px); }
     }
 
     /* Pricing section — eyebrow above the grid, aligned to grid's left edge */
@@ -688,7 +731,7 @@
       color: #a8a8a8;
       font-size: 0.95rem;
       line-height: 1.55;
-      margin: 0 0 1.8rem;
+      margin: 0 0 1.4rem;
       min-height: 2.9em;
       text-wrap: balance;
     }
@@ -696,7 +739,10 @@
       display: flex;
       align-items: baseline;
       gap: 0.3rem;
-      margin-bottom: 1.4rem;
+      margin-top: auto;
+      margin-bottom: 1.2rem;
+      padding-top: 1.4rem;
+      border-top: 1px solid rgba(255,255,255,0.07);
     }
     .pricing-box__amount {
       font-size: 2.2rem;
@@ -726,7 +772,7 @@
       font-weight: 700;
       letter-spacing: 0.02em;
       text-decoration: none;
-      margin-bottom: 1.6rem;
+      margin-bottom: 0;
       transition: background 0.2s, border-color 0.2s, transform 0.2s;
     }
     .pricing-box__cta:hover {
@@ -737,7 +783,7 @@
     .pricing-box__list {
       list-style: none;
       padding: 0;
-      margin: 0;
+      margin: 0 0 0.4rem;
     }
     .pricing-box__list li {
       font-size: 0.93rem;
@@ -859,6 +905,13 @@
                 <p class="journey-detail__desc" id="journeyDesc">Map your skills to specific grad roles and understand what realistic options you have.</p>
               </div>
             </div>
+
+            <p class="journey-swipe-hint" aria-hidden="true">
+              <span class="journey-swipe-hint__arrow journey-swipe-hint__arrow--left">&larr;</span>
+              <span class="journey-swipe-hint__label--touch">Swipe to explore</span>
+              <span class="journey-swipe-hint__label--mouse">Drag to explore</span>
+              <span class="journey-swipe-hint__arrow">&rarr;</span>
+            </p>
           </div>
 
         </div>
@@ -875,31 +928,30 @@
               <span class="pricing-box__eyebrow">Step 1</span>
               <h3 class="pricing-box__title">Initial Consultation</h3>
               <p class="pricing-box__sub">A free call to understand where you're stuck and match you with a mentor.</p>
+              <ul class="pricing-box__list">
+                <li>20-minute online meeting</li>
+                <li>Walk through your current approach</li>
+                <li>Match with the right mentor for you</li>
+              </ul>
               <div class="pricing-box__price">
                 <span class="pricing-box__amount">Free</span>
               </div>
               <a class="pricing-box__cta" href="/discovery-call">Book a free call &rarr;</a>
-              <ul class="pricing-box__list">
-                <li>20-minute online meeting </li>
-                <li>Walk through your current approach</li>
-                <li>Match with the right mentor for you</li>
-                
-              </ul>
             </div>
 
             <div class="pricing-box reveal reveal--right" style="--reveal-delay:0.1s">
               <span class="pricing-box__eyebrow">Step 2</span>
               <h3 class="pricing-box__title">Ongoing Mentoring</h3>
               <p class="pricing-box__sub"> 1-on-1 sessions with your matched mentor.</p>
-              <div class="pricing-box__price">
-                <span class="pricing-box__amount">$30</span><span class="pricing-box__unit">/session</span>
-              </div>
-              <a class="pricing-box__cta" href="/discovery-call">Book a free call &rarr;</a>
               <ul class="pricing-box__list">
                 <li>Mentors who were once International Students</li>
                 <li>Currently working in Australia</li>
                 <li>Change mentors at no extra cost</li>
               </ul>
+              <div class="pricing-box__price">
+                <span class="pricing-box__amount">$30</span><span class="pricing-box__unit">/session</span>
+              </div>
+              <a class="pricing-box__cta" href="/discovery-call">Book a free call &rarr;</a>
             </div>
           </div>
 
@@ -1231,6 +1283,75 @@
     }
     window.addEventListener('scroll', journeyMaybeStart, { passive: true });
     window.addEventListener('load', journeyMaybeStart);
+
+    // ── Journey track: swipe / drag (touch + mouse + pen, all viewports) ──
+    (function setupJourneySwipe() {
+      var wrap = document.querySelector('.journey-wrap');
+      var detail = document.getElementById('journeyDetail');
+      if (!wrap) return;
+      var startX = 0, startY = 0, tracking = false, locked = false, pointerId = null;
+      var THRESHOLD = 38;
+
+      function shouldIgnore(target) {
+        // Don't hijack drags that start on the dots — they have their own
+        // click-to-jump and we don't want a tiny mouse twitch to fire a swipe.
+        return target && target.closest && target.closest('.journey-node');
+      }
+
+      function onStart(e) {
+        if (shouldIgnore(e.target)) return;
+        startX = e.clientX;
+        startY = e.clientY;
+        tracking = true;
+        locked = false;
+        pointerId = e.pointerId;
+        // Capture so we still receive move/up events outside the element
+        try { e.target.setPointerCapture && e.target.setPointerCapture(pointerId); } catch (_) {}
+      }
+      function onMove(e) {
+        if (!tracking) return;
+        if (pointerId != null && e.pointerId !== pointerId) return;
+        var dx = e.clientX - startX;
+        var dy = e.clientY - startY;
+        if (!locked && Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+          locked = true;
+          if (detail) detail.classList.add('is-swiping');
+        }
+      }
+      function onEnd(e) {
+        if (!tracking) return;
+        if (pointerId != null && e.pointerId !== pointerId) return;
+        tracking = false;
+        if (detail) detail.classList.remove('is-swiping');
+        var dx = e.clientX - startX;
+        var dy = e.clientY - startY;
+        pointerId = null;
+        if (Math.abs(dx) < THRESHOLD || Math.abs(dx) < Math.abs(dy) * 1.2) return;
+        var dir = dx < 0 ? 1 : -1;
+        var next = journeyCurrent + dir;
+        if (next < 0) next = JOURNEY_STAGES.length - 1;
+        if (next >= JOURNEY_STAGES.length) next = 0;
+        journeyJump(next);
+      }
+      function onCancel() {
+        tracking = false;
+        pointerId = null;
+        if (detail) detail.classList.remove('is-swiping');
+      }
+
+      [wrap, detail].forEach(function(el) {
+        if (!el) return;
+        el.style.touchAction = 'pan-y';
+        el.style.cursor = 'grab';
+        el.addEventListener('pointerdown',   onStart);
+        el.addEventListener('pointermove',   onMove);
+        el.addEventListener('pointerup',     onEnd);
+        el.addEventListener('pointercancel', onCancel);
+        el.addEventListener('pointerleave',  function(e) {
+          if (tracking && pointerId === e.pointerId) onEnd(e);
+        });
+      });
+    })();
   </script>
 </body>
 </html>

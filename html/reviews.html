@@ -101,7 +101,7 @@
         {
           "@type": "Review",
           "author": { "@type": "Person", "name": "Mohit" },
-          "reviewBody": "I heard about Headstart through a USYD society event and decided to give it a go. After one 45-minute session, I had a much clearer picture of where I should be heading."
+          "reviewBody": "I heard about Headstart through a USYD society event and decided to give it a go. After one 40-minute session, I had a much clearer picture of where I should be heading."
         },
         {
           "@type": "Review",
@@ -138,14 +138,70 @@
     }
     .review-card.hidden { display: none; }
 
+    .review-card__headline {
+      font-size: 1.08rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.32;
+      letter-spacing: -0.005em;
+      margin: 0;
+      padding-left: 0.85rem;
+      position: relative;
+      text-wrap: balance;
+    }
+    .review-card__headline::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.2em;
+      bottom: 0.2em;
+      width: 3px;
+      border-radius: 2px;
+      background: linear-gradient(180deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 70%, #ffeb9f 100%);
+    }
+
     .review-card__quote {
-      font-size: 0.97rem;
-      line-height: 1.7;
-      color: rgba(255,255,255,0.78);
-      flex: 1;
+      font-size: 0.95rem;
+      line-height: 1.65;
+      color: rgba(255,255,255,0.72);
       position: relative;
       padding-left: 1.5rem;
+      max-height: 0;
+      overflow: hidden;
+      margin: 0;
+      opacity: 0;
+      transition: max-height 0.35s ease, opacity 0.25s ease, margin 0.25s ease;
     }
+    .review-card.is-open .review-card__quote {
+      max-height: 600px;
+      opacity: 1;
+      margin: 0.4rem 0 0;
+    }
+
+    /* Toggle styled identically to the mentor card "Read more" link */
+    .review-card__toggle {
+      align-self: flex-start;
+      background: none;
+      border: none;
+      padding: 0;
+      margin: 0;
+      text-align: left;
+      color: #f5d591;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .review-card__toggle::after {
+      content: " \203A";
+      display: inline-block;
+      transition: transform 0.2s ease;
+    }
+    .review-card.is-open .review-card__toggle::after {
+      transform: rotate(90deg);
+    }
+
     .review-card__quote::before {
       content: '\201C';
       position: absolute;
@@ -268,6 +324,7 @@
         <div class="review-grid">
 
           <div class="review-card reveal" data-category="tech">
+            <p class="review-card__headline">Unemployed 2 months &rarr; Analyst &rarr; Consultant</p>
             <p class="review-card__quote">Fidel was incredibly influential during the interview process for my current company. He guided me from networking with the right people to preparing for interviews and individual case studies. He is a huge reason why I was able to present the best version of myself.</p>
             <div class="review-card__meta">
               <span class="review-card__avatar" style="background-image: url('../images/Mentee-review/rapheal.jpeg');"></span>
@@ -279,6 +336,7 @@
           </div>
 
           <div class="review-card reveal reveal--right" data-category="marketing">
+            <p class="review-card__headline">Love the specific industry advice</p>
             <p class="review-card__quote">I&rsquo;ve tried free mentoring programs before, but mentors were rarely committed or tailored in their advice. Koko was the opposite, every piece of advice was specific to my situation and actually actionable.</p>
             <div class="review-card__meta">
               <span class="review-card__avatar" style="background-image: url('../images/Mentee-review/Amy.jpg');"></span>
@@ -290,6 +348,7 @@
           </div>
 
           <div class="review-card reveal" data-category="finance">
+            <p class="review-card__headline">Got the role because mentor sat the same interview</p>
             <p class="review-card__quote">Having a mentor that just did the same interview 2 years ago in the same company is the reason why I got this role.</p>
             <div class="review-card__meta">
               <span class="review-card__avatar" style="background-image: url('../images/Mentee-review/Jordan.jpg');"></span>
@@ -301,6 +360,7 @@
           </div>
 
           <div class="review-card reveal reveal--right" data-category="finance">
+            <p class="review-card__headline">Mass Applications no results &rarr; first final interview</p>
             <p class="review-card__quote">I like the flexible lessons, compared to other career programs that are way more expensive. I have gotten my first ever in person final interview!</p>
             <div class="review-card__meta">
               <span class="review-card__avatar" style="background-image: url('../images/Mentee-review/Shreya.jpg');"></span>
@@ -312,6 +372,7 @@
           </div>
 
           <div class="review-card reveal" data-category="consulting">
+            <p class="review-card__headline">Passed the case study with mentor&rsquo;s PowerPoint template</p>
             <p class="review-card__quote">The reason I passed the individual case study for my current role is because he gave me a PowerPoint template that&rsquo;s professional and impressed the interviewers.</p>
             <div class="review-card__meta">
               <span class="review-card__avatar" style="background-image: url('../images/Mentee-review/Daniel.jpg');"></span>
@@ -323,6 +384,7 @@
           </div>
 
           <div class="review-card reveal reveal--right" data-category="marketing">
+            <p class="review-card__headline">Being &ldquo;unique&rdquo; was the reason I got hired</p>
             <p class="review-card__quote">I thought &lsquo;being unique to stand out&rsquo; was a buzzword until I realised it was the main reason I got my current role.</p>
             <div class="review-card__meta">
               <span class="review-card__avatar" style="background-image: url('../images/Mentee-review/Kyra.jpg');"></span>
@@ -334,6 +396,7 @@
           </div>
 
           <div class="review-card reveal" data-category="tech">
+            <p class="review-card__headline">Paired with a mentor inside my target firm</p>
             <p class="review-card__quote">My mentor worked in my target firm, so I think it will be helpful in the interview process for me.</p>
             <div class="review-card__meta">
               <span class="review-card__avatar" style="background-image: url('../images/Mentee-review/Ken.jpg');"></span>
@@ -345,6 +408,7 @@
           </div>
 
           <div class="review-card reveal reveal--right" data-category="analytics">
+            <p class="review-card__headline">No internships? My mentor showed it&rsquo;s possible</p>
             <p class="review-card__quote">I have no formal internship experience and was feeling quite behind. I got paired with a mentor who landed a full time job with no internships either, I feel more calm about my situation.</p>
             <div class="review-card__meta">
               <span class="review-card__avatar" style="background-image: url('../images/Mentee-review/Mary.jpg');"></span>
@@ -356,6 +420,7 @@
           </div>
 
           <div class="review-card reveal" data-category="finance">
+            <p class="review-card__headline">Faster than Googling visa, tax and job sites</p>
             <p class="review-card__quote">I book sessions ad hoc when I want to ask someone who has done it. Its faster than researching on my own. Life admin no one talks about: visa, tax, investing, which job sites actually reply.</p>
             <div class="review-card__meta">
               <span class="review-card__avatar" style="background-image: url('../images/Mentee-review/Joe.jpg');"></span>
@@ -367,7 +432,8 @@
           </div>
 
           <div class="review-card reveal reveal--right" data-category="finance">
-            <p class="review-card__quote">I heard about Headstart through a USYD society event and decided to give it a go. After one 45-minute session, I had a much clearer picture of where I should be heading.</p>
+            <p class="review-card__headline">One 40-min session gave me a clear direction</p>
+            <p class="review-card__quote">I heard about Headstart through a USYD society event and decided to give it a go. After one 40-minute session, I had a much clearer picture of where I should be heading.</p>
             <div class="review-card__meta">
               <span class="review-card__avatar" style="background-image: url('../images/Mentee-review/Mohit.jpg');"></span>
               <div class="review-card__info">
@@ -378,6 +444,7 @@
           </div>
 
           <div class="review-card reveal" data-category="marketing">
+            <p class="review-card__headline">Stopped mass applying, passed my first recorded interview</p>
             <p class="review-card__quote">I kept seeing Headstart on Instagram and decided to check it out. Before this, I was mass applying with no idea what I was doing wrong. After 3 sessions, I finally passed my first online recorded interview.</p>
             <div class="review-card__meta">
               <span class="review-card__avatar" style="background-image: url('../images/Mentee-review/Ash.jpg');"></span>
@@ -410,9 +477,32 @@
   <button class="back-to-top" type="button" aria-label="Back to top">↑</button>
 
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/Flip.min.js"></script>
   <script type="module" src="../js/main.js"></script>
   <script src="../js/nav-hamburger.js" defer></script>
   <script>
+    // Inject "Read original review" toggle on every card
+    document.querySelectorAll('.review-card').forEach(function(card) {
+      var quote = card.querySelector('.review-card__quote');
+      var meta  = card.querySelector('.review-card__meta');
+      if (!quote || !meta || card.querySelector('.review-card__toggle')) return;
+
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'review-card__toggle';
+      btn.textContent = 'Read original review';
+      card.insertBefore(btn, meta);
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var open = card.classList.toggle('is-open');
+        btn.textContent = open ? 'Hide original review' : 'Read original review';
+      });
+    });
+
+    if (typeof gsap !== 'undefined' && typeof Flip !== 'undefined') {
+      gsap.registerPlugin(Flip);
+    }
+
     document.querySelectorAll('.mentor-filter-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
         document.querySelectorAll('.mentor-filter-btn').forEach(function(b) { b.classList.remove('active'); });
@@ -423,15 +513,16 @@
         var matched   = cards.filter(function(c) { return filter === 'all' || c.dataset.category.split(' ').includes(filter); });
         var unmatched = cards.filter(function(c) { return !matched.includes(c); });
 
-        gsap.to(cards, { opacity: 0, duration: 0.2, ease: 'power1.in',
-          onComplete: function() {
-            unmatched.forEach(function(c) { c.classList.add('hidden'); });
-            matched.forEach(function(c) { c.classList.remove('hidden'); });
-            gsap.fromTo(matched,
-              { opacity: 0, y: 12 },
-              { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out', stagger: 0.06, clearProps: 'transform,opacity' }
-            );
-          }
+        // Flip animation: capture positions, toggle, smoothly interpolate
+        var state = Flip.getState(cards);
+        unmatched.forEach(function(c) { c.classList.add('hidden'); });
+        matched.forEach(function(c) { c.classList.remove('hidden'); });
+
+        Flip.from(state, {
+          duration: 0.4,
+          ease: 'power2.out',
+          onEnter: function(els) { return gsap.from(els, { opacity: 0, duration: 0.3 }); },
+          onLeave: function(els) { return gsap.to(els,   { opacity: 0, duration: 0.2 }); }
         });
       });
     });

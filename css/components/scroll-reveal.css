@@ -72,9 +72,8 @@
 }
 
 .mentor-filter-bar {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 0.8rem;
+  /* Layout (flex on desktop, 3-col grid on mobile) lives in mentor-flip-cards.css.
+     This file only contributes the surrounding container chrome. */
   padding: 0.85rem 1rem;
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: 18px;

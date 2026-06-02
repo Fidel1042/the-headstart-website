@@ -650,6 +650,17 @@
 </head>
 <body class="job-alerts-page">
 
+  <!-- Hidden Netlify form so the dashboard registers the broken-link form -->
+  <form name="broken-link-report" netlify netlify-honeypot="bot-field" hidden>
+    <input type="text" name="company" />
+    <input type="text" name="title" />
+    <input type="url" name="url" />
+    <input type="text" name="category" />
+    <input type="text" name="city" />
+    <input type="text" name="reported_at" />
+    <input type="text" name="bot-field" />
+  </form>
+
   <header>
     <div class="nav">
       <a href="/" class="nav-left nav-home">
@@ -905,7 +916,6 @@ const JOBS = [
   { title: "Growth Marketing Coordinator",                         company: "The Onset",                    city: "Sydney",    cat: "marketing", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4407838178/" },
   { title: "Product Marketing Assistant Manager",                  company: "Hyundai Motor Company",        city: "Sydney",    cat: "marketing", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4410503793/" },
   { title: "Submissions & Marketing Assistant",                    company: "Core Talent",                  city: "Sydney",    cat: "marketing", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4406597999/" },
-  { title: "Graduate Marketing Assistant – Annual Salary Review",  company: "Proforce",                     city: "Sydney",    cat: "marketing", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/91852206" },
   { title: "Marketing Coordinator – Graduate Role",                company: "Robert Walters",               city: "Sydney",    cat: "marketing", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/91911664" },
   { title: "Marketing Assistant",                                  company: "HR Edge",                      city: "Sydney",    cat: "marketing", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/91675590" },
   { title: "Social Media, Marketing & Graphics Coordinator",       company: "The Big Group",                city: "Sydney",    cat: "marketing", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/91946674" },
@@ -989,6 +999,13 @@ const JOBS = [
   { title: "2026/2027 Summer Internship – Technology",             company: "Macquarie Group",        city: "Sydney",    cat: "tech", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4408976282/" },
   { title: "Software Developer Internship 2026-27",                company: "Optiver",                city: "Sydney",    cat: "tech", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4406755414/" },
   { title: "Software Engineer Intern – Frontend / Backend 2026/27", company: "Canva",                 city: "Sydney",    cat: "tech", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4394318074/" },
+  { title: "Technology Internship",                                company: "Westpac",                city: "Sydney",    cat: "tech", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4417600845/", posted: "2026-06-01" },
+  { title: "Backend Software Engineer Intern – Data Trust & Safety (2027 Start, BS/MS)", company: "TikTok", city: "Sydney", cat: "tech", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4380094470/", posted: "2026-06-01" },
+  { title: "AI Activation Intern",                                 company: "Employment Hero",        city: "Sydney",    cat: "tech", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4418062781/", posted: "2026-06-01" },
+  { title: "Forward Deployed Software Engineer Internship – AUS Government", company: "Palantir Technologies", city: "Sydney", cat: "tech", type: "intern", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4422043029/", posted: "2026-06-01" },
+  { title: "Network Engineering Intern (Jul–Dec 2026)",            company: "Cloudflare",             city: "Sydney",    cat: "tech", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4412258443/", posted: "2026-06-01" },
+  { title: "2026/27 EY Vacationer Program – Technology",           company: "EY",                     city: "Sydney",    cat: "tech", type: "intern",   source: "Seek",     url: "https://au.seek.com/job/92430675", posted: "2026-06-01" },
+  { title: "2026/27 KPMG Vacationer Program – Technology & Digital", company: "KPMG",                 city: "Sydney",    cat: "tech", type: "intern",   source: "Seek",     url: "https://au.seek.com/job/92309578", posted: "2026-06-01" },
 
   // ── Tech · Sydney · Graduate ──
   { title: "Technical Support Engineer (Fixed Term)",              company: "Snyk",                   city: "Sydney",    cat: "tech", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4398433057/" },
@@ -1005,12 +1022,27 @@ const JOBS = [
   { title: "2026 Graduate Cloud Associate",                        company: "Datacom",                city: "Sydney",    cat: "tech", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=a37ec2f30ea98fd0" },
   { title: "Information Systems Technician (No Experience)",       company: "Australian Army",        city: "Sydney",    cat: "tech", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=0f7bf082a1ff06bf" },
   { title: "Internal IT Systems Officer",                          company: "Better Recovery Group",  city: "Sydney",    cat: "tech", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=12c34b77a2d69bba" },
+  { title: "Cuscal Technology Graduate Program 2027",              company: "Cuscal Limited",         city: "Sydney",    cat: "tech", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4420627541/", posted: "2026-06-01" },
+  { title: "2027 DXC Technology Graduate Program Australia",       company: "DXC Technology",         city: "Sydney",    cat: "tech", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4415607748/", posted: "2026-06-01" },
+  { title: "Desktop Support Engineer",                             company: "Datacom",                city: "Sydney",    cat: "tech", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4408516832/", posted: "2026-06-01" },
+  { title: "Software Engineer",                                    company: "Nine",                   city: "Sydney",    cat: "tech", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4417452730/", posted: "2026-06-01" },
+  { title: "Graduate Software Developer 2027 (EOI)",               company: "Optiver",                city: "Sydney",    cat: "tech", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4415266465/", posted: "2026-06-01" },
+  { title: "Traineeship – IT Support",                             company: "Xenontech",              city: "Sydney",    cat: "tech", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/92383668", posted: "2026-06-01" },
+  { title: "IT Graduate",                                          company: "Fresh Produce Group of Australia", city: "Sydney", cat: "tech", type: "graduate", source: "Seek",  url: "https://au.seek.com/job/92338190", posted: "2026-06-01" },
+  { title: "Technical Writer",                                     company: "Digital Nomad",          city: "Sydney",    cat: "tech", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=d6516bf46a8da417", posted: "2026-06-01" },
+  { title: "IT Help Desk / Database Support / Software Installer", company: "Unicard Systems",        city: "Sydney",    cat: "tech", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=04f8f0bcc49191ac", posted: "2026-06-01" },
+  { title: "Software Engineer",                                    company: "High Limit Studio",      city: "Sydney",    cat: "tech", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=845b562f916500ed", posted: "2026-06-01" },
+  { title: "Junior Desktop Engineers – Entry Level",               company: "Accenture",              city: "Sydney",    cat: "tech", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=40a51dbd3945620d", posted: "2026-06-01" },
+  { title: "Graduate Software Engineer",                           company: "KONAMI Australia",       city: "Sydney",    cat: "tech", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=b294694f80853d8f", posted: "2026-06-01" },
 
   // ── Tech · Melbourne · Intern ──
   { title: "Technical Sales Intern (Industrial Automation)",       company: "OMRON Automation & Robotics", city: "Melbourne", cat: "tech", type: "intern", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4407668985/" },
   { title: "Information Technology Internship Program",            company: "Readygrad",              city: "Melbourne", cat: "tech", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4404733068/" },
   { title: "Network Dev Engineer Intern – Core Networking",        company: "Amazon",                 city: "Melbourne", cat: "tech", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4384169286/" },
   { title: "Web Development Intern (Remote)",                      company: "Career Panacea",         city: "Melbourne", cat: "tech", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4410523401/" },
+  { title: "Technical Support Intern – Energy Products",           company: "Tesla",                  city: "Melbourne", cat: "tech", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4420224205/", posted: "2026-06-01" },
+  { title: "2027 Applied Science Intern – Computer Vision (Amazon International ML)", company: "Amazon", city: "Melbourne", cat: "tech", type: "intern", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4416664185/", posted: "2026-06-01" },
+  { title: "2026/27 EY Vacationer Program – Computer Science",     company: "EY",                     city: "Melbourne", cat: "tech", type: "intern",   source: "Seek",     url: "https://au.seek.com/job/92430520", posted: "2026-06-01" },
 
   // ── Tech · Melbourne · Graduate ──
   { title: "Undergraduate Engineer",                               company: "Abergeldie Complex Infrastructure", city: "Melbourne", cat: "tech", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4407318537/" },
@@ -1020,11 +1052,18 @@ const JOBS = [
   { title: "Junior Frontend Developer",                            company: "Brightspace (Steribright)", city: "Melbourne", cat: "tech", type: "graduate", source: "Seek",  url: "https://au.seek.com/job/91936746" },
   { title: "Junior Community Tech Support",                        company: "Youngster.co",           city: "Melbourne", cat: "tech", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=231d0099d7169f13" },
   { title: "Technical Administration Consultant",                  company: "AIA",                    city: "Melbourne", cat: "tech", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=6436f4520969c3b7" },
+  { title: "Cloud Support Associate Apprentice – Support Engineering", company: "Amazon Web Services (AWS)", city: "Melbourne", cat: "tech", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4402271344/", posted: "2026-06-01" },
+  { title: "Graduate Software Technician",                         company: "Inject",                 city: "Melbourne", cat: "tech", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/92411191", posted: "2026-06-01" },
+  { title: "Junior Remote Support Technician",                     company: "Innov8tive Services",    city: "Melbourne", cat: "tech", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/92345213", posted: "2026-06-01" },
+  { title: "Junior IT Support",                                    company: "Thomas IT",              city: "Melbourne", cat: "tech", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=5229968a392b68fe", posted: "2026-06-01" },
+  { title: "IT Service Desk Officer",                              company: "Glen Eira City Council", city: "Melbourne", cat: "tech", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=bac62156beb6f543", posted: "2026-06-01" },
+  { title: "IT Technician",                                        company: "IT Hero",                city: "Melbourne", cat: "tech", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=fe68c7637bfbc421", posted: "2026-06-01" },
 
   // ── Tech · Brisbane · Intern ──
   { title: "Internship Resume Submission – Australia only",        company: "PsiQuantum",             city: "Brisbane",  cat: "tech", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4321200420/" },
   { title: "2026 Software Dev Engineer Intern – Brisbane (Grocery)", company: "Amazon",               city: "Brisbane",  cat: "tech", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4384162560/" },
   { title: "Intern Game Designer",                                 company: "Gameloft Brisbane",      city: "Brisbane",  cat: "tech", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4407561536/" },
+  { title: "Intern – Data & Digital Solutions",                    company: "Volvo Group",            city: "Brisbane",  cat: "tech", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4417701389/", posted: "2026-06-01" },
 
   // ── Tech · Brisbane · Graduate ──
   { title: "Technical Associate – Project-Based Contractor",       company: "Slashtech Australia",    city: "Brisbane",  cat: "tech", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4406926440/" },
@@ -1033,6 +1072,13 @@ const JOBS = [
   { title: "Graduate Developer",                                   company: "Blackbook.AI",           city: "Brisbane",  cat: "tech", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/91829219" },
   { title: "Junior IT Support Technician",                         company: "Cromwell Property Group", city: "Brisbane", cat: "tech", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=6c6f0db57e200af2" },
   { title: "Junior Full Stack Developer",                          company: "Give A Grad A Go",       city: "Brisbane",  cat: "tech", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=6f3d454c9e64502f" },
+  { title: "Software Development Graduate – 2026 (Stores)",        company: "Amazon",                 city: "Brisbane",  cat: "tech", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4287965792/", posted: "2026-06-01" },
+  { title: "Junior Desktop Engineers – Entry Level",               company: "Accenture Australia",    city: "Brisbane",  cat: "tech", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4422016719/", posted: "2026-06-01" },
+  { title: "Junior Developer – Ashurst Labs",                      company: "Ashurst",                city: "Brisbane",  cat: "tech", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4420944814/", posted: "2026-06-01" },
+  { title: "Field Tech Support",                                   company: "DXC Technology Australia & New Zealand", city: "Brisbane", cat: "tech", type: "graduate", source: "Seek", url: "https://au.seek.com/job/92265825", posted: "2026-06-01" },
+  { title: "IT Support Officer",                                   company: "Diabetes Australia",     city: "Brisbane",  cat: "tech", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/92401619", posted: "2026-06-01" },
+  { title: "IT Support Officer (12-month Contract)",               company: "RSL Queensland",         city: "Brisbane",  cat: "tech", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=61d2803e319e5767", posted: "2026-06-01" },
+  { title: "Software Developer",                                   company: "WorkingMouse",           city: "Brisbane",  cat: "tech", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=96316117cc5ef42f", posted: "2026-06-01" },
 
   // ── Consulting · Sydney ──
   { title: "BCG First Nations Internship and Scholarship 2026",    company: "BCG",                          city: "Sydney",    cat: "consulting", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4407347943/" },
@@ -1107,13 +1153,30 @@ const CAT_LABELS = {
 const CAT_ORDER = ["finance","accounting","tech","marketing","consulting","data"];
 const SOON_CATS = [];
 
+// Auto-expiry: roles older than FRESH_DAYS are hidden from results.
+// Entries without an explicit `posted` field default to BATCH_RESET_DATE
+// (today's reset point), so the 14-day clock starts now for all current data.
+const FRESH_DAYS = 14;
+const BATCH_RESET_DATE = "2026-05-30";
+function isFresh(j) {
+  const posted = j.posted || BATCH_RESET_DATE;
+  const postedTs = Date.parse(posted);
+  if (isNaN(postedTs)) return true; // bad date → don't hide
+  const ageDays = (Date.now() - postedTs) / (1000 * 60 * 60 * 24);
+  return ageDays <= FRESH_DAYS;
+}
+
 let activeCat = "finance";
 let activeCity = "all";
 let q = "";
 
 function rowHTML(j) {
+  const safe = (s) => String(s || "").replace(/"/g, "&quot;");
   return `
-    <a href="${j.url}" target="_blank" rel="noopener" class="job-row">
+    <a href="${j.url}" target="_blank" rel="noopener" class="job-row"
+       data-company="${safe(j.company)}" data-title="${safe(j.title)}"
+       data-source="${safe(j.source)}" data-category="${safe(j.cat)}"
+       data-city="${safe(j.city)}" data-url="${safe(j.url)}">
       <div class="job-info">
         <div class="job-title">${j.title}</div>
         <div class="job-sub">${j.company}&nbsp;&nbsp;·&nbsp;&nbsp;${j.city}</div>
@@ -1155,7 +1218,8 @@ function render() {
     const catOK = sq || activeCat === "all" || j.cat === activeCat;
     const cityOK = activeCity === "all" || j.city === activeCity;
     const textOK = !sq || j.title.toLowerCase().includes(sq) || j.company.toLowerCase().includes(sq);
-    return catOK && cityOK && textOK;
+    const freshOK = isFresh(j);
+    return catOK && cityOK && textOK && freshOK;
   });
 
   document.getElementById("conversionCta").style.display = filtered.length ? "block" : "none";
@@ -1238,13 +1302,28 @@ document.querySelectorAll("#roleChips .role-chip").forEach(function(chip) {
 });
 
 document.getElementById("jobList").addEventListener("click", function(e) {
-  const btn = e.target.closest(".show-more-btn");
-  if (!btn) return;
-  const extra = document.getElementById(btn.dataset.extra);
-  const n = btn.dataset.count;
-  const isOpen = extra.style.display !== "none";
-  extra.style.display = isOpen ? "none" : "block";
-  btn.innerHTML = isOpen ? `Show ${n} more role${n > 1 ? "s" : ""} &#9660;` : `Show less &#9650;`;
+  // Show more / show less toggle
+  const moreBtn = e.target.closest(".show-more-btn");
+  if (moreBtn) {
+    const extra = document.getElementById(moreBtn.dataset.extra);
+    const n = moreBtn.dataset.count;
+    const isOpen = extra.style.display !== "none";
+    extra.style.display = isOpen ? "none" : "block";
+    moreBtn.innerHTML = isOpen ? `Show ${n} more role${n > 1 ? "s" : ""} &#9660;` : `Show less &#9650;`;
+    return;
+  }
+
+  // Job row click → GA4 click-tracking
+  const rowLink = e.target.closest(".job-row");
+  if (rowLink && typeof gtag === "function") {
+    gtag("event", "job_click", {
+      company: rowLink.dataset.company,
+      title: rowLink.dataset.title,
+      source: rowLink.dataset.source,
+      category: rowLink.dataset.category,
+      city: rowLink.dataset.city
+    });
+  }
 });
 
 // Int Student MCQ behaves like the role chips
@@ -1281,6 +1360,26 @@ document.addEventListener("keydown", function(e) {
 // Job-alerts signup → submit, then open consultation modal
 document.getElementById("emailForm").addEventListener("submit", function(e) {
   e.preventDefault();
+
+  // Enforce chip-based questions: all three groups must have a selection
+  var intStudentVal = (document.getElementById("hiddenIntStudent").value || "").trim();
+  var industriesVal = (document.getElementById("hiddenIndustries").value || "").trim();
+  var roleTypeVal   = (document.getElementById("hiddenRoleType").value || "").trim();
+
+  var missing = [];
+  if (!intStudentVal) missing.push("Are you an international student?");
+  if (!industriesVal) missing.push("Which industries are you open to?");
+  if (!roleTypeVal)   missing.push("What type of roles are you looking for?");
+
+  if (missing.length) {
+    alert("Please answer the following before submitting:\n\n• " + missing.join("\n• "));
+    // Scroll to the first missing chip group so the user sees it
+    var firstMissingId = !intStudentVal ? "intStudentChips" : (!industriesVal ? "industryChips" : "roleChips");
+    var el = document.getElementById(firstMissingId);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
+
   var data = new FormData(this);
   fetch("/", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams(data).toString()

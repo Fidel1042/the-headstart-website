@@ -1,0 +1,151 @@
+/* ── Section dividers + font-size floor (designer feedback) ── */
+
+/* Subtle gold divider between sections — visible cue that one block ends
+   and another begins. Most aggressive on mobile where the eye needs help. */
+@media (max-width: 700px) {
+  main > section,
+  main > .section,
+  main > .section-alt {
+    position: relative;
+  }
+  main > section + section::before,
+  main > section + .section::before,
+  main > section + .section-alt::before,
+  main > .section + section::before,
+  main > .section + .section::before,
+  main > .section + .section-alt::before,
+  main > .section-alt + section::before,
+  main > .section-alt + .section::before,
+  main > .section-alt + .section-alt::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 64%;
+    max-width: 260px;
+    height: 1px;
+    background: linear-gradient(90deg,
+      transparent,
+      rgba(199, 155, 59, 0.55),
+      transparent);
+  }
+
+  /* Mobile alternation: every second section gets a faint card-like background
+     so the rhythm of sections is obvious as the user scrolls. */
+  main > section:nth-of-type(even),
+  main > .section:nth-of-type(even) {
+    background: rgba(255, 255, 255, 0.018);
+  }
+}
+
+/* Slightly tighter desktop hint divider — keeps long pages from feeling like one wall */
+@media (min-width: 701px) {
+  .home-page main > section + section,
+  .home-page main > .section + .section,
+  .home-page main > .section-alt + .section,
+  .home-page main > .section + .section-alt {
+    position: relative;
+  }
+  .home-page main > section + section::before,
+  .home-page main > .section + .section::before,
+  .home-page main > .section-alt + .section::before,
+  .home-page main > .section + .section-alt::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 36%;
+    max-width: 220px;
+    height: 1px;
+    background: linear-gradient(90deg,
+      transparent,
+      rgba(199, 155, 59, 0.22),
+      transparent);
+  }
+}
+
+/* ── Mobile heading unification ──
+   All section headlines on mobile render in the same size + weight +
+   leading so the page doesn't have one giant H2 next to a tiny H1. */
+@media (max-width: 700px) {
+  main h1,
+  main h2,
+  .page-hero-text h1,
+  .section-title-row h2,
+  .mentoring-title,
+  .about-real__subhead,
+  .pain-quiz__head h2,
+  .home-sec-head h2,
+  .headline-standalone__title {
+    font-size: clamp(1.6rem, 6vw, 1.9rem) !important;
+    font-weight: 700 !important;
+    line-height: 1.22 !important;
+    letter-spacing: -0.01em !important;
+    text-wrap: balance;
+    margin-bottom: 0.9rem;
+  }
+}
+
+/* ── Minimum legible font-size enforcement ──
+   Hard floors: 11px on mobile, 13px on desktop. Each rule overrides the
+   specific places we currently dip below the floor. */
+
+@media (min-width: 701px) {
+  .pricing-box__eyebrow,
+  .pain-quiz__pip-num,
+  .pain-quiz__bar-label strong,
+  .nav-brand-text span:last-child,
+  .nav-cta,
+  /* Job-alerts page */
+  .job-alerts-page .hero-tagline,
+  .type-count,
+  .cat-name,
+  .badge,
+  .apply-btn,
+  .tab-soon-badge,
+  .sfilter {
+    font-size: 13px !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .nav-brand-text { font-size: 11px; }
+  .nav-brand-text span:last-child { font-size: 11px; }
+  .nav-cta { font-size: 11px; }
+  .nav-links { font-size: max(11px, 0.78rem); }
+  .hero-ctas .btn { font-size: 11px; }
+  .mobile-sticky-cta p { font-size: 11px; }
+  .mobile-sticky-cta .btn { font-size: 11px; }
+  .pricing-box__eyebrow { font-size: 11px; }
+  .pain-quiz__pip-num { font-size: 11px; }
+  .pain-quiz__bar-label strong { font-size: 11px; }
+  .journey-floater__short,
+  .journey-floater__long { font-size: 11px; }
+
+  /* Job-alerts page mobile font floor */
+  .job-alerts-page .hero-tagline { font-size: 11px !important; }
+  .type-count { font-size: 11px !important; }
+  .cat-name { font-size: 11px !important; }
+  .badge { font-size: 11px !important; }
+  .apply-btn { font-size: 11px !important; }
+  .tab-soon-badge { font-size: 11px !important; }
+  .sfilter { font-size: 11px !important; }
+  /* Primary hero CTA — bumped above the floor so it reads as a CTA */
+  .hero-email-cta { font-size: 14px !important; padding: 0.6rem 1rem !important; }
+}
+
+@media (min-width: 701px) {
+  .hero-email-cta { font-size: 15px !important; }
+}
+
+@media (max-width: 540px) {
+  .journey-label { font-size: 11px !important; }
+}
+
+@media (max-width: 360px) {
+  .nav-cta { font-size: 11px; padding: 0.42rem 0.7rem; }
+  .nav-links { font-size: 11px; }
+  .hero-ctas .btn { font-size: 11px; }
+}

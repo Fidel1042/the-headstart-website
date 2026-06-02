@@ -58,3 +58,5 @@
 /blog/does-your-degree-matter-australia-international-student.html /blog/does-your-degree-matter-australia-international-student 301
 
 /blog/does-your-degree-matter-australia-international-student/index.html /blog/does-your-degree-matter-australia-international-student 301
+
+/english-html/* /:splat 301

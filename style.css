@@ -67,6 +67,8 @@
 
 /* ── Responsive utilities ── */
 @import url("css/utilities/responsive.css");
+@import url("css/utilities/section-dividers.css");
+@import url("css/utilities/spacing-rhythm.css");
 
 /* ── Careers mentor page ── */
 @import url("css/pages/careers-mentor-base.css");
