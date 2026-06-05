@@ -109,6 +109,8 @@
     }
 
     .agreement-form input[type="text"],
+    .agreement-form input[type="email"],
+    .agreement-form input[type="tel"],
     .agreement-form input[type="date"] {
       width: 100%;
       border-radius: 12px;
@@ -121,6 +123,8 @@
     }
 
     .agreement-form input[type="text"]:focus,
+    .agreement-form input[type="email"]:focus,
+    .agreement-form input[type="tel"]:focus,
     .agreement-form input[type="date"]:focus {
       border-color: rgba(247,211,125,0.88);
       box-shadow: 0 0 0 2px rgba(247,211,125,0.2);
@@ -242,6 +246,8 @@
       }
 
       .agreement-form input[type="text"],
+      .agreement-form input[type="email"],
+      .agreement-form input[type="tel"],
       .agreement-form input[type="date"] {
         font-size: 16px;
         padding: 0.72rem 0.78rem;
@@ -307,6 +313,11 @@
         <div>
           <label for="full-name">Full Name (required)</label>
           <input type="text" id="full-name" name="full_name" autocomplete="name" required />
+        </div>
+
+        <div>
+          <label for="email">Email (required)</label>
+          <input type="email" id="email" name="email" autocomplete="email" required />
         </div>
 
         <div>
@@ -453,6 +464,7 @@
         }
 
         const fullName = (document.getElementById("full-name").value || "").trim();
+        const emailValue = (document.getElementById("email").value || "").trim();
         if (!fullName) return;
 
         isSubmitting = true;
@@ -465,7 +477,7 @@
           const setupRes = await fetch("/.netlify/functions/create-stripe-setup", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name: fullName }),
+            body: JSON.stringify({ name: fullName, email: emailValue }),
           });
 
           const setupData = await setupRes.json();
@@ -476,7 +488,10 @@
           const confirmResult = await stripe.confirmCardSetup(setupData.client_secret, {
             payment_method: {
               card: cardElement,
-              billing_details: { name: fullName },
+              billing_details: {
+                name: fullName,
+                email: emailValue || undefined,
+              },
             },
           });
 
