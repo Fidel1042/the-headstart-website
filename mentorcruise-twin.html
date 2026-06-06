@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Headstart Mentoring, black &amp; gold twin mock</title>
+<style>
+:root{
+  /* Real Headstart palette: black & gold */
+  --bg:#000000; --text:#ffffff; --muted:rgba(255,255,255,.72); --muted-2:rgba(255,255,255,.55);
+  --gold:#c79b3b; --gold-light:#f5d591; --gold-eyebrow:#f7d879; --gold-hover:#ffe08d;
+  --cream:#f2e7c8; --gold-btn-text:#2b1b09;
+  --gold-grad:linear-gradient(90deg,#fdf5c4 0%,#f7d37d 35%,#c08a2d 68%,#ffeb9f 100%);
+  --card-bg:rgba(255,255,255,.02); --card-border:rgba(255,255,255,.08);
+  --tag-bg:rgba(199,155,59,.12);
+  --radius:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);line-height:1.55;background:var(--bg);-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}
+a{text-decoration:none;color:inherit}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.section{padding:84px 0}
+
+/* Gold gradient heading helper */
+.gold{background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+h1,h2,h3{line-height:1.18;letter-spacing:-.01em}
+h2.title{font-size:clamp(1.9rem,3.4vw,2.6rem);font-weight:800;text-align:center;max-width:820px;margin:0 auto 14px}
+.lede{text-align:center;color:var(--muted);max-width:660px;margin:0 auto 44px;font-size:1.06rem}
+.eyebrow{text-transform:uppercase;letter-spacing:.16em;font-size:.8rem;font-weight:700;color:var(--gold-eyebrow)}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 24px;border-radius:12px;font-weight:800;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;cursor:pointer;border:none;transition:transform .15s ease,box-shadow .2s ease,background .2s ease}
+.btn:hover{transform:translateY(-2px)}
+.btn-gold{background:var(--gold-grad);color:var(--gold-btn-text);box-shadow:0 8px 22px rgba(199,155,59,.25)}
+.btn-gold:hover{box-shadow:0 12px 28px rgba(199,155,59,.4)}
+.btn-outline{background:transparent;color:var(--gold-light);border:1.5px solid rgba(199,155,59,.5)}
+.btn-outline:hover{background:rgba(199,155,59,.1)}
+
+/* NAV */
+header.nav{position:sticky;top:0;z-index:50;background:rgba(0,0,0,.82);backdrop-filter:blur(10px);border-bottom:1px solid var(--card-border)}
+.nav-inner{display:flex;align-items:center;gap:26px;height:70px}
+.logo{font-weight:800;font-size:1.25rem;color:#fff;letter-spacing:-.02em}
+.logo span{color:var(--gold)}
+.nav-links{display:flex;gap:22px;margin-left:10px}
+.nav-links a{color:var(--muted);font-size:.92rem;font-weight:500}
+.nav-links a:hover{color:var(--gold-light)}
+.nav-cta{margin-left:auto;display:flex;align-items:center;gap:14px}
+.nav-cta .signin{color:var(--muted);font-weight:600;font-size:.92rem}
+.nav-cta .signin:hover{color:var(--gold-light)}
+
+/* HERO */
+.hero{background:radial-gradient(120% 120% at 50% 0%,rgba(199,155,59,.14) 0%,#0a0a0a 45%,#000 80%);text-align:center;padding:88px 0 0}
+.hero h1{font-size:clamp(2.2rem,5vw,3.5rem);font-weight:800;max-width:820px;margin:0 auto 18px}
+.hero p.sub{color:var(--muted);font-size:1.12rem;max-width:580px;margin:0 auto 32px}
+.searchbar{display:flex;gap:8px;background:rgba(255,255,255,.05);border:1px solid var(--card-border);border-radius:16px;padding:8px;max-width:560px;margin:0 auto}
+.searchbar input{flex:1;border:none;outline:none;font-size:1rem;padding:0 14px;color:#fff;background:transparent}
+.searchbar input::placeholder{color:var(--muted-2)}
+.hero-avatars{display:flex;justify-content:center;gap:18px;margin:54px auto 0;flex-wrap:wrap;padding-bottom:78px}
+.avatar-card{width:150px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:16px;padding:14px;text-align:center}
+.avatar-card.featured{transform:translateY(-16px);background:rgba(199,155,59,.08);border-color:rgba(199,155,59,.3)}
+.avatar-card img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:12px;margin-bottom:10px}
+.avatar-card .nm{font-weight:700;font-size:.9rem;color:#fff}
+.avatar-card .rl{font-size:.76rem;color:var(--muted);margin-bottom:8px}
+.avatar-card .mini{display:inline-block;font-size:.72rem;background:var(--gold-grad);color:var(--gold-btn-text);padding:3px 12px;border-radius:20px;font-weight:700}
+
+/* LOGO MARQUEE */
+.logobar{background:#050505;padding:42px 0;border-top:1px solid var(--card-border);border-bottom:1px solid var(--card-border);overflow:hidden}
+.logobar p{text-align:center;color:var(--muted-2);font-size:.82rem;font-weight:600;text-transform:uppercase;letter-spacing:.12em;margin-bottom:26px}
+.marquee{position:relative;width:100%;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.marquee__track{display:flex;width:max-content;gap:64px;align-items:center;animation:scroll 34s linear infinite}
+.marquee:hover .marquee__track{animation-play-state:paused}
+.marquee__track img{height:34px;width:auto;filter:brightness(0) invert(1);opacity:.55;transition:.2s}
+.marquee__track img:hover{opacity:1}
+@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media(prefers-reduced-motion:reduce){.marquee__track{animation:none;flex-wrap:wrap;justify-content:center;width:auto}}
+
+/* PAIN POINTS */
+.pain{background:linear-gradient(160deg,#161616,#0b0b0b);text-align:center}
+.pain h2{font-size:clamp(1.9rem,3.6vw,2.7rem);font-weight:800;margin:10px auto 12px;max-width:720px}
+.pain .rotator{font-size:clamp(1.6rem,4vw,2.6rem);font-weight:800;min-height:1.4em;margin-bottom:30px}
+.pain-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:34px}
+.pain-card{background:var(--card-bg);border:1px solid rgba(199,155,59,.25);border-radius:var(--radius);padding:24px;font-weight:600;color:#fff}
+
+/* HELP AREAS */
+.help{background:linear-gradient(180deg,#0d0d0d,#131313)}
+.help-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.help-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius);padding:24px;display:flex;flex-direction:column}
+.help-card .ico{width:44px;height:44px;border-radius:12px;background:var(--tag-bg);color:var(--gold-light);display:grid;place-items:center;font-size:1.2rem;font-weight:700;margin-bottom:14px}
+.help-card h3{font-size:1.08rem;margin-bottom:8px;color:var(--gold-light)}
+.help-card p{font-size:.92rem;color:var(--muted)}
+
+/* JOURNEY */
+.journey{background:radial-gradient(100% 100% at 50% 0%,rgba(199,155,59,.08),#000 60%)}
+.jrow{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:860px;margin:0 auto}
+.jcard{background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius);padding:28px;display:flex;flex-direction:column}
+.jcard .step-no{font-size:.78rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-eyebrow);margin-bottom:8px}
+.jcard h3{font-size:1.3rem;color:var(--gold-light);margin-bottom:10px}
+.jcard p{color:var(--muted);font-size:.95rem;margin-bottom:14px}
+.jcard ul{list-style:none;display:grid;gap:9px;margin-top:auto}
+.jcard li{display:flex;gap:10px;font-size:.9rem;color:var(--muted)}
+.jcard li::before{content:"✓";color:var(--gold);font-weight:800}
+.center-cta{text-align:center;margin-top:42px}
+
+/* STATS */
+.stats{background:linear-gradient(90deg,#1a1712,#0d0b08);padding:54px 0}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;text-align:center}
+.stat .num{font-size:clamp(2rem,4vw,2.8rem);font-weight:800}
+.stat .lbl{color:var(--muted);font-size:.95rem}
+
+/* MENTOR GRID */
+.mentors-sec{background:linear-gradient(180deg,#0a0a0a,#101010)}
+.filters{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:34px}
+.chip{border:1px solid var(--card-border);background:var(--card-bg);color:var(--muted);padding:8px 16px;border-radius:30px;font-size:.85rem;font-weight:600;cursor:pointer;transition:.15s}
+.chip:hover,.chip.active{background:var(--gold-grad);color:var(--gold-btn-text);border-color:transparent}
+.mentor-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.m-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius);padding:20px;display:flex;flex-direction:column;transition:transform .18s ease,border-color .2s ease}
+.m-card:hover{transform:translateY(-4px);border-color:rgba(199,155,59,.35)}
+.m-card .top{display:flex;gap:14px;align-items:center;margin-bottom:8px}
+.m-card .top img{width:58px;height:58px;border-radius:14px;object-fit:cover}
+.m-card .nm{font-weight:700;font-size:1.02rem;color:#fff}
+.m-card .rl{font-size:.82rem;color:var(--muted-2)}
+.m-card .headline{font-size:.95rem;font-weight:600;color:var(--gold-light);margin-bottom:10px;min-height:2.8em}
+.m-card .bio{font-size:.88rem;color:var(--muted);margin-bottom:14px;min-height:5em}
+.tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:18px;min-height:30px}
+.tag{font-size:.72rem;background:var(--tag-bg);color:var(--gold-light);padding:4px 10px;border-radius:20px;font-weight:600}
+.m-card .btn{margin-top:auto;width:100%}
+
+/* REVIEW DIVIDER STRIP */
+.tstrip{background:#000;text-align:center;padding:74px 0}
+.tstrip .stars{color:var(--gold-light);font-size:1.1rem;letter-spacing:3px;margin-bottom:18px}
+.tstrip blockquote{font-size:clamp(1.2rem,2.4vw,1.7rem);font-weight:600;max-width:780px;margin:0 auto 24px;line-height:1.4;color:var(--cream);font-style:italic}
+.tstrip .person{display:flex;gap:12px;align-items:center;justify-content:center}
+.tstrip .person img{width:46px;height:46px;border-radius:50%;object-fit:cover}
+.tstrip .person .who{text-align:left}
+.tstrip .person .who b{display:block;font-size:.95rem;color:#fff}
+.tstrip .person .who small{color:var(--muted-2)}
+
+/* COST */
+.cost{background:linear-gradient(160deg,#17120a,#0a0a0a)}
+.cost h2{font-size:clamp(1.9rem,3.4vw,2.5rem);font-weight:800;max-width:640px;margin:10px 0 14px}
+.cost p.sub{color:var(--muted);max-width:560px;margin-bottom:38px}
+.cost-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.cost-card{border-radius:var(--radius);padding:26px;border:1px solid var(--card-border);background:var(--card-bg)}
+.cost-card.bad{border-color:rgba(199,155,59,.18)}
+.cost-card.good{border-color:rgba(199,155,59,.5);background:rgba(199,155,59,.08)}
+.cost-card .lbl{font-size:.82rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted-2);margin-bottom:8px}
+.cost-card .amt{font-size:2rem;font-weight:800;color:#fff}
+.cost-card.good .amt{color:var(--gold-light)}
+.cost-card small{display:block;color:var(--muted);font-size:.85rem;margin-top:6px}
+.cost-note{margin-top:30px;color:var(--gold-eyebrow);font-weight:600}
+
+/* PRICING */
+.pricing{background:radial-gradient(120% 120% at 50% 0%,rgba(199,155,59,.12),#0a0a0a 60%)}
+.price-band{max-width:560px;margin:0 auto;background:var(--card-bg);border:1px solid rgba(199,155,59,.3);border-radius:24px;padding:40px;text-align:center}
+.price-band .big{font-size:3.4rem;font-weight:800;line-height:1}
+.price-band .per{color:var(--muted);margin-bottom:22px}
+.price-band ul{list-style:none;display:inline-grid;gap:12px;text-align:left;margin:0 auto 26px}
+.price-band li{display:flex;gap:10px;color:var(--muted)}
+.price-band li::before{content:"✓";color:var(--gold);font-weight:800}
+
+/* FEATURES */
+.features{background:#121212;padding:60px 0}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:30px;text-align:center}
+.feat-grid .ico{font-size:1.8rem;margin-bottom:12px}
+.feat-grid h3{font-size:1.15rem;margin-bottom:8px;color:var(--gold-light)}
+.feat-grid p{color:var(--muted);font-size:.92rem}
+
+/* REVIEWS WALL */
+.reviews{background:linear-gradient(180deg,#0d0d0d,#080808)}
+.review-grid{columns:3;column-gap:22px}
+.r-card{break-inside:avoid;background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius);padding:22px;margin-bottom:22px}
+.r-card .stars{color:var(--gold-light);font-size:.85rem;margin-bottom:10px}
+.r-card p{font-size:.93rem;color:var(--muted);margin-bottom:16px}
+.r-card .who{display:flex;gap:10px;align-items:center}
+.r-card .who img{width:40px;height:40px;border-radius:50%;object-fit:cover}
+.r-card .who b{font-size:.9rem;display:block;color:#fff}
+.r-card .who small{color:var(--muted-2);font-size:.8rem}
+
+/* BLOG */
+.blog{background:#0f0f0f}
+.blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.b-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius);padding:24px;display:flex;flex-direction:column;transition:transform .18s ease,border-color .2s ease}
+.b-card:hover{transform:translateY(-4px);border-color:rgba(199,155,59,.35)}
+.b-card .cat{font-size:.74rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.b-card h3{font-size:1.06rem;margin-bottom:10px;line-height:1.3;color:#fff}
+.b-card .read{margin-top:auto;color:var(--gold-light);font-weight:600;font-size:.9rem}
+
+/* JOB ALERTS */
+.joband{background:linear-gradient(160deg,#14110a,#0a0a0a);text-align:center}
+.joband h2{font-size:clamp(1.9rem,3.4vw,2.5rem);font-weight:800;margin:10px auto 12px;max-width:640px}
+.joband p.sub{color:var(--muted);max-width:560px;margin:0 auto 30px}
+
+/* CAREERS */
+.careers{background:#101010}
+.career-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;max-width:860px;margin:0 auto}
+.c-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius);padding:28px;display:flex;flex-direction:column}
+.c-card .role{font-size:1.3rem;font-weight:800;color:var(--gold-light);margin-bottom:4px}
+.c-card .meta{font-size:.85rem;color:var(--muted-2);margin-bottom:16px}
+.c-card ul{list-style:none;display:grid;gap:9px;margin-bottom:16px}
+.c-card li{display:flex;gap:10px;font-size:.9rem;color:var(--muted)}
+.c-card li::before{content:"›";color:var(--gold);font-weight:800}
+.c-card p{color:var(--muted);font-size:.9rem;margin-bottom:18px}
+.c-card .btn{margin-top:auto;align-self:flex-start}
+
+/* FINAL CTA */
+.finalcta{background:radial-gradient(120% 120% at 50% 0%,rgba(199,155,59,.16),#000 60%);text-align:center;padding:96px 0}
+.finalcta h2{font-size:clamp(2rem,4vw,3rem);font-weight:800;max-width:700px;margin:0 auto 16px}
+.finalcta p{color:var(--muted);max-width:520px;margin:0 auto 30px;font-size:1.08rem}
+
+/* FOOTER */
+footer{background:#050505;color:var(--muted);padding:60px 0 30px;border-top:1px solid var(--card-border)}
+.foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:40px}
+.foot-grid h4{color:var(--gold-light);font-size:.95rem;margin-bottom:14px}
+.foot-grid a{display:block;color:var(--muted);font-size:.9rem;margin-bottom:9px}
+.foot-grid a:hover{color:var(--gold-light)}
+.foot-brand p{font-size:.9rem;margin-top:12px;max-width:280px}
+.foot-bottom{border-top:1px solid var(--card-border);padding-top:24px;text-align:center;font-size:.85rem;color:var(--muted-2)}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .nav-links{display:none}
+  .jrow,.career-grid{grid-template-columns:1fr}
+  .mentor-grid,.help-grid,.feat-grid,.stats-grid,.pain-cards,.cost-grid,.blog-grid{grid-template-columns:1fr}
+  .review-grid{columns:1}
+  .section{padding:60px 0}
+  .btn{min-height:44px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a href="#" class="logo">Head<span>start</span></a>
+    <nav class="nav-links">
+      <a href="#mentors">Mentors</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#reviews">Reviews</a>
+      <a href="#joband">Job Alerts</a>
+      <a href="#blog">Blog</a>
+      <a href="#careers">Careers</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="#" class="signin">Sign in</a>
+      <a href="#pricing" class="btn btn-gold">Free Career Call</a>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap">
+    <h1 class="gold">What do you want to land next?</h1>
+    <p class="sub">1-on-1 mentoring from mentors already in your target industry. Same uni. Same visa stress. They just did it first.</p>
+    <form class="searchbar" onsubmit="return false">
+      <input type="text" placeholder="Try ‘consulting’, ‘visa transition’, or ‘CommBank’" />
+      <button class="btn btn-gold">Find a mentor</button>
+    </form>
+    <div class="hero-avatars">
+      <div class="avatar-card"><img src="images/Mentors/aiden new.jpg" alt="Aidan" /><div class="nm">Aidan</div><div class="rl">Analytics</div><span class="mini">View</span></div>
+      <div class="avatar-card featured"><img src="images/Mentors/fidel new.jpg" alt="Fidel" /><div class="nm">Fidel</div><div class="rl">Co-founder</div><span class="mini">View</span></div>
+      <div class="avatar-card"><img src="images/Mentors/deepika new.jpg" alt="Deepika" /><div class="nm">Deepika</div><div class="rl">Finance</div><span class="mini">View</span></div>
+      <div class="avatar-card featured"><img src="images/Mentors/koda new.jpg" alt="Koda" /><div class="nm">Koda</div><div class="rl">Software</div><span class="mini">View</span></div>
+      <div class="avatar-card"><img src="images/Mentors/angel new.jpg" alt="Angelica" /><div class="nm">Angelica</div><div class="rl">Tech consulting</div><span class="mini">View</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- LOGO MARQUEE -->
+<section class="logobar">
+  <div class="wrap"><p>Where our mentors have worked, and where our students have landed</p></div>
+  <div class="marquee">
+    <div class="marquee__track">
+      <img src="images/Logos/Deliotte.webp" alt="Deloitte" />
+      <img src="images/Logos/macquarie-bank-limited-logo-black-and-white.png" alt="Macquarie" />
+      <img src="images/Logos/woolworths.png" alt="Woolworths" />
+      <img src="images/Logos/Nestle.png" alt="Nestle" />
+      <img src="images/Logos/Grant_Thornton_logo.png" alt="Grant Thornton" />
+      <img src="images/Logos/Kimberly-Clark.avif" alt="Kimberly-Clark" />
+      <img src="images/Logos/Visagio.jpeg" alt="Visagio" />
+      <img src="images/Logos/prysmain.webp" alt="Prysmian" />
+      <img src="images/Logos/Stuart-Alexander.png" alt="Stuart Alexander" />
+      <img src="images/Logos/Fedex-logo.png" alt="FedEx" />
+      <img src="images/Logos/USYD-logo.png" alt="USYD" />
+      <img src="images/Logos/UNSW.png" alt="UNSW" />
+      <img src="images/Logos/Deliotte.webp" alt="" aria-hidden="true" />
+      <img src="images/Logos/macquarie-bank-limited-logo-black-and-white.png" alt="" aria-hidden="true" />
+      <img src="images/Logos/woolworths.png" alt="" aria-hidden="true" />
+      <img src="images/Logos/Nestle.png" alt="" aria-hidden="true" />
+      <img src="images/Logos/Grant_Thornton_logo.png" alt="" aria-hidden="true" />
+      <img src="images/Logos/Kimberly-Clark.avif" alt="" aria-hidden="true" />
+      <img src="images/Logos/Visagio.jpeg" alt="" aria-hidden="true" />
+      <img src="images/Logos/prysmain.webp" alt="" aria-hidden="true" />
+      <img src="images/Logos/Stuart-Alexander.png" alt="" aria-hidden="true" />
+      <img src="images/Logos/Fedex-logo.png" alt="" aria-hidden="true" />
+      <img src="images/Logos/USYD-logo.png" alt="" aria-hidden="true" />
+      <img src="images/Logos/UNSW.png" alt="" aria-hidden="true" />
+    </div>
+  </div>
+</section>
+
+<!-- PAIN POINTS -->
+<section class="section pain">
+  <div class="wrap">
+    <p class="eyebrow">Be honest, is this you?</p>
+    <h2 class="gold">You are doing the work. The results just are not coming.</h2>
+    <div class="rotator gold" id="rotator">100 jobs applied, 0 interviews?</div>
+    <div class="pain-cards">
+      <div class="pain-card">100 jobs applied, but 0 interviews?</div>
+      <div class="pain-card">Getting auto-rejected because of your visa status?</div>
+      <div class="pain-card">Graduating soon without an offer?</div>
+    </div>
+  </div>
+</section>
+
+<!-- HELP AREAS -->
+<section class="section help">
+  <div class="wrap">
+    <p class="eyebrow" style="text-align:center;display:block">Which part of the job search can we help?</p>
+    <h2 class="title gold">Every stage. Your mentor went through the exact same pain.</h2>
+    <p class="lede">They know how to navigate it because they already did, here, as international students.</p>
+    <div class="help-grid">
+      <div class="help-card"><div class="ico">🧭</div><h3>Career direction</h3><p>Map your skills to specific grad roles and understand what realistic options you have.</p></div>
+      <div class="help-card"><div class="ico">📄</div><h3>Resume sharpening</h3><p>Feedback on your resume to make sure it passes the screening on your applications.</p></div>
+      <div class="help-card"><div class="ico">in</div><h3>LinkedIn optimisation</h3><p>Headline, About section, and all the parts of your profile that make you stand out.</p></div>
+      <div class="help-card"><div class="ico">🤝</div><h3>Networking &amp; outreach</h3><p>Who to connect with, how to message them, and how to act in coffee chats.</p></div>
+      <div class="help-card"><div class="ico">🎯</div><h3>Application strategy</h3><p>Tailor each application, know which jobs to prioritise, and stand out from the 400 other resumes in the pile.</p></div>
+      <div class="help-card"><div class="ico">🎤</div><h3>Interview practice</h3><p>Mock interviews built around the roles you are actually applying for.</p></div>
+      <div class="help-card"><div class="ico">📝</div><h3>Offer &amp; negotiation</h3><p>Read the offer properly and ask for what the role is worth without overstepping.</p></div>
+      <div class="help-card"><div class="ico">🛂</div><h3>Visa &amp; life admin</h3><p>The stuff no one talks about. Visa, tax, and which job sites actually reply.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- JOURNEY -->
+<section class="section journey" id="how">
+  <div class="wrap">
+    <p class="eyebrow" style="text-align:center;display:block">How it works</p>
+    <h2 class="title gold">Two simple steps, and the first one is free</h2>
+    <p class="lede">A free call to find your fit, then pay-as-you-go sessions when you want them.</p>
+    <div class="jrow">
+      <div class="jcard">
+        <div class="step-no">Step 1</div>
+        <h3>Initial consultation</h3>
+        <p>A free call to understand where you are stuck and match you with the right mentor.</p>
+        <ul><li>No card, no pressure</li><li>Matched to a mentor for you</li><li>Change mentors at no extra cost</li></ul>
+      </div>
+      <div class="jcard">
+        <div class="step-no">Step 2</div>
+        <h3>Ongoing mentoring</h3>
+        <p>1-on-1 sessions with your matched mentor, booked when you need them.</p>
+        <ul><li>Mentors who were once international students</li><li>$30 a session, pay as you go</li><li>No bundles, no lock-in</li></ul>
+      </div>
+    </div>
+    <div class="center-cta"><a href="#mentors" class="btn btn-gold">Meet our mentors</a></div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="wrap stats-grid">
+    <div class="stat"><div class="num gold">9</div><div class="lbl">Mentors, every one interviewed first</div></div>
+    <div class="stat"><div class="num gold">$30</div><div class="lbl">A session. One price, no lock-in</div></div>
+    <div class="stat"><div class="num gold">Free</div><div class="lbl">First call, always</div></div>
+  </div>
+</section>
+
+<!-- MENTOR GRID -->
+<section class="section mentors-sec" id="mentors">
+  <h2 class="title gold">Meet your mentors</h2>
+  <p class="lede">We have been through exactly what you are facing. We are all hirable. What most of us lacked was the ability to show it. We help you explain it in a way that impresses local hiring managers.</p>
+  <div class="wrap">
+    <div class="filters">
+      <span class="chip active">All</span>
+      <span class="chip">Finance &amp; Accounting</span>
+      <span class="chip">Tech</span>
+      <span class="chip">Analytics</span>
+      <span class="chip">Marketing</span>
+      <span class="chip">Consulting</span>
+    </div>
+    <div class="mentor-grid">
+
+      <div class="m-card">
+        <div class="top"><img src="images/Mentors/fidel new.jpg" alt="Fidel" /><div><div class="nm">Fidel</div><div class="rl">Category Analyst</div></div></div>
+        <div class="headline">From Hong Kong student with an accent to 4 grad offers</div>
+        <p class="bio">Came here as an international student with an accent. I can help you connect to local hiring managers in ways that make you desirable.</p>
+        <div class="tags"><span class="tag">Analytics</span><span class="tag">Marketing</span></div>
+        <a href="#" class="btn btn-gold">Book a free session</a>
+      </div>
+
+      <div class="m-card">
+        <div class="top"><img src="images/Mentors/koko new.jpg" alt="Koko" /><div><div class="nm">Koko</div><div class="rl">Marketing &amp; Sales Graduate</div></div></div>
+        <div class="headline">1 of the 2 grads hired out of 450 applications</div>
+        <p class="bio">To be confident in an interview, first understand what makes you different. I help you find what to talk about beyond your degree and societies.</p>
+        <div class="tags"><span class="tag">Marketing</span></div>
+        <a href="#" class="btn btn-gold">Book a free session</a>
+      </div>
+
+      <div class="m-card">
+        <div class="top"><img src="images/Mentors/deepika new.jpg" alt="Deepika" /><div><div class="nm">Deepika</div><div class="rl">Finance Officer</div></div></div>
+        <div class="headline">Finance role within the government</div>
+        <p class="bio">I broke into a stable finance role here and can show you how the public sector hires graduates differently from the private side.</p>
+        <div class="tags"><span class="tag">Finance</span></div>
+        <a href="#" class="btn btn-gold">Book a free session</a>
+      </div>
+
+      <div class="m-card">
+        <div class="top"><img src="images/Mentors/angel new.jpg" alt="Angelica" /><div><div class="nm">Angelica</div><div class="rl">Tech Consultant</div></div></div>
+        <div class="headline">Broke into tech consulting as an international student</div>
+        <p class="bio">Consulting felt closed off until it was not. I help you think and present like a consultant before you are one.</p>
+        <div class="tags"><span class="tag">Tech</span><span class="tag">Consulting</span></div>
+        <a href="#" class="btn btn-gold">Book a free session</a>
+      </div>
+
+      <div class="m-card">
+        <div class="top"><img src="images/Mentors/aiden new.jpg" alt="Aidan" /><div><div class="nm">Aidan</div><div class="rl">Analyst</div></div></div>
+        <div class="headline">Landed a full-time role from a networking event</div>
+        <p class="bio">One conversation changed everything for me. I teach you how to make those conversations happen, not wait for luck.</p>
+        <div class="tags"><span class="tag">Analytics</span></div>
+        <a href="#" class="btn btn-gold">Book a free session</a>
+      </div>
+
+      <div class="m-card">
+        <div class="top"><img src="images/Mentors/koda new.jpg" alt="Koda" /><div><div class="nm">Koda</div><div class="rl">Software Engineer</div></div></div>
+        <div class="headline">SWE role with no internship experience</div>
+        <p class="bio">No internships, no problem. I focus on portfolios, technical interviews, and the communication that gets a dev grad hired here.</p>
+        <div class="tags"><span class="tag">Tech</span></div>
+        <a href="#" class="btn btn-gold">Book a free session</a>
+      </div>
+
+      <div class="m-card">
+        <div class="top"><img src="images/Mentors/raun new.jpg" alt="Raunaq" /><div><div class="nm">Raunaq</div><div class="rl">Finance Analyst</div></div></div>
+        <div class="headline">Broke into finance as an international student</div>
+        <p class="bio">From applications to assessment centres, I help you think and present the way finance teams expect before you walk in.</p>
+        <div class="tags"><span class="tag">Finance</span></div>
+        <a href="#" class="btn btn-gold">Book a free session</a>
+      </div>
+
+      <div class="m-card">
+        <div class="top"><img src="images/Mentors/wohee.jpg" alt="Wohee" /><div><div class="nm">Wohee</div><div class="rl">Banking Analyst</div></div></div>
+        <div class="headline">Worked for 2 major banks in Australia</div>
+        <p class="bio">Two banks, two very different cultures. I help you read what a firm actually wants and tailor yourself to it.</p>
+        <div class="tags"><span class="tag">Finance</span><span class="tag">Analytics</span></div>
+        <a href="#" class="btn btn-gold">Book a free session</a>
+      </div>
+
+      <div class="m-card">
+        <div class="top"><img src="images/Mentors/khaleel new.jpg" alt="Khaleel" /><div><div class="nm">Khaleel</div><div class="rl">Finance Grad &amp; Career Coach</div></div></div>
+        <div class="headline">Finance grad and career coach</div>
+        <p class="bio">I have sat on both sides, applying and coaching. I help you fix the small things that quietly cost you interviews.</p>
+        <div class="tags"><span class="tag">Finance</span><span class="tag">Consulting</span></div>
+        <a href="#" class="btn btn-gold">Book a free session</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- REVIEW DIVIDER 1 -->
+<section class="tstrip">
+  <div class="wrap">
+    <div class="stars">★★★★★</div>
+    <blockquote>“Having a mentor who did the same interview 2 years ago at the same company is the reason I got this role.”</blockquote>
+    <div class="person"><img src="images/Mentee-review/Jordan.jpg" alt="Jordan" /><div class="who"><b>Jordan</b><small>Headstart student</small></div></div>
+  </div>
+</section>
+
+<!-- COST -->
+<section class="section cost">
+  <div class="wrap">
+    <p class="eyebrow">What staying stuck costs you</p>
+    <h2 class="gold">Doing nothing has a price too. A much bigger one.</h2>
+    <p class="sub">Every month without an offer is lost salary, and for international students, a ticking visa clock on top.</p>
+    <div class="cost-grid">
+      <div class="cost-card bad"><div class="lbl">2 months without a job</div><div class="amt">~$11,000</div><small>Lost graduate salary, roughly</small></div>
+      <div class="cost-card bad"><div class="lbl">Graduate visa extension</div><div class="amt">$4,600</div><small>If you run out of time to find work</small></div>
+      <div class="cost-card good"><div class="lbl">A Headstart session</div><div class="amt">$30</div><small>And your first call is free</small></div>
+    </div>
+    <p class="cost-note">Two months stuck costs roughly 257x the price of a single session.</p>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section pricing" id="pricing">
+  <h2 class="title gold">One service. One simple price.</h2>
+  <p class="lede">No bundles. No lock-in. The same price whoever you pick.</p>
+  <div class="wrap">
+    <div class="price-band">
+      <div class="big gold">$30</div>
+      <div class="per">per 1-on-1 session</div>
+      <ul>
+        <li>Free initial consultation</li>
+        <li>Pay as you go, book when you need it</li>
+        <li>Mentors already in your target industry</li>
+        <li>Change mentors at no extra cost</li>
+        <li>No lock-in, cancel anytime</li>
+      </ul>
+      <a href="#" class="btn btn-gold">Book your free call</a>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEW DIVIDER 2 -->
+<section class="tstrip">
+  <div class="wrap">
+    <div class="stars">★★★★★</div>
+    <blockquote>“Fidel was incredibly influential to my first offer. He guided me from networking with the right people to preparing for interviews and case studies.”</blockquote>
+    <div class="person"><img src="images/Mentee-review/rapheal.jpeg" alt="Rapheal" /><div class="who"><b>Rapheal</b><small>Headstart student</small></div></div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <div class="wrap feat-grid">
+    <div><div class="ico">📞</div><h3>Free first call</h3><p>Your initial consultation costs nothing. Feel the fit before you pay for anything.</p></div>
+    <div><div class="ico">🔓</div><h3>No lock-in</h3><p>Pay per session at $30. Book when you need it, stop when you want.</p></div>
+    <div><div class="ico">✅</div><h3>Every mentor vetted</h3><p>We interview each mentor before they take a single student. No advice from strangers.</p></div>
+  </div>
+</section>
+
+<!-- REVIEWS WALL -->
+<section class="section reviews" id="reviews">
+  <h2 class="title gold">Hear it from the students</h2>
+  <p class="lede">Real words from international students who were exactly where you are now.</p>
+  <div class="wrap">
+    <div class="review-grid">
+
+      <div class="r-card"><div class="stars">★★★★★</div><p>Fidel was incredibly influential to my first offer. He guided me from networking with the right people to preparing for interviews and case studies. He is a huge reason I was able to present the best version of myself.</p><div class="who"><img src="images/Mentee-review/rapheal.jpeg" alt="Rapheal" /><div><b>Rapheal</b></div></div></div>
+
+      <div class="r-card"><div class="stars">★★★★★</div><p>I have tried free mentoring programs before, but mentors were rarely committed or tailored. Koko was the opposite. Every piece of advice was specific to my situation and actually actionable.</p><div class="who"><img src="images/Mentee-review/Amy.jpg" alt="Amy" /><div><b>Amy</b></div></div></div>
+
+      <div class="r-card"><div class="stars">★★★★★</div><p>Having a mentor who did the same interview 2 years ago at the same company is the reason I got this role.</p><div class="who"><img src="images/Mentee-review/Jordan.jpg" alt="Jordan" /><div><b>Jordan</b></div></div></div>
+
+      <div class="r-card"><div class="stars">★★★★★</div><p>I like the flexible lessons, compared to other career programs that are way more expensive. I have gotten my first ever in-person final interview.</p><div class="who"><img src="images/Mentee-review/Shreya.jpg" alt="Shreya" /><div><b>Shreya</b></div></div></div>
+
+      <div class="r-card"><div class="stars">★★★★★</div><p>The reason I passed the individual case study for my current role is the PowerPoint template he gave me. It was professional and it impressed the interviewers.</p><div class="who"><img src="images/Mentee-review/Daniel.jpg" alt="Daniel" /><div><b>Daniel</b></div></div></div>
+
+      <div class="r-card"><div class="stars">★★★★★</div><p>I thought “being unique to stand out” was a buzzword until I realised it was the main reason I got my current role.</p><div class="who"><img src="images/Mentee-review/Kyra.jpg" alt="Kyra" /><div><b>Kyra</b></div></div></div>
+
+      <div class="r-card"><div class="stars">★★★★★</div><p>I have no formal internship experience and was feeling quite behind. I got paired with a mentor who landed a full-time job with no internships either. I feel more calm about my situation.</p><div class="who"><img src="images/Mentee-review/Mary.jpg" alt="Mary" /><div><b>Mary</b></div></div></div>
+
+      <div class="r-card"><div class="stars">★★★★★</div><p>I book sessions ad hoc when I want to ask someone who has done it. It is faster than researching on my own. The life admin no one talks about: visa, tax, which job sites actually reply.</p><div class="who"><img src="images/Mentee-review/Joe.jpg" alt="Joe" /><div><b>Joe</b></div></div></div>
+
+      <div class="r-card"><div class="stars">★★★★★</div><p>I heard about Headstart through a USYD society event and gave it a go. After one 40-minute session, I had a much clearer picture of where I should be heading.</p><div class="who"><img src="images/Mentee-review/Mohit.jpg" alt="Mohit" /><div><b>Mohit</b></div></div></div>
+
+    </div>
+  </div>
+</section>
+
+<!-- BLOG -->
+<section class="section blog" id="blog">
+  <p class="eyebrow" style="text-align:center;display:block">From the blog</p>
+  <h2 class="title gold">Straight answers about the Australian job hunt</h2>
+  <p class="lede">No fluff. The things we wish someone had told us as international students.</p>
+  <div class="wrap">
+    <div class="blog-grid">
+      <a class="b-card" href="#"><div class="cat">Job market</div><h3>Is the Australian graduate job market getting harder? Here is what the data says</h3><div class="read">Read article →</div></a>
+      <a class="b-card" href="#"><div class="cat">Networking</div><h3>How to network in Australia as an international student</h3><div class="read">Read article →</div></a>
+      <a class="b-card" href="#"><div class="cat">Mindset</div><h3>Your degree does not get you hired in Australia as an international student</h3><div class="read">Read article →</div></a>
+      <a class="b-card" href="#"><div class="cat">Interviews</div><h3>Why international students fail Australian interviews, even with good English</h3><div class="read">Read article →</div></a>
+      <a class="b-card" href="#"><div class="cat">Interviews</div><h3>One-way video interviews: the worst invention in recruiting</h3><div class="read">Read article →</div></a>
+      <a class="b-card" href="#"><div class="cat">Resume</div><h3>Resume experience alignment for graduate jobs in Australia</h3><div class="read">Read article →</div></a>
+      <a class="b-card" href="#"><div class="cat">Honesty</div><h3>Read this if you have faked a story in a job interview before</h3><div class="read">Read article →</div></a>
+      <a class="b-card" href="#"><div class="cat">Visa</div><h3>Temporary graduate visa fee increase 2026: what it means for you</h3><div class="read">Read article →</div></a>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEW DIVIDER 3 -->
+<section class="tstrip">
+  <div class="wrap">
+    <div class="stars">★★★★★</div>
+    <blockquote>“Every piece of advice was specific to my situation and actually actionable.”</blockquote>
+    <div class="person"><img src="images/Mentee-review/Amy.jpg" alt="Amy" /><div class="who"><b>Amy</b><small>Headstart student</small></div></div>
+  </div>
+</section>
+
+<!-- JOB ALERTS -->
+<section class="section joband" id="joband">
+  <div class="wrap">
+    <p class="eyebrow" style="display:block">Job alerts</p>
+    <h2 class="gold">Fresh internship and grad roles, sorted for you</h2>
+    <p class="sub">We track new openings across the big firms and post the ones worth your time, so you stop scrolling job boards alone.</p>
+    <a href="#" class="btn btn-gold">See the latest roles</a>
+  </div>
+</section>
+
+<!-- CAREERS -->
+<section class="section careers" id="careers">
+  <h2 class="title gold">Work with us</h2>
+  <p class="lede">Current openings at Headstart Mentoring. Choose a role to view full details.</p>
+  <div class="wrap">
+    <div class="career-grid">
+
+      <div class="c-card">
+        <div class="role">Early Career Mentor</div>
+        <div class="meta">Headstart Mentoring · Remote</div>
+        <ul>
+          <li>Flexible sessions around your full-time schedule</li>
+          <li>Direct impact on uni students and fresh grads</li>
+          <li>Paid mentoring with structured support resources</li>
+        </ul>
+        <p>We are hiring mentors with proven job-search experience in Australia to guide students through resumes, interviews, and internship strategy.</p>
+        <a href="#" class="btn btn-outline">View role</a>
+      </div>
+
+      <div class="c-card">
+        <div class="role">Growth Intern</div>
+        <div class="meta">Headstart Mentoring · Remote</div>
+        <ul>
+          <li>Free career mentoring sessions with the founder</li>
+          <li>Commission-based pay after proving yourself</li>
+          <li>Low pressure, spark conversations and drive consultations</li>
+        </ul>
+        <p>Are you a 1st or 2nd year student on the exec team of a university international, business, or tech society? We are hiring 3 Growth Interns.</p>
+        <a href="#" class="btn btn-outline">View role</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="finalcta">
+  <div class="wrap">
+    <h2 class="gold">Your first call is free. What are you waiting for?</h2>
+    <p>Book a free initial consultation, meet your mentor, and find out what your next move actually is.</p>
+    <a href="#pricing" class="btn btn-gold">Book your free career call</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a href="#" class="logo">Head<span>start</span></a>
+        <p>1-on-1 online mentoring for international students in Australia. Mentors who have lived the same job hunt and now guide you through it.</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <a href="#mentors">Mentors</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#reviews">Reviews</a>
+        <a href="#joband">Job Alerts</a>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <a href="#blog">Blog</a>
+        <a href="#careers">Careers</a>
+        <a href="#how">How it works</a>
+        <a href="#pricing">Free Career Call</a>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <a href="#">info@headstart.com</a>
+        <a href="#">LinkedIn</a>
+        <a href="#">Instagram</a>
+      </div>
+    </div>
+    <div class="foot-bottom">© 2026 Headstart Mentoring. Black &amp; gold twin mock for design review only.</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var lines = [
+    "100 jobs applied, 0 interviews?",
+    "Getting auto-rejected because of visa status?",
+    "Graduating soon without an offer?"
+  ];
+  var el = document.getElementById('rotator');
+  if(!el) return;
+  var i = 0;
+  el.style.transition = 'opacity .25s ease';
+  setInterval(function(){
+    i = (i + 1) % lines.length;
+    el.style.opacity = 0;
+    setTimeout(function(){ el.textContent = lines[i]; el.style.opacity = 1; }, 250);
+  }, 2600);
+})();
+</script>
+
+</body>
+</html>

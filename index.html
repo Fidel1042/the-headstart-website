@@ -949,7 +949,7 @@
                 <li>Change mentors at no extra cost</li>
               </ul>
               <div class="pricing-box__price">
-                <span class="pricing-box__amount">$30</span><span class="pricing-box__unit">/session</span>
+                <span class="pricing-box__amount">$35</span><span class="pricing-box__unit">/session</span>
               </div>
               <a class="pricing-box__cta" href="/discovery-call">Book a free call &rarr;</a>
             </div>
@@ -1028,7 +1028,7 @@
               <span class="cost-calc__total-label">Total cost of staying stuck</span>
               <span class="cost-calc__total-value" id="home-calc-grand">$13,600+</span>
             </div>
-            <p class="cost-calc__note">Our sessions are $30 each. <span id="home-calc-note-months">2 months</span> without a job costs you roughly <strong class="cost-calc__multiplier" id="home-calc-multiplier">300x</strong> that in salary alone.</p>
+            <p class="cost-calc__note">Our sessions are $35 each. <span id="home-calc-note-months">2 months</span> without a job costs you roughly <strong class="cost-calc__multiplier" id="home-calc-multiplier">257x</strong> that in salary alone.</p>
           </div>
         </div>
       </section>
@@ -1141,7 +1141,7 @@
       if (noteEl) noteEl.textContent = monthLabel;
       var newSal   = Math.round(HOME_SALARY * months);
       var newGrand = newSal + HOME_VISA;
-      var newMult  = Math.round(newSal / 30);
+      var newMult  = Math.round(newSal / 35);
       homeTween("salary", document.getElementById("home-calc-salary"), newSal,   "", "");
       homeTween("grand",  document.getElementById("home-calc-grand"),  newGrand, "", "+");
       // Tween multiplier
