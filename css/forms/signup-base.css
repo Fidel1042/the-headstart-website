@@ -102,13 +102,6 @@
     grid-template-columns: auto minmax(0, 1fr);
     padding: 0.8rem 0.85rem;
   }
-  .phone-input-group {
-    flex-direction: column;
-  }
-  .phone-input-group input[type="tel"] {
-    flex: 1;
-    max-width: 100%;
-  }
 }
 
 .phone-input-group {
@@ -137,6 +130,54 @@
 .phone-input-group input[type="tel"] {
   flex: 0 0 50%;
   max-width: 50%;
+}
+
+@media (max-width: 600px) {
+  /* Unified box: the wrapper holds the visible border, the children are flush */
+  .signup-form.multi-step .form-group.phone-field .phone-input-group {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 0 !important;
+    background: rgba(0,0,0,0.6);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 18px;
+    overflow: hidden;
+  }
+  /* Country code: fixed slot on the left with a divider to its right */
+  .signup-form.multi-step .form-group.phone-field .phone-country-field {
+    flex: 0 0 78px !important;
+    max-width: 78px !important;
+    min-width: 78px !important;
+    width: 78px !important;
+    border-right: 1px solid rgba(255,255,255,0.15);
+    background: transparent;
+  }
+  .signup-form.multi-step .form-group.phone-field .phone-country-field .search-select-field {
+    width: 100% !important;
+    height: 100%;
+  }
+  .signup-form.multi-step .form-group.phone-field .phone-country-field input {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 1rem 0.6rem !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    text-align: center;
+  }
+  /* Phone number: fills the remaining space, no border */
+  .signup-form.multi-step .form-group.phone-field .phone-input-group input[type="tel"] {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    flex: 1 1 auto !important;
+    width: auto !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    padding: 1rem 1rem !important;
+  }
 }
 
 .inline-radio-group {

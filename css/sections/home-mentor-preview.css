@@ -1,0 +1,136 @@
+/* Home mentor preview: a row of photo cards on the landing page linking to the
+   full mentors page. Follows the four card-grid alignment rules (equal height,
+   baseline CTAs, shared headline heights, shared button min-height). */
+
+.home-mentors__head {
+  text-align: left;
+  margin-bottom: 2.4rem;
+}
+
+.home-mentors__head .mentoring-title {
+  text-wrap: wrap;
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .home-mentors__head .mentoring-title {
+    white-space: normal;
+  }
+}
+
+.home-mentors__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.2rem;
+}
+
+.home-mentor-card {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 18px;
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.18s ease, border-color 0.2s ease;
+}
+
+.home-mentor-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(199,155,59,0.4);
+}
+
+.home-mentor-card__photo {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 14px;
+  margin-bottom: 0.9rem;
+}
+
+.home-mentor-card__name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.home-mentor-card__role {
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: rgba(255,255,255,0.55);
+  margin: 0.1rem 0 0.7rem;
+  min-height: 2.4em;
+}
+
+.home-mentor-card__headline {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #f5d591;
+  line-height: 1.35;
+  margin: 0 0 1.1rem;
+  min-height: 3.6em;
+}
+
+.home-mentor-card__cta {
+  margin-top: auto;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  font-size: 0.66rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #2b1b09;
+  background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
+  transition: box-shadow 0.2s ease, transform 0.15s ease;
+}
+
+.home-mentor-card__cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(199,155,59,0.35);
+}
+
+.home-mentors__all {
+  text-align: center;
+  margin-top: 2.2rem;
+}
+
+@media (max-width: 900px) {
+  .home-mentors__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .home-mentor-card__headline {
+    min-height: 0;
+  }
+  .home-mentor-card__cta {
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 720px) {
+  .home-mentors__grid {
+    display: flex;
+    grid-template-columns: none;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 0.9rem;
+    padding-bottom: 0.5rem;
+    margin-right: -1.2rem;
+    padding-right: 1.2rem;
+  }
+  .home-mentors__grid::-webkit-scrollbar {
+    display: none;
+  }
+  .home-mentor-card {
+    flex: 0 0 82%;
+    max-width: 320px;
+    scroll-snap-align: start;
+  }
+  .home-mentor-card__headline {
+    min-height: 0;
+  }
+}

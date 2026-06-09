@@ -1,0 +1,112 @@
+/* The 4-persona matrix. Click a box to select and showcase it. */
+
+.matrix {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.4rem;
+  align-items: stretch;
+  margin-top: 0.6rem;
+}
+@media (max-width: 720px) { .matrix { grid-template-columns: 1fr; } }
+
+.persona-box {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  border-radius: 18px;
+  padding: 1.7rem 1.7rem 1.8rem;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s ease, background 0.25s ease;
+}
+.persona-box:hover { transform: translateY(-4px); border-color: rgba(199, 155, 59, 0.5); }
+
+/* Reserve space so titles + tags line up across all 4 boxes */
+.persona-box__num {
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 0.5rem;
+}
+.persona-box__title {
+  font-size: 1.5rem;
+  font-weight: 750;
+  line-height: 1.2;
+  min-height: 3.6rem;
+  color: #fff;
+}
+.persona-box__tag {
+  margin-top: 0.45rem;
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.55);
+  min-height: 2.7rem;
+}
+
+/* Detail block — hidden until the box is selected */
+.persona-box__detail {
+  display: none;
+  margin-top: 1.2rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  flex: 1;
+  flex-direction: column;
+}
+.persona-box__desc { color: rgba(255, 255, 255, 0.85); font-size: 1rem; }
+.persona-box__stat {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin: 1.1rem 0 1.3rem;
+}
+.persona-box__stat-num {
+  font-size: 1.7rem;
+  font-weight: 800;
+  background: var(--gold-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.persona-box__stat-label {
+  font-size: 0.86rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.persona-box__ctas {
+  margin-top: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+
+/* ── Selected state ── */
+.persona-box.is-selected {
+  cursor: default;
+  background: linear-gradient(#0c0c0c, #0c0c0c) padding-box, var(--gold-frame) border-box;
+  border: 2px solid transparent;
+  grid-column: 1 / -1; /* selected box spans full width so detail has room */
+}
+.persona-box.is-selected:hover { transform: none; }
+.persona-box.is-selected .persona-box__num { color: rgba(247, 211, 125, 0.7); }
+.persona-box.is-selected .persona-box__title {
+  background: var(--gold-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  min-height: 0;
+}
+.persona-box.is-selected .persona-box__tag { display: none; }
+.persona-box.is-selected .persona-box__detail { display: flex; }
+
+.matrix__hint {
+  margin-top: 1.4rem;
+  font-size: 0.84rem;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.04em;
+}

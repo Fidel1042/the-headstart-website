@@ -24,6 +24,7 @@ import { init as initReviewScroller }     from "./modules/review-scroller.js";
 import { init as initReviewTranslations } from "./modules/review-translations.js";
 import { init as initPainQuiz }           from "./modules/pain-quiz.js";
 import { init as initHomeGsapAnimations } from "./modules/home-gsap-animations.js";
+import { init as initHomeReviewModal }    from "./modules/home-review-modal.js";
 
 const bootstrap = () => {
   initFooterYear();
@@ -47,6 +48,7 @@ const bootstrap = () => {
   initReviewTranslations();
   initPainQuiz();
   initHomeGsapAnimations();
+  initHomeReviewModal();
 };
 
 if (document.readyState === "loading") {

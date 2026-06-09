@@ -51,6 +51,8 @@
 @import url("css/sections/mentor-cards.css");
 @import url("css/sections/mentor-logo-bar.css");
 @import url("css/sections/mentor-flip-cards.css");
+@import url("css/sections/home-mentor-preview.css");
+@import url("css/sections/home-reviews-preview.css");
 
 /* ── Forms (signup, fields, pickers, messages, buttons) ── */
 @import url("css/forms/signup-base.css");

@@ -1,0 +1,119 @@
+/* Mentor search + cards. Fidel is always pinned as the default. */
+
+.mentor-search {
+  position: relative;
+  max-width: 520px;
+  margin: 0.4rem 0 2.2rem;
+}
+.mentor-search__input {
+  width: 100%;
+  font: inherit;
+  font-size: 1rem;
+  color: #fff;
+  padding: 0.95rem 1.1rem 0.95rem 2.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--card-border);
+  background: rgba(255, 255, 255, 0.03);
+  transition: border-color 0.2s ease;
+}
+.mentor-search__input::placeholder { color: rgba(255, 255, 255, 0.4); }
+.mentor-search__input:focus { outline: none; border-color: rgba(199, 155, 59, 0.7); }
+.mentor-search__icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 1.05rem;
+}
+.mentor-search__hint {
+  margin-top: 0.7rem;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.mentor-group-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #f7d879;
+  margin: 0 0 1rem;
+}
+.mentor-group-label:not(:first-child) { margin-top: 2.6rem; }
+
+.mentor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.4rem;
+  align-items: stretch;
+}
+
+.mentor-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 18px;
+  padding: 1.6rem;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.mentor-card:hover { transform: translateY(-4px); border-color: rgba(199, 155, 59, 0.5); }
+.mentor-card--pinned {
+  background: linear-gradient(#0c0c0c, #0c0c0c) padding-box, var(--gold-frame) border-box;
+  border: 2px solid transparent;
+}
+
+.mentor-card__top { display: flex; align-items: center; gap: 0.9rem; }
+.mentor-card__avatar {
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: #2b1b09;
+  background: linear-gradient(135deg, #fdf5c4, #f7d37d 45%, #c08a2d);
+}
+.mentor-card__avatar--photo { background: none; overflow: hidden; padding: 0; }
+.mentor-card__avatar--photo img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; }
+.mentor-card__name { font-size: 1.12rem; font-weight: 700; color: #fff; line-height: 1.2; }
+.mentor-card__pin {
+  display: inline-block;
+  margin-top: 0.2rem;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #daa520;
+}
+.mentor-card__pin--muted { color: rgba(255, 255, 255, 0.4); }
+
+.mentor-card__role { margin-top: 1rem; color: rgba(255, 255, 255, 0.85); font-size: 0.95rem; min-height: 2.7em; }
+.mentor-card__meta { margin-top: 0.5rem; color: rgba(255, 255, 255, 0.5); font-size: 0.84rem; min-height: 2.4em; }
+.mentor-card__tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.9rem; }
+.mentor-card__tag {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.7);
+  padding: 0.18rem 0.55rem;
+  border-radius: 20px;
+  border: 1px solid var(--card-border);
+  background: rgba(255, 255, 255, 0.03);
+}
+.mentor-card__best {
+  margin-top: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+.mentor-card__cta { margin-top: 1.3rem; }
+
+.mentor-empty {
+  padding: 2.4rem;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.45);
+  border: 1px dashed var(--card-border);
+  border-radius: 16px;
+}

@@ -1,0 +1,117 @@
+/* Per-persona session structure, built from the 5-stage framework. */
+
+.persona-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.4rem 0 2rem;
+}
+.persona-switch__btn {
+  font: inherit;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.5rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+  color: rgba(255, 255, 255, 0.6);
+  transition: color 0.2s, border-color 0.2s;
+}
+.persona-switch__btn:hover { color: #fff; border-color: rgba(199, 155, 59, 0.5); }
+.persona-switch__btn.is-active {
+  border-color: transparent;
+  color: #2b1b09;
+  background: linear-gradient(135deg, #fdf5c4, #f7d37d 40%, #c08a2d 80%, #ffeb9f);
+}
+
+.struct-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.8rem 1.4rem;
+  padding: 1.5rem 1.7rem;
+  border-radius: 18px;
+  background: linear-gradient(#0c0c0c, #0c0c0c) padding-box, var(--gold-frame) border-box;
+  border: 2px solid transparent;
+  margin-bottom: 2.2rem;
+}
+.struct-head__name {
+  font-size: 1.5rem;
+  font-weight: 750;
+  background: var(--gold-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.struct-head__count { color: rgba(255, 255, 255, 0.55); font-size: 0.95rem; }
+.struct-head__count strong { color: #f5d591; font-weight: 700; }
+
+.stage-list { display: flex; flex-direction: column; gap: 1.2rem; }
+
+.stage {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1.2rem;
+  padding: 1.6rem 1.7rem;
+  border-radius: 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+}
+.stage__num {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: #2b1b09;
+  background: linear-gradient(135deg, #fdf5c4, #f7d37d 45%, #c08a2d);
+}
+.stage__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 0.8rem;
+  margin-bottom: 0.8rem;
+}
+.stage__name { font-size: 1.18rem; font-weight: 700; color: #fff; }
+.stage__count {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #daa520;
+  border: 1px solid rgba(218, 165, 32, 0.4);
+  border-radius: 20px;
+  padding: 0.15rem 0.6rem;
+}
+.stage__sessions { list-style: none; display: flex; flex-direction: column; gap: 0.55rem; }
+.stage__sessions li {
+  position: relative;
+  padding-left: 1.5rem;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.96rem;
+}
+.stage__sessions li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #daa520;
+}
+
+.struct-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-top: 2.4rem;
+}
+
+@media (max-width: 600px) {
+  .stage { grid-template-columns: 1fr; gap: 0.9rem; }
+}

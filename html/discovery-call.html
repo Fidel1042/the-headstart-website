@@ -104,6 +104,63 @@
       opacity: 0;
       transform: translateY(16px);
     }
+
+    /* Phone field unified-box on mobile (inline so cascade order is guaranteed) */
+    @media (max-width: 600px) {
+      .signup-form .form-group.phone-field .phone-input-group {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: stretch !important;
+        gap: 0 !important;
+        background: rgba(0,0,0,0.6) !important;
+        border: 1px solid rgba(255,255,255,0.15) !important;
+        border-radius: 18px !important;
+        overflow: hidden !important;
+        padding: 0 !important;
+      }
+      .signup-form .form-group.phone-field .phone-country-field {
+        flex: 0 0 80px !important;
+        max-width: 80px !important;
+        min-width: 80px !important;
+        width: 80px !important;
+        border-right: 1px solid rgba(255,255,255,0.15) !important;
+        background: transparent !important;
+        position: relative !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .signup-form .form-group.phone-field .phone-country-field .search-select-field {
+        width: 100% !important;
+        height: 100% !important;
+        display: block !important;
+      }
+      .signup-form .form-group.phone-field .phone-country-field input,
+      .signup-form .form-group.phone-field .phone-country-field input[type="text"] {
+        background: transparent !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        padding: 0.95rem 0.5rem !important;
+        margin: 0 !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        text-align: center !important;
+        box-shadow: none !important;
+      }
+      .signup-form .form-group.phone-field .phone-input-group > input[type="tel"] {
+        background: transparent !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        flex: 1 1 0 !important;
+        width: auto !important;
+        max-width: none !important;
+        min-width: 0 !important;
+        padding: 0.95rem 1rem !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+      }
+    }
   </style>
 </head>
 <body class="discovery-page">
@@ -141,7 +198,7 @@
         <div class="page-hero">
           <div class="page-hero-text">
             <h1>Book a Free Initial Consultation to Find a Mentor</h1>
-            <p style="color:#aaa; margin-top:0.9rem; font-size:1.05rem; line-height:1.75;">To change your career trajectory, all you need is 30 seconds to fill your info, a 20 minute free consultation, and you will know exactly how far away you are from getting a job, and how we can help you.</p>
+    
           </div>
         </div>
       </div>
@@ -190,7 +247,7 @@
                 </div>
               </div>
               <div class="form-group">
-                <label>Are you an international student?</label>
+                <label>International student?</label>
                 <div class="inline-radio-group">
                   <label>
                     <input type="radio" name="international_student" value="yes" required />
