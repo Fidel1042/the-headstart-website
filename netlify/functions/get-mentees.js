@@ -27,7 +27,7 @@ exports.handler = async (event) => {
 
   const {
     AIRTABLE_API_TOKEN,
-    AIRTABLE_BASE_ID,
+    AIRTABLE_CORE_BASE_ID,
     AIRTABLE_MENTEE_TABLE_ID,
     AIRTABLE_MENTOR_TABLE_ID,
   } = process.env;
@@ -40,7 +40,7 @@ exports.handler = async (event) => {
   try {
     // Step 1: find the mentor's Airtable record ID by email
     const mentorRes = await fetch(
-      `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_MENTOR_TABLE_ID}` +
+      `https://api.airtable.com/v0/${AIRTABLE_CORE_BASE_ID}/${AIRTABLE_MENTOR_TABLE_ID}` +
         `?filterByFormula=${encodeURIComponent(`{Email}="${mentorEmail}"`)}` +
         `&fields[]=Email`,
       { headers: airtableHeaders }
@@ -57,10 +57,10 @@ exports.handler = async (event) => {
 
     const mentorRecordId = mentorData.records[0].id;
 
-    // Step 2: find all mentees linked to this mentor
+    // Step 2: find mentees linked to this mentor who have a session price set (i.e. signed/active)
     const menteeRes = await fetch(
-      `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_MENTEE_TABLE_ID}` +
-        `?filterByFormula=${encodeURIComponent(`FIND("${mentorRecordId}", ARRAYJOIN({Mentor}))`)}` +
+      `https://api.airtable.com/v0/${AIRTABLE_CORE_BASE_ID}/${AIRTABLE_MENTEE_TABLE_ID}` +
+        `?filterByFormula=${encodeURIComponent(`AND(FIND("${mentorRecordId}", ARRAYJOIN({Mentor})), {Session Price} > 0)`)}` +
         `&fields[]=Name`,
       { headers: airtableHeaders }
     );

@@ -35,6 +35,7 @@ exports.handler = async (event) => {
   const {
     STRIPE_SECRET_KEY,
     AIRTABLE_API_TOKEN,
+    AIRTABLE_CORE_BASE_ID,
     AIRTABLE_BASE_ID,
     AIRTABLE_MENTEE_TABLE_ID,
     AIRTABLE_SESSION_TABLE_ID,
@@ -48,7 +49,7 @@ exports.handler = async (event) => {
   try {
     // ── Step 1: get Stripe Customer ID from the mentee's Airtable record ──
     const menteeRes = await fetch(
-      `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_MENTEE_TABLE_ID}/${menteeRecordId}`,
+      `https://api.airtable.com/v0/${AIRTABLE_CORE_BASE_ID}/${AIRTABLE_MENTEE_TABLE_ID}/${menteeRecordId}`,
       { headers: airtableHeaders }
     );
     const menteeRecord = await menteeRes.json();
