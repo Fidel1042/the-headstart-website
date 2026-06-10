@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <title>P&L Statement – The Headstart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+  <style id="auth-gate">html:not(.auth-ok) body { visibility: hidden; }</style>
+  <script type="module">
+    import { requireAuth, bindSignOutButton } from "./auth.js";
+
+    requireAuth((session) => {
+      const email = session?.user?.email || "";
+
+      const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com"];
+      if (!OWNERS.includes(email) && email !== "dev@localhost") {
+        window.location.replace("/mentor-portal/index.html");
+        return;
+      }
+
+      bindSignOutButton("#signout-btn");
+      const chip = document.getElementById("user-chip");
+      if (chip && email) { chip.textContent = email; chip.hidden = false; }
+
+      loadPL();
+    });
+
+    async function loadPL() {
+      const selector   = document.getElementById("month-selector");
+      const statement  = document.getElementById("statement");
+      const emptyState = document.getElementById("empty-state");
+      const loading    = document.getElementById("loading");
+
+      loading.hidden = false;
+
+      let records = [];
+      try {
+        const res  = await fetch("/.netlify/functions/get-pl", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({}),
+        });
+        const data = await res.json();
+        records = data.records || [];
+      } catch {
+        loading.hidden = true;
+        emptyState.hidden = false;
+        emptyState.textContent = "Could not load data. Refresh to try again.";
+        return;
+      }
+
+      loading.hidden = true;
+
+      if (records.length === 0) {
+        emptyState.hidden = false;
+        return;
+      }
+
+      // Populate month dropdown
+      selector.innerHTML = records
+        .map((r) => `<option value="${r.month}">${formatMonthLabel(r.month)}</option>`)
+        .join("");
+      selector.hidden = false;
+
+      function render(month) {
+        const r = records.find((x) => x.month === month);
+        if (!r) return;
+        renderStatement(r);
+        statement.hidden = false;
+      }
+
+      selector.addEventListener("change", () => render(selector.value));
+      render(records[0].month);
+    }
+
+    function formatMonthLabel(ym) {
+      if (!ym) return ym;
+      const [y, m] = ym.split("-");
+      const d = new Date(Number(y), Number(m) - 1, 1);
+      return d.toLocaleDateString("en-AU", { month: "long", year: "numeric" });
+    }
+
+    function fmt(n) {
+      const abs  = Math.abs(n);
+      const sign = n < 0 ? "-" : "";
+      return `${sign}$${abs.toLocaleString("en-AU", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+
+    function renderStatement(r) {
+      const el = (id) => document.getElementById(id);
+
+      el("s-month").textContent        = formatMonthLabel(r.month).toUpperCase();
+      el("s-session-count").textContent = r.sessionCount;
+      el("s-gross-revenue").textContent = fmt(r.grossRevenue);
+      el("s-stripe-fees").textContent   = fmt(-r.stripeFees);
+      el("s-payouts").textContent       = fmt(-r.mentorPayouts);
+      el("s-gross-profit").textContent  = fmt(r.grossProfit);
+      el("s-gross-margin").textContent  = `${r.grossMargin}%`;
+      el("s-claude").textContent        = fmt(-r.claudePro);
+      el("s-makecom").textContent       = fmt(-r.makeCom);
+      el("s-total-opex").textContent    = fmt(-r.totalOpex);
+      el("s-net-profit").textContent    = fmt(r.netProfit);
+      el("s-net-margin").textContent    = `${r.netMargin}%`;
+
+      // Colour net profit
+      const netEl = el("s-net-profit");
+      netEl.classList.toggle("positive", r.netProfit >= 0);
+      netEl.classList.toggle("negative", r.netProfit < 0);
+    }
+  </script>
+  <style>
+    :root {
+      --bg: #000000;
+      --bg-card: rgba(255,255,255,0.04);
+      --text: #ffffff;
+      --text-muted: rgba(255,255,255,0.45);
+      --line: rgba(255,255,255,0.1);
+      --line-soft: rgba(255,255,255,0.06);
+      --accent: #c79b3b;
+      --accent-bright: #f0c75c;
+      --accent-soft: rgba(199,155,59,0.18);
+      --gold-gradient: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
+      --shadow-card: 0 12px 32px rgba(0,0,0,0.4);
+    }
+    [data-theme="light"] {
+      --bg: #ffffff;
+      --bg-card: rgba(0,0,0,0.025);
+      --text: #000000;
+      --text-muted: rgba(0,0,0,0.4);
+      --line: rgba(0,0,0,0.1);
+      --line-soft: rgba(0,0,0,0.05);
+      --accent: #a07a1d;
+      --accent-bright: #c79b3b;
+      --accent-soft: rgba(199,155,59,0.12);
+      --gold-gradient: linear-gradient(90deg, #8a6210 0%, #b88820 35%, #a07a1d 68%, #c79b3b 100%);
+      --shadow-card: 0 6px 18px rgba(0,0,0,0.08);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 110%; }
+    @media (max-width: 700px) { html { font-size: 95%; } }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Nav ── */
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 28px;
+      border-bottom: 1px solid var(--line);
+    }
+    .nav-left { display: flex; align-items: center; gap: 20px; }
+    .nav-logo {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      background: var(--gold-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-decoration: none;
+    }
+    .nav-link {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .nav-link:hover { color: var(--accent-bright); }
+    .nav-right { display: flex; align-items: center; gap: 14px; }
+    .user-chip {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      border-radius: 99px;
+      padding: 4px 12px;
+    }
+    .signout-btn {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      background: none;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 5px 12px;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .signout-btn:hover { color: var(--accent-bright); border-color: var(--accent); }
+
+    /* ── Page ── */
+    .page {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 36px;
+      flex-wrap: wrap;
+    }
+    .page-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .month-selector {
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .month-selector:focus { border-color: var(--accent); }
+
+    /* ── Statement ── */
+    .statement {
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 32px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .stmt-heading {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+    .stmt-month {
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+    }
+    .stmt-meta {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+    }
+
+    .stmt-divider {
+      border: none;
+      border-top: 1px solid var(--line);
+      margin: 20px 0;
+    }
+    .stmt-divider.thick {
+      border-top: 1px solid var(--line);
+      margin: 24px 0 20px;
+    }
+
+    .stmt-section-label {
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+
+    .stmt-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      padding: 6px 0;
+    }
+    .stmt-row-label {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+    .stmt-row-label.indent { padding-left: 14px; }
+    .stmt-row-value {
+      font-size: 0.88rem;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+    }
+    .stmt-row-value.deduction { color: var(--text-muted); }
+
+    .stmt-subtotal {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      padding: 10px 0 4px;
+    }
+    .stmt-subtotal-label {
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+    .stmt-subtotal-value {
+      font-size: 0.9rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+    .stmt-margin {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-align: right;
+      margin-top: 2px;
+      margin-bottom: 4px;
+    }
+
+    /* Net profit — big row */
+    .stmt-net {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 0 4px;
+    }
+    .stmt-net-label {
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .stmt-net-value {
+      font-size: 1.3rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+    .stmt-net-value.positive { color: #4caf81; }
+    .stmt-net-value.negative { color: #e05252; }
+    .stmt-net-margin {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-align: right;
+    }
+
+    /* ── States ── */
+    .empty-state, .loading {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      padding: 60px 0;
+    }
+    .loading::after {
+      content: "";
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--line);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin-left: 10px;
+      vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-left">
+      <a href="/mentor-portal/index.html" class="nav-logo">The Headstart</a>
+      <a href="/mentor-portal/index.html" class="nav-link">Log Session</a>
+    </div>
+    <div class="nav-right">
+      <span class="user-chip" id="user-chip" hidden></span>
+      <button class="signout-btn" id="signout-btn">Sign out</button>
+    </div>
+  </nav>
+
+  <main class="page">
+
+    <div class="page-header">
+      <span class="page-title">P&amp;L Statement</span>
+      <select class="month-selector" id="month-selector" hidden></select>
+    </div>
+
+    <p class="loading" id="loading" hidden>Loading</p>
+    <p class="empty-state" id="empty-state" hidden>No P&amp;L records yet. The first statement generates on the 1st of next month.</p>
+
+    <div class="statement" id="statement" hidden>
+
+      <p class="stmt-heading">Headstart Mentoring</p>
+      <p class="stmt-month" id="s-month"></p>
+      <p class="stmt-meta"><span id="s-session-count"></span> sessions</p>
+
+      <p class="stmt-section-label">Revenue</p>
+      <div class="stmt-row">
+        <span class="stmt-row-label indent">Gross Session Revenue</span>
+        <span class="stmt-row-value" id="s-gross-revenue"></span>
+      </div>
+
+      <hr class="stmt-divider" />
+
+      <p class="stmt-section-label">Direct Costs</p>
+      <div class="stmt-row">
+        <span class="stmt-row-label indent">Stripe Processing Fees</span>
+        <span class="stmt-row-value deduction" id="s-stripe-fees"></span>
+      </div>
+      <div class="stmt-row">
+        <span class="stmt-row-label indent">Mentor Payouts</span>
+        <span class="stmt-row-value deduction" id="s-payouts"></span>
+      </div>
+
+      <hr class="stmt-divider" />
+
+      <div class="stmt-subtotal">
+        <span class="stmt-subtotal-label">Gross Profit</span>
+        <span class="stmt-subtotal-value" id="s-gross-profit"></span>
+      </div>
+      <p class="stmt-margin" id="s-gross-margin"></p>
+
+      <hr class="stmt-divider thick" />
+
+      <p class="stmt-section-label">Operating Expenses</p>
+      <div class="stmt-row">
+        <span class="stmt-row-label indent">Claude Pro</span>
+        <span class="stmt-row-value deduction" id="s-claude"></span>
+      </div>
+      <div class="stmt-row">
+        <span class="stmt-row-label indent">Make.com</span>
+        <span class="stmt-row-value deduction" id="s-makecom"></span>
+      </div>
+      <div class="stmt-row" style="padding-top:10px;">
+        <span class="stmt-row-label" style="font-weight:600;">Total Opex</span>
+        <span class="stmt-row-value deduction" id="s-total-opex" style="font-weight:600;"></span>
+      </div>
+
+      <hr class="stmt-divider thick" />
+
+      <div class="stmt-net">
+        <span class="stmt-net-label">Net Profit</span>
+        <span class="stmt-net-value" id="s-net-profit"></span>
+      </div>
+      <p class="stmt-net-margin" id="s-net-margin"></p>
+
+    </div>
+
+  </main>
+
+</body>
+</html>

@@ -7,6 +7,22 @@
   <title>Pricing — Headstart</title>
   <link rel="stylesheet" href="css/base.css" />
   <link rel="stylesheet" href="css/pricing.css" />
+  <style id="auth-gate">html:not(.auth-ok) body { visibility: hidden; }</style>
+  <script type="module">
+    import { getSession } from "/mentor-portal/auth.js";
+    const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com"];
+    (async () => {
+      if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+        document.documentElement.classList.add("auth-ok"); return;
+      }
+      const session = await getSession();
+      if (!session) { location.replace("/mentor-portal/login.html?next=" + encodeURIComponent(location.pathname)); return; }
+      if (!OWNERS.includes((session.user?.email || "").toLowerCase().trim())) {
+        location.replace("/mentor-portal/index.html"); return;
+      }
+      document.documentElement.classList.add("auth-ok");
+    })();
+  </script>
 </head>
 <body>
   <nav class="tool-nav">

@@ -16,6 +16,13 @@
 
       const chip = document.getElementById("user-chip");
       if (chip && mentorEmail) { chip.textContent = mentorEmail; chip.hidden = false; }
+      const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com"];
+      if (OWNERS.includes(mentorEmail) || mentorEmail === "dev@localhost") {
+        const plLink = document.getElementById("pl-link");
+        if (plLink) plLink.style.display = "";
+        const consultLink = document.getElementById("consult-link");
+        if (consultLink) consultLink.style.display = "";
+      }
       bindSignOutButton("#signout-btn");
 
       initSessionForm(mentorEmail);
@@ -748,6 +755,8 @@
         <span class="top-nav-subtitle">Internal use only</span>
       </div>
       <div class="top-nav-actions">
+        <a href="/consultation-tool/index.html" id="consult-link" class="signout-btn" style="text-decoration:none;display:none;">Consultation</a>
+        <a href="/mentor-portal/pl.html" id="pl-link" class="signout-btn" style="text-decoration:none;display:none;">P&amp;L</a>
         <span class="user-chip" id="user-chip" hidden></span>
         <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle light/dark mode" title="Toggle light/dark mode">
           <span id="theme-icon">&#9788;</span>
