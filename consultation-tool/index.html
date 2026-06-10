@@ -4,35 +4,99 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
-  <title>Where are you right now? — Headstart</title>
+  <title>Notes — Headstart</title>
   <link rel="stylesheet" href="css/base.css" />
-  <link rel="stylesheet" href="css/matrix.css" />
+  <style>
+    body { background: #f5f5f5; color: #111; }
+    .notes-shell {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 2.4rem 2rem 4rem;
+    }
+    .notes-doc {
+      display: flex;
+      flex-direction: column;
+      gap: 2.8rem;
+    }
+    .notes-block__label {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #111;
+      margin: 0 0 0.7rem;
+    }
+    .notes-block__area {
+      width: 100%;
+      min-height: 120px;
+      background: #fff;
+      border: 1.5px solid #ddd;
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      color: #111;
+      font: inherit;
+      font-size: 1rem;
+      line-height: 1.65;
+      resize: none;
+      outline: none;
+      transition: border-color 0.2s ease;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    .notes-block__area:focus {
+      border-color: #c9a84c;
+    }
+    .notes-block__area::placeholder {
+      color: #bbb;
+    }
+  </style>
 </head>
 <body>
   <nav class="tool-nav">
     <div class="tool-nav__inner">
       <a class="tool-nav__brand" href="index.html"><img src="../images/headstart-italic-logo.png" alt="Headstart" class="tool-nav__logo" style="height:70px;width:auto;display:block;" /></a>
-      <a class="tool-nav__link is-current" href="index.html">Where you are</a>
+      <a class="tool-nav__link is-current" href="index.html">Notes</a>
+      <a class="tool-nav__link" href="matrix.html">Where you are</a>
       <a class="tool-nav__link" href="structure.html">Session structure</a>
       <a class="tool-nav__link" href="mentors.html">Mentors</a>
       <a class="tool-nav__link" href="pricing.html">Pricing</a>
-      <button class="tool-nav__live" onclick="location.href=location.pathname+'?v='+Date.now()">
-        <span class="tool-nav__live__icon">&#8635;</span> Live
-      </button>
+      <button class="tool-nav__live" onclick="location.href=location.pathname+'?v='+Date.now()"><span class="tool-nav__live__icon">&#8635;</span> Live</button>
     </div>
   </nav>
 
-  <main class="matrix-main">
-    <header class="matrix-header">
-      <p class="eyebrow">Where are you right now?</p>
-      <p class="matrix__hint" id="matrixHint">Select the situation that sounds most like you.</p>
-    </header>
-    <div class="matrix" id="matrix"></div>
+  <main class="notes-shell">
+    <div class="notes-doc">
+
+      <div class="notes-block">
+        <p class="notes-block__label">Small Talk + Which year are they in?</p>
+        <textarea class="notes-block__area" placeholder="Type here…"></textarea>
+      </div>
+
+      <div class="notes-block">
+        <p class="notes-block__label">What industry would you like to enter? Why?</p>
+        <textarea class="notes-block__area" placeholder="Type here…"></textarea>
+      </div>
+
+      <div class="notes-block">
+        <p class="notes-block__label">How did you find us?</p>
+        <textarea class="notes-block__area" placeholder="Type here…"></textarea>
+      </div>
+
+      <div class="notes-block">
+        <p class="notes-block__label">Tell me the stage of job searching that you are stuck at?</p>
+        <textarea class="notes-block__area" placeholder="Type here…"></textarea>
+      </div>
+
+    </div>
   </main>
 
-  <script>// Propagate ?v= to all nav links so every navigation is cache-fresh
-(function(){var v=new URLSearchParams(location.search).get("v");if(!v)return;document.querySelectorAll(".tool-nav__link").forEach(function(a){var u=new URL(a.href,location.href);u.searchParams.set("v",v);a.href=u.pathname+"?v="+v;});})();
-</script>
-  <script type="module">const v=new URLSearchParams(location.search).get("v")||"0";await import(`./js/matrix.js?v=${v}`);</script>
+  <script>
+    // Auto-grow textareas
+    document.querySelectorAll(".notes-block__area").forEach(function(ta) {
+      function grow() { ta.style.height = "auto"; ta.style.height = ta.scrollHeight + "px"; }
+      ta.addEventListener("input", grow);
+      grow();
+    });
+    // Propagate ?v= to nav links
+    (function(){var v=new URLSearchParams(location.search).get("v");if(!v)return;document.querySelectorAll(".tool-nav__link").forEach(function(a){var u=new URL(a.href,location.href);u.searchParams.set("v",v);a.href=u.pathname+"?v="+v;});})();
+  </script>
 </body>
 </html>

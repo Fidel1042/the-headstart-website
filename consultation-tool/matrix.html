@@ -4,36 +4,36 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
-  <title>Mentor profile — Headstart</title>
+  <title>Where are you right now? — Headstart</title>
   <link rel="stylesheet" href="css/base.css" />
-  <link rel="stylesheet" href="css/profile.css" />
+  <link rel="stylesheet" href="css/matrix.css" />
 </head>
 <body>
   <nav class="tool-nav">
     <div class="tool-nav__inner">
       <a class="tool-nav__brand" href="index.html"><img src="../images/headstart-italic-logo.png" alt="Headstart" class="tool-nav__logo" style="height:70px;width:auto;display:block;" /></a>
       <a class="tool-nav__link" href="index.html">Notes</a>
-      <a class="tool-nav__link" href="matrix.html">Where you are</a>
+      <a class="tool-nav__link is-current" href="matrix.html">Where you are</a>
       <a class="tool-nav__link" href="structure.html">Session structure</a>
-      <a class="tool-nav__link is-current" href="mentors.html">Mentors</a>
+      <a class="tool-nav__link" href="mentors.html">Mentors</a>
       <a class="tool-nav__link" href="pricing.html">Pricing</a>
-      <button class="tool-nav__live" onclick="location.href=location.pathname+'?v='+Date.now()"><span class="tool-nav__live__icon">&#8635;</span> Live</button>
+      <button class="tool-nav__live" onclick="location.href=location.pathname+'?v='+Date.now()">
+        <span class="tool-nav__live__icon">&#8635;</span> Live
+      </button>
     </div>
   </nav>
 
-  <section class="profile-card-section">
-    <img class="profile-card-img" id="profileCardImg" src="" alt="Mentor profile card" />
-  </section>
-
-  <main class="shell profile-body" id="profileBody"></main>
-
-  <footer class="tool-foot">
-    <div class="shell">Headstart Mentoring — internal consultation resource.</div>
-  </footer>
+  <main class="matrix-main">
+    <header class="matrix-header">
+      <p class="eyebrow">Where are you right now?</p>
+      <p class="matrix__hint" id="matrixHint">Select the situation that sounds most like you.</p>
+    </header>
+    <div class="matrix" id="matrix"></div>
+  </main>
 
   <script>// Propagate ?v= to all nav links so every navigation is cache-fresh
 (function(){var v=new URLSearchParams(location.search).get("v");if(!v)return;document.querySelectorAll(".tool-nav__link").forEach(function(a){var u=new URL(a.href,location.href);u.searchParams.set("v",v);a.href=u.pathname+"?v="+v;});})();
 </script>
-  <script type="module">const v=new URLSearchParams(location.search).get("v")||"0";await import(`./js/profile.js?v=${v}`);</script>
+  <script type="module">const v=new URLSearchParams(location.search).get("v")||"0";await import(`./js/matrix.js?v=${v}`);</script>
 </body>
 </html>
