@@ -10,14 +10,109 @@
   <style id="auth-gate">html:not(.auth-ok) body { visibility: hidden; }</style>
   <script type="module">
     import { requireAuth, bindSignOutButton } from "./auth.js";
+
     requireAuth((session) => {
+      const mentorEmail = session?.user?.email || "";
+
       const chip = document.getElementById("user-chip");
-      if (chip && session?.user?.email) {
-        chip.textContent = session.user.email;
-        chip.hidden = false;
-      }
+      if (chip && mentorEmail) { chip.textContent = mentorEmail; chip.hidden = false; }
       bindSignOutButton("#signout-btn");
+
+      initSessionForm(mentorEmail);
     });
+
+    async function initSessionForm(mentorEmail) {
+      const menteeSelect  = document.getElementById("mentee-select");
+      const dateInput     = document.getElementById("session-date");
+      const typeSelect    = document.getElementById("session-type");
+      const notesField    = document.getElementById("session-notes");
+      const submitBtn     = document.getElementById("session-submit-btn");
+      const errorEl       = document.getElementById("form-error");
+      const logCard       = document.getElementById("log-card");
+      const successCard   = document.getElementById("success-card");
+      const successDetail = document.getElementById("success-detail");
+
+      // Default date = today in local timezone
+      if (dateInput) {
+        const now   = new Date();
+        const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+        dateInput.value = local.toISOString().split("T")[0];
+      }
+
+      // Load mentees assigned to this mentor
+      try {
+        const res  = await fetch("/.netlify/functions/get-mentees", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mentorEmail }),
+        });
+        const data = await res.json();
+        if (!data.mentees || data.mentees.length === 0) {
+          menteeSelect.innerHTML = '<option value="">No mentees assigned yet</option>';
+        } else {
+          menteeSelect.innerHTML = data.mentees
+            .map((m) => `<option value="${m.id}">${m.name}</option>`)
+            .join("");
+        }
+      } catch {
+        menteeSelect.innerHTML = '<option value="">Could not load — refresh page</option>';
+      }
+
+      function resetForm() {
+        const now   = new Date();
+        const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+        dateInput.value          = local.toISOString().split("T")[0];
+        typeSelect.selectedIndex = 0;
+        notesField.value         = "";
+        submitBtn.disabled       = false;
+        submitBtn.textContent    = "Log Session + Charge Mentee →";
+        errorEl.textContent      = "";
+      }
+
+      document.getElementById("session-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const menteeRecordId = menteeSelect.value;
+        const sessionDate    = dateInput.value;
+
+        if (!menteeRecordId) { errorEl.textContent = "Please select a mentee."; return; }
+        if (!sessionDate)    { errorEl.textContent = "Please pick a session date."; return; }
+
+        submitBtn.disabled    = true;
+        submitBtn.textContent = "Charging…";
+        errorEl.textContent   = "";
+
+        try {
+          const res    = await fetch("/.netlify/functions/charge-mentee", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              menteeRecordId,
+              mentorEmail,
+              sessionDate,
+              sessionType: typeSelect.value,
+              notes: notesField.value.trim(),
+            }),
+          });
+          const result = await res.json();
+          if (!res.ok) throw new Error(result.error);
+
+          logCard.hidden     = true;
+          successCard.hidden = false;
+          successDetail.textContent = `${result.menteeName} charged $${result.amountCharged} AUD`;
+        } catch (err) {
+          errorEl.textContent   = err.message || "Something went wrong. Please try again.";
+          submitBtn.disabled    = false;
+          submitBtn.textContent = "Log Session + Charge Mentee →";
+        }
+      });
+
+      document.getElementById("log-another-btn")?.addEventListener("click", () => {
+        successCard.hidden = true;
+        logCard.hidden     = false;
+        resetForm();
+      });
+    }
   </script>
   <style>
     :root {
@@ -536,7 +631,112 @@
       .primary-card { grid-template-columns: 1fr; gap: 1.2rem; padding: 1.5rem 1.5rem 1.7rem; }
       .primary-cta { width: 100%; justify-content: center; }
       .hero { margin-bottom: 2.2rem; }
+      .form-row-2 { grid-template-columns: 1fr; }
     }
+
+    /* ── Session log form ── */
+    .log-card { grid-template-columns: 1fr; align-items: flex-start; overflow: visible; }
+
+    .session-form { display: flex; flex-direction: column; gap: 1rem; width: 100%; }
+
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    .form-field label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.4rem;
+    }
+
+    .form-field select,
+    .form-field input[type="date"],
+    .form-field textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--line);
+      color: var(--text);
+      padding: 0.72rem 0.9rem;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      color-scheme: dark;
+    }
+
+    [data-theme="light"] .form-field select,
+    [data-theme="light"] .form-field input[type="date"],
+    [data-theme="light"] .form-field textarea {
+      background: rgba(0,0,0,0.03);
+      color-scheme: light;
+    }
+
+    .form-field select:focus,
+    .form-field input[type="date"]:focus,
+    .form-field textarea:focus {
+      border-color: var(--accent-line);
+      box-shadow: 0 0 0 2px var(--accent-soft);
+    }
+
+    .form-field textarea { resize: vertical; min-height: 80px; }
+
+    .session-submit {
+      align-self: flex-start;
+      background: var(--gold-gradient);
+      border: none;
+      border-radius: 999px;
+      color: #2b1b09;
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      padding: 0.85rem 1.8rem;
+      cursor: pointer;
+      transition: filter 0.15s, opacity 0.15s;
+    }
+    .session-submit:hover { filter: brightness(1.06); }
+    .session-submit:disabled { opacity: 0.55; cursor: not-allowed; filter: none; }
+
+    .form-error {
+      color: #ffb6b6;
+      font-size: 0.85rem;
+      min-height: 1.2em;
+      margin: 0;
+    }
+
+    /* ── Success state ── */
+    .success-card {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      padding: 1.8rem 2rem;
+      border-radius: 20px;
+      border: 1px solid rgba(76,175,80,0.35);
+      background: rgba(76,175,80,0.06);
+    }
+    .success-icon { font-size: 1.5rem; color: #4caf50; flex-shrink: 0; }
+    .success-title { font-size: 1rem; font-weight: 700; color: var(--text); }
+    .success-detail { font-size: 0.9rem; color: var(--accent); margin-top: 0.25rem; }
+    .log-another {
+      margin-left: auto;
+      flex-shrink: 0;
+      background: none;
+      border: 1px solid var(--line);
+      color: var(--text);
+      padding: 0.5rem 1.1rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      font-family: inherit;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .log-another:hover { border-color: var(--accent-line); color: var(--accent-bright); }
   </style>
 </head>
 <body>
@@ -603,15 +803,54 @@
     <!-- LOG SESSION (primary daily action) -->
     <section class="portal-section section-log">
       <h2 class="section-label">After every session</h2>
-      <div class="primary-card">
+
+      <div class="primary-card log-card" id="log-card">
         <div class="primary-card-content">
           <div class="primary-card-eyebrow">Within 24 hours &middot; required</div>
           <h2>Log your session</h2>
-          <p>Submit the Airtable form within 24 hours of every session. This is the only record Fidel uses to calculate your payment.</p>
         </div>
-        <a class="primary-cta" href="https://airtable.com/appkQCJeB0bs92FN8/pag6PDCggrmdFd2VU/form" target="_blank" rel="noopener">
-          Open Form <span class="arrow">&rarr;</span>
-        </a>
+        <form class="session-form" id="session-form">
+          <div class="form-row-2">
+            <div class="form-field">
+              <label for="mentee-select">Mentee</label>
+              <select id="mentee-select">
+                <option value="">Loading&hellip;</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="session-date">Session Date</label>
+              <input type="date" id="session-date" />
+            </div>
+          </div>
+          <div class="form-field">
+            <label for="session-type">Session Type</label>
+            <select id="session-type">
+              <option>Standard Session</option>
+              <option>Resume Review</option>
+              <option>Interview Prep</option>
+              <option>Mock Interview</option>
+              <option>Networking &amp; Applications</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="session-notes">Notes (optional)</label>
+            <textarea id="session-notes" placeholder="What did you cover? Any follow-ups for next session?"></textarea>
+          </div>
+          <button type="submit" class="session-submit" id="session-submit-btn">
+            Log Session + Charge Mentee &rarr;
+          </button>
+          <p class="form-error" id="form-error" aria-live="polite"></p>
+        </form>
+      </div>
+
+      <div class="success-card" id="success-card" hidden>
+        <div class="success-icon">&#10003;</div>
+        <div>
+          <div class="success-title">Session logged</div>
+          <div class="success-detail" id="success-detail"></div>
+        </div>
+        <button class="log-another" id="log-another-btn">Log another &rarr;</button>
       </div>
     </section>
 
