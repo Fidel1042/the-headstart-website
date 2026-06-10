@@ -57,19 +57,19 @@ exports.handler = async (event) => {
 
     const mentorRecordId = mentorData.records[0].id;
 
-    // Step 2: find mentees linked to this mentor who have a session price set (i.e. signed/active)
+    // Step 2: fetch all mentees and filter by mentor record ID in JavaScript
+    // (Airtable's ARRAYJOIN on a linked field returns display names, not record IDs,
+    // so formula-based filtering won't match — JS filter is reliable)
     const menteeRes = await fetch(
       `https://api.airtable.com/v0/${AIRTABLE_CORE_BASE_ID}/${AIRTABLE_MENTEE_TABLE_ID}` +
-        `?filterByFormula=${encodeURIComponent(`AND(FIND("${mentorRecordId}", ARRAYJOIN({Mentor})), {Session Price} > 0)`)}` +
-        `&fields[]=Name`,
+        `?fields[]=Name&fields[]=Mentor`,
       { headers: airtableHeaders }
     );
     const menteeData = await menteeRes.json();
 
-    const mentees = (menteeData.records || []).map((r) => ({
-      id: r.id,
-      name: r.fields["Name"] || "Unnamed mentee",
-    }));
+    const mentees = (menteeData.records || [])
+      .filter((r) => Array.isArray(r.fields.Mentor) && r.fields.Mentor.includes(mentorRecordId))
+      .map((r) => ({ id: r.id, name: r.fields.Name || "Unnamed mentee" }));
 
     return {
       statusCode: 200,
