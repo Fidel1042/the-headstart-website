@@ -24,7 +24,6 @@
     async function initSessionForm(mentorEmail) {
       const menteeSelect  = document.getElementById("mentee-select");
       const dateInput     = document.getElementById("session-date");
-      const typeSelect    = document.getElementById("session-type");
       const notesField    = document.getElementById("session-notes");
       const submitBtn     = document.getElementById("session-submit-btn");
       const errorEl       = document.getElementById("form-error");
@@ -61,11 +60,10 @@
       function resetForm() {
         const now   = new Date();
         const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
-        dateInput.value          = local.toISOString().split("T")[0];
-        typeSelect.selectedIndex = 0;
-        notesField.value         = "";
+        dateInput.value  = local.toISOString().split("T")[0];
+        notesField.value = "";
         submitBtn.disabled       = false;
-        submitBtn.textContent    = "Log Session + Charge Mentee →";
+        submitBtn.textContent    = "Log Session →";
         errorEl.textContent      = "";
       }
 
@@ -90,7 +88,6 @@
               menteeRecordId,
               mentorEmail,
               sessionDate,
-              sessionType: typeSelect.value,
               notes: notesField.value.trim(),
             }),
           });
@@ -103,7 +100,7 @@
         } catch (err) {
           errorEl.textContent   = err.message || "Something went wrong. Please try again.";
           submitBtn.disabled    = false;
-          submitBtn.textContent = "Log Session + Charge Mentee →";
+          submitBtn.textContent = "Log Session →";
         }
       });
 
@@ -823,22 +820,11 @@
             </div>
           </div>
           <div class="form-field">
-            <label for="session-type">Session Type</label>
-            <select id="session-type">
-              <option>Standard Session</option>
-              <option>Resume Review</option>
-              <option>Interview Prep</option>
-              <option>Mock Interview</option>
-              <option>Networking &amp; Applications</option>
-              <option>Other</option>
-            </select>
-          </div>
-          <div class="form-field">
             <label for="session-notes">Notes (optional)</label>
             <textarea id="session-notes" placeholder="What did you cover? Any follow-ups for next session?"></textarea>
           </div>
           <button type="submit" class="session-submit" id="session-submit-btn">
-            Log Session + Charge Mentee &rarr;
+            Log Session &rarr;
           </button>
           <p class="form-error" id="form-error" aria-live="polite"></p>
         </form>

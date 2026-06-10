@@ -47,7 +47,7 @@ exports.handler = async (event) => {
   };
 
   try {
-    // ── Step 1: get Stripe Customer ID from the mentee's Airtable record ──
+    // ── Step 1: get mentee details from Airtable ──
     const menteeRes = await fetch(
       `https://api.airtable.com/v0/${AIRTABLE_CORE_BASE_ID}/${AIRTABLE_MENTEE_TABLE_ID}/${menteeRecordId}`,
       { headers: airtableHeaders }
@@ -55,7 +55,8 @@ exports.handler = async (event) => {
     const menteeRecord = await menteeRes.json();
 
     const stripeCustomerId = menteeRecord.fields?.["Stripe Customer ID"];
-    const menteeName = menteeRecord.fields?.["Name"] || "Unknown";
+    const menteeName       = menteeRecord.fields?.["Name"] || "Unknown";
+    const menteeEmail      = menteeRecord.fields?.["Gmail"] || "";
 
     if (!stripeCustomerId) {
       return {
@@ -65,10 +66,16 @@ exports.handler = async (event) => {
       };
     }
 
-    // ── Step 2: get the saved payment method ──
+    // ── Step 2: get the saved payment method, backfill email if missing ──
     const stripe = new Stripe(STRIPE_SECRET_KEY, { apiVersion: "2024-06-20" });
 
     const customer = await stripe.customers.retrieve(stripeCustomerId);
+
+    // If the Stripe customer has no email (old mentees), push it from Airtable
+    if (!customer.email && menteeEmail) {
+      await stripe.customers.update(stripeCustomerId, { email: menteeEmail });
+    }
+
     let paymentMethodId = customer.invoice_settings?.default_payment_method;
 
     if (!paymentMethodId) {
@@ -87,39 +94,49 @@ exports.handler = async (event) => {
     }
 
     // ── Step 3: charge the card (price from mentee record, fallback $150 AUD) ──
-    const sessionPriceAUD = menteeRecord.fields?.["Session Price"] || 150;
+    const sessionPriceAUD = parseFloat(menteeRecord.fields?.["Session Price"]) || 30;
     const amountCents = Math.round(sessionPriceAUD * 100);
 
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: amountCents,
-      currency: "aud",
-      customer: stripeCustomerId,
-      payment_method: paymentMethodId,
-      off_session: true,
-      confirm: true,
-      description: `Headstart session — ${menteeName} — ${sessionDate}`,
-    });
+    // Idempotency key prevents double-charge if browser retries the same request
+    const idempotencyKey = `session-${menteeRecordId}-${mentorEmail}-${sessionDate}`;
 
-    // ── Step 4: log the session to Airtable ──
-    await fetch(
-      `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_SESSION_TABLE_ID}`,
+    const paymentIntent = await stripe.paymentIntents.create(
       {
-        method: "POST",
-        headers: airtableHeaders,
-        body: JSON.stringify({
-          fields: {
-            "Mentee": [menteeRecordId],
-            "Mentor Email": mentorEmail,
-            "Session Date": sessionDate,
-            "Session Type": sessionType || "Standard",
-            "Notes": notes || "",
-            "Amount Charged": amountCents / 100,
-            "Stripe Payment ID": paymentIntent.id,
-            "Status": "Charged",
-          },
-        }),
-      }
+        amount: amountCents,
+        currency: "aud",
+        customer: stripeCustomerId,
+        payment_method: paymentMethodId,
+        off_session: true,
+        confirm: true,
+        description: `Headstart session — ${menteeName} — ${sessionDate}`,
+      },
+      { idempotencyKey }
     );
+
+    // ── Step 4: log the session to Airtable (non-blocking — charge already succeeded) ──
+    try {
+      if (AIRTABLE_SESSION_TABLE_ID) {
+        await fetch(
+          `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_SESSION_TABLE_ID}`,
+          {
+            method: "POST",
+            headers: airtableHeaders,
+            body: JSON.stringify({
+              fields: {
+                "Mentor Email": mentorEmail,
+                "Mentee Name": menteeName,
+                "Date": sessionDate,
+                "Extra Notes": notes || "",
+                "Amount Charged": amountCents / 100,
+                "Stripe Payment ID": paymentIntent.id,
+              },
+            }),
+          }
+        );
+      }
+    } catch {
+      // Logging failed but charge succeeded — Stripe has the record
+    }
 
     return {
       statusCode: 200,
