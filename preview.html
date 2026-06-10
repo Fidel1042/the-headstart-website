@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Live Preview</title>
+  <meta name="robots" content="noindex" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0d0d0d;
+      color: #fff;
+      font-family: system-ui, -apple-system, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Toolbar ── */
+    .toolbar {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 14px;
+      background: #161616;
+      border-bottom: 1px solid #2a2a2a;
+    }
+    .toolbar-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #c79b3b;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .toolbar input {
+      flex: 1;
+      min-width: 0;
+      background: #222;
+      border: 1px solid #3a3a3a;
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 7px;
+      font-size: 0.84rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .toolbar input:focus { border-color: #c79b3b; }
+    .btn {
+      background: #222;
+      border: 1px solid #3a3a3a;
+      color: #ddd;
+      padding: 6px 13px;
+      border-radius: 7px;
+      cursor: pointer;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+    .btn:hover { border-color: #c79b3b; color: #f0c75c; background: rgba(199,155,59,0.08); }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #444;
+      flex-shrink: 0;
+      transition: background 0.3s;
+    }
+    .status-dot.connected { background: #4caf50; }
+    .status-dot.reloading { background: #f0c75c; }
+
+    /* ── Preview area ── */
+    .previews {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* Desktop pane */
+    .pane-desktop {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid #2a2a2a;
+      overflow: hidden;
+    }
+
+    /* Mobile pane */
+    .pane-mobile {
+      width: 430px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      background: #111;
+      overflow: hidden;
+    }
+
+    .pane-label {
+      flex-shrink: 0;
+      padding: 5px 12px;
+      font-size: 0.66rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #666;
+      background: #131313;
+      border-bottom: 1px solid #222;
+    }
+    .pane-label b { color: #c79b3b; }
+
+    .pane-desktop iframe {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    /* Phone frame */
+    .phone-scroll {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 20px 14px 24px;
+      background: #111;
+    }
+    .phone {
+      width: 375px;
+      flex-shrink: 0;
+      border-radius: 44px;
+      border: 7px solid #2e2e2e;
+      background: #000;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.8), inset 0 0 0 1px #111;
+      overflow: hidden;
+      position: relative;
+    }
+    .phone-top {
+      height: 28px;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 2;
+    }
+    .phone-notch {
+      width: 110px;
+      height: 20px;
+      background: #111;
+      border-radius: 0 0 14px 14px;
+    }
+    .phone iframe {
+      display: block;
+      width: 375px;
+      height: 780px;
+      border: none;
+    }
+    .phone-bottom {
+      height: 22px;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .phone-home {
+      width: 100px;
+      height: 4px;
+      background: #333;
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="toolbar">
+    <span class="toolbar-label">Preview</span>
+    <input type="text" id="page-input" placeholder="e.g. html/mentee-agreement.html" />
+    <button class="btn" onclick="loadPage()">Load</button>
+    <button class="btn" onclick="reloadBoth()">Reload</button>
+    <div class="status-dot" id="status-dot" title="Live reload status"></div>
+  </div>
+
+  <div class="previews">
+
+    <div class="pane-desktop">
+      <div class="pane-label">Desktop <b>full width</b></div>
+      <iframe id="desktop-frame" src="about:blank" title="Desktop preview"></iframe>
+    </div>
+
+    <div class="pane-mobile">
+      <div class="pane-label">Mobile <b>375px</b></div>
+      <div class="phone-scroll">
+        <div class="phone">
+          <div class="phone-top"><div class="phone-notch"></div></div>
+          <iframe id="mobile-frame" src="about:blank" title="Mobile preview" scrolling="yes"></iframe>
+          <div class="phone-bottom"><div class="phone-home"></div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const input  = document.getElementById('page-input');
+    const dfr    = document.getElementById('desktop-frame');
+    const mfr    = document.getElementById('mobile-frame');
+    const dot    = document.getElementById('status-dot');
+
+    // Restore last page from URL param or localStorage
+    const params = new URLSearchParams(location.search);
+    const saved  = params.get('page') || localStorage.getItem('hs_preview_page') || 'mentor-portal/index.html';
+    input.value  = saved;
+
+    function loadPage() {
+      const page = input.value.trim() || 'index.html';
+      const url  = '/' + page.replace(/^\//, '');
+      dfr.src = url;
+      mfr.src = url;
+      history.replaceState(null, '', '?page=' + encodeURIComponent(page));
+      localStorage.setItem('hs_preview_page', page);
+    }
+
+    function reloadBoth() {
+      try { dfr.contentWindow.location.reload(); } catch(e) { dfr.src = dfr.src; }
+      try { mfr.contentWindow.location.reload(); } catch(e) { mfr.src = mfr.src; }
+    }
+
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') loadPage(); });
+
+    // Live reload via SSE — reloads iframes, not this shell
+    (function connectSSE() {
+      const es = new EventSource('/__livereload');
+
+      es.onopen = function() {
+        dot.className = 'status-dot connected';
+        dot.title = 'Live reload connected';
+      };
+
+      es.onmessage = function(e) {
+        if (e.data !== 'reload') return;
+        dot.className = 'status-dot reloading';
+        dot.title = 'Reloading...';
+        reloadBoth();
+        setTimeout(() => {
+          dot.className = 'status-dot connected';
+          dot.title = 'Live reload connected';
+        }, 600);
+      };
+
+      es.onerror = function() {
+        dot.className = 'status-dot';
+        dot.title = 'Reconnecting...';
+        es.close();
+        setTimeout(connectSSE, 2000);
+      };
+    })();
+
+    loadPage();
+  </script>
+</body>
+</html>
