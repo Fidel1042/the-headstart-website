@@ -11,27 +11,27 @@
 <body>
   <nav class="tool-nav">
     <div class="tool-nav__inner">
-      <span class="tool-nav__brand">Headstart</span>
+      <a class="tool-nav__brand" href="index.html"><img src="../images/headstart-italic-logo.png" alt="Headstart" class="tool-nav__logo" style="height:70px;width:auto;display:block;" /></a>
       <a class="tool-nav__link" href="index.html">Where you are</a>
       <a class="tool-nav__link" href="structure.html">Session structure</a>
       <a class="tool-nav__link is-current" href="mentors.html">Mentors</a>
       <a class="tool-nav__link" href="pricing.html">Pricing</a>
+      <button class="tool-nav__live" onclick="location.href=location.pathname+'?v='+Date.now()"><span class="tool-nav__live__icon">&#8635;</span> Live</button>
     </div>
   </nav>
 
   <main class="shell">
-    <header class="page-head">
-      <p class="eyebrow">Your match</p>
-      <h1 class="page-title">Recommended mentors</h1>
-      <p class="page-sub">Type a major or field and we'll surface the mentors who've actually walked that path. Fidel is your default match either way.</p>
-    </header>
-
-    <div class="mentor-search">
-      <span class="mentor-search__icon">&#128269;</span>
-      <input class="mentor-search__input" id="mentorSearch" type="text"
-        placeholder="Search by major, e.g. finance, marketing, data science…"
-        autocomplete="off" />
-      <p class="mentor-search__hint" id="searchHint"></p>
+    <div class="mentors-top">
+      <header class="page-head">
+        <p class="eyebrow">Your match</p>
+        <h1 class="page-title">Recommended mentors</h1>
+      </header>
+      <div class="mentor-search">
+        <span class="mentor-search__icon">&#128269;</span>
+        <input class="mentor-search__input" id="mentorSearch" type="text"
+          placeholder="Search by major, e.g. finance, marketing, data science…"
+          autocomplete="off" />
+      </div>
     </div>
 
     <div id="mentorResults"></div>
@@ -43,6 +43,9 @@
     <div class="shell">Headstart Mentoring — internal consultation resource.</div>
   </footer>
 
-  <script type="module" src="js/mentors.js"></script>
+  <script>// Propagate ?v= to all nav links so every navigation is cache-fresh
+(function(){var v=new URLSearchParams(location.search).get("v");if(!v)return;document.querySelectorAll(".tool-nav__link").forEach(function(a){var u=new URL(a.href,location.href);u.searchParams.set("v",v);a.href=u.pathname+"?v="+v;});})();
+</script>
+  <script type="module">const v=new URLSearchParams(location.search).get("v")||"0";await import(`./js/mentors.js?v=${v}`);</script>
 </body>
 </html>

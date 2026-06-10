@@ -11,23 +11,16 @@
 <body>
   <nav class="tool-nav">
     <div class="tool-nav__inner">
-      <span class="tool-nav__brand">Headstart</span>
+      <a class="tool-nav__brand" href="index.html"><img src="../images/headstart-italic-logo.png" alt="Headstart" class="tool-nav__logo" style="height:70px;width:auto;display:block;" /></a>
       <a class="tool-nav__link" href="index.html">Where you are</a>
       <a class="tool-nav__link is-current" href="structure.html">Session structure</a>
       <a class="tool-nav__link" href="mentors.html">Mentors</a>
       <a class="tool-nav__link" href="pricing.html">Pricing</a>
+      <button class="tool-nav__live" onclick="location.href=location.pathname+'?v='+Date.now()"><span class="tool-nav__live__icon">&#8635;</span> Live</button>
     </div>
   </nav>
 
   <main class="shell">
-    <header class="page-head">
-      <p class="eyebrow">How the mentoring works</p>
-      <h1 class="page-title">Your session roadmap</h1>
-      <p class="page-sub">Every plan is built from the same five stages. You only start where you need to, and we move forward as you tick things off.</p>
-    </header>
-
-    <div class="persona-switch" id="personaSwitch"></div>
-
     <div class="struct-head" id="structHead"></div>
     <div class="stage-list" id="stageList"></div>
 
@@ -43,6 +36,9 @@
     <div class="shell">Headstart Mentoring — internal consultation resource.</div>
   </footer>
 
-  <script type="module" src="js/structure.js"></script>
+  <script>// Propagate ?v= to all nav links so every navigation is cache-fresh
+(function(){var v=new URLSearchParams(location.search).get("v");if(!v)return;document.querySelectorAll(".tool-nav__link").forEach(function(a){var u=new URL(a.href,location.href);u.searchParams.set("v",v);a.href=u.pathname+"?v="+v;});})();
+</script>
+  <script type="module">const v=new URLSearchParams(location.search).get("v")||"0";await import(`./js/structure.js?v=${v}`);</script>
 </body>
 </html>

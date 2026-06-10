@@ -39,15 +39,29 @@
 .struct-head__name {
   font-size: 1.5rem;
   font-weight: 750;
-  background: var(--gold-grad);
+  display: block;
+  background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
   -webkit-background-clip: text;
   background-clip: text;
+  -webkit-text-fill-color: transparent;
   color: transparent;
 }
 .struct-head__count { color: rgba(255, 255, 255, 0.55); font-size: 0.95rem; }
 .struct-head__count strong { color: #f5d591; font-weight: 700; }
 
-.stage-list { display: flex; flex-direction: column; gap: 1.2rem; }
+.stage-list { display: flex; flex-direction: column; gap: 0; }
+
+/* Arrow connector between stages */
+.stage-arrow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 2rem;
+  color: rgba(199, 155, 59, 0.55);
+  font-size: 1.3rem;
+  user-select: none;
+  flex-shrink: 0;
+}
 
 .stage {
   display: grid;
@@ -72,7 +86,7 @@
 .stage__head {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
+  align-items: center;
   gap: 0.5rem 0.8rem;
   margin-bottom: 0.8rem;
 }

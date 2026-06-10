@@ -1,82 +1,187 @@
-/* The 4-persona matrix. Click a box to select and showcase it. */
+/* 4-persona matrix — fills everything below the nav.
+   Selection: gold border on chosen box, others dim. No size change. */
 
+/* ── Page layout: nav is sticky ~54px, fill the rest ── */
+.matrix-main {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 54px);
+  padding: 0.8rem 2rem 1rem;
+  box-sizing: border-box;
+}
+@media (max-width: 700px) {
+  .matrix-main { padding: 0.6rem 1.2rem 0.8rem; height: auto; }
+}
+
+.matrix-header {
+  display: flex;
+  align-items: baseline;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  padding-bottom: 0.7rem;
+}
+.matrix-header .eyebrow { margin: 0; }
+.matrix__hint {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.38);
+  letter-spacing: 0.03em;
+  margin: 0;
+  transition: opacity 0.3s ease;
+}
+.matrix.has-selection ~ * .matrix__hint,
+.matrix-main:has(.matrix.has-selection) .matrix__hint { opacity: 0; }
+
+/* ── 2×2 grid that fills remaining height ── */
 .matrix {
+  flex: 1;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1.4rem;
-  align-items: stretch;
-  margin-top: 0.6rem;
+  grid-template-rows: repeat(2, 1fr);
+  gap: 1rem;
+  min-height: 0;
 }
-@media (max-width: 720px) { .matrix { grid-template-columns: 1fr; } }
+@media (max-width: 700px) {
+  .matrix {
+    flex: none;
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    gap: 0.8rem;
+  }
+}
 
+/* ── Each box ── */
 .persona-box {
   position: relative;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   text-align: left;
   border-radius: 18px;
-  padding: 1.7rem 1.7rem 1.8rem;
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
+  padding: 2.8rem 3rem;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   color: #fff;
   cursor: pointer;
   font: inherit;
-  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s ease, background 0.25s ease;
+  overflow: hidden;
+  min-height: 0;
+  opacity: 1;
+  transition: opacity 0.3s ease, border-color 0.25s ease, background 0.25s ease;
 }
-.persona-box:hover { transform: translateY(-4px); border-color: rgba(199, 155, 59, 0.5); }
+.persona-box:hover { border-color: rgba(199, 155, 59, 0.4); background: rgba(255, 255, 255, 0.035); }
 
-/* Reserve space so titles + tags line up across all 4 boxes */
+/* Dim unselected when any is active */
+.matrix.has-selection .persona-box:not(.is-selected) {
+  opacity: 0.32;
+}
+.matrix.has-selection .persona-box:not(.is-selected):hover {
+  opacity: 0.52;
+  cursor: pointer;
+}
+
+/* ── Gold border on selected — via ::after so box doesn't shift ── */
+/* Anchor content to top when selected so detail expands downward */
+.persona-box.is-selected {
+  justify-content: flex-start;
+  cursor: default;
+  background: rgba(255, 255, 255, 0.035);
+}
+.persona-box.is-selected::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  padding: 2px;
+  background: linear-gradient(135deg, #ffe066, #daa520 40%, #7a5500 80%, #ffe066);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* ── Always-visible header inside each box ── */
 .persona-box__num {
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 800;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.4);
-  margin-bottom: 0.5rem;
+  color: rgba(255, 255, 255, 0.32);
+  margin-bottom: 0.55rem;
+  transition: color 0.25s ease;
 }
+.persona-box.is-selected .persona-box__num { color: rgba(247, 211, 125, 0.7); }
+
 .persona-box__title {
-  font-size: 1.5rem;
-  font-weight: 750;
-  line-height: 1.2;
-  min-height: 3.6rem;
+  font-size: clamp(1.2rem, 2vw, 2.2rem);
+  font-weight: 700;
+  line-height: 1.25;
   color: #fff;
+  transition: background 0.25s ease, color 0.25s ease;
 }
-.persona-box__tag {
-  margin-top: 0.45rem;
-  font-size: 0.92rem;
-  color: rgba(255, 255, 255, 0.55);
-  min-height: 2.7rem;
+.persona-box.is-selected .persona-box__title {
+  background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
-/* Detail block — hidden until the box is selected */
-.persona-box__detail {
-  display: none;
-  margin-top: 1.2rem;
-  padding-top: 1.2rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  flex: 1;
-  flex-direction: column;
+.persona-box__tag {
+  margin-top: 0.6rem;
+  font-size: clamp(0.88rem, 0.95vw, 1rem);
+  color: rgba(255, 255, 255, 0.48);
+  transition: opacity 0.2s ease, max-height 0.2s ease;
 }
-.persona-box__desc { color: rgba(255, 255, 255, 0.85); font-size: 1rem; }
+.persona-box.is-selected .persona-box__tag {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  margin: 0;
+}
+
+/* ── Detail block — always in DOM, revealed on selection ── */
+.persona-box__detail {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  margin-top: 0;
+  transition: max-height 0.35s ease, opacity 0.3s ease, margin-top 0.3s ease;
+}
+.persona-box.is-selected .persona-box__detail {
+  max-height: 500px;
+  opacity: 1;
+  margin-top: 1.1rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.persona-box__desc {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: clamp(1rem, 1.2vw, 1.2rem);
+  line-height: 1.58;
+}
 .persona-box__stat {
   display: flex;
   align-items: baseline;
-  gap: 0.5rem;
-  margin: 1.1rem 0 1.3rem;
+  gap: 0.55rem;
+  margin: 1rem 0 1.1rem;
 }
 .persona-box__stat-num {
-  font-size: 1.7rem;
+  font-size: clamp(1.8rem, 2.5vw, 2.5rem);
   font-weight: 800;
-  background: var(--gold-grad);
+  background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 .persona-box__stat-label {
-  font-size: 0.86rem;
-  color: rgba(255, 255, 255, 0.6);
+  font-size: clamp(0.84rem, 1vw, 1rem);
+  color: rgba(255, 255, 255, 0.5);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
 }
 .persona-box__ctas {
   margin-top: auto;
@@ -85,28 +190,8 @@
   gap: 0.7rem;
 }
 
-/* ── Selected state ── */
-.persona-box.is-selected {
-  cursor: default;
-  background: linear-gradient(#0c0c0c, #0c0c0c) padding-box, var(--gold-frame) border-box;
-  border: 2px solid transparent;
-  grid-column: 1 / -1; /* selected box spans full width so detail has room */
-}
-.persona-box.is-selected:hover { transform: none; }
-.persona-box.is-selected .persona-box__num { color: rgba(247, 211, 125, 0.7); }
-.persona-box.is-selected .persona-box__title {
-  background: var(--gold-grad);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  min-height: 0;
-}
-.persona-box.is-selected .persona-box__tag { display: none; }
-.persona-box.is-selected .persona-box__detail { display: flex; }
-
-.matrix__hint {
-  margin-top: 1.4rem;
-  font-size: 0.84rem;
-  color: rgba(255, 255, 255, 0.4);
-  letter-spacing: 0.04em;
+@media (max-width: 700px) {
+  .persona-box { padding: 1.3rem 1.3rem 1.4rem; }
+  .persona-box__title { font-size: 1.15rem; }
+  .persona-box.is-selected .persona-box__detail { max-height: 600px; }
 }

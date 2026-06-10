@@ -1,93 +1,35 @@
 /* Mentor ID-card profile — recreates the gold card mockup, then the write-up below. */
 
-/* ── Dark "harbour" stage the card sits on ── */
-.id-stage {
-  position: relative;
+/* ── Pre-made card image display ── */
+.profile-card-section {
   display: flex;
   justify-content: center;
-  padding: 3.4rem 1.4rem 3.8rem;
-  background-color: #0c1018;
-  /* Drop a file at images/sydney-harbour.jpg to show the real backdrop. */
-  background-image: linear-gradient(rgba(8, 12, 20, 0.45), rgba(8, 12, 20, 0.78)),
-    url("../../images/sydney-harbour.jpg");
-  background-size: cover;
-  background-position: center;
+  align-items: flex-start;
+  padding: 3rem 1.4rem 3.4rem;
+  background: #000;
 }
-.id-wordmark {
-  position: absolute;
-  top: 1.3rem;
-  right: 1.6rem;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  font-size: 1.05rem;
-  color: #fff;
-}
-.id-wordmark sup { font-size: 0.7em; }
-
-/* ── The cream card ── */
-.id-card {
-  position: relative;
+.profile-card-img {
+  display: block;
   width: 100%;
   max-width: 430px;
-  border-radius: 30px;
-  padding: 2.3rem 2rem 2.4rem;
-  background: linear-gradient(168deg, #f6dd8f 0%, #fbeab0 38%, #fdf6e1 100%);
+  margin: 0 auto;
+  border-radius: 24px;
   box-shadow: 0 30px 70px rgba(0, 0, 0, 0.55);
-  color: #2b1b09;
-  text-align: center;
 }
-.id-card__logos {
-  position: absolute;
-  top: 1.5rem;
-  right: 1.6rem;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.6rem;
-}
-.id-card__logos img { max-height: 34px; max-width: 96px; object-fit: contain; }
-
-.id-card__photo {
-  width: 190px;
-  height: 190px;
-  margin: 0.4rem auto 1.3rem;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 5px solid #c08a2d;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-}
-.id-card__photo img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; }
-
-.id-card__spec-label {
-  font-size: 0.82rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  margin-bottom: 0.4rem;
-}
-.id-card__spec {
-  font-size: 1.2rem;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  margin-bottom: 1.4rem;
-}
-.id-card__fields {
-  list-style: none;
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-.id-card__fields li { font-size: 0.98rem; line-height: 1.35; }
-.id-card__fields strong { font-weight: 700; }
 
 /* ── Write-up below the card ── */
 .profile-body { max-width: 720px; }
+.profile-who {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 2.6rem 0 0.4rem;
+}
 .profile-lead {
   font-size: 1.1rem;
   line-height: 1.6;
   color: rgba(255, 255, 255, 0.85);
-  margin: 2.6rem 0 0.6rem;
+  margin: 0 0 0.6rem;
 }
 .profile-intl {
   display: inline-block;
