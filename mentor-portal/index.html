@@ -104,6 +104,13 @@
           logCard.hidden     = true;
           successCard.hidden = false;
           successDetail.textContent = `${result.menteeName} charged $${result.amountCharged} AUD`;
+
+          clearTimeout(window._successTimer);
+          window._successTimer = setTimeout(() => {
+            successCard.hidden = true;
+            logCard.hidden     = false;
+            resetForm();
+          }, 30000);
         } catch (err) {
           errorEl.textContent   = err.message || "Something went wrong. Please try again.";
           submitBtn.disabled    = false;
@@ -112,6 +119,7 @@
       });
 
       document.getElementById("log-another-btn")?.addEventListener("click", () => {
+        clearTimeout(window._successTimer);
         successCard.hidden = true;
         logCard.hidden     = false;
         resetForm();

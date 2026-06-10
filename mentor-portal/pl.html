@@ -74,9 +74,11 @@
     }
 
     function formatMonthLabel(ym) {
-      if (!ym) return ym;
-      const [y, m] = ym.split("-");
-      const d = new Date(Number(y), Number(m) - 1, 1);
+      if (!ym) return "Unknown month";
+      const parts = ym.split("-");
+      if (parts.length < 2) return ym;
+      const d = new Date(Number(parts[0]), Number(parts[1]) - 1, 1);
+      if (isNaN(d)) return ym;
       return d.toLocaleDateString("en-AU", { month: "long", year: "numeric" });
     }
 
@@ -215,13 +217,13 @@
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--text-muted);
+      color: var(--text);
     }
 
     .month-selector {
-      background: var(--bg-card);
+      background: #1a1a1a;
       border: 1px solid var(--line);
-      color: var(--text);
+      color: #ffffff;
       padding: 8px 14px;
       border-radius: 10px;
       font-size: 0.85rem;
@@ -231,6 +233,7 @@
       transition: border-color 0.15s;
     }
     .month-selector:focus { border-color: var(--accent); }
+    .month-selector option { background: #1a1a1a; color: #ffffff; }
 
     /* ── Statement ── */
     .statement {
@@ -256,8 +259,8 @@
       margin-bottom: 6px;
     }
     .stmt-meta {
-      font-size: 0.78rem;
-      color: var(--text-muted);
+      font-size: 0.82rem;
+      color: var(--text);
       margin-bottom: 28px;
     }
 
@@ -272,11 +275,11 @@
     }
 
     .stmt-section-label {
-      font-size: 0.62rem;
+      font-size: 0.7rem;
       font-weight: 700;
       letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: var(--text-muted);
+      color: var(--text);
       margin-bottom: 14px;
     }
 
@@ -285,19 +288,19 @@
       justify-content: space-between;
       align-items: baseline;
       gap: 12px;
-      padding: 6px 0;
+      padding: 7px 0;
     }
     .stmt-row-label {
-      font-size: 0.88rem;
-      color: var(--text-muted);
+      font-size: 0.95rem;
+      color: var(--text);
     }
     .stmt-row-label.indent { padding-left: 14px; }
     .stmt-row-value {
-      font-size: 0.88rem;
+      font-size: 0.95rem;
       font-weight: 500;
       font-variant-numeric: tabular-nums;
     }
-    .stmt-row-value.deduction { color: var(--text-muted); }
+    .stmt-row-value.deduction { color: var(--text); }
 
     .stmt-subtotal {
       display: flex;
@@ -307,17 +310,17 @@
       padding: 10px 0 4px;
     }
     .stmt-subtotal-label {
-      font-size: 0.9rem;
+      font-size: 1rem;
       font-weight: 700;
     }
     .stmt-subtotal-value {
-      font-size: 0.9rem;
+      font-size: 1rem;
       font-weight: 700;
       font-variant-numeric: tabular-nums;
     }
     .stmt-margin {
-      font-size: 0.72rem;
-      color: var(--text-muted);
+      font-size: 0.78rem;
+      color: var(--text);
       text-align: right;
       margin-top: 2px;
       margin-bottom: 4px;
@@ -345,8 +348,8 @@
     .stmt-net-value.positive { color: #4caf81; }
     .stmt-net-value.negative { color: #e05252; }
     .stmt-net-margin {
-      font-size: 0.72rem;
-      color: var(--text-muted);
+      font-size: 0.78rem;
+      color: var(--text);
       text-align: right;
     }
 
