@@ -46,6 +46,14 @@ export const stages = {
       "Individual Case Study",
     ],
   },
+  6: {
+    name: "It's only the start",
+    sessionLabel: "2 sessions",
+    sessions: [
+      "Turn Internship into return offer",
+      "Turn Internship into another better Grad role",
+    ],
+  },
 };
 
 // ── The 4 personas ──
@@ -81,7 +89,7 @@ export const personas = [
     tag: "Has tried, has traction, still no offer",
     desc: "Knows what roles to chase and has some society or screening experience, but the internship keeps slipping through.",
     sessions: "12 sessions",
-    stages: [2, 3, 4, 5],
+    stages: [5, 6],
   },
 ];
 
