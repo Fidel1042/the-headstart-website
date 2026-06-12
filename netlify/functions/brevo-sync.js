@@ -46,11 +46,10 @@ exports.handler = async (event) => {
     listIds: [listId],
     updateEnabled: true, // upsert: create on first signup, update on re-signup
     attributes: {
-      FIRSTNAME: (data.name || "").trim(),
-      INDUSTRIES: (data.industries || "").trim(),
-      ROLE_TYPE: (data["role-type"] || data.role_type || "").trim(),
-      INTERNATIONAL_STUDENT: (data.international_student || "").trim(),
-      SIGNUP_SOURCE: data.source || "job-alerts-form",
+      // Take the first word of the submitted name as the first name; avoids
+      // emails greeting people by their full multi-word name.
+      FIRSTNAME: (data.name || "").trim().split(/\s+/)[0] || "",
+      INDUSTRY: (data.industries || "").trim(), // singular attribute name in Brevo; value can be comma-separated
     },
   };
 

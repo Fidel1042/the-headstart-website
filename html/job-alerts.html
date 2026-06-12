@@ -1142,7 +1142,18 @@ function isFresh(j) {
   return ageDays <= FRESH_DAYS;
 }
 
-let activeCat = "finance";
+// Default category, can be overridden by ?cat= URL parameter so email links
+// like /job-alerts?cat=marketing land users directly on that tab.
+const VALID_CATS = ["all","finance","accounting","tech","marketing","consulting","data"];
+function initialCat() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const requested = (params.get("cat") || "").toLowerCase().trim();
+    if (VALID_CATS.includes(requested)) return requested;
+  } catch (e) {}
+  return "finance";
+}
+let activeCat = initialCat();
 let activeCity = "all";
 let q = "";
 
@@ -1459,6 +1470,11 @@ document.getElementById("consultForm").addEventListener("submit", function(e) {
     }
   }, 100);
 });
+
+// Sync visual tab state with activeCat (in case it was set via URL param)
+document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
+const activeTabEl = document.querySelector(`.tab[data-cat="${activeCat}"]`);
+if (activeTabEl) activeTabEl.classList.add("active");
 
 render();
   </script>
