@@ -22,7 +22,7 @@ exports.handler = async (event) => {
     return { statusCode: 400, headers, body: JSON.stringify({ error: "Invalid JSON" }) };
   }
 
-  const { menteeRecordId, mentorEmail, sessionDate, sessionType, notes } = payload;
+  const { menteeRecordId, mentorEmail, sessionDate, notes } = payload;
 
   if (!menteeRecordId || !mentorEmail || !sessionDate) {
     return {
@@ -46,60 +46,55 @@ exports.handler = async (event) => {
     "Content-Type": "application/json",
   };
 
-  try {
-    // ── Step 1: get mentee details from Airtable ──
-    const menteeRes = await fetch(
-      `https://api.airtable.com/v0/${AIRTABLE_CORE_BASE_ID}/${AIRTABLE_MENTEE_TABLE_ID}/${menteeRecordId}`,
-      { headers: airtableHeaders }
-    );
-    const menteeRecord = await menteeRes.json();
+  // ── Step 1: get mentee details ──
+  const menteeRes = await fetch(
+    `https://api.airtable.com/v0/${AIRTABLE_CORE_BASE_ID}/${AIRTABLE_MENTEE_TABLE_ID}/${menteeRecordId}`,
+    { headers: airtableHeaders }
+  );
+  const menteeRecord = await menteeRes.json();
 
-    const stripeCustomerId = menteeRecord.fields?.["Stripe Customer ID"];
-    const menteeName       = menteeRecord.fields?.["Name"] || "Unknown";
-    const menteeEmail      = menteeRecord.fields?.["Gmail"] || "";
+  const stripeCustomerId = menteeRecord.fields?.["Stripe Customer ID"];
+  const menteeName       = menteeRecord.fields?.["Name"] || "Unknown";
+  const menteeEmail      = menteeRecord.fields?.["Gmail"] || "";
+  const sessionPriceAUD  = parseFloat(menteeRecord.fields?.["Session Price"]) || 30;
+  const amountCents      = Math.round(sessionPriceAUD * 100);
 
-    if (!stripeCustomerId) {
+  if (!stripeCustomerId) {
+    return {
+      statusCode: 400,
+      headers,
+      body: JSON.stringify({ error: `No Stripe Customer ID on file for ${menteeName}` }),
+    };
+  }
+
+  // ── Step 2: get saved payment method ──
+  const stripe = new Stripe(STRIPE_SECRET_KEY, { apiVersion: "2024-06-20" });
+  const customer = await stripe.customers.retrieve(stripeCustomerId);
+
+  if (!customer.email && menteeEmail) {
+    await stripe.customers.update(stripeCustomerId, { email: menteeEmail });
+  }
+
+  let paymentMethodId = customer.invoice_settings?.default_payment_method;
+  if (!paymentMethodId) {
+    const methods = await stripe.paymentMethods.list({ customer: stripeCustomerId, type: "card" });
+    if (!methods.data.length) {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ error: `No Stripe Customer ID on file for ${menteeName}` }),
+        body: JSON.stringify({ error: `No saved card on file for ${menteeName}` }),
       };
     }
+    paymentMethodId = methods.data[0].id;
+  }
 
-    // ── Step 2: get the saved payment method, backfill email if missing ──
-    const stripe = new Stripe(STRIPE_SECRET_KEY, { apiVersion: "2024-06-20" });
+  // ── Step 3: attempt charge ──
+  let paymentSucceeded = false;
+  let paymentIntentId  = null;
+  let failureReason    = null;
 
-    const customer = await stripe.customers.retrieve(stripeCustomerId);
-
-    // If the Stripe customer has no email (old mentees), push it from Airtable
-    if (!customer.email && menteeEmail) {
-      await stripe.customers.update(stripeCustomerId, { email: menteeEmail });
-    }
-
-    let paymentMethodId = customer.invoice_settings?.default_payment_method;
-
-    if (!paymentMethodId) {
-      const methods = await stripe.paymentMethods.list({
-        customer: stripeCustomerId,
-        type: "card",
-      });
-      if (!methods.data.length) {
-        return {
-          statusCode: 400,
-          headers,
-          body: JSON.stringify({ error: `No saved card on file for ${menteeName}` }),
-        };
-      }
-      paymentMethodId = methods.data[0].id;
-    }
-
-    // ── Step 3: charge the card (price from mentee record, fallback $150 AUD) ──
-    const sessionPriceAUD = parseFloat(menteeRecord.fields?.["Session Price"]) || 30;
-    const amountCents = Math.round(sessionPriceAUD * 100);
-
-    // Idempotency key prevents double-charge if browser retries the same request
+  try {
     const idempotencyKey = `session-${menteeRecordId}-${mentorEmail}-${sessionDate}`;
-
     const paymentIntent = await stripe.paymentIntents.create(
       {
         amount: amountCents,
@@ -112,48 +107,49 @@ exports.handler = async (event) => {
       },
       { idempotencyKey }
     );
-
-    // ── Step 4: log the session to Airtable (non-blocking — charge already succeeded) ──
-    try {
-      if (AIRTABLE_SESSION_TABLE_ID) {
-        await fetch(
-          `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_SESSION_TABLE_ID}`,
-          {
-            method: "POST",
-            headers: airtableHeaders,
-            body: JSON.stringify({
-              fields: {
-                "Mentor Email": mentorEmail,
-                "Mentee Name": menteeName,
-                "Date": sessionDate,
-                "Extra Notes": notes || "",
-                "Amount Charged": amountCents / 100,
-                "Stripe Payment ID": paymentIntent.id,
-              },
-            }),
-          }
-        );
-      }
-    } catch {
-      // Logging failed but charge succeeded — Stripe has the record
-    }
-
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({
-        success: true,
-        menteeName,
-        amountCharged: amountCents / 100,
-        paymentIntentId: paymentIntent.id,
-      }),
-    };
-  } catch (err) {
-    // Stripe off-session failures (e.g. card declined) land here
-    return {
-      statusCode: 402,
-      headers,
-      body: JSON.stringify({ error: err.message || "Charge failed" }),
-    };
+    paymentSucceeded = true;
+    paymentIntentId  = paymentIntent.id;
+  } catch (stripeErr) {
+    failureReason = stripeErr.message || "Charge failed";
   }
+
+  // ── Step 4: always log the session ──
+  try {
+    if (AIRTABLE_SESSION_TABLE_ID) {
+      await fetch(
+        `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_SESSION_TABLE_ID}`,
+        {
+          method: "POST",
+          headers: airtableHeaders,
+          body: JSON.stringify({
+            fields: {
+              "Mentor Email":      mentorEmail,
+              "Mentee Name":       menteeName,
+              "Date":              sessionDate,
+              "Extra Notes":       notes || "",
+              "Amount Charged":    paymentSucceeded ? amountCents / 100 : 0,
+              "Stripe Payment ID": paymentIntentId || "",
+              "Payment Status":    paymentSucceeded ? "Charged" : "Failed",
+              "Failure Reason":    failureReason || "",
+            },
+          }),
+        }
+      );
+    }
+  } catch {
+    // session log failed — not blocking
+  }
+
+  return {
+    statusCode: 200,
+    headers,
+    body: JSON.stringify({
+      success: true,
+      menteeName,
+      amountCharged: paymentSucceeded ? amountCents / 100 : 0,
+      paymentSucceeded,
+      paymentIntentId,
+      failureReason,
+    }),
+  };
 };

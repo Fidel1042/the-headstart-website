@@ -101,14 +101,21 @@
           const result = await res.json();
           if (!res.ok) throw new Error(result.error);
 
-          logCard.hidden     = true;
+          logCard.hidden = true;
           successCard.hidden = false;
-          successDetail.textContent = `${result.menteeName} charged $${result.amountCharged} AUD`;
+
+          if (result.paymentSucceeded) {
+            successDetail.textContent = `Session logged — ${result.menteeName} charged $${result.amountCharged} AUD`;
+          } else {
+            successDetail.textContent = `Session logged — payment failed for ${result.menteeName}. Fidel has been notified.`;
+            successDetail.style.color = "#e0a030";
+          }
 
           clearTimeout(window._successTimer);
           window._successTimer = setTimeout(() => {
             successCard.hidden = true;
             logCard.hidden     = false;
+            successDetail.style.color = "";
             resetForm();
           }, 30000);
         } catch (err) {
