@@ -34,19 +34,11 @@ exports.handler = async (event) => {
     "Content-Type": "application/json",
   };
 
-  const today   = new Date();
-  const weekAgo = new Date(today);
-  weekAgo.setDate(today.getDate() - 7);
+  const today     = new Date();
+  const weekLabel = today.toLocaleDateString("en-AU", { day: "numeric", month: "long", year: "numeric" });
 
-  const fmt       = (d) => d.toISOString().split("T")[0];
-  const startDate = fmt(weekAgo);
-  const endDate   = fmt(today);
-  const weekLabel = `${weekAgo.toLocaleDateString("en-AU", { day: "numeric", month: "short" })} – ${today.toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" })}`;
-
-  // Fetch ALL unpaid charged sessions regardless of date — nothing falls through
-  const formula = encodeURIComponent(
-    `AND({Payment Status} = "Charged", {Mentor Paid} = 0)`
-  );
+  // All sessions not yet paid to mentor, regardless of mentee payment status
+  const formula = encodeURIComponent(`{Mentor Paid} = 0`);
 
   const res  = await fetch(
     `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_SESSION_TABLE_ID}` +

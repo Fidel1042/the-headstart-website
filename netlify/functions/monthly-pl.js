@@ -55,8 +55,9 @@ exports.handler = async () => {
     const amount      = parseFloat(s.fields["Amount Charged"]) || 0;
     const mentorEmail = (s.fields["Mentor Email"] || "").toLowerCase().trim();
 
+    if (amount <= 0) continue; // skip failed sessions
     grossRevenue  += amount;
-    stripeFees    += amount * 0.0325 + 0.30; // 1.75% domestic + 1.5% international card surcharge
+    stripeFees    += amount * 0.0325 + 0.30;
     mentorPayouts += MENTOR_RATES[mentorEmail] ?? 0;
   }
 

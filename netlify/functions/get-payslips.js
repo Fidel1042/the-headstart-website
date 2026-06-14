@@ -24,18 +24,10 @@ exports.handler = async (event) => {
 
   const { AIRTABLE_API_TOKEN, AIRTABLE_BASE_ID, AIRTABLE_SESSION_TABLE_ID } = process.env;
 
-  const today   = new Date();
-  const weekAgo = new Date(today);
-  weekAgo.setDate(today.getDate() - 7);
+  const today     = new Date();
+  const weekLabel = `Outstanding as of ${today.toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" })}`;
 
-  const fmt       = (d) => d.toISOString().split("T")[0];
-  const startDate = fmt(weekAgo);
-  const endDate   = fmt(today);
-  const weekLabel = `${weekAgo.toLocaleDateString("en-AU", { day: "numeric", month: "short" })} – ${today.toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" })}`;
-
-  const formula = encodeURIComponent(
-    `AND({Date} >= "${startDate}", {Date} <= "${endDate}", {Payment Status} = "Charged")`
-  );
+  const formula = encodeURIComponent(`{Mentor Paid} = 0`);
 
   const res  = await fetch(
     `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_SESSION_TABLE_ID}` +
