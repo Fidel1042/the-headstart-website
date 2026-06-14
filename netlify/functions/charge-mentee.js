@@ -1,5 +1,18 @@
 const Stripe = require("stripe");
 
+const MENTOR_RATES = {
+  "angelicagrace160272@gmail.com": 55,
+  "edrickkoda@gmail.com":          20,
+  "aidanmwibrata@gmail.com":       20,
+  "dhulipatideepika@gmail.com":    20,
+  "wooheehan3@gmail.com":          50,
+  "laljimkf@gmail.com":            45,
+  "raunaqrsa@gmail.com":           20,
+  "jai.arora115@gmail.com":        20,
+  "fidelhon@gmail.com":             0,
+  "kokoro.araki1015@gmail.com":     0,
+};
+
 const headers = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -94,19 +107,15 @@ exports.handler = async (event) => {
   let failureReason    = null;
 
   try {
-    const idempotencyKey = `session-${menteeRecordId}-${mentorEmail}-${sessionDate}`;
-    const paymentIntent = await stripe.paymentIntents.create(
-      {
-        amount: amountCents,
-        currency: "aud",
-        customer: stripeCustomerId,
-        payment_method: paymentMethodId,
-        off_session: true,
-        confirm: true,
-        description: `Headstart session — ${menteeName} — ${sessionDate}`,
-      },
-      { idempotencyKey }
-    );
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amountCents,
+      currency: "aud",
+      customer: stripeCustomerId,
+      payment_method: paymentMethodId,
+      off_session: true,
+      confirm: true,
+      description: `Headstart session — ${menteeName} — ${sessionDate}`,
+    });
     paymentSucceeded = true;
     paymentIntentId  = paymentIntent.id;
   } catch (stripeErr) {
@@ -131,6 +140,7 @@ exports.handler = async (event) => {
               "Stripe Payment ID": paymentIntentId || "",
               "Payment Status":    paymentSucceeded ? "Charged" : "Failed",
               "Failure Reason":    failureReason || "",
+              "Mentor Payout":     MENTOR_RATES[mentorEmail.toLowerCase().trim()] ?? 0,
             },
           }),
         }

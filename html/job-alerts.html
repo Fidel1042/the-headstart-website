@@ -1252,6 +1252,12 @@ document.querySelectorAll(".tab:not(.soon)").forEach(btn => {
     document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
     activeCat = btn.dataset.cat;
+    // Keep the URL in sync so users can copy/share the current tab view.
+    try {
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.set("cat", activeCat);
+      history.replaceState(null, "", newUrl.toString());
+    } catch (e) {}
     render();
   });
 });
@@ -1272,6 +1278,11 @@ document.getElementById("searchInput").addEventListener("input", e => {
     document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
     document.querySelector(".tab[data-cat='all']").classList.add("active");
     activeCat = "all";
+    try {
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.set("cat", "all");
+      history.replaceState(null, "", newUrl.toString());
+    } catch (e) {}
   }
   render();
 });

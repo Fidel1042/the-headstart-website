@@ -56,7 +56,7 @@ exports.handler = async () => {
     const mentorEmail = (s.fields["Mentor Email"] || "").toLowerCase().trim();
 
     grossRevenue  += amount;
-    stripeFees    += amount * 0.0175 + 0.30;
+    stripeFees    += amount * 0.0325 + 0.30; // 1.75% domestic + 1.5% international card surcharge
     mentorPayouts += MENTOR_RATES[mentorEmail] ?? 0;
   }
 

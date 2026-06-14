@@ -22,6 +22,8 @@
         if (plLink) plLink.style.display = "";
         const consultLink = document.getElementById("consult-link");
         if (consultLink) consultLink.style.display = "";
+        const payslipBtn = document.getElementById("payslip-btn");
+        if (payslipBtn) payslipBtn.style.display = "";
       }
       bindSignOutButton("#signout-btn");
 
@@ -774,6 +776,7 @@
       <div class="top-nav-actions">
         <a href="/consultation-tool/index.html" id="consult-link" class="signout-btn" style="text-decoration:none;display:none;">Consultation</a>
         <a href="/mentor-portal/pl.html" id="pl-link" class="signout-btn" style="text-decoration:none;display:none;">P&amp;L</a>
+        <a href="/mentor-portal/payslips.html" id="payslip-btn" class="signout-btn" style="display:none;text-decoration:none;">Payslips</a>
         <span class="user-chip" id="user-chip" hidden></span>
         <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle light/dark mode" title="Toggle light/dark mode">
           <span id="theme-icon">&#9788;</span>
