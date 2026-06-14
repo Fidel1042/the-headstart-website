@@ -143,6 +143,19 @@
         observer.observe(embed, { childList: true, subtree: true });
       }
     })();
+
+    window.addEventListener('message', function (e) {
+      if (e.data && e.data.event === 'calendly.event_scheduled') {
+        if (typeof window.gtag === 'function') {
+          var payload = e.data.payload || {};
+          var eventType = payload.event_type || {};
+          window.gtag('event', 'invitee_meeting_scheduled', {
+            service_name: eventType.name || 'Free Career Call',
+            event_category: 'Calendly'
+          });
+        }
+      }
+    });
   </script>
   <script src="https://assets.calendly.com/assets/external/widget.js" async></script>
   <script type="module" src="../js/main.js"></script>

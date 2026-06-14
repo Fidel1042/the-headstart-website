@@ -435,6 +435,9 @@
         }, 4000);
 
         try {
+          if (typeof window.gtag === 'function') {
+            window.gtag('event', 'discovery_form_submit', { form_id: 'discovery_call_form' });
+          }
           window.location.href = '/free-call-submitted';
         } catch (err) {
           clearTimeout(failsafe);

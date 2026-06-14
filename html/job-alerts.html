@@ -1252,6 +1252,9 @@ document.querySelectorAll(".tab:not(.soon)").forEach(btn => {
     document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
     activeCat = btn.dataset.cat;
+    if (typeof gtag === "function") {
+      gtag("event", "industry_tab_click", { tab_name: btn.dataset.cat });
+    }
     // Keep the URL in sync so users can copy/share the current tab view.
     try {
       const newUrl = new URL(window.location.href);
@@ -1351,6 +1354,9 @@ var consultClose = document.getElementById("consultClose");
 function openConsultModal() {
   consultModal.classList.add("is-open");
   document.body.style.overflow = "hidden";
+  if (typeof gtag === "function") {
+    gtag("event", "modal_view", { modal_name: "consultation_popup" });
+  }
 }
 function closeConsultModal() {
   consultModal.classList.remove("is-open");
@@ -1392,6 +1398,15 @@ document.getElementById("emailForm").addEventListener("submit", function(e) {
   this.style.display = "none";
   document.getElementById("emailSuccess").style.display = "block";
 
+  if (typeof gtag === "function") {
+    gtag("event", "generate_lead", {
+      form_id: "job_alert_signup",
+      student_status: (document.getElementById("hiddenIntStudent").value || "").trim(),
+      industries: (document.getElementById("hiddenIndustries").value || "").trim(),
+      role_type: (document.getElementById("hiddenRoleType").value || "").trim()
+    });
+  }
+
   // Carry forward name/email/intStudent into the consult modal's hidden fields
   document.getElementById("consultName").value = document.getElementById("signupName").value || "";
   document.getElementById("consultEmail").value = document.getElementById("signupEmail").value || "";
@@ -1419,6 +1434,10 @@ document.getElementById("consultForm").addEventListener("submit", function(e) {
 
   var prefillName = (document.getElementById("consultName").value || "").trim();
   var prefillEmail = (document.getElementById("consultEmail").value || "").trim();
+
+  if (typeof gtag === "function") {
+    gtag("event", "consult_form_submit", { form_id: "job_alerts_consult_modal" });
+  }
 
   // Save the lead to Netlify in the background; never block the user on it
   try {
