@@ -1312,6 +1312,8 @@ document.querySelectorAll("#roleChips .role-chip").forEach(function(chip) {
   });
 });
 
+var sessionJobClickCount = 0;
+
 document.getElementById("jobList").addEventListener("click", function(e) {
   // Show more / show less toggle
   const moreBtn = e.target.closest(".show-more-btn");
@@ -1327,12 +1329,14 @@ document.getElementById("jobList").addEventListener("click", function(e) {
   // Job row click → GA4 click-tracking
   const rowLink = e.target.closest(".job-row");
   if (rowLink && typeof gtag === "function") {
+    sessionJobClickCount++;
     gtag("event", "job_click", {
       company: rowLink.dataset.company,
       title: rowLink.dataset.title,
       source: rowLink.dataset.source,
       category: rowLink.dataset.category,
-      city: rowLink.dataset.city
+      city: rowLink.dataset.city,
+      click_index: sessionJobClickCount
     });
   }
 });

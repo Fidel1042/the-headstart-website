@@ -123,9 +123,10 @@ exports.handler = async (event) => {
   }
 
   // ── Step 4: always log the session ──
+  let logError = null;
   try {
     if (AIRTABLE_SESSION_TABLE_ID) {
-      await fetch(
+      const logRes  = await fetch(
         `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_SESSION_TABLE_ID}`,
         {
           method: "POST",
@@ -145,9 +146,13 @@ exports.handler = async (event) => {
           }),
         }
       );
+      if (!logRes.ok) {
+        const logBody = await logRes.json().catch(() => ({}));
+        logError = logBody?.error?.message || `Airtable status ${logRes.status}`;
+      }
     }
-  } catch {
-    // session log failed — not blocking
+  } catch (e) {
+    logError = e.message;
   }
 
   return {
@@ -160,6 +165,7 @@ exports.handler = async (event) => {
       paymentSucceeded,
       paymentIntentId,
       failureReason,
+      logError,
     }),
   };
 };

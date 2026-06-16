@@ -194,6 +194,23 @@ export const mentors = [
     why: "His brother went through the mentoring process, and watching that up close showed him what a real difference it makes. He has also seen enough people struggle to know the gap is real.",
     different: "Jai helps students build something concrete, whether a project, a personal website, or a presence in the right societies, and then connect it back to their story rather than letting it sit as a line on a resume.",
   },
+  {
+    id: "brendon", name: "Brendon Vo", intl: "Local",
+    role: "Early Careers Specialist", company: "InfraBuild",
+    uni: "University of Wollongong", degree: "Double Degree, Law and Commerce",
+    major: "Human Resources", industry: "HR / Law / Recruitment", rate: "$20",
+    visa: "Domestic", gradYear: "2022",
+    specialiseIn: ["HR", "Law", "Recruitment"],
+    photo: IMG + "Brendon .png",
+    detailPhoto: DIMG + "Brendon.png",
+    logos: [{ src: LOGO + "Infrabuild.png", alt: "InfraBuild" }],
+    tags: ["hr", "human resources", "law", "sales", "manufacturing", "engineering", "finance", "recruitment", "graduate programs"],
+    bestFor: "Students aiming for careers in HR, law, sales, manufacturing, engineering, or finance, especially international students who need to build genuine connections and stand out beyond the transactional.",
+    detailed: true,
+    lead: "Brendon holds a double degree in law and commerce, majoring in HR, from the University of Wollongong and works as an Early Careers specialist at InfraBuild. He built and managed a graduate program from scratch that achieved 100% retention, including visa support for international students.",
+    why: "He has a genuine drive to work with graduates, especially those whose confidence has been worn down by repeated rejections. Seeing people in his own network land roles in HR and law clerkships is what keeps him going.",
+    different: "His background is on the recruiter side. He built and ran a graduate hiring program from the inside, which means he can teach students how to build connections that go beyond the transactional and actually stick. He uses structured frameworks to help mentees take ownership of their own development, including those who tend to hold back.",
+  },
 ];
 
 export function getMentor(id) {
