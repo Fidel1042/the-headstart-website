@@ -5,7 +5,7 @@
 .matrix-main {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 54px);
+  min-height: calc(100vh - 54px);
   padding: 0.8rem 2rem 1rem;
   box-sizing: border-box;
 }
@@ -41,6 +41,13 @@
   gap: 1rem;
   min-height: 0;
 }
+/* Once a card is selected, stop locking rows to a quarter-screen so the
+   chosen card can grow to fit all its text + buttons (page scrolls if needed). */
+.matrix.has-selection {
+  flex: none;
+  grid-template-rows: repeat(2, auto);
+}
+
 @media (max-width: 700px) {
   .matrix {
     flex: none;
@@ -151,7 +158,7 @@
   transition: max-height 0.35s ease, opacity 0.3s ease, margin-top 0.3s ease;
 }
 .persona-box.is-selected .persona-box__detail {
-  max-height: 500px;
+  max-height: 600px;
   opacity: 1;
   margin-top: 1.1rem;
   padding-top: 1.1rem;
