@@ -5,7 +5,8 @@
 // Each stage lists the individual sessions inside it.
 export const stages = {
   1: {
-    name: "Knowing where to apply",
+    name: "Direction",
+    tagline: "Knowing where to apply",
     sessionLabel: "2 sessions",
     sessions: [
       "Target role mapping",
@@ -13,7 +14,8 @@ export const stages = {
     ],
   },
   2: {
-    name: "Strong application material",
+    name: "Foundation",
+    tagline: "Strong application material",
     sessionLabel: "3 sessions",
     sessions: [
       "Resume + Cover Letter Fix",
@@ -22,7 +24,8 @@ export const stages = {
     ],
   },
   3: {
-    name: "Building a network",
+    name: "Access",
+    tagline: "Building a network",
     sessionLabel: "2 sessions",
     sessions: [
       "Who to reach out",
@@ -30,7 +33,8 @@ export const stages = {
     ],
   },
   4: {
-    name: "Initial interviews",
+    name: "First Rounds",
+    tagline: "Initial interviews",
     sessionLabel: "2–3 sessions",
     sessions: [
       "Screening Calls",
@@ -38,7 +42,8 @@ export const stages = {
     ],
   },
   5: {
-    name: "Final boss",
+    name: "Final Boss",
+    tagline: "Assessment centres and final rounds",
     sessionLabel: "3–5 sessions",
     sessions: [
       "F2F Interview Prep",
@@ -47,7 +52,8 @@ export const stages = {
     ],
   },
   6: {
-    name: "It's only the start",
+    name: "Headstart",
+    tagline: "It's only the start",
     sessionLabel: "2 sessions",
     sessions: [
       "Turn Internship into return offer",
@@ -60,6 +66,7 @@ export const stages = {
 export const personas = [
   {
     id: "visibility-fix",
+    short: "Visibility Fix",
     name: "Grad/Junior Role: The Visibility Fix",
     tag: "Applying for grad roles, no callbacks yet",
     desc: "Has started applying for graduate or junior roles but the inbox stays silent. Time to fix the visibility problem.",
@@ -68,15 +75,17 @@ export const personas = [
   },
   {
     id: "seal-the-deal",
+    short: "Seal the Deal",
     name: "Grad/Junior Role: Seal the Deal",
     tag: "Making finals, can't close the offer",
     desc: "Gets through the early rounds but can't convert when it counts. The offer is one step away.",
     sessions: "5–6 sessions",
     stages: [2, 5],
-    sessionOverrides: { 2: { name: "Finding Your Edge", sessionLabel: "2 sessions", sessions: ["Understanding your story", "Present them as unique stories"] } },
+    sessionOverrides: { 2: { name: "The Edge", tagline: "Finding what makes you unique", sessionLabel: "2 sessions", sessions: ["Understanding your story", "Present them as unique stories"] } },
   },
   {
     id: "internship-bound",
+    short: "Internship Bound",
     name: "Internship Bound: Let's Build the Plan",
     tag: "Wants to start early, no clue where to begin",
     desc: "Knows the market is brutal and wants a head start, but has no clue where to begin or what to target.",
@@ -85,6 +94,7 @@ export const personas = [
   },
   {
     id: "internship-slipping",
+    short: "Internship Slipping",
     name: "The Internship That Keeps Slipping",
     tag: "Has tried, has traction, still no offer",
     desc: "Knows what roles to chase and has some society or screening experience, but the internship keeps slipping through.",

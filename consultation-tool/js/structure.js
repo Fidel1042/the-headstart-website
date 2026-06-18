@@ -4,9 +4,27 @@ const { stages, getPersona, personas } = await import(`./data.js?v=${v}`);
 const headEl = document.getElementById("structHead");
 const listEl = document.getElementById("stageList");
 const mentorCta = document.getElementById("mentorCta");
+const switchEl = document.getElementById("personaSwitch");
 
 const currentId = new URLSearchParams(location.search).get("p") || personas[0].id;
 const p = getPersona(currentId);
+
+// Quick-pick buttons to switch between the 4 personas without the matrix page
+if (switchEl) {
+  switchEl.innerHTML = personas
+    .map(
+      (x) =>
+        `<button type="button" class="persona-switch__btn${x.id === p.id ? " is-active" : ""}" data-id="${x.id}">${x.short || x.name}</button>`
+    )
+    .join("");
+  switchEl.addEventListener("click", (e) => {
+    const btn = e.target.closest(".persona-switch__btn");
+    if (!btn) return;
+    const url = new URL(location.href);
+    url.searchParams.set("p", btn.dataset.id);
+    location.href = url.pathname + url.search;
+  });
+}
 
 headEl.innerHTML = `
   <span class="struct-head__name">${p.name}</span>
