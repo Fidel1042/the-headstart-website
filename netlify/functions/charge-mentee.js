@@ -72,54 +72,48 @@ exports.handler = async (event) => {
   const sessionPriceAUD  = parseFloat(menteeRecord.fields?.["Session Price"]) || 30;
   const amountCents      = Math.round(sessionPriceAUD * 100);
 
-  if (!stripeCustomerId) {
-    return {
-      statusCode: 400,
-      headers,
-      body: JSON.stringify({ error: `No Stripe Customer ID on file for ${menteeName}` }),
-    };
-  }
-
-  // ── Step 2: get saved payment method ──
-  const stripe = new Stripe(STRIPE_SECRET_KEY, { apiVersion: "2024-06-20" });
-  const customer = await stripe.customers.retrieve(stripeCustomerId);
-
-  if (!customer.email && menteeEmail) {
-    await stripe.customers.update(stripeCustomerId, { email: menteeEmail });
-  }
-
-  let paymentMethodId = customer.invoice_settings?.default_payment_method;
-  if (!paymentMethodId) {
-    const methods = await stripe.paymentMethods.list({ customer: stripeCustomerId, type: "card" });
-    if (!methods.data.length) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: `No saved card on file for ${menteeName}` }),
-      };
-    }
-    paymentMethodId = methods.data[0].id;
-  }
-
-  // ── Step 3: attempt charge ──
+  // ── Step 2: attempt charge (skip if no payment setup) ──
   let paymentSucceeded = false;
   let paymentIntentId  = null;
   let failureReason    = null;
 
-  try {
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: amountCents,
-      currency: "aud",
-      customer: stripeCustomerId,
-      payment_method: paymentMethodId,
-      off_session: true,
-      confirm: true,
-      description: `Headstart session — ${menteeName} — ${sessionDate}`,
-    });
-    paymentSucceeded = true;
-    paymentIntentId  = paymentIntent.id;
-  } catch (stripeErr) {
-    failureReason = stripeErr.message || "Charge failed";
+  if (!stripeCustomerId) {
+    failureReason = "No Stripe Customer ID on file — mentee hasn't completed payment setup";
+  } else {
+    const stripe = new Stripe(STRIPE_SECRET_KEY, { apiVersion: "2024-06-20" });
+    const customer = await stripe.customers.retrieve(stripeCustomerId);
+
+    if (!customer.email && menteeEmail) {
+      await stripe.customers.update(stripeCustomerId, { email: menteeEmail });
+    }
+
+    let paymentMethodId = customer.invoice_settings?.default_payment_method;
+    if (!paymentMethodId) {
+      const methods = await stripe.paymentMethods.list({ customer: stripeCustomerId, type: "card" });
+      if (methods.data.length) {
+        paymentMethodId = methods.data[0].id;
+      }
+    }
+
+    if (!paymentMethodId) {
+      failureReason = "No saved card on file — mentee hasn't added a payment method";
+    } else {
+      try {
+        const paymentIntent = await stripe.paymentIntents.create({
+          amount: amountCents,
+          currency: "aud",
+          customer: stripeCustomerId,
+          payment_method: paymentMethodId,
+          off_session: true,
+          confirm: true,
+          description: `Headstart session — ${menteeName} — ${sessionDate}`,
+        });
+        paymentSucceeded = true;
+        paymentIntentId  = paymentIntent.id;
+      } catch (stripeErr) {
+        failureReason = stripeErr.message || "Charge failed";
+      }
+    }
   }
 
   // ── Step 4: always log the session ──

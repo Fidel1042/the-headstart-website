@@ -37,11 +37,18 @@ exports.handler = async (event) => {
   try {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2024-06-20" });
 
-    const customer = await stripe.customers.create({
-      name,
-      email: email || undefined,
-      metadata: { source: "mentee-agreement" },
-    });
+    let customer;
+    if (email) {
+      const existing = await stripe.customers.list({ email, limit: 1 });
+      customer = existing.data[0];
+    }
+    if (!customer) {
+      customer = await stripe.customers.create({
+        name,
+        email: email || undefined,
+        metadata: { source: "mentee-agreement" },
+      });
+    }
 
     const setupIntent = await stripe.setupIntents.create({
       customer: customer.id,
