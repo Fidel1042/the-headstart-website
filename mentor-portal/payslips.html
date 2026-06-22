@@ -22,6 +22,12 @@
       loadPayslips();
     });
 
+    function formatDate(dateStr) {
+      if (!dateStr) return "—";
+      const d = new Date(dateStr.slice(0, 10) + "T00:00:00");
+      return d.toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" });
+    }
+
     async function loadPayslips() {
       const loading  = document.getElementById("loading");
       const empty    = document.getElementById("empty");
@@ -99,7 +105,7 @@
         grandTotal += m.total;
         const rows = m.sessions.map((s) => `
           <div class="session-row">
-            <span class="session-date">${s.date}</span>
+            <span class="session-date">${formatDate(s.date)}</span>
             <span class="session-mentee">${s.mentee}</span>
             <span class="session-amount">$${s.payout.toFixed(2)}</span>
           </div>`).join("");
@@ -361,7 +367,7 @@
     </div>
 
     <p class="loading" id="loading" hidden>Loading…</p>
-    <p class="empty" id="empty" hidden>No charged sessions in the last 7 days.</p>
+    <p class="empty" id="empty" hidden>No unpaid sessions outstanding.</p>
 
     <div id="content" hidden>
       <div class="mentor-list" id="mentor-list"></div>

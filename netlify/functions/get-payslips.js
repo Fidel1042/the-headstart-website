@@ -29,14 +29,19 @@ exports.handler = async (event) => {
 
   const formula = encodeURIComponent(`{Mentor Paid} = 0`);
 
-  const res  = await fetch(
-    `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_SESSION_TABLE_ID}` +
-    `?filterByFormula=${formula}` +
-    `&fields[]=Mentor%20Email&fields[]=Mentee%20Name&fields[]=Date&fields[]=Mentor%20Payout`,
-    { headers: { Authorization: `Bearer ${AIRTABLE_API_TOKEN}`, "Content-Type": "application/json" } }
-  );
-  const data     = await res.json();
-  const sessions = data.records || [];
+  let sessions;
+  try {
+    const res  = await fetch(
+      `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_SESSION_TABLE_ID}` +
+      `?filterByFormula=${formula}` +
+      `&fields[]=Mentor%20Email&fields[]=Mentee%20Name&fields[]=Date&fields[]=Mentor%20Payout`,
+      { headers: { Authorization: `Bearer ${AIRTABLE_API_TOKEN}`, "Content-Type": "application/json" } }
+    );
+    const data = await res.json();
+    sessions   = data.records || [];
+  } catch {
+    return { statusCode: 502, headers, body: JSON.stringify({ error: "Could not reach Airtable — try again in a moment" }) };
+  }
 
   const byMentor = {};
   for (const s of sessions) {

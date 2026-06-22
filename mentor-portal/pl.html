@@ -30,6 +30,8 @@
       const statement  = document.getElementById("statement");
       const emptyState = document.getElementById("empty-state");
       const loading    = document.getElementById("loading");
+      const previewBtn = document.getElementById("preview-btn");
+      const liveBadge  = document.getElementById("live-badge");
 
       loading.hidden = false;
 
@@ -51,26 +53,50 @@
 
       loading.hidden = true;
 
-      if (records.length === 0) {
-        emptyState.hidden = false;
-        return;
-      }
-
-      // Populate month dropdown
-      selector.innerHTML = records
-        .map((r) => `<option value="${r.month}">${formatMonthLabel(r.month)}</option>`)
-        .join("");
-      selector.hidden = false;
-
       function render(month) {
         const r = records.find((x) => x.month === month);
         if (!r) return;
+        liveBadge.hidden = true;
         renderStatement(r);
         statement.hidden = false;
       }
 
-      selector.addEventListener("change", () => render(selector.value));
-      render(records[0].month);
+      if (records.length > 0) {
+        selector.innerHTML = records
+          .map((r) => `<option value="${r.month}">${formatMonthLabel(r.month)}</option>`)
+          .join("");
+        selector.hidden = false;
+        selector.addEventListener("change", () => render(selector.value));
+        render(records[0].month);
+      } else {
+        emptyState.hidden = false;
+      }
+
+      // "This month" preview button
+      previewBtn.hidden = false;
+      previewBtn.addEventListener("click", async () => {
+        previewBtn.textContent = "Loading…";
+        previewBtn.disabled = true;
+        try {
+          const res  = await fetch("/.netlify/functions/preview-pl", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({}),
+          });
+          const data = await res.json();
+          selector.hidden = true;
+          emptyState.hidden = true;
+          liveBadge.hidden = false;
+          renderStatement(data);
+          statement.hidden = false;
+        } catch {
+          previewBtn.textContent = "Failed — try again";
+          previewBtn.disabled = false;
+          return;
+        }
+        previewBtn.textContent = "This month";
+        previewBtn.disabled = false;
+      });
     }
 
     function formatMonthLabel(ym) {
@@ -235,6 +261,21 @@
     .month-selector:focus { border-color: var(--accent); }
     .month-selector option { background: #1a1a1a; color: #ffffff; }
 
+    .preview-btn {
+      background: none;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s, color 0.15s;
+    }
+    .preview-btn:hover { background: var(--accent); color: #000; }
+    .preview-btn:disabled { opacity: 0.5; cursor: default; }
+
     /* ── Statement ── */
     .statement {
       background: var(--bg-card);
@@ -381,6 +422,7 @@
     <div class="nav-left">
       <a href="/mentor-portal/index.html" class="nav-logo">The Headstart</a>
       <a href="/mentor-portal/index.html" class="nav-link">Log Session</a>
+      <a href="/mentor-portal/payslips.html" class="nav-link">Payslips</a>
     </div>
     <div class="nav-right">
       <span class="user-chip" id="user-chip" hidden></span>
@@ -392,8 +434,12 @@
 
     <div class="page-header">
       <span class="page-title">P&amp;L Statement</span>
-      <select class="month-selector" id="month-selector" hidden></select>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <select class="month-selector" id="month-selector" hidden></select>
+        <button class="preview-btn" id="preview-btn" hidden>This month</button>
+      </div>
     </div>
+    <p id="live-badge" hidden style="font-size:0.75rem;font-weight:700;letter-spacing:0.1em;color:var(--accent);text-transform:uppercase;margin-bottom:20px;">Live preview</p>
 
     <p class="loading" id="loading" hidden>Loading</p>
     <p class="empty-state" id="empty-state" hidden>No P&amp;L records yet. The first statement generates on the 1st of next month.</p>

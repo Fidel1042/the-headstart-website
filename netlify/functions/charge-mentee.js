@@ -60,17 +60,24 @@ exports.handler = async (event) => {
   };
 
   // ── Step 1: get mentee details ──
-  const menteeRes = await fetch(
-    `https://api.airtable.com/v0/${AIRTABLE_CORE_BASE_ID}/${AIRTABLE_MENTEE_TABLE_ID}/${menteeRecordId}`,
-    { headers: airtableHeaders }
-  );
-  const menteeRecord = await menteeRes.json();
-
-  const stripeCustomerId = menteeRecord.fields?.["Stripe Customer ID"];
-  const menteeName       = menteeRecord.fields?.["Name"] || "Unknown";
-  const menteeEmail      = menteeRecord.fields?.["Gmail"] || "";
-  const sessionPriceAUD  = parseFloat(menteeRecord.fields?.["Session Price"]) || 30;
-  const amountCents      = Math.round(sessionPriceAUD * 100);
+  let stripeCustomerId, menteeName, menteeEmail, amountCents;
+  try {
+    const menteeRes    = await fetch(
+      `https://api.airtable.com/v0/${AIRTABLE_CORE_BASE_ID}/${AIRTABLE_MENTEE_TABLE_ID}/${menteeRecordId}`,
+      { headers: airtableHeaders }
+    );
+    const menteeRecord = await menteeRes.json();
+    if (!menteeRecord.fields) {
+      return { statusCode: 404, headers, body: JSON.stringify({ error: "Mentee record not found in Airtable" }) };
+    }
+    stripeCustomerId = menteeRecord.fields["Stripe Customer ID"];
+    menteeName       = menteeRecord.fields["Name"] || "Unknown";
+    menteeEmail      = menteeRecord.fields["Gmail"] || "";
+    const sessionPriceAUD = parseFloat(menteeRecord.fields["Session Price"]) || 30;
+    amountCents = Math.round(sessionPriceAUD * 100);
+  } catch (err) {
+    return { statusCode: 502, headers, body: JSON.stringify({ error: "Could not reach Airtable — try again in a moment" }) };
+  }
 
   // ── Step 2: attempt charge (skip if no payment setup) ──
   let paymentSucceeded = false;
@@ -81,17 +88,26 @@ exports.handler = async (event) => {
     failureReason = "No Stripe Customer ID on file — mentee hasn't completed payment setup";
   } else {
     const stripe = new Stripe(STRIPE_SECRET_KEY, { apiVersion: "2024-06-20" });
-    const customer = await stripe.customers.retrieve(stripeCustomerId);
 
-    if (!customer.email && menteeEmail) {
-      await stripe.customers.update(stripeCustomerId, { email: menteeEmail });
+    let customer;
+    try {
+      customer = await stripe.customers.retrieve(stripeCustomerId);
+    } catch {
+      failureReason = "Stripe customer record not found — mentee may need to re-add their card";
+      customer = null;
     }
 
-    let paymentMethodId = customer.invoice_settings?.default_payment_method;
-    if (!paymentMethodId) {
-      const methods = await stripe.paymentMethods.list({ customer: stripeCustomerId, type: "card" });
-      if (methods.data.length) {
-        paymentMethodId = methods.data[0].id;
+    if (customer && !customer.email && menteeEmail) {
+      await stripe.customers.update(stripeCustomerId, { email: menteeEmail }).catch(() => {});
+    }
+
+    let paymentMethodId = customer?.invoice_settings?.default_payment_method;
+    if (customer && !paymentMethodId) {
+      try {
+        const methods = await stripe.paymentMethods.list({ customer: stripeCustomerId, type: "card" });
+        if (methods.data.length) paymentMethodId = methods.data[0].id;
+      } catch {
+        // leave paymentMethodId null — will fall through to "no saved card" failure reason
       }
     }
 

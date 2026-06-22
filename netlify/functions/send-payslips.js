@@ -37,6 +37,12 @@ exports.handler = async (event) => {
   const today     = new Date();
   const weekLabel = today.toLocaleDateString("en-AU", { day: "numeric", month: "long", year: "numeric" });
 
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "—";
+    const d = new Date(dateStr.slice(0, 10) + "T00:00:00");
+    return d.toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" });
+  };
+
   // All sessions not yet paid to mentor, regardless of mentee payment status
   const formula = encodeURIComponent(`{Mentor Paid} = 0`);
 
@@ -50,7 +56,7 @@ exports.handler = async (event) => {
   const sessions = data.records || [];
 
   if (sessions.length === 0) {
-    return { statusCode: 200, headers, body: JSON.stringify({ message: "No unpaid sessions in the last 7 days." }) };
+    return { statusCode: 200, headers, body: JSON.stringify({ message: "No unpaid sessions outstanding." }) };
   }
 
   // Group by mentor, collect record IDs per mentor
@@ -85,7 +91,7 @@ exports.handler = async (event) => {
       .sort((a, b) => a.date.localeCompare(b.date))
       .map((s) => `
         <tr>
-          <td style="padding:8px 12px;border-bottom:1px solid #f0f0f0;">${s.date}</td>
+          <td style="padding:8px 12px;border-bottom:1px solid #f0f0f0;">${formatDate(s.date)}</td>
           <td style="padding:8px 12px;border-bottom:1px solid #f0f0f0;">${s.mentee}</td>
           <td style="padding:8px 12px;border-bottom:1px solid #f0f0f0;text-align:right;">$${s.payout.toFixed(2)}</td>
         </tr>`)
