@@ -115,6 +115,28 @@
     <span>Contact: <a href="mailto:theuniheadstart@gmail.com">theuniheadstart@gmail.com</a></span>
   </footer>
   <script>
+    // Gate: only show Calendly for Australian university students.
+    // Non-AU leads are still recorded in Netlify; they just see a holding message.
+    (function () {
+      var ausUni = '0';
+      try { ausUni = sessionStorage.getItem('hs_eligible') || '0'; } catch (e) {}
+      if (ausUni !== '1') {
+        var label = document.querySelector('.thanks-label');
+        var h1    = document.querySelector('.thanks-headline h1');
+        var wrap  = document.querySelector('.booking-embed-wrap');
+        if (label) label.textContent = "We've got your details";
+        if (h1)    h1.textContent    = "We'll be in touch.";
+        var p = document.createElement('p');
+        p.textContent = "Headstart currently works with students at Australian universities. We've saved your details and will reach out when we can help.";
+        p.style.cssText = 'color:rgba(255,255,255,0.7);max-width:520px;text-align:center;line-height:1.7;margin:0.5rem auto 0';
+        var inner = document.querySelector('.thanks-inner');
+        if (inner) inner.appendChild(p);
+        if (wrap) wrap.style.display = 'none';
+        return;
+      }
+    })();
+  </script>
+  <script>
     (function () {
       var embed = document.getElementById('calendlyEmbed');
       if (!embed) return;

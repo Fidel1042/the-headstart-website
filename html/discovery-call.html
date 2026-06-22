@@ -415,6 +415,14 @@
           sessionStorage.setItem('hs_booking_email', emailEl ? emailEl.value : '');
         } catch (err) { /* sessionStorage blocked; Calendly will just load empty */ }
 
+        // Flag whether this lead has an Australian mobile number (starts with 04 or 4)
+        try {
+          var phoneEl = document.getElementById('contact-phone');
+          var phoneVal = phoneEl ? phoneEl.value.replace(/[\s\-()+.]/g, '') : '';
+          var isAus = /^(04|4)\d/.test(phoneVal);
+          sessionStorage.setItem('hs_eligible', isAus ? '1' : '0');
+        } catch (err) {}
+
         // Send the lead to Netlify with keepalive so the POST survives navigation
         try {
           var data = new FormData(form);
