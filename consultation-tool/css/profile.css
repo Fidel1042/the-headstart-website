@@ -5,13 +5,16 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 3rem 1.4rem 3.4rem;
+  min-height: 100dvh;
+  padding: 1.5rem 1.4rem 3rem;
   background: #000;
 }
 .profile-card-img {
   display: block;
   width: 100%;
-  max-width: 430px;
+  max-width: 780px;
+  max-height: 92dvh;
+  object-fit: contain;
   margin: 0 auto;
   border-radius: 24px;
   box-shadow: 0 30px 70px rgba(0, 0, 0, 0.55);

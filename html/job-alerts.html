@@ -1149,10 +1149,16 @@ function isFresh(j) {
   return ageDays <= FRESH_DAYS;
 }
 
+// The most recently refreshed category, updated by hand whenever a new batch
+// is uploaded (see CHECK 7C in Skills/job-alerts-data-checker.md). initialCat()
+// uses this so the freshest content always lands users on its tab first.
+const LAST_UPDATED_CAT = "consulting";
+
 // Default category, can be overridden by ?cat= URL parameter so email links
 // like /job-alerts?cat=marketing land users directly on that tab.
-// If no override, pick the first category in CAT_ORDER that has fresh entries
-// so users never land on an empty tab when one category goes stale.
+// If no override: prefer LAST_UPDATED_CAT (if it still has fresh entries),
+// otherwise fall through to the first category in CAT_ORDER with fresh
+// entries so users never land on an empty tab.
 const VALID_CATS = ["all","finance","accounting","tech","marketing","consulting","data"];
 function initialCat() {
   try {
@@ -1160,6 +1166,9 @@ function initialCat() {
     const requested = (params.get("cat") || "").toLowerCase().trim();
     if (VALID_CATS.includes(requested)) return requested;
   } catch (e) {}
+  if (VALID_CATS.includes(LAST_UPDATED_CAT) && JOBS.some(j => j.cat === LAST_UPDATED_CAT && isFresh(j))) {
+    return LAST_UPDATED_CAT;
+  }
   for (const c of CAT_ORDER) {
     if (JOBS.some(j => j.cat === c && isFresh(j))) return c;
   }

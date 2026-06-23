@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mentor Card — Timeline Concept</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0d0d0d;
+      color: #fff;
+      padding: 3rem 2rem;
+    }
+
+    .card {
+      width: 260px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 1.2rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card__photo {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      border-radius: 14px;
+      margin-bottom: 0.9rem;
+    }
+
+    .card__name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 0;
+    }
+
+    .card__role {
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.5);
+      margin: 0.1rem 0 0.9rem;
+    }
+
+    .timeline {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-bottom: 1.1rem;
+      padding-left: 0.2rem;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: calc(0.2rem + 3px);
+      top: calc(0.22rem + 4px);
+      bottom: calc(0.22rem + 4px);
+      width: 1.5px;
+      background: linear-gradient(to bottom, #fdf5c4, rgba(199,155,59,0.25));
+      z-index: 0;
+    }
+
+    .timeline__item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .timeline__item:not(:last-child) { padding-bottom: 0.5rem; }
+
+    .timeline__dot-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+      padding-top: 0.22rem;
+    }
+
+    .timeline__dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #fdf5c4 0%, #f7d37d 40%, #c08a2d 100%);
+      flex-shrink: 0;
+      box-shadow: 0 0 5px rgba(199,155,59,0.5);
+      position: relative;
+      z-index: 2;
+    }
+
+    .timeline__text {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #ffffff;
+      line-height: 1.35;
+    }
+
+    .card__cta {
+      margin-top: auto;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      font-size: 0.66rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #2b1b09;
+      background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
+      text-decoration: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <img class="card__photo" src="../images/Mentors/aiden new.jpg" alt="Aidan" />
+    <p class="card__name">Aidan</p>
+    <p class="card__role">Information Systems & Analytics</p>
+
+    <div class="timeline">
+      <div class="timeline__item">
+        <div class="timeline__dot-wrap"><span class="timeline__dot"></span></div>
+        <span class="timeline__text">6 Months Of Silence</span>
+      </div>
+      <div class="timeline__item">
+        <div class="timeline__dot-wrap"><span class="timeline__dot"></span></div>
+        <span class="timeline__text">One Networking Event</span>
+      </div>
+      <div class="timeline__item">
+        <div class="timeline__dot-wrap"><span class="timeline__dot"></span></div>
+        <span class="timeline__text">Promoted In 8 Months</span>
+      </div>
+    </div>
+
+    <a class="card__cta">View profile</a>
+  </div>
+
+</body>
+</html>
