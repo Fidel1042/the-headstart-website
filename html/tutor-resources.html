@@ -330,6 +330,120 @@
   strong { color: var(--text); font-weight: 700; }
   em { color: var(--text); font-style: italic; }
 
+  /* Step-by-step guide (numbered, with image per step) */
+  .lk-guide {
+    list-style: none;
+    counter-reset: lk-step;
+    padding: 0;
+    margin: 1rem 0 1.4rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+  .lk-guide > li {
+    counter-increment: lk-step;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 1.1rem 1.3rem 1.3rem;
+    background: var(--bg-card);
+  }
+  .lk-guide > li::before {
+    content: counter(lk-step);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-line);
+    color: var(--accent);
+    font-weight: 800;
+    font-size: 0.88rem;
+    margin-right: 0.6rem;
+    vertical-align: middle;
+  }
+  .lk-guide .lk-step-title {
+    display: inline;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--text);
+    line-height: 1.4;
+  }
+  .lk-guide figure {
+    margin: 0.9rem 0 0 0;
+  }
+  /* Two side-by-side sub-steps inside one parent step */
+  .lk-substeps {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.4rem;
+    margin-top: 0.9rem;
+  }
+  .lk-substep h5 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 0.5rem 0;
+  }
+  .lk-substep figure { margin: 0; }
+  @media (max-width: 700px) {
+    .lk-substeps { grid-template-columns: 1fr; gap: 1.2rem; }
+  }
+
+  /* Numbered circle marker placed over an image. Use --mx/--my (% of wrap)
+     to position. Border + shadow make it readable on any background. */
+  .lk-marker-wrap {
+    position: relative;
+    line-height: 0;
+  }
+  .lk-marker-wrap img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+  }
+  .lk-marker {
+    position: absolute;
+    left: var(--mx, 50%);
+    top: var(--my, 50%);
+    transform: translate(-50%, -50%);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #000;
+    font-weight: 800;
+    font-size: 0.78rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px var(--accent), 0 2px 6px rgba(0,0,0,0.4);
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  /* Step caption list under a marker image */
+  ol.lk-marker-list {
+    margin: 1rem 0 0 0;
+    padding-left: 1.4rem;
+    counter-reset: none;
+    list-style: none;
+  }
+  ol.lk-marker-list li {
+    margin-bottom: 0.4rem;
+    padding-left: 0;
+    color: var(--text);
+  }
+  ol.lk-marker-list li strong {
+    color: var(--accent);
+    margin-right: 0.4rem;
+  }
+
+
   /* Inline gold-gradient text (for parenthetical asides, callouts in body) */
   .gold-text {
     background: var(--gold-gradient);
@@ -1208,6 +1322,92 @@ No em dashes, and the letter cannot be more than 200 words. Make sure the paragr
       <h4>3. Recruiters and Talent Acquisition</h4>
       <p>Directly responsible for the initial rounds of hiring. They are often too busy, so it is recommended to reach out before a job post is out.</p>
 
+      <h3>How to find the right people on LinkedIn</h3>
+      <p>A step-by-step walkthrough of using the company's LinkedIn page to surface people in the team or department you're targeting.</p>
+
+      <ol class="lk-guide">
+        <li>
+          <span class="lk-step-title">On the company's LinkedIn page, click <strong>"People"</strong>.</span>
+          <figure>
+            <img src="../images/Linkedin search/Slide 1.png" alt="LinkedIn company page with the People tab highlighted" />
+          </figure>
+        </li>
+        <li>
+          <span class="lk-step-title">In <strong>"Where they live"</strong>, pick your state. If your city isn't listed, type it into the search bar first.</span>
+          <figure>
+            <img src="../images/Linkedin search/Slide 2.png" alt="LinkedIn associated members panel showing the Where they live filter and the search bar" />
+          </figure>
+        </li>
+        <li>
+          <span class="lk-step-title">Refine the location filter (only if you typed your city into the search bar).</span>
+          <p class="note" style="margin-top: 0.6rem; margin-bottom: 0.4rem;">Skip this step if you selected your state directly from the list in step 2.</p>
+          <div class="lk-substeps">
+            <div class="lk-substep">
+              <h5>3a. Click the <strong>"New South Wales"</strong> row.</h5>
+              <figure>
+                <img src="../images/Linkedin search/Slide 3.1.png" alt="LinkedIn People panel after a city search, with the New South Wales row highlighted" />
+              </figure>
+            </div>
+            <div class="lk-substep">
+              <h5>3b. Click the <strong>"X"</strong> on the search chip to clear the city filter.</h5>
+              <figure>
+                <img src="../images/Linkedin search/Slide 3.2.png" alt="LinkedIn People panel with the sydney search chip and the X to remove it highlighted" />
+              </figure>
+            </div>
+          </div>
+        </li>
+        <li>
+          <span class="lk-step-title">Filter by what they do (their function or department).</span>
+          <div class="lk-substeps">
+            <div class="lk-substep">
+              <h5>Inside the People panel:</h5>
+              <div class="lk-marker-wrap">
+                <img src="../images/Linkedin search/Slide 4.1.png" alt="LinkedIn People panel with keyword search, panel-scroll arrow, and the matching field row highlighted" />
+                <span class="lk-marker" style="--mx: 56%; --my: 18%;">4.1</span>
+                <span class="lk-marker" style="--mx: 91%; --my: 18%;">4.2</span>
+                <span class="lk-marker" style="--mx: 67%; --my: 87%;">4.3</span>
+              </div>
+            </div>
+            <div class="lk-substep">
+              <h5>Then clean up the keyword chip:</h5>
+              <div class="lk-marker-wrap">
+                <img src="../images/Linkedin search/Slide 4.2.png" alt="LinkedIn People panel showing the marketing search chip with the X to remove it highlighted" />
+                <span class="lk-marker" style="--mx: 54%; --my: 22%;">4.4</span>
+              </div>
+            </div>
+          </div>
+          <ol class="lk-marker-list">
+            <li><strong>4.1</strong> Type the field you're targeting (e.g. "marketing") and press Enter.</li>
+            <li><strong>4.2</strong> Scroll the panels with the right arrow until <em>"What they do"</em> appears.</li>
+            <li><strong>4.3</strong> Click the matching field inside <em>"What they do"</em>.</li>
+            <li><strong>4.4</strong> Remove the keyword chip from 4.1. The function filter is more accurate.</li>
+          </ol>
+        </li>
+        <li>
+          <span class="lk-step-title">If their card shows a <strong>"Connect"</strong> button, click it.</span>
+          <figure>
+            <img src="../images/Linkedin search/Slide 5.png" alt="LinkedIn profile card preview with the Connect button highlighted at the bottom" />
+          </figure>
+        </li>
+        <li>
+          <span class="lk-step-title">No <strong>"Connect"</strong> button? Open their full profile and use the three-dots menu.</span>
+          <div class="lk-substeps">
+            <div class="lk-substep">
+              <h5>6a. Click their profile picture to open the full page.</h5>
+              <figure>
+                <img src="../images/Linkedin search/Slide 6.1.png" alt="LinkedIn profile card showing only a Message button (no Connect), with the profile picture as the way in" />
+              </figure>
+            </div>
+            <div class="lk-substep">
+              <h5>6b. Click the <strong>three dots</strong> (next to Message), then <strong>"Connect"</strong>.</h5>
+              <figure>
+                <img src="../images/Linkedin search/Slide 6.2.png" alt="LinkedIn full profile page with the three-dots menu open showing a Connect option" />
+              </figure>
+            </div>
+          </div>
+        </li>
+      </ol>
+
       <h3>Message templates</h3>
       <p class="note"><strong>Important:</strong> never copy and paste. Always change some wordings.</p>
       <p class="note"><strong>Optional compliment line:</strong> each template below has a bracketed line for a quick compliment of a recent achievement or story (within the last year) from their profile. <strong>Don't force it.</strong> A hollow or generic compliment reads worse than skipping it. Only include it if there's something specific and genuine to mention.</p>
@@ -1255,6 +1455,11 @@ Alternatively, happy to do a quick meet here: [insert Google Meet invite link]
 
 Best regards,
 Name</div>
+
+      <h3>If you have LinkedIn Premium</h3>
+      <p>Premium lets you attach a note to the initial connection request, capped at 300 characters. Use that space well: 1 line complimenting a specific recent thing of theirs, then 1 line on why you want to connect. No "hi, I'd love to connect" filler.</p>
+      <p class="note"><strong>Format:</strong> 1 line of compliment + 1 line of reason to connect.</p>
+      <div class="template">Saw your recent nomination for the leadership award in XXXXXXX! I'd love to connect to learn more about your journey to being a marketing director in Salesforce.</div>
     </section>
 
     <!-- 8. COFFEE CHAT -->
@@ -1375,9 +1580,20 @@ Name</div>
         <li>Show ownership, reflection, and impact (numbers).</li>
         <li>If you have a choice or better options, don't use uni projects as your examples.</li>
         <li>Build your persona and interview answers around a general theme that shows you are: able to integrate and fit in the team, willing to learn, communicative, and able to do the job, while showcasing your own strengths.</li>
+        <li>Research the interviewer on LinkedIn beforehand so you know who you're talking to and can prepare small talk. Their hobbies and personal interests on their profile are great natural openers.</li>
       </ul>
 
       <h3>9.2 Answer Structures</h3>
+
+      <h4>"How are you?": the opening small talk</h4>
+      <p>It isn't filler. It's the first chance to come across as a real person before the formal questions start. Have one or two of these ready to share, then flip the question back to them.</p>
+      <ul>
+        <li>Something you did on the weekend (if it's early in the week).</li>
+        <li>A hobby you did yesterday. Bonus points if it overlaps with one you spotted on the interviewer's LinkedIn.</li>
+        <li>Something you did this morning, or on your way to the interview.</li>
+        <li>The weather, if it shifted noticeably.</li>
+      </ul>
+      <p><strong>Always flip it back:</strong> "And how about you?" or "How's your week been?" It gives them a chance to talk and builds rapport before the real questions start.</p>
 
       <h4>Tell me about yourself: the "DU" strategy</h4>
       <p><strong>Due diligence introduction (max 30 seconds):</strong> everyone literally has the same information.</p>
