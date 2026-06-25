@@ -5,18 +5,6 @@ const headers = {
   "Content-Type": "application/json",
 };
 
-const MENTOR_NAMES = {
-  "angelicagrace160272@gmail.com": "Angelica",
-  "edrickkoda@gmail.com":          "Koda",
-  "aidanmwibrata@gmail.com":       "Aidan",
-  "dhulipatideepika@gmail.com":    "Deepika",
-  "wooheehan3@gmail.com":          "Woo Hee",
-  "laljimkf@gmail.com":            "Khaleel",
-  "raunaqrsa@gmail.com":           "Raunaq",
-  "jai.arora115@gmail.com":        "Jai",
-  "fidelhon@gmail.com":            "Fidel",
-  "kokoro.araki1015@gmail.com":    "Koko",
-};
 
 exports.handler = async (event) => {
   if (event.httpMethod === "OPTIONS") return { statusCode: 204, headers, body: "" };
@@ -49,7 +37,7 @@ exports.handler = async (event) => {
   const res  = await fetch(
     `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_SESSION_TABLE_ID}` +
     `?filterByFormula=${formula}` +
-    `&fields[]=Mentor%20Email&fields[]=Mentee%20Name&fields[]=Date&fields[]=Mentor%20Payout`,
+    `&fields[]=Mentor%20Email&fields[]=Mentor%20Name&fields[]=Mentee%20Name&fields[]=Date&fields[]=Mentor%20Payout`,
     { headers: airtableHeaders }
   );
   const data     = await res.json();
@@ -66,7 +54,8 @@ exports.handler = async (event) => {
     const email  = (s.fields["Mentor Email"] || "").toLowerCase().trim();
     const payout = parseFloat(s.fields["Mentor Payout"]) || 0;
     if (!email || payout === 0) continue;
-    if (!byMentor[email]) byMentor[email] = { sessions: [], recordIds: [], total: 0 };
+    const name = s.fields["Mentor Name"] || email;
+    if (!byMentor[email]) byMentor[email] = { name, sessions: [], recordIds: [], total: 0 };
     byMentor[email].recordIds.push(s.id);
     byMentor[email].sessions.push({
       date:   s.fields["Date"] || "",
@@ -84,8 +73,7 @@ exports.handler = async (event) => {
   // Send one email per mentor via Brevo
   const results = [];
   for (const email of mentorEmails) {
-    const { sessions: mSessions, total } = byMentor[email];
-    const name = MENTOR_NAMES[email] || email;
+    const { name, sessions: mSessions, total } = byMentor[email];
 
     const sessionRows = mSessions
       .sort((a, b) => a.date.localeCompare(b.date))
