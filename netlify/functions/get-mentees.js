@@ -62,14 +62,18 @@ exports.handler = async (event) => {
     // so formula-based filtering won't match — JS filter is reliable)
     const menteeRes = await fetch(
       `https://api.airtable.com/v0/${AIRTABLE_CORE_BASE_ID}/${AIRTABLE_MENTEE_TABLE_ID}` +
-        `?fields[]=Name&fields[]=Mentor`,
+        `?fields[]=Name&fields[]=Mentor&fields[]=Billing%20Type`,
       { headers: airtableHeaders }
     );
     const menteeData = await menteeRes.json();
 
     const mentees = (menteeData.records || [])
       .filter((r) => Array.isArray(r.fields.Mentor) && r.fields.Mentor.includes(mentorRecordId))
-      .map((r) => ({ id: r.id, name: r.fields.Name || "Unnamed mentee" }));
+      .map((r) => ({
+        id:          r.id,
+        name:        r.fields.Name || "Unnamed mentee",
+        billingType: r.fields["Billing Type"] || "Per Session",
+      }));
 
     return {
       statusCode: 200,

@@ -60,7 +60,7 @@ exports.handler = async (event) => {
   };
 
   // ── Step 1: get mentee details ──
-  let stripeCustomerId, menteeName, menteeEmail, amountCents;
+  let stripeCustomerId, menteeName, menteeEmail, amountCents, isPackage;
   try {
     const menteeRes    = await fetch(
       `https://api.airtable.com/v0/${AIRTABLE_CORE_BASE_ID}/${AIRTABLE_MENTEE_TABLE_ID}/${menteeRecordId}`,
@@ -73,18 +73,21 @@ exports.handler = async (event) => {
     stripeCustomerId = menteeRecord.fields["Stripe Customer ID"];
     menteeName       = menteeRecord.fields["Name"] || "Unknown";
     menteeEmail      = menteeRecord.fields["Gmail"] || "";
-    const sessionPriceAUD = parseFloat(menteeRecord.fields["Session Price"]) || 30;
+    isPackage        = (menteeRecord.fields["Billing Type"] || "Per Session") === "Package";
+    const sessionPriceAUD = isPackage ? 0 : (parseFloat(menteeRecord.fields["Session Price"]) || 30);
     amountCents = Math.round(sessionPriceAUD * 100);
   } catch (err) {
     return { statusCode: 502, headers, body: JSON.stringify({ error: "Could not reach Airtable — try again in a moment" }) };
   }
 
-  // ── Step 2: attempt charge (skip if no payment setup) ──
+  // ── Step 2: attempt charge (skip if no payment setup or package billing) ──
   let paymentSucceeded = false;
   let paymentIntentId  = null;
   let failureReason    = null;
 
-  if (!stripeCustomerId) {
+  if (isPackage) {
+    paymentSucceeded = true; // package is pre-paid — session counts as settled
+  } else if (!stripeCustomerId) {
     failureReason = "No Stripe Customer ID on file — mentee hasn't completed payment setup";
   } else {
     const stripe = new Stripe(STRIPE_SECRET_KEY, { apiVersion: "2024-06-20" });
@@ -111,7 +114,7 @@ exports.handler = async (event) => {
       }
     }
 
-    if (!paymentMethodId) {
+    if (!failureReason && !paymentMethodId) {
       failureReason = "No saved card on file — mentee hasn't added a payment method";
     } else {
       try {
@@ -149,7 +152,7 @@ exports.handler = async (event) => {
               "Extra Notes":       notes || "",
               "Amount Charged":    paymentSucceeded ? amountCents / 100 : 0,
               "Stripe Payment ID": paymentIntentId || "",
-              "Payment Status":    paymentSucceeded ? "Charged" : "Failed",
+              "Payment Status":    isPackage ? "Package" : paymentSucceeded ? "Charged" : "Failed",
               "Failure Reason":    failureReason || "",
               "Mentor Payout":     MENTOR_RATES[mentorEmail.toLowerCase().trim()] ?? 0,
             },

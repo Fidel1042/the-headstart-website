@@ -61,6 +61,7 @@
           menteeSelect.innerHTML = data.mentees
             .map((m) => `<option value="${m.id}">${m.name}</option>`)
             .join("");
+
         }
       } catch {
         menteeSelect.innerHTML = '<option value="">Could not load — refresh page</option>';
