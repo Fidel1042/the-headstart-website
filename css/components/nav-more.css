@@ -107,6 +107,9 @@
   background: radial-gradient(circle at top left, rgba(199,155,59,0.28), transparent 55%);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+.nav-cta strong {
+  font-weight: inherit;
+}
 /* Bigger CTA on desktop (≥960px) — ~1.3x sizing */
 @media (min-width: 960px) {
   .nav-cta {

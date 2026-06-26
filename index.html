@@ -93,6 +93,44 @@
 
   <link rel="stylesheet" href="style.css" />
   <style>
+    body > header {
+      position: fixed !important;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+    }
+
+    .home-mentors__grid {
+      display: flex !important;
+      flex-wrap: nowrap !important;
+      overflow-x: auto !important;
+      scrollbar-color: rgba(255,255,255,0.15) transparent;
+      scrollbar-width: thin;
+    }
+    .home-mentors__grid::-webkit-scrollbar {
+      height: 4px;
+    }
+    .home-mentors__grid::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.04);
+      border-radius: 999px;
+    }
+    .home-mentors__grid::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.15);
+      border-radius: 999px;
+    }
+
+    .home-mentor-card {
+      flex: 0 0 calc(25% - 0.9rem) !important;
+      min-width: 0;
+    }
+    @media (max-width: 600px) {
+      .home-mentor-card {
+        flex: 0 0 85% !important;
+        max-width: 85% !important;
+      }
+    }
+
     /* Section intro text */
     .why-hs-intro {
       max-width: 660px;
@@ -803,13 +841,336 @@
       font-size: 1rem;
       line-height: 1.55;
     }
+
+
+    /* ── Hero split layout ── */
+    .hero-outer {
+      display: grid;
+      grid-template-columns: 1fr 35vw;
+      grid-template-rows: 1fr auto;
+      min-height: calc(88vh - 80px);
+      overflow: hidden;
+      padding: 0;
+    }
+    .hero-split__text {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      padding: 3.5rem 2rem 3rem 3rem;
+      min-width: 0;
+    }
+    .hero-h1 {
+      font-size: clamp(1.5rem, 2.4vw, 2.1rem);
+      font-weight: 700;
+      line-height: 1.25;
+      color: #ffffff;
+      letter-spacing: -0.01em;
+      margin: 0;
+    }
+    .hero-gold {
+      background: linear-gradient(135deg, #d4a030 0%, #f5d060 45%, #d4a84c 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-h1__session {
+      display: block;
+      font-size: 0.75em;
+      font-weight: 700;
+      color: #ffffff;
+      margin-top: 1rem;
+      letter-spacing: 0;
+    }
+    .hero-sub {
+      margin: 1.25rem 0 0;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.7;
+    }
+    .hero-cta-group {
+      margin-top: 1.9rem;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.1rem;
+    }
+    .hero-trust-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+    .hero-trust-list li {
+      font-size: 0.95rem;
+      color: #ffffff;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+    }
+    .hero-trust-list li::before {
+      content: "✓";
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 1.5px solid transparent;
+      background:
+        linear-gradient(#000, #000) padding-box,
+        linear-gradient(135deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 100%) border-box;
+      color: #c9a84c;
+      font-size: 0.62rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .hero-cta-group .btn-hero-primary {
+      background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
+      color: #2b1b09;
+      border: none;
+      box-shadow: 0 10px 24px rgba(255,214,137,0.35);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 800;
+    }
+    .hero-cta-group .btn-hero-primary strong {
+      font-weight: inherit;
+    }
+    .hero-cta-group .btn-hero-primary:hover {
+      color: #2b1b09;
+      box-shadow: 0 14px 30px rgba(255,214,137,0.5);
+    }
+    .hero-cta-group .btn-hero-primary .btn-hero-primary__arrow {
+      background: none;
+      -webkit-text-fill-color: #2b1b09;
+      color: #2b1b09;
+    }
+    .hero-split__image {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      min-width: 0;
+    }
+    /* ── Hero review strips ── */
+    .hero-reviews {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    .hero-review-strip {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 1.1rem;
+      padding: 1.5rem 2rem 1.5rem 1.75rem;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .hero-review-strip:last-child {
+      border-bottom: none;
+    }
+    .hero-reviews__label {
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: rgba(255,255,255,0.4);
+      text-align: center;
+      padding: 0.9rem 1.5rem 0.5rem;
+      margin: 0;
+    }
+    .hero-review-strip__face {
+      flex-shrink: 0;
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background-size: cover;
+      background-position: center top;
+    }
+    .hero-review-strip__content {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .hero-review-strip__stars {
+      color: #c9a84c;
+      font-size: 0.8rem;
+      letter-spacing: 0.04em;
+    }
+    .hero-review-strip__headline {
+      font-size: clamp(0.78rem, 1vw, 0.9rem);
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.3;
+      margin: 0;
+    }
+    .hero-review-strip__quote {
+      font-size: clamp(0.7rem, 0.9vw, 0.8rem);
+      color: rgba(255,255,255,0.5);
+      line-height: 1.55;
+      margin: 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .hero-review-strip__name {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.75);
+      margin-top: 0.2rem;
+    }
+    .hero-review-strip__tag {
+      display: block;
+      font-size: 0.68rem;
+      color: rgba(255,255,255,0.75);
+    }
+
+    @media (max-width: 800px) {
+      .hero-outer {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+        min-height: auto;
+        align-content: start;
+      }
+      .hero-split__text {
+        padding: 2rem 1.4rem 2rem;
+        justify-content: flex-start;
+        overflow: hidden;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .hero-h1 {
+        font-size: 1.35rem;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        max-width: 100%;
+      }
+      .hero-cta-group {
+        align-items: flex-start;
+      }
+      .hero-cta-group .btn-hero-primary {
+        width: min(380px, 100%);
+        text-align: center;
+        white-space: nowrap;
+      }
+      .hero-h1__session { display: none; }
+      .hero-trust-list { display: none; }
+      .hero-reviews__label { display: none; }
+      .hero-split__image {
+        min-height: auto;
+        order: 1;
+      }
+      .hero-logo-slider {
+        order: -1;
+        border-top: none;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+      }
+      .hero-reviews {
+        flex: 1;
+        margin-top: 2.5rem;
+      }
+      .hero-review-strip {
+        padding: 1rem 1.2rem 1rem 1rem;
+      }
+      .hero-review-strip__face {
+        width: 52px;
+        height: 52px;
+      }
+      .hero-logo-slider__item {
+        height: 30px;
+        max-width: 96px;
+      }
+      .hero-logo-slider__item--lg {
+        height: 46px;
+        max-width: 120px;
+      }
+    }
+
+    /* Mobile: show only Raphael and Shreya, hide Mohit (3rd card) */
+    @media (max-width: 800px) {
+      .hero-review-strip:last-child {
+        display: none;
+      }
+      .hero-outer {
+        min-height: 100svh;
+      }
+    }
+
+    /* 320px phones: smaller h1, smaller logos, smaller CTA */
+    @media (max-width: 350px) {
+      .hero-h1 {
+        font-size: 0.9rem;
+      }
+      .hero-logo-slider__item {
+        height: 19px;
+        max-width: 60px;
+      }
+      .hero-logo-slider__item--lg {
+        height: 29px;
+        max-width: 75px;
+      }
+      .hero-cta-group .btn-hero-primary {
+        font-size: 0.75rem;
+        letter-spacing: 0.03em;
+      }
+    }
+
+    /* ── Logo slider ── */
+    @keyframes logo-slide {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .hero-logo-slider {
+      grid-column: 1 / -1;
+      min-width: 0;
+      padding: 2rem 0;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .hero-logo-slider__viewport {
+      overflow: hidden;
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+      mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+    }
+    .hero-logo-slider__label {
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #ffffff;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .hero-logo-slider__track {
+      display: flex;
+      align-items: center;
+      gap: 3.5rem;
+      width: max-content;
+      animation: logo-slide 40s linear infinite;
+    }
+    .hero-logo-slider__item {
+      height: 38px;
+      width: auto;
+      max-width: 120px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+    .hero-logo-slider__item--invert {
+      filter: brightness(0) invert(1);
+    }
+    .hero-logo-slider__item--lg {
+      height: 58px;
+      max-width: 150px;
+    }
   </style>
 </head>
 <body class="home-page">
 
   <div id="main">
 
-  <header>
+  <header style="position:fixed;top:0;left:0;right:0;z-index:1000;">
     <div class="nav">
       <a href="/" class="nav-left nav-home">
         <img src="images/headstart-italic-logo.png" decoding="async" alt="Headstart Mentoring logo" class="nav-logo-icon" />
@@ -832,21 +1193,184 @@
           </div>
         </div>
       </nav>
-      <a href="/discovery-call" class="nav-cta nav-cta--gold">Free Career Call</a>
+      <a href="/discovery-call" class="nav-cta nav-cta--gold">Free Strategy Call</a>
     </div>
   </header>
 
     <main class="home-page">
 
       <!-- ── Hero ── -->
-      <section class="section">
-        <div class="section-inner headline-standalone">
-          <p class="hero-eyebrow-line reveal reveal--up">1-on-1 Mentoring from Mentors already in your target industry</p>
-          <h1 class="headline-standalone__title hero-rotating-title reveal reveal--up" aria-live="polite" style="--reveal-delay: 0.1s">
-            <span class="headline-standalone__highlight pain-rotating" id="painType">100 jobs applied<br>But 0 interviews?</span>
+      <section class="hero-outer">
+
+        <!-- Left: text -->
+        <div class="hero-split__text">
+          <h1 class="hero-h1">
+            <span class="hero-gold">Personalised</span> Career Mentorship for International Students in Australia
+            <span class="hero-h1__session">Get <span class="hero-gold">clarity</span> on your job search within your first session.</span>
           </h1>
-          <div class="hero-primary-cta reveal reveal--up" style="--reveal-delay: 0.2s">
-            <a href="#mentoring" class="btn-hero-primary" data-scroll-to="#mentoring">See your solution <span class="btn-hero-primary__arrow">&darr;</span></a>
+          <div class="hero-cta-group">
+            <a href="/discovery-call" class="btn-hero-primary">Apply for free strategy call</a>
+            <ul class="hero-trust-list">
+              <li>Mentor who gets your story</li>
+              <li>No lock-in</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Right: 3 review strips, bleeds to viewport edge -->
+        <div class="hero-split__image">
+          <div class="hero-reviews">
+            <p class="hero-reviews__label">Reviews from our international student mentees</p>
+
+            <div class="hero-review-strip">
+              <div class="hero-review-strip__face" style="background-image: url('images/Mentee-review/rapheal.jpeg');"></div>
+              <div class="hero-review-strip__content">
+                <div class="hero-review-strip__stars">★★★★★</div>
+                <p class="hero-review-strip__headline">2 months, no offers &rarr; Tech role &rarr; Promotion</p>
+                <span class="hero-review-strip__tag">Implementation Consultant, Enable</span>
+              </div>
+            </div>
+
+            <div class="hero-review-strip">
+              <div class="hero-review-strip__face" style="background-image: url('images/Mentee-review/Shreya.jpg');"></div>
+              <div class="hero-review-strip__content">
+                <div class="hero-review-strip__stars">★★★★★</div>
+                <p class="hero-review-strip__headline">Anxious (100+ rejections) &rarr; Confident &amp; 2 final interviews</p>
+                <span class="hero-review-strip__tag">Economics Major, Macquarie Uni</span>
+              </div>
+            </div>
+
+            <div class="hero-review-strip">
+              <div class="hero-review-strip__face" style="background-image: url('images/Mentee-review/Mohit.jpg');"></div>
+              <div class="hero-review-strip__content">
+                <div class="hero-review-strip__stars">★★★★★</div>
+                <p class="hero-review-strip__headline">Stressed from Job Search &rarr; 2 Internship Offers</p>
+                <span class="hero-review-strip__tag">Finance Major, USYD</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ── Company logo slider (spans both columns, pinned to bottom of hero) ── -->
+        <div class="hero-logo-slider">
+          <p class="hero-logo-slider__label">Our Mentors, who were once <strong>exactly</strong> in your situation, now work in:</p>
+          <div class="hero-logo-slider__viewport">
+          <div class="hero-logo-slider__track">
+            <img class="hero-logo-slider__item" src="images/Logos/commbank-beacon-white.webp" alt="Commonwealth Bank" />
+            <img class="hero-logo-slider__item" src="images/Logos/pwc white logo.jpg" alt="PwC" />
+            <img class="hero-logo-slider__item" src="images/Logos/Delioote.png" alt="Deloitte" />
+            <img class="hero-logo-slider__item" src="images/Logos/Nestle.png" alt="Nestle" />
+            <img class="hero-logo-slider__item" src="images/Logos/Fedex-logo.png" alt="FedEx" />
+            <img class="hero-logo-slider__item" src="images/Logos/woolworths.png" alt="Woolworths" />
+            <img class="hero-logo-slider__item" src="images/Logos/Kimberly-Clark.avif" alt="Kimberly-Clark" />
+            <img class="hero-logo-slider__item hero-logo-slider__item--lg" src="images/Logos/macquarie-bank-limited-logo-black-and-white.png" alt="Macquarie Bank" />
+            <img class="hero-logo-slider__item hero-logo-slider__item--invert" src="images/Logos/Grant_Thornton_logo.png" alt="Grant Thornton" />
+            <img class="hero-logo-slider__item" src="images/Logos/OW_logo_k-white.png" alt="Oliver Wyman" />
+            <img class="hero-logo-slider__item" src="images/Logos/Visagio.jpeg" alt="Visagio" />
+            <!-- Duplicate set for seamless loop -->
+            <img class="hero-logo-slider__item" src="images/Logos/commbank-beacon-white.webp" alt="Commonwealth Bank" />
+            <img class="hero-logo-slider__item" src="images/Logos/pwc white logo.jpg" alt="PwC" />
+            <img class="hero-logo-slider__item" src="images/Logos/Delioote.png" alt="Deloitte" />
+            <img class="hero-logo-slider__item" src="images/Logos/Nestle.png" alt="Nestle" />
+            <img class="hero-logo-slider__item" src="images/Logos/Fedex-logo.png" alt="FedEx" />
+            <img class="hero-logo-slider__item" src="images/Logos/woolworths.png" alt="Woolworths" />
+            <img class="hero-logo-slider__item" src="images/Logos/Kimberly-Clark.avif" alt="Kimberly-Clark" />
+            <img class="hero-logo-slider__item hero-logo-slider__item--lg" src="images/Logos/macquarie-bank-limited-logo-black-and-white.png" alt="Macquarie Bank" />
+            <img class="hero-logo-slider__item hero-logo-slider__item--invert" src="images/Logos/Grant_Thornton_logo.png" alt="Grant Thornton" />
+            <img class="hero-logo-slider__item" src="images/Logos/OW_logo_k-white.png" alt="Oliver Wyman" />
+            <img class="hero-logo-slider__item" src="images/Logos/Visagio.jpeg" alt="Visagio" />
+          </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ── Meet your mentors (preview) ── -->
+      <section class="section home-mentors">
+        <div class="section-inner">
+          <div class="home-mentors__head reveal reveal--up">
+            <p class="mentoring-eyebrow">Your mentors</p>
+            <h2 class="mentoring-title">Mentors who were once in your situation</h2>
+          </div>
+          <div class="home-mentors__grid reveal">
+            <div class="home-mentor-card">
+              <img class="home-mentor-card__photo" src="images/Mentors/koko new.jpg" alt="Koko" />
+              <p class="home-mentor-card__name">Koko</p>
+              <p class="home-mentor-card__role">Marketing &amp; Sales Graduate</p>
+              <p class="home-mentor-card__headline">1 of the 2 grads hired out of 450 applications</p>
+              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
+            </div>
+            <div class="home-mentor-card">
+              <img class="home-mentor-card__photo" src="images/Mentors/angel new.jpg" alt="Angelica" />
+              <p class="home-mentor-card__name">Angelica</p>
+              <p class="home-mentor-card__role">Tech Consultant</p>
+              <p class="home-mentor-card__headline">Broke into Tech Consulting as an Int Student</p>
+              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
+            </div>
+            <div class="home-mentor-card">
+              <img class="home-mentor-card__photo" src="images/Mentors/koda new.jpg" alt="Koda" />
+              <p class="home-mentor-card__name">Koda</p>
+              <p class="home-mentor-card__role">Software Engineer</p>
+              <p class="home-mentor-card__headline">SWE role with no prior internship experience</p>
+              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
+            </div>
+            <div class="home-mentor-card">
+              <img class="home-mentor-card__photo" src="images/Mentors/raun new.jpg" alt="Raunaq" />
+              <p class="home-mentor-card__name">Raunaq</p>
+              <p class="home-mentor-card__role">Finance Analyst</p>
+              <p class="home-mentor-card__headline">Broke into Finance as an Int Student</p>
+              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
+            </div>
+            <div class="home-mentor-card">
+              <img class="home-mentor-card__photo" src="images/Mentors/fidel new.jpg" alt="Fidel" />
+              <p class="home-mentor-card__name">Fidel</p>
+              <p class="home-mentor-card__role">Category Analyst</p>
+              <p class="home-mentor-card__headline">From Hong Kong student with an accent to 4 Grad offers</p>
+              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
+            </div>
+            <div class="home-mentor-card">
+              <img class="home-mentor-card__photo" src="images/Mentors/aiden new.jpg" alt="Aidan" />
+              <p class="home-mentor-card__name">Aidan</p>
+              <p class="home-mentor-card__role">Demand Planner</p>
+              <p class="home-mentor-card__headline">Landed a full time role from a Networking event</p>
+              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
+            </div>
+            <div class="home-mentor-card">
+              <img class="home-mentor-card__photo" src="images/Mentors/deepika new.jpg" alt="Deepika" />
+              <p class="home-mentor-card__name">Deepika</p>
+              <p class="home-mentor-card__role">Finance Officer</p>
+              <p class="home-mentor-card__headline">Finance role within the Government</p>
+              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
+            </div>
+            <div class="home-mentor-card">
+              <img class="home-mentor-card__photo" src="images/Mentors/Brendon .png" alt="Brendon" />
+              <p class="home-mentor-card__name">Brendon</p>
+              <p class="home-mentor-card__role">Early Careers Specialist</p>
+              <p class="home-mentor-card__headline">Built a grad program with 100% retention from scratch</p>
+              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
+            </div>
+            <div class="home-mentor-card">
+              <img class="home-mentor-card__photo" src="images/Mentors/wohee.jpg" alt="Wohee" />
+              <p class="home-mentor-card__name">Wohee</p>
+              <p class="home-mentor-card__role">Data Scientist</p>
+              <p class="home-mentor-card__headline">Worked for 2 major banks in Australia</p>
+              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
+            </div>
+            <div class="home-mentor-card">
+              <img class="home-mentor-card__photo" src="images/Mentors/khaleel new.jpg" alt="Khaleel" />
+              <p class="home-mentor-card__name">Khaleel</p>
+              <p class="home-mentor-card__role">Finance Graduate</p>
+              <p class="home-mentor-card__headline">Finance Grad + Career Coach</p>
+              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
+            </div>
+            <div class="home-mentor-card">
+              <img class="home-mentor-card__photo" src="images/Mentors/Jai .png" alt="Jai" />
+              <p class="home-mentor-card__name">Jai</p>
+              <p class="home-mentor-card__role">Cyber Security Analyst</p>
+              <p class="home-mentor-card__headline">Cyber Security for Major Bank</p>
+              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
+            </div>
           </div>
         </div>
       </section>
@@ -914,49 +1438,6 @@
             </p>
           </div>
 
-        </div>
-      </section>
-
-      <!-- ── Meet your mentors (preview) ── -->
-      <section class="section home-mentors">
-        <div class="section-inner">
-          <div class="home-mentors__head reveal reveal--up">
-            <p class="mentoring-eyebrow">Your mentors</p>
-            <h2 class="mentoring-title">Mentors who were once in your situation</h2>
-          </div>
-          <div class="home-mentors__grid reveal">
-            <div class="home-mentor-card">
-              <img class="home-mentor-card__photo" src="images/Mentors/koko new.jpg" alt="Koko" />
-              <p class="home-mentor-card__name">Koko</p>
-              <p class="home-mentor-card__role">Marketing &amp; Sales Graduate</p>
-              <p class="home-mentor-card__headline">1 of the 2 grads hired out of 450 applications</p>
-              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
-            </div>
-            <div class="home-mentor-card">
-              <img class="home-mentor-card__photo" src="images/Mentors/angel new.jpg" alt="Angelica" />
-              <p class="home-mentor-card__name">Angelica</p>
-              <p class="home-mentor-card__role">Tech Consultant</p>
-              <p class="home-mentor-card__headline">Broke into Tech Consulting as an Int Student</p>
-              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
-            </div>
-            <div class="home-mentor-card">
-              <img class="home-mentor-card__photo" src="images/Mentors/koda new.jpg" alt="Koda" />
-              <p class="home-mentor-card__name">Koda</p>
-              <p class="home-mentor-card__role">Software Engineer</p>
-              <p class="home-mentor-card__headline">SWE role with no prior internship experience</p>
-              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
-            </div>
-            <div class="home-mentor-card">
-              <img class="home-mentor-card__photo" src="images/Mentors/raun new.jpg" alt="Raunaq" />
-              <p class="home-mentor-card__name">Raunaq</p>
-              <p class="home-mentor-card__role">Finance Analyst</p>
-              <p class="home-mentor-card__headline">Broke into Finance as an Int Student</p>
-              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
-            </div>
-          </div>
-          <div class="home-mentors__all">
-            <a href="/mentors" class="btn btn-outline-gold"><span>Meet all mentors &rarr;</span></a>
-          </div>
         </div>
       </section>
 

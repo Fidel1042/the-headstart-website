@@ -50,6 +50,12 @@
   }
 }
 
+@media (max-width: 520px) {
+  .nav-cta-pre {
+    display: none;
+  }
+}
+
 @media (max-width: 600px) {
   .section,
   .section-alt {

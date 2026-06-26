@@ -37,8 +37,8 @@ body::after {
   z-index: 0;
 }
 
-/* Make sure page content sits above the texture layers */
-body > * { position: relative; z-index: 1; }
+/* Make sure page content sits above the texture layers (exclude header — it uses position:fixed) */
+body > *:not(header) { position: relative; z-index: 1; }
 
 a {
   color: inherit;
