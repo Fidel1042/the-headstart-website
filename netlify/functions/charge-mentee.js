@@ -1,18 +1,5 @@
 const Stripe = require("stripe");
 
-const MENTOR_RATES = {
-  "angelicagrace160272@gmail.com": 55,
-  "edrickkoda@gmail.com":          20,
-  "aidanmwibrata@gmail.com":       20,
-  "dhulipatideepika@gmail.com":    20,
-  "wooheehan3@gmail.com":          50,
-  "laljimkf@gmail.com":            45,
-  "raunaqrsa@gmail.com":           20,
-  "jai.arora115@gmail.com":        20,
-  "fidelhon@gmail.com":             0,
-  "kokoro.araki1015@gmail.com":     0,
-};
-
 const headers = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -60,10 +47,10 @@ exports.handler = async (event) => {
   };
 
   // ── Step 1: get mentee + mentor details in parallel ──
-  let stripeCustomerId, menteeName, menteeEmail, amountCents, isPackage, mentorName;
+  let stripeCustomerId, menteeName, menteeEmail, amountCents, isPackage, mentorName, mentorRate;
   try {
     const mentorLookupUrl = `https://api.airtable.com/v0/${AIRTABLE_CORE_BASE_ID}/${process.env.AIRTABLE_MENTOR_TABLE_ID}` +
-      `?filterByFormula=${encodeURIComponent(`{Email}="${mentorEmail}"`)}&fields[]=Name`;
+      `?filterByFormula=${encodeURIComponent(`{Email}="${mentorEmail}"`)}&fields[]=Name&fields[]=Rate`;
 
     const [menteeRes, mentorRes] = await Promise.all([
       fetch(`https://api.airtable.com/v0/${AIRTABLE_CORE_BASE_ID}/${AIRTABLE_MENTEE_TABLE_ID}/${menteeRecordId}`, { headers: airtableHeaders }),
@@ -84,6 +71,7 @@ exports.handler = async (event) => {
     const sessionPriceAUD = isPackage ? 0 : (parseFloat(menteeRecord.fields["Session Price"]) || 30);
     amountCents = Math.round(sessionPriceAUD * 100);
     mentorName  = mentorData.records?.[0]?.fields?.["Name"] || mentorEmail;
+    mentorRate  = parseFloat(mentorData.records?.[0]?.fields?.["Rate"]) || 0;
   } catch (err) {
     return { statusCode: 502, headers, body: JSON.stringify({ error: "Could not reach Airtable — try again in a moment" }) };
   }
@@ -163,7 +151,7 @@ exports.handler = async (event) => {
               "Stripe Payment ID": paymentIntentId || "",
               "Payment Status":    isPackage ? "Package" : paymentSucceeded ? "Charged" : "Failed",
               "Failure Reason":    failureReason || "",
-              "Mentor Payout":     MENTOR_RATES[mentorEmail.toLowerCase().trim()] ?? 0,
+              "Mentor Payout":     mentorRate,
             },
           }),
         }

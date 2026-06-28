@@ -154,6 +154,74 @@ exports.handler = async (event) => {
     );
   }
 
+  // Send audit summary to Fidel
+  const grandTotal = Object.values(byMentor).reduce((sum, m) => sum + m.total, 0);
+  const summaryRows = results
+    .map(({ email, success }) => {
+      const m = byMentor[email];
+      const sessionLines = m.sessions
+        .sort((a, b) => a.date.localeCompare(b.date))
+        .map((s) => `<tr>
+          <td style="padding:6px 12px;border-bottom:1px solid #f0f0f0;color:#555;">${m.name}</td>
+          <td style="padding:6px 12px;border-bottom:1px solid #f0f0f0;">${formatDate(s.date)}</td>
+          <td style="padding:6px 12px;border-bottom:1px solid #f0f0f0;">${s.mentee}</td>
+          <td style="padding:6px 12px;border-bottom:1px solid #f0f0f0;text-align:right;">$${s.payout.toFixed(2)}</td>
+          <td style="padding:6px 12px;border-bottom:1px solid #f0f0f0;text-align:center;">${success ? "✓ Sent" : "✗ Failed"}</td>
+        </tr>`)
+        .join("");
+      return sessionLines;
+    })
+    .join("");
+
+  const auditHtml = `
+<!DOCTYPE html>
+<html>
+<body style="margin:0;padding:0;font-family:system-ui,-apple-system,sans-serif;background:#f9f9f9;">
+  <div style="max-width:640px;margin:40px auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.07);">
+    <div style="background:#000;padding:28px 32px;">
+      <p style="margin:0;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#c79b3b;font-weight:700;">The Headstart</p>
+      <p style="margin:6px 0 0;font-size:22px;font-weight:700;color:#fff;">Payslip Run — ${weekLabel}</p>
+    </div>
+    <div style="padding:32px;">
+      <p style="margin:0 0 24px;font-size:14px;color:#555;">${results.length} mentor${results.length !== 1 ? "s" : ""} paid &nbsp;·&nbsp; ${results.filter(r => r.success).length} emails sent successfully</p>
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <thead>
+          <tr style="background:#f5f5f5;">
+            <th style="padding:10px 12px;text-align:left;font-weight:600;color:#111;">Mentor</th>
+            <th style="padding:10px 12px;text-align:left;font-weight:600;color:#111;">Date</th>
+            <th style="padding:10px 12px;text-align:left;font-weight:600;color:#111;">Mentee</th>
+            <th style="padding:10px 12px;text-align:right;font-weight:600;color:#111;">Payout</th>
+            <th style="padding:10px 12px;text-align:center;font-weight:600;color:#111;">Email</th>
+          </tr>
+        </thead>
+        <tbody>${summaryRows}</tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3" style="padding:14px 12px;font-weight:700;font-size:15px;color:#111;">Total paid out</td>
+            <td style="padding:14px 12px;font-weight:700;font-size:15px;color:#111;text-align:right;">$${grandTotal.toFixed(2)} AUD</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+    <div style="background:#f5f5f5;padding:16px 32px;">
+      <p style="margin:0;font-size:12px;color:#aaa;">The Headstart Mentoring &nbsp;·&nbsp; Internal payslip audit</p>
+    </div>
+  </div>
+</body>
+</html>`;
+
+  await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: { "api-key": BREVO_API_KEY, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      sender:      { name: "The Headstart", email: "theuniheadstart@gmail.com" },
+      to:          [{ email: "fidelhon@gmail.com", name: "Fidel" }],
+      subject:     `Payslip audit — ${weekLabel}`,
+      htmlContent: auditHtml,
+    }),
+  });
+
   return {
     statusCode: 200,
     headers,
