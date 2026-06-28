@@ -29,7 +29,6 @@ exports.handler = async (event) => {
     AIRTABLE_API_TOKEN,
     AIRTABLE_CORE_BASE_ID,
     AIRTABLE_MENTEE_TABLE_ID,
-    AIRTABLE_MENTOR_TABLE_ID,
   } = process.env;
 
   const airtableHeaders = {
@@ -38,41 +37,25 @@ exports.handler = async (event) => {
   };
 
   try {
-    // Step 1: find the mentor's Airtable record ID by email
-    const mentorRes = await fetch(
-      `https://api.airtable.com/v0/${AIRTABLE_CORE_BASE_ID}/${AIRTABLE_MENTOR_TABLE_ID}` +
-        `?filterByFormula=${encodeURIComponent(`{Email}="${mentorEmail}"`)}` +
-        `&fields[]=Email`,
-      { headers: airtableHeaders }
-    );
-    const mentorData = await mentorRes.json();
+    // Filter mentees directly by Mentor Email Plain field — avoids linked-record ID matching
+    const allMenteeRecords = [];
+    let offset = null;
+    do {
+      const formula = encodeURIComponent(`{Mentor Email Plain}="${mentorEmail}"`);
+      const url = `https://api.airtable.com/v0/${AIRTABLE_CORE_BASE_ID}/${AIRTABLE_MENTEE_TABLE_ID}` +
+        `?filterByFormula=${formula}&fields[]=Name&fields[]=Billing%20type` +
+        (offset ? `&offset=${offset}` : "");
+      const menteeRes  = await fetch(url, { headers: airtableHeaders });
+      const menteeData = await menteeRes.json();
+      allMenteeRecords.push(...(menteeData.records || []));
+      offset = menteeData.offset || null;
+    } while (offset);
 
-    if (!mentorData.records || mentorData.records.length === 0) {
-      return {
-        statusCode: 404,
-        headers,
-        body: JSON.stringify({ error: "Mentor not found in Airtable" }),
-      };
-    }
-
-    const mentorRecordId = mentorData.records[0].id;
-
-    // Step 2: fetch all mentees and filter by mentor record ID in JavaScript
-    // (Airtable's ARRAYJOIN on a linked field returns display names, not record IDs,
-    // so formula-based filtering won't match — JS filter is reliable)
-    const menteeRes = await fetch(
-      `https://api.airtable.com/v0/${AIRTABLE_CORE_BASE_ID}/${AIRTABLE_MENTEE_TABLE_ID}` +
-        `?fields[]=Name&fields[]=Mentor&fields[]=Billing%20Type`,
-      { headers: airtableHeaders }
-    );
-    const menteeData = await menteeRes.json();
-
-    const mentees = (menteeData.records || [])
-      .filter((r) => Array.isArray(r.fields.Mentor) && r.fields.Mentor.includes(mentorRecordId))
+    const mentees = allMenteeRecords
       .map((r) => ({
         id:          r.id,
         name:        r.fields.Name || "Unnamed mentee",
-        billingType: r.fields["Billing Type"] || "Per Session",
+        billingType: r.fields["Billing type"] || "Per Session",
       }));
 
     return {
