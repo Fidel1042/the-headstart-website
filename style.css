@@ -7,78 +7,78 @@
  */
 
 /* ── Base ── */
-@import url("css/base/variables.css");
-@import url("css/base/sections.css");
+@import url("css/base/variables.css?v=2");
+@import url("css/base/sections.css?v=2");
 
 /* ── Page chrome ── */
-@import url("css/components/grain-overlay.css");
-@import url("css/components/splash.css");
-@import url("css/components/nav-base.css");
+@import url("css/components/grain-overlay.css?v=2");
+@import url("css/components/splash.css?v=2");
+@import url("css/components/nav-base.css?v=2");
 
 /* ── Our story (about-real) ── */
-@import url("css/sections/about-real.css");
-@import url("css/sections/about-real-extras.css");
-@import url("css/sections/about-real-responsive.css");
+@import url("css/sections/about-real.css?v=2");
+@import url("css/sections/about-real-extras.css?v=2");
+@import url("css/sections/about-real-responsive.css?v=2");
 
 /* ── Nav: brand text + links + dropdown ── */
-@import url("css/components/nav-brand.css");
-@import url("css/components/nav-links.css");
-@import url("css/components/nav-more.css");
-@import url("css/components/nav-hamburger.css");
+@import url("css/components/nav-brand.css?v=2");
+@import url("css/components/nav-links.css?v=2");
+@import url("css/components/nav-more.css?v=2");
+@import url("css/components/nav-hamburger.css?v=2");
 
 /* ── About spacing (home about section) ── */
-@import url("css/pages/about-spacing.css");
+@import url("css/pages/about-spacing.css?v=2");
 
 /* ── Hero CTAs + cards/grids ── */
-@import url("css/components/hero-buttons.css");
-@import url("css/components/cards.css");
-@import url("css/components/author-card.css");
+@import url("css/components/hero-buttons.css?v=2");
+@import url("css/components/cards.css?v=2");
+@import url("css/components/author-card.css?v=2");
 
 /* ── Service rows + blog + common problems ── */
-@import url("css/sections/service-rows.css");
-@import url("css/sections/blog.css");
-@import url("css/sections/blog-responsive.css");
-@import url("css/sections/common-problems.css");
+@import url("css/sections/service-rows.css?v=2");
+@import url("css/sections/blog.css?v=2");
+@import url("css/sections/blog-responsive.css?v=2");
+@import url("css/sections/common-problems.css?v=2");
 
 /* ── Pain points quiz ── */
-@import url("css/sections/pain-quiz-card.css");
-@import url("css/sections/pain-quiz-bars-pips.css");
-@import url("css/sections/pain-quiz-result.css");
-@import url("css/sections/pain-quiz-responsive.css");
+@import url("css/sections/pain-quiz-card.css?v=2");
+@import url("css/sections/pain-quiz-bars-pips.css?v=2");
+@import url("css/sections/pain-quiz-result.css?v=2");
+@import url("css/sections/pain-quiz-responsive.css?v=2");
 
 /* ── Stats + mentor cards/flip ── */
-@import url("css/sections/stats-bar.css");
-@import url("css/sections/mentor-cards.css");
-@import url("css/sections/mentor-logo-bar.css");
-@import url("css/sections/mentor-flip-cards.css");
-@import url("css/sections/home-mentor-preview.css");
-@import url("css/sections/home-reviews-preview.css");
+@import url("css/sections/stats-bar.css?v=2");
+@import url("css/sections/mentor-cards.css?v=2");
+@import url("css/sections/mentor-logo-bar.css?v=2");
+@import url("css/sections/mentor-flip-cards.css?v=2");
+@import url("css/sections/home-mentor-preview.css?v=2");
+@import url("css/sections/home-reviews-preview.css?v=2");
 
 /* ── Forms (signup, fields, pickers, messages, buttons) ── */
-@import url("css/forms/signup-base.css");
-@import url("css/forms/form-fields.css");
-@import url("css/forms/pickers.css");
-@import url("css/forms/messages-thanks.css");
-@import url("css/forms/form-buttons.css");
+@import url("css/forms/signup-base.css?v=2");
+@import url("css/forms/form-fields.css?v=2");
+@import url("css/forms/pickers.css?v=2");
+@import url("css/forms/messages-thanks.css?v=2");
+@import url("css/forms/form-buttons.css?v=2");
 
 /* ── Careers + buttons/scroll/sticky ── */
-@import url("css/pages/careers.css");
-@import url("css/components/buttons-links.css");
-@import url("css/components/scroll-reveal.css");
-@import url("css/components/mobile-sticky-cta.css");
+@import url("css/pages/careers.css?v=2");
+@import url("css/components/buttons-links.css?v=2");
+@import url("css/components/scroll-reveal.css?v=2");
+@import url("css/components/mobile-sticky-cta.css?v=2");
 
 /* ── Responsive utilities ── */
-@import url("css/utilities/responsive.css");
-@import url("css/utilities/section-dividers.css");
-@import url("css/utilities/spacing-rhythm.css");
+@import url("css/utilities/responsive.css?v=2");
+@import url("css/utilities/section-dividers.css?v=2");
+@import url("css/utilities/spacing-rhythm.css?v=2");
 
 /* ── Careers mentor page ── */
-@import url("css/pages/careers-mentor-base.css");
-@import url("css/pages/careers-mentor-mid.css");
-@import url("css/pages/careers-mentor-end.css");
+@import url("css/pages/careers-mentor-base.css?v=2");
+@import url("css/pages/careers-mentor-mid.css?v=2");
+@import url("css/pages/careers-mentor-end.css?v=2");
 
 /* ── Pricing page ── */
-@import url("css/pages/pricing-base.css");
-@import url("css/pages/pricing-tiers.css");
-@import url("css/pages/pricing-responsive.css");
-@import url("css/pages/pricing-ladder.css");
+@import url("css/pages/pricing-base.css?v=2");
+@import url("css/pages/pricing-tiers.css?v=2");
+@import url("css/pages/pricing-responsive.css?v=2");
+@import url("css/pages/pricing-ladder.css?v=2");
