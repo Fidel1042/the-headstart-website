@@ -13,12 +13,12 @@ body > header {
 
 /* Push content below the fixed header. JS in nav-scroll.js refines this with exact measured height. */
 body {
-  padding-top: 130px;
+  padding-top: 90px;
 }
 
 @media (max-width: 960px) {
   body {
-    padding-top: 80px;
+    padding-top: 75px;
   }
 }
 

@@ -846,7 +846,7 @@
     /* ── Hero split layout ── */
     .hero-outer {
       display: grid;
-      grid-template-columns: 1fr 35vw;
+      grid-template-columns: 1fr min(35vw, 420px);
       grid-template-rows: 1fr auto;
       min-height: calc(88vh - 80px);
       overflow: hidden;
@@ -936,6 +936,7 @@
       text-transform: uppercase;
       letter-spacing: 0.08em;
       font-weight: 800;
+      white-space: nowrap;
     }
     .hero-cta-group .btn-hero-primary strong {
       font-weight: inherit;
