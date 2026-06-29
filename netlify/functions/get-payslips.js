@@ -15,7 +15,7 @@ exports.handler = async (event) => {
   const today     = new Date();
   const weekLabel = `Outstanding as of ${today.toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" })}`;
 
-  const formula = encodeURIComponent(`{Mentor Paid} = 0`);
+  const formula = encodeURIComponent(`AND({Mentor Paid}=0, IS_AFTER({Date}, DATEADD(TODAY(), -7, 'days')))`);
 
   let sessions;
   try {

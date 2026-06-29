@@ -32,7 +32,7 @@ exports.handler = async (event) => {
   };
 
   // All sessions not yet paid to mentor, regardless of mentee payment status
-  const formula = encodeURIComponent(`{Mentor Paid} = 0`);
+  const formula = encodeURIComponent(`AND({Mentor Paid}=0, IS_AFTER({Date}, DATEADD(TODAY(), -7, 'days')))`);
 
   const res  = await fetch(
     `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_SESSION_TABLE_ID}` +
@@ -148,7 +148,7 @@ exports.handler = async (event) => {
         method: "PATCH",
         headers: airtableHeaders,
         body: JSON.stringify({
-          records: chunk.map((id) => ({ id, fields: { "Mentor Paid": true } })),
+          records: chunk.map((id) => ({ id, fields: { "Mentor Paid": "Yes" } })),
         }),
       }
     );
