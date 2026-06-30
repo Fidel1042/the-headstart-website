@@ -52,9 +52,12 @@ main > .section-alt:first-of-type + .section-alt {
 .section-inner > .section-title-row,
 .section-inner > .mentoring-head,
 .section-inner > .home-sec-head,
-.section-inner > .pricing-head,
-.section-inner .page-hero-text {
+.section-inner > .pricing-head {
   margin-bottom: var(--space-5);
+}
+
+.section-inner .page-hero-text {
+  margin-bottom: 0.4rem;
 }
 
 /* Hero block trims its internal bottom space — the section padding handles

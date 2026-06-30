@@ -25,6 +25,7 @@ export const ALLOWED_MENTOR_EMAILS = [
   "raunaqrsa@gmail.com",
   "jai.arora115@gmail.com",
   "brendonvo@outlook.com",
+  "luischua18@gmail.com",
 ];
 
 // ─── CLIENT ───────────────────────────────────────────────────────────────────

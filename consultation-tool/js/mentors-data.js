@@ -211,6 +211,23 @@ export const mentors = [
     why: "He has a genuine drive to work with graduates, especially those whose confidence has been worn down by repeated rejections. Seeing people in his own network land roles in HR and law clerkships is what keeps him going.",
     different: "His background is on the recruiter side. He built and ran a graduate hiring program from the inside, which means he can teach students how to build connections that go beyond the transactional and actually stick. He uses structured frameworks to help mentees take ownership of their own development, including those who tend to hold back.",
   },
+  {
+    id: "luis", name: "Luis Chua", intl: "International",
+    role: "Graduate Civil Engineer", company: "Vinculum",
+    uni: "University of New South Wales", degree: "Civil Engineering",
+    major: "Civil Engineering", industry: "Engineering / Sustainability", rate: "$20",
+    visa: "485 - Temporary Graduate Visa", gradYear: "2025",
+    specialiseIn: ["Civil Engineering", "Sustainability", "Networking"],
+    photo: IMG + "Luis.png",
+    detailPhoto: DIMG + "Luis.png",
+    logos: [{ src: LOGO + "Vinculum.png", alt: "Vinculum" }, { src: LOGO + "Trace.png", alt: "Trace" }],
+    tags: ["civil engineering", "engineering", "sustainability", "infrastructure", "civil", "mechanical", "chemical", "industrial", "mechatronics", "networking", "graduate"],
+    bestFor: "Civil, mechanical, chemical, industrial, and mechatronics engineering students looking to build confidence, network properly, and explore sustainability-adjacent paths. Not for software / computer science students.",
+    detailed: true,
+    lead: "Luis is a Sydney-based graduate civil engineer at Vinculum, with prior part-time sustainability experience at Trace. He is moving into a sustainable infrastructure engineering role he landed through a direct referral after just five months in his first full-time role.",
+    why: "Mentorship was a big part of how he built his career in Australia. He had several mentors who helped him network and understand what it takes to work here, and he wants to give that back to international students going through the same job hunt.",
+    different: "Luis breaks the stigma that engineering is antisocial. He focuses on the communication, networking, and 'selling yourself' side that engineering students tend to skip, and helps mentees push through the low points and rejections that come with an international student job search.",
+  },
 ];
 
 export function getMentor(id) {
