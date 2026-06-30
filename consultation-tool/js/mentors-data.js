@@ -185,7 +185,7 @@ export const mentors = [
     visa: "485 - Temporary Graduate Visa", gradYear: "2025",
     specialiseIn: ["Cyber Security", "Financial Services"],
     photo: IMG + "Jai .png",
-    detailPhoto: DIMG + "Jai.png",
+    detailPhoto: DIMG + "Jai.jpg",
     logos: [{ src: LOGO + "macquarie-bank-limited-logo-black-and-white.png", alt: "Macquarie" }, { src: LOGO + "pwc white logo.jpg", alt: "PwC" }],
     tags: ["information systems", "tech", "finance", "financial services", "banking", "it", "cyber security", "internship", "return offer"],
     bestFor: "IT and tech students looking to break into financial services or convert an internship into a return offer.",
