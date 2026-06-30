@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SMH2KVMJT2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag("js", new Date());
+    gtag("config", "G-SMH2KVMJT2");
+  </script>
+  <title>Get Weekly Job Alerts | Headstart Mentoring</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta name="description" content="Get hand-picked graduate and internship job alerts for international students in Australia, emailed to you weekly." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://theheadstartmentoring.com/job-alerts-signup/" />
+  <meta property="og:site_name" content="Headstart Mentoring" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Get Weekly Job Alerts | Headstart Mentoring" />
+  <meta property="og:description" content="Get hand-picked graduate and internship job alerts for international students in Australia, emailed to you weekly." />
+  <meta property="og:url" content="https://theheadstartmentoring.com/job-alerts-signup/" />
+  <meta property="og:image" content="https://theheadstartmentoring.com/images/website-logo.png" />
+  <link rel="stylesheet" href="../style.css?v=2" />
+  <link rel="preconnect" href="https://calendly.com" crossorigin />
+  <link rel="preconnect" href="https://assets.calendly.com" crossorigin />
+  <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet" />
+  <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+  <style>
+    /* ── PAGE LAYOUT ── */
+    .signup-page-wrap {
+      min-height: 60vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 3rem 1.25rem 5rem;
+    }
+    .signup-inner {
+      width: 100%;
+      max-width: 520px;
+    }
+
+    /* ── HERO COPY ── */
+    .signup-eyebrow {
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #f7d879;
+      margin-bottom: 0.75rem;
+    }
+    .signup-headline {
+      font-size: clamp(1.6rem, 4vw, 2.1rem);
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.2;
+      margin: 0 0 1rem;
+    }
+    .signup-desc {
+      font-size: 0.96rem;
+      color: rgba(255,255,255,0.72);
+      line-height: 1.65;
+      margin: 0 0 0.6rem;
+    }
+    .signup-proof {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1.2rem;
+      margin: 0 0 2rem;
+      list-style: none;
+      padding: 0;
+    }
+    .signup-proof li {
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.55);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .signup-proof li::before {
+      content: "✓";
+      color: #c79b3b;
+      font-weight: 700;
+    }
+
+    /* ── FORM ── */
+    .email-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .email-form input[type="email"],
+    .email-form input[type="text"] {
+      width: 100%;
+      padding: 0.88rem 1.1rem;
+      background: rgba(255,255,255,0.05);
+      border: 1.5px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 0.92rem;
+      font-family: inherit;
+      box-sizing: border-box;
+      transition: border-color 0.2s;
+    }
+    .email-form input[type="email"]:focus,
+    .email-form input[type="text"]:focus {
+      outline: none;
+      border-color: #c79b3b;
+    }
+    .email-form input::placeholder { color: rgba(255,255,255,0.35); }
+
+    .form-question { display: flex; flex-direction: column; gap: 0.6rem; }
+    .form-question-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.6);
+    }
+    .chip-group { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+    .chip {
+      padding: 0.42rem 0.9rem;
+      border: 1.5px solid rgba(255,255,255,0.14);
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #fff;
+      background: transparent;
+      cursor: pointer;
+      font-family: inherit;
+      transition: border-color 0.15s, background 0.15s, color 0.15s;
+      user-select: none;
+    }
+    .chip:hover { border-color: rgba(199,155,59,0.5); }
+    .chip.selected {
+      border-color: #c79b3b;
+      background: rgba(199,155,59,0.12);
+      color: #f7d879;
+    }
+    .role-group { display: flex; gap: 0.6rem; }
+    .role-chip {
+      flex: 1;
+      padding: 0.7rem 0.5rem;
+      border: 1.5px solid rgba(255,255,255,0.14);
+      border-radius: 10px;
+      text-align: center;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #fff;
+      background: transparent;
+      cursor: pointer;
+      font-family: inherit;
+      transition: border-color 0.15s, background 0.15s, color 0.15s;
+    }
+    .role-chip:hover { border-color: rgba(199,155,59,0.5); }
+    .role-chip.selected {
+      border-color: #c79b3b;
+      background: rgba(199,155,59,0.12);
+      color: #f7d879;
+    }
+    .email-submit {
+      width: 100%;
+      padding: 0.95rem;
+      background: linear-gradient(135deg, #c79b3b, #f7d37d);
+      color: #2b1b09;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: opacity 0.18s;
+      font-family: inherit;
+      margin-top: 0.5rem;
+    }
+    .email-submit:hover { opacity: 0.88; }
+
+    .email-success {
+      display: none;
+      padding: 1.4rem 1.8rem;
+      background: rgba(199,155,59,0.08);
+      border: 1px solid rgba(199,155,59,0.2);
+      border-radius: 12px;
+      text-align: center;
+    }
+    .email-success p { color: #fff; font-size: 0.9rem; line-height: 1.65; margin: 0; }
+    .email-success strong { color: #f7d879; }
+
+    .signup-back-link {
+      display: block;
+      margin-top: 1.5rem;
+      text-align: center;
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.45);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .signup-back-link:hover { color: rgba(255,255,255,0.75); }
+
+    /* ── CONSULTATION UPSELL MODAL ── */
+    .consult-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+    .consult-modal.is-open { pointer-events: auto; opacity: 1; }
+    .consult-modal__backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(6px);
+    }
+    .consult-modal__panel {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: #0d0d0d;
+      border: 1px solid rgba(199,155,59,0.3);
+      border-radius: 20px;
+      padding: 2.25rem 1.75rem 2rem;
+      transform: translateY(20px);
+      transition: transform 0.3s ease;
+    }
+    .consult-modal.is-open .consult-modal__panel { transform: translateY(0); }
+    .consult-modal__close {
+      position: absolute;
+      top: 0.85rem;
+      right: 0.85rem;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.6);
+      font-size: 1.3rem;
+      line-height: 1;
+      cursor: pointer;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, color 0.15s;
+    }
+    .consult-modal__close:hover { background: rgba(255,255,255,0.12); color: #fff; }
+    .consult-modal__eyebrow {
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #c9a84c;
+      margin: 0 0 0.65rem;
+    }
+    .consult-modal__title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #fff;
+      margin: 0 0 0.75rem;
+      line-height: 1.25;
+    }
+    .consult-modal__desc {
+      color: #aaa;
+      font-size: 0.92rem;
+      line-height: 1.55;
+      margin: 0 0 1.6rem;
+    }
+    .consult-form { display: flex; flex-direction: column; gap: 1rem; }
+    .consult-form__group { display: flex; flex-direction: column; gap: 0.4rem; }
+    .consult-form__group label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.55);
+    }
+    .consult-form__group input {
+      width: 100%;
+      padding: 0.82rem 1rem;
+      background: rgba(255,255,255,0.05);
+      border: 1.5px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 0.9rem;
+      font-family: inherit;
+      box-sizing: border-box;
+      transition: border-color 0.2s;
+    }
+    .consult-form__group input:focus { outline: none; border-color: #c79b3b; }
+    .consult-form__group input::placeholder { color: rgba(255,255,255,0.3); }
+    .consult-submit {
+      width: 100%;
+      padding: 0.92rem;
+      background: linear-gradient(135deg, #c79b3b, #f7d37d);
+      color: #2b1b09;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: opacity 0.18s;
+      font-family: inherit;
+      margin-top: 0.5rem;
+    }
+    .consult-submit:hover { opacity: 0.88; }
+    .consult-submit:disabled { opacity: 0.55; cursor: not-allowed; }
+    .consult-success {
+      display: none;
+      text-align: center;
+      padding: 1rem 0;
+    }
+    .consult-success p { color: #fff; font-size: 0.9rem; line-height: 1.6; margin: 0; }
+    .consult-success strong { color: #f7d879; }
+
+    @media (max-width: 600px) {
+      .signup-page-wrap { padding: 2rem 1rem 4rem; }
+      .consult-modal__panel { padding: 2rem 1.3rem 1.6rem; }
+      .consult-modal__title { font-size: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="nav">
+      <a href="/" class="nav-left nav-home">
+        <img src="../images/headstart-italic-logo.png" decoding="async" alt="Headstart Mentoring logo" class="nav-logo-icon" />
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+      </button>
+      <nav class="nav-links" id="navLinks">
+        <a href="/mentors">Mentors</a>
+        <a href="/#pricing">Pricing</a>
+        <a href="/reviews">Reviews</a>
+        <a href="/job-alerts" class="active">Job Alerts</a>
+        <div class="nav-more">
+          <button class="nav-more__trigger" type="button">More <span class="nav-more__arrow">▾</span></button>
+          <div class="nav-more__menu">
+            <a href="/blog">Blog</a>
+            <a href="/careers">Careers</a>
+          </div>
+        </div>
+      </nav>
+      <a href="/discovery-call" class="nav-cta nav-cta--gold">Free Strategy Call</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="signup-page-wrap">
+      <div class="signup-inner">
+
+        <p class="signup-eyebrow">Free weekly job alerts</p>
+        <h1 class="signup-headline">Get the right roles in your inbox every week</h1>
+        <p class="signup-desc">We hand-pick graduate and internship openings across Sydney, Melbourne and Brisbane — filtered by industry and role type so you only see what's relevant to you.</p>
+        <ul class="signup-proof">
+          <li>Updated every week</li>
+          <li>Finance, Tech, Accounting, Marketing &amp; more</li>
+          <li>Free, no spam</li>
+        </ul>
+
+        <form name="job-alerts-signup" netlify class="email-form" id="emailForm">
+          <input type="hidden" name="form-name" value="job-alerts-signup" />
+          <input type="hidden" name="industries" id="hiddenIndustries" />
+          <input type="hidden" name="role-type" id="hiddenRoleType" />
+
+          <input type="text" name="name" id="signupName" placeholder="Your name" required autocomplete="name" />
+          <input type="email" name="email" id="signupEmail" placeholder="Your email address" required autocomplete="email" />
+
+          <div class="form-question">
+            <p class="form-question-label">Are you an international student?</p>
+            <div class="role-group" id="intStudentChips">
+              <button type="button" class="role-chip" data-value="yes">Yes</button>
+              <button type="button" class="role-chip" data-value="no">No</button>
+            </div>
+            <input type="hidden" name="international_student" id="hiddenIntStudent" />
+          </div>
+
+          <div class="form-question">
+            <p class="form-question-label">Which industries are you open to?</p>
+            <div class="chip-group" id="industryChips">
+              <button type="button" class="chip" data-value="finance">Finance</button>
+              <button type="button" class="chip" data-value="accounting">Accounting</button>
+              <button type="button" class="chip" data-value="tech">Tech</button>
+              <button type="button" class="chip" data-value="marketing">Marketing</button>
+              <button type="button" class="chip" data-value="consulting">Consulting</button>
+              <button type="button" class="chip" data-value="data">Data &amp; Analytics</button>
+            </div>
+          </div>
+
+          <div class="form-question">
+            <p class="form-question-label">What type of roles are you looking for?</p>
+            <div class="role-group" id="roleChips">
+              <button type="button" class="role-chip" data-value="internship">Internship</button>
+              <button type="button" class="role-chip" data-value="graduate">Graduate</button>
+              <button type="button" class="role-chip" data-value="both">Both</button>
+            </div>
+          </div>
+
+          <button type="submit" class="email-submit">Join the list</button>
+        </form>
+
+        <div class="email-success" id="emailSuccess">
+          <p><strong>You're in.</strong><br>We'll reach out when the next batch for your field is live.</p>
+        </div>
+
+        <a href="/job-alerts" class="signup-back-link">Browse this week's roles instead</a>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Consultation upsell modal -->
+  <div class="consult-modal" id="consultModal" aria-modal="true" role="dialog" aria-labelledby="consultTitle">
+    <div class="consult-modal__backdrop" id="consultBackdrop"></div>
+    <div class="consult-modal__panel" id="consultPanel">
+      <button class="consult-modal__close" id="consultClose" aria-label="Close">&times;</button>
+      <p class="consult-modal__eyebrow">Congratulations</p>
+      <h3 class="consult-modal__title" id="consultTitle">You've just redeemed a free career readiness call</h3>
+      <p class="consult-modal__desc">That's the first step taken. Drop your LinkedIn and phone below and we will reach out within 24 hours to lock in your 20-minute call.</p>
+
+      <form name="mentee-signup" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="consult-form" id="consultForm">
+        <input type="hidden" name="form-name" value="mentee-signup" />
+        <input type="hidden" name="name" id="consultName" />
+        <input type="hidden" name="email" id="consultEmail" />
+        <input type="hidden" name="international_student" id="consultIntStudent" />
+        <input type="hidden" name="source" value="job-alerts-signup-page" />
+        <p style="display:none;"><label>Don't fill this out: <input name="bot-field" /></label></p>
+
+        <div class="consult-form__group">
+          <label for="consultLinkedIn">LinkedIn profile URL</label>
+          <input type="url" id="consultLinkedIn" name="linkedin_url" placeholder="https://linkedin.com/in/your-handle" required />
+        </div>
+        <div class="consult-form__group">
+          <label for="consultPhone">Phone number</label>
+          <input type="tel" id="consultPhone" name="phone" placeholder="+61 412 345 678" inputmode="tel" required />
+        </div>
+
+        <button type="submit" class="consult-submit">Lock in my call &rarr;</button>
+      </form>
+
+      <div class="consult-success" id="consultSuccess">
+        <p><strong>Locked in.</strong><br>We'll reach out within 24 hours to schedule your call.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span>&copy; <span id="year"></span> Headstart Mentoring. All rights reserved.</span>
+    <span>Contact: <a href="mailto:theuniheadstart@gmail.com">theuniheadstart@gmail.com</a></span>
+  </footer>
+
+  <script type="module" src="../js/main.js"></script>
+  <script src="../js/nav-hamburger.js" defer></script>
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    // Industry chip multi-select
+    document.querySelectorAll("#industryChips .chip").forEach(function(chip) {
+      chip.addEventListener("click", function() {
+        chip.classList.toggle("selected");
+        var selected = Array.from(document.querySelectorAll("#industryChips .chip.selected"))
+          .map(function(c) { return c.dataset.value; });
+        document.getElementById("hiddenIndustries").value = selected.join(",");
+      });
+    });
+
+    // Role type single-select
+    document.querySelectorAll("#roleChips .role-chip").forEach(function(chip) {
+      chip.addEventListener("click", function() {
+        document.querySelectorAll("#roleChips .role-chip").forEach(function(c) {
+          c.classList.remove("selected");
+        });
+        chip.classList.add("selected");
+        document.getElementById("hiddenRoleType").value = chip.dataset.value;
+      });
+    });
+
+    // International student single-select
+    document.querySelectorAll("#intStudentChips .role-chip").forEach(function(chip) {
+      chip.addEventListener("click", function() {
+        document.querySelectorAll("#intStudentChips .role-chip").forEach(function(c) {
+          c.classList.remove("selected");
+        });
+        chip.classList.add("selected");
+        document.getElementById("hiddenIntStudent").value = chip.dataset.value;
+      });
+    });
+
+    // Consultation modal
+    var consultModal = document.getElementById("consultModal");
+    var consultBackdrop = document.getElementById("consultBackdrop");
+    var consultClose = document.getElementById("consultClose");
+
+    function openConsultModal() {
+      consultModal.classList.add("is-open");
+      document.body.style.overflow = "hidden";
+      if (typeof gtag === "function") {
+        gtag("event", "modal_view", { modal_name: "consultation_popup" });
+      }
+    }
+    function closeConsultModal() {
+      consultModal.classList.remove("is-open");
+      document.body.style.overflow = "";
+    }
+    consultClose.addEventListener("click", closeConsultModal);
+    consultBackdrop.addEventListener("click", closeConsultModal);
+    document.addEventListener("keydown", function(e) {
+      if (e.key === "Escape" && consultModal.classList.contains("is-open")) closeConsultModal();
+    });
+
+    // Signup form submit
+    document.getElementById("emailForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      var intStudentVal = (document.getElementById("hiddenIntStudent").value || "").trim();
+      var industriesVal = (document.getElementById("hiddenIndustries").value || "").trim();
+      var roleTypeVal   = (document.getElementById("hiddenRoleType").value || "").trim();
+
+      var missing = [];
+      if (!intStudentVal) missing.push("Are you an international student?");
+      if (!industriesVal) missing.push("Which industries are you open to?");
+      if (!roleTypeVal)   missing.push("What type of roles are you looking for?");
+
+      if (missing.length) {
+        alert("Please answer the following before submitting:\n\n• " + missing.join("\n• "));
+        var firstMissingId = !intStudentVal ? "intStudentChips" : (!industriesVal ? "industryChips" : "roleChips");
+        var el = document.getElementById(firstMissingId);
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+
+      var data = new FormData(this);
+      fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams(data).toString()
+      }).catch(function() {});
+
+      this.style.display = "none";
+      document.getElementById("emailSuccess").style.display = "block";
+
+      if (typeof gtag === "function") {
+        gtag("event", "generate_lead", {
+          form_id: "job_alert_signup",
+          student_status: intStudentVal,
+          industries: industriesVal,
+          role_type: roleTypeVal
+        });
+      }
+
+      document.getElementById("consultName").value = document.getElementById("signupName").value || "";
+      document.getElementById("consultEmail").value = document.getElementById("signupEmail").value || "";
+      document.getElementById("consultIntStudent").value = intStudentVal;
+
+      setTimeout(openConsultModal, 350);
+    });
+
+    // Consult form submit
+    var CALENDLY_URL = "https://calendly.com/fidelhon/30min";
+
+    document.getElementById("consultForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      var submitBtn = this.querySelector(".consult-submit");
+      if (submitBtn && submitBtn.disabled) return;
+      var originalLabel = submitBtn ? submitBtn.innerHTML : "";
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = "Opening calendar..."; }
+
+      var prefillName  = (document.getElementById("consultName").value || "").trim();
+      var prefillEmail = (document.getElementById("consultEmail").value || "").trim();
+
+      if (typeof gtag === "function") {
+        gtag("event", "consult_form_submit", { form_id: "job_alerts_consult_modal" });
+      }
+
+      try {
+        var data = new FormData(this);
+        fetch("/", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams(data).toString()
+        }).catch(function() {});
+      } catch (err) {}
+
+      function buildFallbackUrl() {
+        var params = [];
+        if (prefillName)  params.push("name="  + encodeURIComponent(prefillName));
+        if (prefillEmail) params.push("email=" + encodeURIComponent(prefillEmail));
+        return params.length ? CALENDLY_URL + "?" + params.join("&") : CALENDLY_URL;
+      }
+
+      var opened = false;
+      if (typeof Calendly !== "undefined" && Calendly.initPopupWidget) {
+        try {
+          Calendly.initPopupWidget({
+            url: CALENDLY_URL,
+            prefill: { name: prefillName, email: prefillEmail }
+          });
+          opened = true;
+        } catch (err) {}
+      }
+      if (!opened) { window.open(buildFallbackUrl(), "_blank"); }
+
+      document.getElementById("consultForm").style.display = "none";
+      document.getElementById("consultSuccess").style.display = "block";
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Headstart Mentoring</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="description" content="Career mentors for international students in Australia." />
+  <meta name="robots" content="noindex, follow" />
+  <link rel="icon" href="images/website-logo.png" />
+  <link rel="apple-touch-icon" href="images/website-logo.png" />
+
+  <meta property="og:title" content="Headstart Mentoring" />
+  <meta property="og:description" content="Career mentors for international students in Australia." />
+  <meta property="og:image" content="images/website-logo.png" />
+  <meta property="og:type" content="website" />
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SMH2KVMJT2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag("js", new Date());
+    gtag("config", "G-SMH2KVMJT2");
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #000000;
+      --text: #ffffff;
+      --muted: rgba(255, 255, 255, 0.55);
+      --gold-1: #f3d27a;
+      --gold-2: #d9a94a;
+      --gold-3: #a87923;
+      --gold-grad: linear-gradient(135deg, var(--gold-1) 0%, var(--gold-2) 50%, var(--gold-3) 100%);
+      --card: rgba(255, 255, 255, 0.04);
+      --card-hover: rgba(255, 255, 255, 0.08);
+      --border: rgba(255, 255, 255, 0.1);
+      --border-gold: rgba(217, 169, 74, 0.55);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      height: 100%;
+      overflow-x: hidden;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100dvh;
+      position: relative;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .bg-glow {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(243, 210, 122, 0.18), transparent 55%),
+        radial-gradient(circle at 80% 100%, rgba(168, 121, 35, 0.12), transparent 50%);
+      opacity: 0;
+    }
+
+    .grain {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0;
+      mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 10;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 40px 24px 40px;
+      max-width: 440px;
+      margin: 0 auto;
+    }
+
+    .brand-logo {
+      width: auto;
+      height: 100px;
+      max-width: 100%;
+      margin-bottom: 8px;
+      opacity: 0;
+      mix-blend-mode: screen;
+      filter: drop-shadow(0 2px 14px rgba(243, 210, 122, 0.25));
+    }
+
+    .brand-tagline {
+      font-size: 12px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 36px;
+      opacity: 0;
+    }
+
+    .cta-stack {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .cta {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      width: 100%;
+      padding: 18px 20px;
+      border-radius: 18px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      text-decoration: none;
+      overflow: hidden;
+      transition: background 0.25s ease, border-color 0.25s ease;
+      opacity: 0;
+      transform: translateY(60px) scale(0.9);
+      cursor: pointer;
+      will-change: transform;
+    }
+
+    .cta::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent 30%, rgba(243, 210, 122, 0.22) 50%, transparent 70%);
+      transform: translateX(-100%);
+      transition: transform 0.7s ease;
+      pointer-events: none;
+    }
+
+    .cta:hover, .cta:active {
+      background: var(--card-hover);
+      border-color: var(--border-gold);
+    }
+    .cta:hover::before, .cta:active::before {
+      transform: translateX(100%);
+    }
+
+    .cta-icon {
+      flex: 0 0 44px;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--gold-grad);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #0a0a0a;
+      box-shadow: 0 6px 18px rgba(217, 169, 74, 0.25);
+    }
+    .cta-icon svg { width: 22px; height: 22px; }
+
+    .cta-body { flex: 1; min-width: 0; }
+    .cta-title {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      line-height: 1.3;
+      margin-bottom: 3px;
+    }
+    .cta-sub {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .cta-arrow {
+      flex: 0 0 auto;
+      color: var(--muted);
+      transition: transform 0.25s ease;
+    }
+    .cta:hover .cta-arrow, .cta:active .cta-arrow {
+      transform: translateX(4px);
+    }
+    .cta-arrow svg { display: block; }
+
+    .cta--gold {
+      background: rgba(199, 155, 59, 0.08);
+      border-color: rgba(199, 155, 59, 0.3);
+    }
+    .cta--gold:hover, .cta--gold:active {
+      background: rgba(199, 155, 59, 0.14);
+      border-color: rgba(199, 155, 59, 0.6);
+    }
+    .cta--gold .cta-title {
+      background: var(--gold-grad);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .cta--gold .cta-icon {
+      background: rgba(199, 155, 59, 0.12);
+      box-shadow: none;
+      color: #f3d27a;
+    }
+
+@media (max-width: 360px) {
+      .cta-title { font-size: 13.5px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.001s !important;
+        transition-duration: 0.001s !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <linearGradient id="arrowStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#f3d27a" />
+        <stop offset="100%" stop-color="#a87923" />
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <div class="bg-glow"></div>
+  <div class="grain"></div>
+
+  <main class="wrap">
+    <img class="brand-logo" src="images/headstart-italic-logo.png" alt="Headstart Mentoring" />
+    <p class="brand-tagline" style="color:#fff;">Career mentors for international students</p>
+
+    <div class="cta-stack">
+
+      <a class="cta" href="/" data-cta data-track="mentoring_landing">
+        <div class="cta-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+        </div>
+        <div class="cta-body">
+          <div class="cta-title">Land your Grad Role with Mentors who went through a similar path</div>
+        </div>
+        <span class="cta-arrow">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="url(#arrowStroke)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+      </a>
+
+      <a class="cta cta--gold" href="/job-alerts-signup" data-cta data-track="deloitte_grad_program">
+        <div class="cta-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+          </svg>
+        </div>
+        <div class="cta-body">
+          <div class="cta-title">Deloitte Grad Program</div>
+          <div class="cta-sub">Join our mailing list to get links to the 4 roles opened for International Students</div>
+        </div>
+        <span class="cta-arrow">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="url(#arrowStroke)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+      </a>
+
+      <a class="cta" href="/job-alerts" data-cta data-track="job_alerts">
+        <div class="cta-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 16v-5a6 6 0 0 0-4-5.66V4a2 2 0 1 0-4 0v1.34A6 6 0 0 0 6 11v5l-2 2h16l-2-2z" />
+            <path d="M10 22a2 2 0 0 0 4 0" />
+          </svg>
+        </div>
+        <div class="cta-body">
+          <div class="cta-title">Job Alerts</div>
+          <div class="cta-sub">Weekly Jobs Open for International Students, filtered by major</div>
+        </div>
+        <span class="cta-arrow">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="url(#arrowStroke)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+      </a>
+
+    </div>
+  </main>
+
+  <script>
+    window.addEventListener('load', () => {
+      gsap.to('.bg-glow', { opacity: 1, duration: 1.5, ease: 'power2.out' });
+      gsap.to('.grain',   { opacity: 0.04, duration: 1.5, ease: 'power2.out' });
+
+      gsap.fromTo('.brand-logo',
+        { opacity: 0, filter: 'blur(18px)' },
+        { opacity: 1, filter: 'blur(0px)', duration: 1.0, ease: 'power3.out' }
+      );
+      gsap.fromTo('.brand-tagline',
+        { opacity: 0, filter: 'blur(10px)' },
+        { opacity: 1, filter: 'blur(0px)', duration: 0.9, delay: 0.25, ease: 'power3.out' }
+      );
+
+      gsap.fromTo('.cta',
+        { opacity: 0, y: 40, scale: 0.95, filter: 'blur(12px)' },
+        {
+          opacity: 1, y: 0, scale: 1, filter: 'blur(0px)',
+          duration: 0.7,
+          stagger: 0.18,
+          delay: 0.4,
+          ease: 'power3.out',
+        }
+      );
+    });
+
+    // 3D tilt on desktop (hover-capable) devices only
+    var canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    if (canHover) {
+      document.querySelectorAll('[data-cta]').forEach((btn) => {
+        btn.addEventListener('pointermove', (e) => {
+          const rect = btn.getBoundingClientRect();
+          const x = ((e.clientX - rect.left) / rect.width  - 0.5) * 6;
+          const y = ((e.clientY - rect.top)  / rect.height - 0.5) * 6;
+          gsap.to(btn, { rotateY: x, rotateX: -y, duration: 0.4, ease: 'power2.out', transformPerspective: 800 });
+        });
+        btn.addEventListener('pointerleave', () => {
+          gsap.to(btn, { rotateY: 0, rotateX: 0, duration: 0.5, ease: 'power3.out' });
+        });
+      });
+    }
+
+    // GA4 link click tracking
+    document.querySelectorAll('[data-track]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        if (typeof gtag === 'function') {
+          gtag('event', 'link_click', {
+            link_id: btn.dataset.track,
+            link_url: btn.href,
+            source: 'instagram_bio',
+          });
+        }
+      });
+    });
+
+    // Tap press feel on all devices
+    document.querySelectorAll('[data-cta]').forEach((btn) => {
+      btn.addEventListener('pointerdown', () => {
+        gsap.to(btn, { scale: 0.97, duration: 0.12, ease: 'power2.out' });
+      });
+      btn.addEventListener('pointerup', () => {
+        gsap.to(btn, { scale: 1, duration: 0.2, ease: 'power2.out' });
+      });
+      btn.addEventListener('pointercancel', () => {
+        gsap.to(btn, { scale: 1, duration: 0.2, ease: 'power2.out' });
+      });
+    });
+  </script>
+</body>
+</html>
