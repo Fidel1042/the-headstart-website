@@ -1451,9 +1451,7 @@ document.getElementById("emailForm").addEventListener("submit", function(e) {
   setTimeout(openConsultModal, 350);
 });
 
-// Consult form → post to Netlify as mentee-signup, then open Calendly popup
-var CALENDLY_URL = "https://calendly.com/fidelhon/30min";
-
+// Consult form → same hierarchy as discovery-call page
 document.getElementById("consultForm").addEventListener("submit", function(e) {
   e.preventDefault();
 
@@ -1461,79 +1459,39 @@ document.getElementById("consultForm").addEventListener("submit", function(e) {
   var submitBtn = form.querySelector(".consult-submit");
   if (submitBtn && submitBtn.disabled) return;
 
-  var originalLabel = submitBtn ? submitBtn.innerHTML : "";
-  if (submitBtn) {
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = "Opening calendar...";
-  }
-
   var prefillName = (document.getElementById("consultName").value || "").trim();
   var prefillEmail = (document.getElementById("consultEmail").value || "").trim();
 
+  // Australian phone check — same logic as discovery-call page
+  var phoneEl = document.getElementById("consultPhone");
+  var phoneVal = phoneEl ? phoneEl.value.replace(/[\s\-()+.]/g, '') : '';
+  var isAus = /^(04|4)\d/.test(phoneVal);
+
   if (typeof gtag === "function") {
-    gtag("event", "consult_form_submit", { form_id: "job_alerts_consult_modal" });
+    gtag("event", "consult_form_submit", { form_id: "job_alerts_consult_modal", is_au: isAus ? "yes" : "no" });
   }
 
-  // Save the lead to Netlify in the background; never block the user on it
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = "One moment..."; }
+
+  // Save lead to Netlify with keepalive so POST survives navigation
   try {
     var data = new FormData(form);
     fetch("/", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams(data).toString()
+      body: new URLSearchParams(data).toString(),
+      keepalive: true
     }).catch(function() {});
-  } catch (err) { /* lead save failed silently */ }
+  } catch (err) {}
 
-  function buildFallbackUrl() {
-    var params = [];
-    if (prefillName) params.push("name=" + encodeURIComponent(prefillName));
-    if (prefillEmail) params.push("email=" + encodeURIComponent(prefillEmail));
-    return params.length ? CALENDLY_URL + "?" + params.join("&") : CALENDLY_URL;
-  }
+  // Set sessionStorage flags — free-call-submitted.html reads these
+  try {
+    sessionStorage.setItem("hs_eligible", isAus ? "1" : "0");
+    sessionStorage.setItem("hs_booking_name", prefillName);
+    sessionStorage.setItem("hs_booking_email", prefillEmail);
+  } catch (err) {}
 
-  function showFallback() {
-    if (submitBtn) {
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = originalLabel;
-    }
-    form.style.display = "none";
-    var success = document.getElementById("consultSuccess");
-    success.innerHTML =
-      '<p><strong>You\'re in.</strong><br>Click below to pick a time for your free career call.</p>' +
-      '<a href="' + buildFallbackUrl() + '" target="_blank" rel="noopener" class="consult-submit">Pick a time</a>';
-    success.style.display = "block";
-  }
-
-  function tryOpenCalendly() {
-    if (typeof Calendly === "undefined" || !Calendly || typeof Calendly.initPopupWidget !== "function") return false;
-    try {
-      closeConsultModal();
-      form.style.display = "none";
-      Calendly.initPopupWidget({
-        url: CALENDLY_URL,
-        prefill: { name: prefillName, email: prefillEmail }
-      });
-      return true;
-    } catch (err) {
-      // Calendly threw mid-call; restore form so user can see the fallback
-      form.style.display = "";
-      return false;
-    }
-  }
-
-  if (tryOpenCalendly()) return;
-
-  // Widget script hasn't finished loading yet; poll up to ~4s
-  var tries = 0;
-  var poll = setInterval(function() {
-    tries++;
-    if (tryOpenCalendly()) {
-      clearInterval(poll);
-    } else if (tries > 40) {
-      clearInterval(poll);
-      showFallback();
-    }
-  }, 100);
+  window.location.href = "/free-call-submitted";
 });
 
 // Sync visual tab state with activeCat (in case it was set via URL param)

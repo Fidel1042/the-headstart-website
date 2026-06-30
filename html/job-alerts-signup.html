@@ -377,15 +377,8 @@
     <div class="signup-page-wrap">
       <div class="signup-inner">
 
-        <p class="signup-eyebrow">Free weekly job alerts</p>
+        <p class="signup-eyebrow">Deloitte Grad Program</p>
         <h1 class="signup-headline">Get the right roles in your inbox every week</h1>
-        <p class="signup-desc">We hand-pick graduate and internship openings across Sydney, Melbourne and Brisbane — filtered by industry and role type so you only see what's relevant to you.</p>
-        <ul class="signup-proof">
-          <li>Updated every week</li>
-          <li>Finance, Tech, Accounting, Marketing &amp; more</li>
-          <li>Free, no spam</li>
-        </ul>
-
         <form name="job-alerts-signup" netlify class="email-form" id="emailForm">
           <input type="hidden" name="form-name" value="job-alerts-signup" />
           <input type="hidden" name="industries" id="hiddenIndustries" />
@@ -431,7 +424,7 @@
           <p><strong>You're in.</strong><br>We'll reach out when the next batch for your field is live.</p>
         </div>
 
-        <a href="/job-alerts" class="signup-back-link">Browse this week's roles instead</a>
+        <a href="/job-alerts" class="signup-back-link">Browse other accounting / finance roles for International Students</a>
 
       </div>
     </div>
@@ -589,48 +582,43 @@
     document.getElementById("consultForm").addEventListener("submit", function(e) {
       e.preventDefault();
 
-      var submitBtn = this.querySelector(".consult-submit");
+      var form = this;
+      var submitBtn = form.querySelector(".consult-submit");
       if (submitBtn && submitBtn.disabled) return;
-      var originalLabel = submitBtn ? submitBtn.innerHTML : "";
-      if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = "Opening calendar..."; }
 
       var prefillName  = (document.getElementById("consultName").value || "").trim();
       var prefillEmail = (document.getElementById("consultEmail").value || "").trim();
 
+      // Australian phone check — same logic as discovery-call page
+      var phoneEl = document.getElementById("consultPhone");
+      var phoneVal = phoneEl ? phoneEl.value.replace(/[\s\-()+.]/g, '') : '';
+      var isAus = /^(04|4)\d/.test(phoneVal);
+
       if (typeof gtag === "function") {
-        gtag("event", "consult_form_submit", { form_id: "job_alerts_consult_modal" });
+        gtag("event", "consult_form_submit", { form_id: "job_alerts_consult_modal", is_au: isAus ? "yes" : "no" });
       }
 
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = "One moment..."; }
+
+      // Save lead to Netlify with keepalive so POST survives navigation
       try {
-        var data = new FormData(this);
+        var data = new FormData(form);
         fetch("/", {
           method: "POST",
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: new URLSearchParams(data).toString()
+          body: new URLSearchParams(data).toString(),
+          keepalive: true
         }).catch(function() {});
       } catch (err) {}
 
-      function buildFallbackUrl() {
-        var params = [];
-        if (prefillName)  params.push("name="  + encodeURIComponent(prefillName));
-        if (prefillEmail) params.push("email=" + encodeURIComponent(prefillEmail));
-        return params.length ? CALENDLY_URL + "?" + params.join("&") : CALENDLY_URL;
-      }
+      // Set sessionStorage flags — free-call-submitted.html reads these
+      try {
+        sessionStorage.setItem("hs_eligible", isAus ? "1" : "0");
+        sessionStorage.setItem("hs_booking_name", prefillName);
+        sessionStorage.setItem("hs_booking_email", prefillEmail);
+      } catch (err) {}
 
-      var opened = false;
-      if (typeof Calendly !== "undefined" && Calendly.initPopupWidget) {
-        try {
-          Calendly.initPopupWidget({
-            url: CALENDLY_URL,
-            prefill: { name: prefillName, email: prefillEmail }
-          });
-          opened = true;
-        } catch (err) {}
-      }
-      if (!opened) { window.open(buildFallbackUrl(), "_blank"); }
-
-      document.getElementById("consultForm").style.display = "none";
-      document.getElementById("consultSuccess").style.display = "block";
+      window.location.href = "/free-call-submitted";
     });
   </script>
 </body>

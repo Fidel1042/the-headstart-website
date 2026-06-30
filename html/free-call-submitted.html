@@ -41,7 +41,6 @@
       position: relative;
     }
     .calendly-inline-widget {
-      min-width: 320px;
       width: 100%;
       height: 720px;
       border-radius: 18px;
@@ -61,6 +60,11 @@
     .booking-loading.is-hidden { display: none; }
     @media (max-width: 640px) {
       .calendly-inline-widget { height: 1080px; }
+    }
+    @media (max-width: 400px) {
+      .thanks-confirmation { padding: 2rem 0 3rem; }
+      .booking-embed-wrap { width: 100vw; margin-left: -1rem; }
+      .calendly-inline-widget { border-radius: 0; }
     }
   </style>
 </head>
@@ -119,7 +123,8 @@
     // Non-AU leads are still recorded in Netlify; they just see a holding message.
     (function () {
       var ausUni = '0';
-      try { ausUni = sessionStorage.getItem('hs_eligible') || '0'; } catch (e) {}
+      if (new URLSearchParams(location.search).get('preview') === 'calendly') ausUni = '1';
+      else { try { ausUni = sessionStorage.getItem('hs_eligible') || '0'; } catch (e) {} }
       if (ausUni !== '1') {
         var label = document.querySelector('.thanks-label');
         var h1    = document.querySelector('.thanks-headline h1');
