@@ -205,12 +205,15 @@
       inset: 0;
       z-index: 9999;
       display: flex;
-      align-items: center;
+      align-items: flex-end;
       justify-content: center;
-      padding: 1.25rem;
+      padding: 0;
       pointer-events: none;
       opacity: 0;
       transition: opacity 0.25s ease;
+    }
+    @media (min-height: 600px) {
+      .consult-modal { align-items: center; padding: 1rem; }
     }
     .consult-modal.is-open { pointer-events: auto; opacity: 1; }
     .consult-modal__backdrop {
@@ -224,7 +227,7 @@
       z-index: 1;
       width: 100%;
       max-width: 480px;
-      max-height: 90vh;
+      max-height: 90dvh;
       overflow-y: auto;
       background: #0d0d0d;
       border: 1px solid rgba(199,155,59,0.3);
@@ -326,8 +329,18 @@
 
     @media (max-width: 600px) {
       .signup-page-wrap { padding: 2rem 1rem 4rem; }
-      .consult-modal__panel { padding: 2rem 1.3rem 1.6rem; }
-      .consult-modal__title { font-size: 1.2rem; }
+      .consult-modal__panel {
+        padding: 2.5rem 1.2rem 1.5rem;
+        border-radius: 20px 20px 0 0;
+        max-height: 92dvh;
+        width: 100%;
+        max-width: 100%;
+      }
+      .consult-modal__title { font-size: 1.15rem; }
+      .consult-modal__desc { font-size: 0.87rem; margin-bottom: 1.2rem; }
+    }
+    @media (min-width: 601px) {
+      .consult-modal__panel { border-radius: 20px; }
     }
   </style>
 </head>
