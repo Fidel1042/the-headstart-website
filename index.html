@@ -91,7 +91,7 @@
   }
   </script>
 
-  <link rel="stylesheet" href="style.css?v=2" />
+  <link rel="stylesheet" href="style.css?v=7" />
   <style>
     body > header {
       position: fixed !important;
@@ -144,7 +144,7 @@
 
     /* ── Calculator ── */
     .cost-calc {
-      background: rgba(199,155,59,0.05);
+      background: #000 !important;
       border: 1px solid rgba(199,155,59,0.2);
       border-radius: 16px;
       padding: 2rem;
@@ -180,14 +180,40 @@
       width: 20px;
       height: 20px;
       border-radius: 50%;
-      background: #c79b3b;
+      background: radial-gradient(circle at 35% 28%, #fff4c2 0%, #f7d37d 42%, #c08a2d 100%);
       cursor: pointer;
       border: 2px solid #000;
       box-shadow: 0 0 0 3px rgba(199,155,59,0.3);
-      transition: box-shadow 0.15s;
+      animation: calcThumbPulse 1.8s ease-in-out infinite;
     }
     .cost-calc__control input[type="range"]::-webkit-slider-thumb:hover {
-      box-shadow: 0 0 0 6px rgba(199,155,59,0.18);
+      box-shadow: 0 0 0 7px rgba(199,155,59,0.22);
+    }
+    .cost-calc__control input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 28%, #fff4c2 0%, #f7d37d 42%, #c08a2d 100%);
+      cursor: pointer;
+      border: 2px solid #000;
+      box-shadow: 0 0 0 3px rgba(199,155,59,0.3);
+      animation: calcThumbPulse 1.8s ease-in-out infinite;
+    }
+    @keyframes calcThumbPulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 3px rgba(199,155,59,0.30);
+      }
+      50% {
+        transform: scale(1.22);
+        box-shadow: 0 0 0 8px rgba(199,155,59,0.10);
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .cost-calc__control input[type="range"]::-webkit-slider-thumb,
+      .cost-calc__control input[type="range"]::-moz-range-thumb {
+        animation: none;
+      }
     }
     .cost-calc__range-labels {
       display: flex;
@@ -208,7 +234,7 @@
     .cost-calc__row--salary {
       padding: 1rem 1.1rem;
       margin: 0 -1.1rem;
-      background: rgba(199,155,59,0.07);
+      background: #0d0b00;
       border-radius: 10px;
       border-bottom: none;
     }
@@ -573,7 +599,9 @@
     .journey-detail {
       max-width: 900px;
       margin: 2.2rem auto 3rem;
-      background: #0a0a0a;
+      background: rgba(10,10,10,0.75);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
       border: 1px solid #2a2a2a;
       border-radius: 16px;
       padding: 1.8rem 2rem;
@@ -731,7 +759,9 @@
       .pricing-grid { grid-template-columns: 1fr; }
     }
     .pricing-box {
-      background: #0a0a0a;
+      background: rgba(10,10,10,0.75);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
       border: 1px solid #2a2a2a;
       border-radius: 20px;
       padding: 2.2rem 1.9rem;
@@ -917,10 +947,8 @@
       width: 20px;
       height: 20px;
       border-radius: 50%;
-      border: 1.5px solid transparent;
-      background:
-        linear-gradient(#000, #000) padding-box,
-        linear-gradient(135deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 100%) border-box;
+      border: 1.5px solid #c9a84c;
+      background: transparent;
       color: #c9a84c;
       font-size: 0.62rem;
       font-weight: 700;
@@ -932,7 +960,7 @@
       background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
       color: #2b1b09;
       border: none;
-      box-shadow: 0 10px 24px rgba(255,214,137,0.35);
+      box-shadow: 0 6px 16px rgba(255,214,137,0.16);
       text-transform: uppercase;
       letter-spacing: 0.08em;
       font-weight: 800;
@@ -943,7 +971,7 @@
     }
     .hero-cta-group .btn-hero-primary:hover {
       color: #2b1b09;
-      box-shadow: 0 14px 30px rgba(255,214,137,0.5);
+      box-shadow: 0 8px 20px rgba(255,214,137,0.24);
     }
     .hero-cta-group .btn-hero-primary .btn-hero-primary__arrow {
       background: none;
@@ -1171,7 +1199,7 @@
 
   <div id="main">
 
-  <header style="position:fixed;top:0;left:0;right:0;z-index:1000;">
+  <header style="position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(12,11,14,0.55);backdrop-filter:blur(20px) saturate(150%);-webkit-backdrop-filter:blur(20px) saturate(150%);border-bottom:1px solid rgba(199,155,59,0.22);box-shadow:0 8px 30px rgba(0,0,0,0.35);">
     <div class="nav">
       <a href="/" class="nav-left nav-home">
         <img src="images/headstart-italic-logo.png" decoding="async" alt="Headstart Mentoring logo" class="nav-logo-icon" />
@@ -1259,25 +1287,25 @@
           <div class="hero-logo-slider__viewport">
           <div class="hero-logo-slider__track">
             <img class="hero-logo-slider__item" src="images/Logos/commbank-beacon-white.webp" alt="Commonwealth Bank" />
-            <img class="hero-logo-slider__item" src="images/Logos/pwc white logo.jpg" alt="PwC" />
-            <img class="hero-logo-slider__item" src="images/Logos/Delioote.png" alt="Deloitte" />
+            <img class="hero-logo-slider__item" src="images/Logos/PWC real.png" alt="PwC" />
+            <img class="hero-logo-slider__item" src="images/Logos/Deliotte.png" alt="Deloitte" />
             <img class="hero-logo-slider__item" src="images/Logos/Nestle.png" alt="Nestle" />
             <img class="hero-logo-slider__item" src="images/Logos/Fedex-logo.png" alt="FedEx" />
             <img class="hero-logo-slider__item" src="images/Logos/woolworths.png" alt="Woolworths" />
             <img class="hero-logo-slider__item" src="images/Logos/Kimberly-Clark.avif" alt="Kimberly-Clark" />
-            <img class="hero-logo-slider__item hero-logo-slider__item--lg" src="images/Logos/macquarie-bank-limited-logo-black-and-white.png" alt="Macquarie Bank" />
+            <img class="hero-logo-slider__item hero-logo-slider__item--lg" src="images/Logos/Mac Bank.png" alt="Macquarie Bank" />
             <img class="hero-logo-slider__item hero-logo-slider__item--invert" src="images/Logos/Grant_Thornton_logo.png" alt="Grant Thornton" />
             <img class="hero-logo-slider__item" src="images/Logos/OW_logo_k-white.png" alt="Oliver Wyman" />
             <img class="hero-logo-slider__item" src="images/Logos/Visagio.jpeg" alt="Visagio" />
             <!-- Duplicate set for seamless loop -->
             <img class="hero-logo-slider__item" src="images/Logos/commbank-beacon-white.webp" alt="Commonwealth Bank" />
-            <img class="hero-logo-slider__item" src="images/Logos/pwc white logo.jpg" alt="PwC" />
-            <img class="hero-logo-slider__item" src="images/Logos/Delioote.png" alt="Deloitte" />
+            <img class="hero-logo-slider__item" src="images/Logos/PWC real.png" alt="PwC" />
+            <img class="hero-logo-slider__item" src="images/Logos/Deliotte.png" alt="Deloitte" />
             <img class="hero-logo-slider__item" src="images/Logos/Nestle.png" alt="Nestle" />
             <img class="hero-logo-slider__item" src="images/Logos/Fedex-logo.png" alt="FedEx" />
             <img class="hero-logo-slider__item" src="images/Logos/woolworths.png" alt="Woolworths" />
             <img class="hero-logo-slider__item" src="images/Logos/Kimberly-Clark.avif" alt="Kimberly-Clark" />
-            <img class="hero-logo-slider__item hero-logo-slider__item--lg" src="images/Logos/macquarie-bank-limited-logo-black-and-white.png" alt="Macquarie Bank" />
+            <img class="hero-logo-slider__item hero-logo-slider__item--lg" src="images/Logos/Mac Bank.png" alt="Macquarie Bank" />
             <img class="hero-logo-slider__item hero-logo-slider__item--invert" src="images/Logos/Grant_Thornton_logo.png" alt="Grant Thornton" />
             <img class="hero-logo-slider__item" src="images/Logos/OW_logo_k-white.png" alt="Oliver Wyman" />
             <img class="hero-logo-slider__item" src="images/Logos/Visagio.jpeg" alt="Visagio" />
@@ -1626,11 +1654,11 @@
             </div>
             <div class="cost-calc__row">
               <span class="cost-calc__row-label">Graduate visa extension cost</span>
-              <span class="cost-calc__row-value">$4,600</span>
+              <span class="cost-calc__row-value">$5,700</span>
             </div>
             <div class="cost-calc__total">
               <span class="cost-calc__total-label">Total cost of staying stuck</span>
-              <span class="cost-calc__total-value" id="home-calc-grand">$13,600+</span>
+              <span class="cost-calc__total-value" id="home-calc-grand">$14,700+</span>
             </div>
             <p class="cost-calc__note">Our sessions are $35 each. <span id="home-calc-note-months">2 months</span> without a job costs you roughly <strong class="cost-calc__multiplier" id="home-calc-multiplier">257x</strong> that in salary alone.</p>
           </div>
@@ -1751,8 +1779,8 @@
 
     // ── Calculator ──
     var HOME_SALARY = 4500;
-    var HOME_VISA   = 4600;
-    var homeCalcState  = { salary: 9000, grand: 13600, mult: 300 };
+    var HOME_VISA   = 5700;
+    var homeCalcState  = { salary: 9000, grand: 14700, mult: 300 };
     var homeActiveTweens = {};
 
     function homeTween(key, el, toVal, prefix, suffix) {
@@ -1996,5 +2024,7 @@
       });
     })();
   </script>
+
+  <script src="js/silk-bg.js?v=2"></script>
 </body>
 </html>

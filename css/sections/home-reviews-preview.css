@@ -32,8 +32,10 @@
 }
 
 .home-review-card {
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(10,10,10,0.75);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255,255,255,0.1);
   border-radius: 16px;
   padding: 1.6rem 1.3rem 1.3rem;
   display: flex;

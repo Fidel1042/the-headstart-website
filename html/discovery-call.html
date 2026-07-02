@@ -68,7 +68,7 @@
   }
   </script>
 
-  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../style.css?v=7" />
   <style>
     /* ââ Word-by-word h1 ââ */
     .page-hero { grid-template-columns: 1fr; }
@@ -419,6 +419,7 @@
         try {
           var phoneEl = document.getElementById('contact-phone');
           var phoneVal = phoneEl ? phoneEl.value.replace(/[\s\-()+.]/g, '') : '';
+          phoneVal = phoneVal.replace(/^(0061|61)/, '0');
           var isAus = /^(04|4)\d/.test(phoneVal);
           sessionStorage.setItem('hs_eligible', isAus ? '1' : '0');
         } catch (err) {}
@@ -458,5 +459,6 @@
     })();
 
   </script>
+  <script src="../js/silk-bg.js?v=2"></script>
 </body>
 </html>

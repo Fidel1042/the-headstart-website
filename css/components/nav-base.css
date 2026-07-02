@@ -6,9 +6,11 @@ body > header {
   left: 0;
   right: 0;
   z-index: 1000;
-  background: rgba(0,0,0,0.9);
-  backdrop-filter: blur(14px);
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  background: rgba(12, 11, 14, 0.55);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border-bottom: 1px solid rgba(199, 155, 59, 0.22);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
 }
 
 /* Push content below the fixed header. JS in nav-scroll.js refines this with exact measured height. */
@@ -34,8 +36,8 @@ body {
 
 .nav.shrunk {
   padding: 0.9rem 0.5rem;
-  transition: padding 0.2s ease, background 0.2s ease;
-  background: rgba(0, 0, 0, 0.92);
+  transition: padding 0.2s ease;
+  background: transparent;
 }
 
 .nav-left {

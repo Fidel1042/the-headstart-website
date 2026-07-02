@@ -22,7 +22,7 @@
   <meta property="og:description" content="Get hand-picked graduate and internship job alerts for international students in Australia, emailed to you weekly." />
   <meta property="og:url" content="https://theheadstartmentoring.com/job-alerts-signup/" />
   <meta property="og:image" content="https://theheadstartmentoring.com/images/website-logo.png" />
-  <link rel="stylesheet" href="../style.css?v=2" />
+  <link rel="stylesheet" href="../style.css?v=7" />
   <link rel="preconnect" href="https://calendly.com" crossorigin />
   <link rel="preconnect" href="https://assets.calendly.com" crossorigin />
   <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet" />
@@ -592,6 +592,7 @@
       // Australian phone check — same logic as discovery-call page
       var phoneEl = document.getElementById("consultPhone");
       var phoneVal = phoneEl ? phoneEl.value.replace(/[\s\-()+.]/g, '') : '';
+      phoneVal = phoneVal.replace(/^(0061|61)/, '0');
       var isAus = /^(04|4)\d/.test(phoneVal);
 
       if (typeof gtag === "function") {
@@ -621,5 +622,6 @@
       window.location.href = "/free-call-submitted";
     });
   </script>
+  <script src="../js/silk-bg.js?v=2"></script>
 </body>
 </html>

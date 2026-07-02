@@ -45,8 +45,8 @@
 .mentor-new-card {
   cursor: default;
   border-radius: 18px;
-  background: rgba(255,255,255,0.025);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: #0a0a0a;
+  border: 1px solid rgba(255,255,255,0.1);
   display: flex;
   height: 100%;
   transition: border-color 0.2s ease, background 0.2s ease;
@@ -54,7 +54,7 @@
 
 .mentor-new-card:hover {
   border-color: rgba(199,155,59,0.35);
-  background: rgba(255,255,255,0.035);
+  background: #111111;
 }
 
 .mentor-new-card__inner {

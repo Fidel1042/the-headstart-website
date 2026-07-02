@@ -35,7 +35,9 @@
 .home-mentor-card {
   flex: 0 0 calc(25% - 0.9rem);
   scroll-snap-align: start;
-  background: rgba(255,255,255,0.02);
+  background: rgba(10,10,10,0.72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: 18px;
   padding: 1.2rem;

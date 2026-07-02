@@ -140,7 +140,7 @@
   color: #2b1b09;
   font-weight: 800;
   border: none;
-  box-shadow: 0 10px 24px rgba(255,214,137,0.35);
+  box-shadow: 0 6px 16px rgba(255,214,137,0.16);
 }
 
 .nav-cta--gold {
@@ -161,7 +161,7 @@
 
 .nav-cta--gold:hover {
   transform: translateY(-1px);
-  box-shadow: 0 14px 30px rgba(255,214,137,0.5);
+  box-shadow: 0 8px 20px rgba(255,214,137,0.24);
   color: #fff;
 }
 
