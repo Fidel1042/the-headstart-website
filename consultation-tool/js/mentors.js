@@ -7,7 +7,8 @@ const results = document.getElementById("mentorResults");
 const pinned = mentors.find((m) => m.pinned);
 const others = mentors.filter((m) => !m.pinned);
 
-const shortlist = new Set();
+const STORAGE_KEY = "hs_ct_shortlist";
+const shortlist = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"));
 
 function initials(name) {
   return name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
@@ -81,6 +82,10 @@ function render(query) {
   results.innerHTML = html;
 }
 
+function saveShortlist() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify([...shortlist]));
+}
+
 function toggleShortlist(id) {
   if (shortlist.has(id)) {
     shortlist.delete(id);
@@ -88,6 +93,7 @@ function toggleShortlist(id) {
     if (shortlist.size >= 2) return;
     shortlist.add(id);
   }
+  saveShortlist();
   render(input.value);
 }
 
