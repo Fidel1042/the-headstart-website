@@ -90,7 +90,7 @@
       hex = hex.replace('#','');
       return [parseInt(hex.slice(0,2),16)/255, parseInt(hex.slice(2,4),16)/255, parseInt(hex.slice(4,6),16)/255];
     }
-    var rgb = hexRgb('#7B7481');
+    var rgb = hexRgb('#57535B');
     gl.uniform3f(uColor, rgb[0], rgb[1], rgb[2]);
     gl.uniform1f(uSpeed, 5);
     gl.uniform1f(uScale, 1);
