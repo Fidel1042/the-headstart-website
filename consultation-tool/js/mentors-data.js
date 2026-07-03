@@ -228,6 +228,23 @@ export const mentors = [
     why: "Mentorship was a big part of how he built his career in Australia. He had several mentors who helped him network and understand what it takes to work here, and he wants to give that back to international students going through the same job hunt.",
     different: "Luis breaks the stigma that engineering is antisocial. He focuses on the communication, networking, and 'selling yourself' side that engineering students tend to skip, and helps mentees push through the low points and rejections that come with an international student job search.",
   },
+  {
+    id: "shriyansh", name: "Shriyansh", intl: "International",
+    role: "Financial Analyst", company: "Deloitte",
+    uni: "Deakin University", degree: "Accounting",
+    major: "Accounting", industry: "Finance / Accounting", rate: "$20",
+    visa: "485 - Temporary Graduate Visa", gradYear: "2024",
+    specialiseIn: ["Financial Analysis", "Accounting", "Big 4"],
+    photo: IMG + "Shriyansh.png",
+    detailPhoto: DIMG + "Shriyansh.png",
+    logos: [{ src: LOGO + "Delioote.png", alt: "Deloitte" }],
+    tags: ["financial analyst", "financial analysis", "finance", "accounting", "audit", "big 4", "kpmg", "deloitte", "graduate", "international"],
+    bestFor: "Accounting and finance students, especially international students targeting Big 4 firms in Australia and anyone facing a long job hunt.",
+    detailed: true,
+    lead: "Shriyansh started his career at KPMG in India, where he won an audit quality award, before moving to Sydney and job hunting for 107 days to land his Financial Analyst role at Deloitte. He then moved to Melbourne to take up the role.",
+    why: "He knows what a long job search feels like from the inside. 107 days of applications, interviews, and doubt before the offer came. He wants to help international students stay in the fight when it starts to feel stuck.",
+    different: "Shriyansh has worked in Big 4 on both sides of the ocean and can speak specifically to Deloitte's process, including the 3-stage interview.",
+  },
 ];
 
 export function getMentor(id) {
