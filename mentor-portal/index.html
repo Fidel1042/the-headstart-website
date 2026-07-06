@@ -732,6 +732,20 @@
       color-scheme: light;
     }
 
+    /* Force legible dropdown options. Some browsers (notably Windows Chrome)
+       ignore color-scheme and render the native option list on a white
+       background while keeping the inherited white text — making every
+       non-highlighted mentee invisible. Setting option colours explicitly
+       fixes the "only one mentee shows" white-on-white bug. */
+    .form-field select option {
+      background: #1a1a1a;
+      color: #ffffff;
+    }
+    [data-theme="light"] .form-field select option {
+      background: #ffffff;
+      color: #000000;
+    }
+
     .form-field select:focus,
     .form-field input[type="date"]:focus,
     .form-field textarea:focus {
