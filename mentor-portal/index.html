@@ -9,24 +9,47 @@
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <style id="auth-gate">html:not(.auth-ok) body { visibility: hidden; }</style>
   <script type="module">
-    import { requireAuth, bindSignOutButton } from "./auth.js";
+    import { requireAuth, bindSignOutButton, ALLOWED_MENTOR_EMAILS } from "./auth.js";
 
     requireAuth((session) => {
-      const mentorEmail = session?.user?.email || "";
+      const loginEmail = session?.user?.email || "";
+      const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com"];
+      const isOwner = OWNERS.includes(loginEmail) || loginEmail === "dev@localhost";
+
+      // Owner impersonation: ?as=mentor@email loads the portal exactly as that
+      // mentor sees it (for troubleshooting). Ignored for non-owners.
+      const asParam = (new URLSearchParams(location.search).get("as") || "").toLowerCase().trim();
+      const mentorEmail = (isOwner && asParam) ? asParam : loginEmail;
 
       const chip = document.getElementById("user-chip");
-      if (chip && mentorEmail) { chip.textContent = mentorEmail; chip.hidden = false; }
-      const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com"];
-      if (OWNERS.includes(mentorEmail) || mentorEmail === "dev@localhost") {
-        const plLink = document.getElementById("pl-link");
-        if (plLink) plLink.style.display = "";
-        const consultLink = document.getElementById("consult-link");
-        if (consultLink) consultLink.style.display = "";
-        const payslipBtn = document.getElementById("payslip-btn");
-        if (payslipBtn) payslipBtn.style.display = "";
+      if (chip && mentorEmail) {
+        chip.textContent = (isOwner && asParam) ? `viewing as ${mentorEmail}` : mentorEmail;
+        chip.hidden = false;
       }
-      bindSignOutButton("#signout-btn");
 
+      if (isOwner) {
+        ["pl-link", "consult-link", "payslip-btn", "billing-link"].forEach((id) => {
+          const el = document.getElementById(id);
+          if (el) el.style.display = "";
+        });
+
+        // Build the "View as mentor" dropdown.
+        const viewAs = document.getElementById("view-as");
+        if (viewAs) {
+          const opts = ['<option value="">View as… (yourself)</option>']
+            .concat(ALLOWED_MENTOR_EMAILS
+              .filter((e) => !OWNERS.includes(e))
+              .map((e) => `<option value="${e}"${e === asParam ? " selected" : ""}>${e}</option>`));
+          viewAs.innerHTML = opts.join("");
+          viewAs.style.display = "";
+          viewAs.addEventListener("change", () => {
+            const val = viewAs.value;
+            location.search = val ? `?as=${encodeURIComponent(val)}` : "";
+          });
+        }
+      }
+
+      bindSignOutButton("#signout-btn");
       initSessionForm(mentorEmail);
     });
 
@@ -48,20 +71,33 @@
       }
 
       // Load mentees assigned to this mentor
+      const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1";
       try {
-        const res  = await fetch("/.netlify/functions/get-mentees", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ mentorEmail }),
-        });
-        const data = await res.json();
+        let data;
+        if (isLocal) {
+          // Mock data so the portal can be demoed / troubleshot without live functions.
+          data = { mentees: [
+            { id: "recMOCK1", name: "Mary Chen",     billingType: "Per Session", hasCard: true  },
+            { id: "recMOCK2", name: "Priya Sharma",  billingType: "Per Session", hasCard: false },
+            { id: "recMOCK3", name: "Chen Wei",      billingType: "Package",     hasCard: true  },
+          ] };
+        } else {
+          const res = await fetch("/.netlify/functions/get-mentees", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ mentorEmail }),
+          });
+          data = await res.json();
+        }
         if (!data.mentees || data.mentees.length === 0) {
           menteeSelect.innerHTML = '<option value="">No mentees assigned yet</option>';
         } else {
           menteeSelect.innerHTML = data.mentees
-            .map((m) => `<option value="${m.id}">${m.name}</option>`)
+            .map((m) => {
+              const noCard = m.hasCard === false && m.billingType !== "Package";
+              return `<option value="${m.id}">${m.name}${noCard ? " — no card on file" : ""}</option>`;
+            })
             .join("");
-
         }
       } catch {
         menteeSelect.innerHTML = '<option value="">Could not load — refresh page</option>';
@@ -87,39 +123,32 @@
         if (!sessionDate)    { errorEl.textContent = "Please pick a session date."; return; }
 
         submitBtn.disabled    = true;
-        submitBtn.textContent = "Charging…";
+        submitBtn.textContent = "Logging…";
         errorEl.textContent   = "";
 
         try {
-          const res    = await fetch("/.netlify/functions/charge-mentee", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              menteeRecordId,
-              mentorEmail,
-              sessionDate,
-              notes: notesField.value.trim(),
-            }),
-          });
-          const result = await res.json();
-          if (!res.ok) throw new Error(result.error);
+          let result;
+          if (isLocal) {
+            const opt = menteeSelect.options[menteeSelect.selectedIndex];
+            result = { success: true, menteeName: (opt ? opt.textContent : "mentee").replace(" — no card on file", "") };
+          } else {
+            const res = await fetch("/.netlify/functions/log-session", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                menteeRecordId,
+                mentorEmail,
+                sessionDate,
+                notes: notesField.value.trim(),
+              }),
+            });
+            result = await res.json();
+            if (!res.ok) throw new Error(result.error);
+          }
 
           logCard.hidden = true;
           successCard.hidden = false;
-
-          if (result.paymentSucceeded) {
-            successDetail.textContent = `Session logged — ${result.menteeName} charged $${result.amountCharged} AUD`;
-          } else {
-            successDetail.textContent = `Session logged — payment failed for ${result.menteeName}. Fidel has been notified.`;
-            successDetail.style.color = "#e0a030";
-          }
-
-          if (result.logError) {
-            const errNote = document.createElement("p");
-            errNote.style.cssText = "margin-top:8px;font-size:0.8rem;color:#e05050;";
-            errNote.textContent = `Airtable log failed: ${result.logError}`;
-            successDetail.insertAdjacentElement("afterend", errNote);
-          }
+          successDetail.textContent = `Session logged for ${result.menteeName}. It'll be billed in this week's charge run.`;
 
           clearTimeout(window._successTimer);
           window._successTimer = setTimeout(() => {
@@ -782,7 +811,9 @@
         <span class="top-nav-subtitle">Internal use only</span>
       </div>
       <div class="top-nav-actions">
+        <select id="view-as" class="signout-btn" style="display:none;" title="View the portal as a mentor" aria-label="View as mentor"></select>
         <a href="/consultation-tool/index.html" id="consult-link" class="signout-btn" style="text-decoration:none;display:none;">Consultation</a>
+        <a href="/mentor-portal/billing.html" id="billing-link" class="signout-btn" style="text-decoration:none;display:none;">Billing</a>
         <a href="/mentor-portal/pl.html" id="pl-link" class="signout-btn" style="text-decoration:none;display:none;">P&amp;L</a>
         <a href="/mentor-portal/payslips.html" id="payslip-btn" class="signout-btn" style="display:none;text-decoration:none;">Payslips</a>
         <span class="user-chip" id="user-chip" hidden></span>

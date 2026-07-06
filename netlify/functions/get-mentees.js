@@ -37,13 +37,16 @@ exports.handler = async (event) => {
   };
 
   try {
-    // Filter mentees directly by Mentor Email Plain field — avoids linked-record ID matching
+    // Filter mentees by Mentor Email Plain field — matched case- and
+    // whitespace-insensitively so a stray capital or trailing space in the
+    // Airtable field can't silently hide a mentee from their mentor.
+    const wanted = mentorEmail.toLowerCase().trim();
     const allMenteeRecords = [];
     let offset = null;
     do {
-      const formula = encodeURIComponent(`{Mentor Email Plain}="${mentorEmail}"`);
+      const formula = encodeURIComponent(`LOWER(TRIM({Mentor Email Plain}))="${wanted}"`);
       const url = `https://api.airtable.com/v0/${AIRTABLE_CORE_BASE_ID}/${AIRTABLE_MENTEE_TABLE_ID}` +
-        `?filterByFormula=${formula}&fields[]=Name&fields[]=Billing%20type` +
+        `?filterByFormula=${formula}&fields[]=Name&fields[]=Billing%20type&fields[]=Stripe%20Customer%20ID` +
         (offset ? `&offset=${offset}` : "");
       const menteeRes  = await fetch(url, { headers: airtableHeaders });
       const menteeData = await menteeRes.json();
@@ -56,6 +59,7 @@ exports.handler = async (event) => {
         id:          r.id,
         name:        r.fields.Name || "Unnamed mentee",
         billingType: r.fields["Billing type"] || "Per Session",
+        hasCard:     Boolean(r.fields["Stripe Customer ID"]),
       }));
 
     return {
