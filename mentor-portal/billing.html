@@ -23,7 +23,10 @@
       const chip = document.getElementById("user-chip");
       if (chip && email) { chip.textContent = email; chip.hidden = false; }
       loadPreview();
+      runSchemaCheck(document.getElementById("schema-btn")); // auto-run on open
     });
+
+    const BASE_TITLE = "Weekly Billing – The Headstart";
 
     const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1";
 
@@ -116,6 +119,115 @@
         btn.textContent = "Failed — try again"; btn.disabled = false;
         resultEl.innerHTML = `<span style="color:#e05050;">${e.message}</span>`;
       }
+    };
+
+    // ── Schema check ──
+    window.runSchemaCheck = async function (btn) {
+      const out = document.getElementById("schema-out");
+      btn.disabled = true; const original = btn.textContent; btn.textContent = "Checking…";
+
+      let data;
+      if (isLocal) {
+        data = { allOk: false, failCount: 1, groups: [
+          { table: "Session Log", checks: [
+            { label: "Field: Mentee Record ID", ok: true, detail: "" },
+            { label: "Field: Amount Due", ok: true, detail: "" },
+            { label: "Payment Status option: Pending", ok: false, detail: "add this dropdown option" },
+            { label: "Payment Status option: Charged", ok: true, detail: "" },
+          ] },
+          { table: "Mentees", checks: [
+            { label: "Field: Stripe Customer ID", ok: true, detail: "" },
+            { label: "Field: Session Price", ok: true, detail: "" },
+          ] },
+        ] };
+      } else {
+        try {
+          const res = await fetch("/.netlify/functions/schema-check", {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ adminEmail: ADMIN_EMAIL }),
+          });
+          data = await res.json();
+        } catch (e) {
+          out.innerHTML = `<span style="color:#e05050;">${e.message}</span>`;
+          btn.disabled = false; btn.textContent = original; return;
+        }
+      }
+
+      if (data.error) {
+        out.innerHTML = `<span style="color:#e05050;">${data.error}</span>`;
+        document.title = "⚠ Billing – schema unreadable";
+        btn.disabled = false; btn.textContent = original; return;
+      }
+
+      document.title = data.allOk ? BASE_TITLE : `⚠ (${data.failCount}) ${BASE_TITLE}`;
+
+      const banner = data.allOk
+        ? '<p style="color:#4caf81;font-weight:700;margin-bottom:10px;">✓ All good — every field and option is present.</p>'
+        : `<p class="warn" style="margin-bottom:10px;">${data.failCount} issue${data.failCount !== 1 ? "s" : ""} to fix in Airtable:</p>`;
+
+      const groupsHtml = data.groups.map((g) => {
+        const rows = g.checks.map((c) => `
+          <div class="row" style="padding:7px 0;">
+            <div class="row-main">
+              <span class="row-name" style="font-weight:500;color:${c.ok ? "var(--text)" : "#e0a030"};">
+                ${c.ok ? "✓" : "✗"} ${c.label}
+              </span>
+              ${c.detail ? `<span class="row-sub">${c.detail}</span>` : ""}
+            </div>
+          </div>`).join("");
+        return `<p class="sub-label" style="margin-top:16px;">${g.table}</p><div class="list">${rows}</div>`;
+      }).join("");
+
+      out.innerHTML = banner + groupsHtml;
+      btn.disabled = false; btn.textContent = original;
+    };
+
+    // ── Package tracker ──
+    window.loadPackages = async function (btn) {
+      const out = document.getElementById("package-out");
+      btn.disabled = true; const original = btn.textContent; btn.textContent = "Loading…";
+
+      let data;
+      if (isLocal) {
+        data = { count: 3, mentees: [
+          { name: "Chen Wei",   mentor: "aidanmwibrata@gmail.com", used: 5, total: 5, remaining: 0, status: "exhausted" },
+          { name: "Sofia Rossi",mentor: "raunaqrsa@gmail.com",     used: 4, total: 5, remaining: 1, status: "low" },
+          { name: "Omar Haddad",mentor: "raunaqrsa@gmail.com",     used: 2, total: 5, remaining: 3, status: "ok" },
+        ] };
+      } else {
+        try {
+          const res = await fetch("/.netlify/functions/package-tracker", {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ adminEmail: ADMIN_EMAIL }),
+          });
+          data = await res.json();
+          if (!res.ok) throw new Error(data.error);
+        } catch (e) {
+          out.innerHTML = `<span style="color:#e05050;">${e.message}</span>`;
+          btn.disabled = false; btn.textContent = original; return;
+        }
+      }
+
+      if (!data.mentees || data.mentees.length === 0) {
+        out.innerHTML = '<p class="empty">No package mentees found.</p>';
+        btn.disabled = false; btn.textContent = original; return;
+      }
+
+      const badge = (m) => {
+        if (m.status === "exhausted") return '<span class="warn">EXHAUSTED</span>';
+        if (m.status === "low")       return '<span class="warn">1 left</span>';
+        return `<span style="color:#4caf81;">${m.remaining} left</span>`;
+      };
+
+      out.innerHTML = `<div class="list">${data.mentees.map((m) => `
+        <div class="row">
+          <div class="row-main">
+            <span class="row-name">${m.name}</span>
+            <span class="row-sub">${m.mentor || "—"}</span>
+          </div>
+          <span class="row-amount">${m.used}${m.total != null ? " / " + m.total : ""} &nbsp; ${badge(m)}</span>
+        </div>`).join("")}</div>`;
+      btn.disabled = false; btn.textContent = original;
     };
 
     // ── Mentee audit ──
@@ -242,6 +354,14 @@
 
   <main class="page">
 
+    <!-- SCHEMA CHECK -->
+    <div class="card-block">
+      <p class="block-title">Schema Check</p>
+      <p class="block-sub">Confirm Airtable has every field &amp; dropdown option logging needs, before a mentor hits a gap.</p>
+      <button class="btn ghost" id="schema-btn" onclick="runSchemaCheck(this)">Run schema check</button>
+      <div class="result" id="schema-out"></div>
+    </div>
+
     <!-- WEEKLY CHARGE -->
     <div class="card-block">
       <p class="block-title">Weekly Mentee Charge</p>
@@ -262,6 +382,14 @@
         </div>
         <p class="result" id="charge-result"></p>
       </div>
+    </div>
+
+    <!-- PACKAGE TRACKER -->
+    <div class="card-block">
+      <p class="block-title">Package Tracker</p>
+      <p class="block-sub">How many sessions each pre-paid mentee has used vs. bought.</p>
+      <button class="btn ghost" onclick="loadPackages(this)">Load package usage</button>
+      <div class="result" id="package-out"></div>
     </div>
 
     <!-- MENTEE AUDIT -->

@@ -92,38 +92,64 @@ exports.handler = async (event) => {
   }
 
   // ── Step 2: log the session as Pending (or Package if pre-paid) ──
+  // Self-healing write: if the Sessions table is missing a field (e.g. it was
+  // never created, or named slightly differently), Airtable rejects the whole
+  // write with "Unknown field name: X". Rather than block the mentor, we drop
+  // just that field and retry. The session always saves; any dropped fields are
+  // reported back so Fidel can fix the schema, but the mentor never sees an error.
+  const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_SESSION_TABLE_ID}`;
+
+  let fields = {
+    "Mentor Email":     mentorEmail,
+    "Mentor Name":      mentorName,
+    "Mentee Name":      menteeName,
+    "Mentee Record ID": menteeRecordId,
+    "Date":             sessionDate,
+    "Extra Notes":      notes || "",
+    "Amount Due":       isPackage ? 0 : sessionPriceAUD,
+    "Mentor Payout":    mentorRate,
+    "Payment Status":   isPackage ? "Package" : "Pending",
+  };
+
+  const droppedFields = [];
+  let saved = false;
+  let lastError = null;
+
   try {
-    const logRes = await fetch(
-      `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_SESSION_TABLE_ID}`,
-      {
+    // At most 9 attempts — one per possible field to drop.
+    for (let attempt = 0; attempt < 9; attempt++) {
+      const logRes = await fetch(url, {
         method: "POST",
         headers: airtableHeaders,
-        body: JSON.stringify({
-          fields: {
-            "Mentor Email":     mentorEmail,
-            "Mentor Name":      mentorName,
-            "Mentee Name":      menteeName,
-            "Mentee Record ID": menteeRecordId,
-            "Date":             sessionDate,
-            "Extra Notes":      notes || "",
-            "Amount Due":       isPackage ? 0 : sessionPriceAUD,
-            "Mentor Payout":    mentorRate,
-            "Payment Status":   isPackage ? "Package" : "Pending",
-          },
-        }),
-      }
-    );
+        body: JSON.stringify({ fields }),
+      });
 
-    if (!logRes.ok) {
+      if (logRes.ok) { saved = true; break; }
+
       const logBody = await logRes.json().catch(() => ({}));
-      return {
-        statusCode: 502,
-        headers,
-        body: JSON.stringify({ error: logBody?.error?.message || `Airtable status ${logRes.status}` }),
-      };
+      const msg = logBody?.error?.message || `Airtable status ${logRes.status}`;
+      lastError = msg;
+
+      // If Airtable names an unknown field, drop it and retry.
+      const match = msg.match(/Unknown field name:\s*"?([^"]+?)"?$/i);
+      if (match && Object.prototype.hasOwnProperty.call(fields, match[1])) {
+        droppedFields.push(match[1]);
+        delete fields[match[1]];
+        continue;
+      }
+      // A different error (auth, table not found, bad value) — stop.
+      break;
     }
   } catch (e) {
     return { statusCode: 502, headers, body: JSON.stringify({ error: e.message || "Could not log session" }) };
+  }
+
+  if (!saved) {
+    return {
+      statusCode: 502,
+      headers,
+      body: JSON.stringify({ error: lastError || "Could not log session" }),
+    };
   }
 
   return {
@@ -133,6 +159,10 @@ exports.handler = async (event) => {
       success: true,
       menteeName,
       status: isPackage ? "Package" : "Pending",
+      // Present only if the Sessions table is missing fields — a signal to fix
+      // the schema. Charging needs "Amount Due" + "Mentee Record ID", so if
+      // either is dropped it'll show up here (and as $0 in the weekly preview).
+      droppedFields: droppedFields.length ? droppedFields : undefined,
     }),
   };
 };

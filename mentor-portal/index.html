@@ -103,6 +103,52 @@
         menteeSelect.innerHTML = '<option value="">Could not load — refresh page</option>';
       }
 
+      async function loadHistory() {
+        const body = document.getElementById("history-body");
+        if (!body) return;
+        try {
+          let data;
+          if (isLocal) {
+            data = { sessions: [
+              { date: "2026-07-04", mentee: "Mary Chen",    amount: 30,   status: "Pending" },
+              { date: "2026-07-02", mentee: "Priya Sharma", amount: 30,   status: "Charged" },
+              { date: "2026-06-28", mentee: "Chen Wei",     amount: null, status: "Package" },
+            ] };
+          } else {
+            const res = await fetch("/.netlify/functions/get-sessions", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ mentorEmail }),
+            });
+            data = await res.json();
+          }
+          const rows = data.sessions || [];
+          if (!rows.length) {
+            body.innerHTML = '<tr><td colspan="4" class="history-empty">No sessions logged yet.</td></tr>';
+            return;
+          }
+          const fmt = (d) => {
+            if (!d) return "—";
+            return new Date(d.slice(0, 10) + "T00:00:00").toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" });
+          };
+          body.innerHTML = rows.map((s) => {
+            const amt = s.status === "Package"
+              ? "Package"
+              : (s.amount != null ? `$${Number(s.amount).toFixed(2)}` : "—");
+            const safeStatus = ["Charged", "Pending", "Failed", "Package"].includes(s.status) ? s.status : "";
+            return `<tr>
+              <td>${fmt(s.date)}</td>
+              <td class="mentee">${s.mentee}</td>
+              <td class="amount">${amt}</td>
+              <td><span class="status-pill status-${safeStatus}">${s.status}</span></td>
+            </tr>`;
+          }).join("");
+        } catch {
+          body.innerHTML = '<tr><td colspan="4" class="history-empty">Could not load history — refresh page.</td></tr>';
+        }
+      }
+      loadHistory();
+
       function resetForm() {
         const now   = new Date();
         const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
@@ -149,6 +195,7 @@
           logCard.hidden = true;
           successCard.hidden = false;
           successDetail.textContent = `Session logged for ${result.menteeName}. It'll be billed in this week's charge run.`;
+          loadHistory();
 
           clearTimeout(window._successTimer);
           window._successTimer = setTimeout(() => {
@@ -433,10 +480,12 @@
     main { display: flex; flex-direction: column; }
     .section-onboarding { order: 1; }
     .section-log         { order: 2; }
-    .section-resources   { order: 3; }
+    .section-history     { order: 3; }
+    .section-resources   { order: 4; }
     [data-onboarded="true"] .section-onboarding { order: 99; }
     [data-onboarded="true"] .section-log        { order: 1; }
-    [data-onboarded="true"] .section-resources  { order: 2; }
+    [data-onboarded="true"] .section-history    { order: 2; }
+    [data-onboarded="true"] .section-resources  { order: 3; }
 
     /* Onboarding incomplete vs complete states */
     .onboarding-incomplete { display: block; }
@@ -811,6 +860,60 @@
       transition: border-color 0.15s, color 0.15s;
     }
     .log-another:hover { border-color: var(--accent-line); color: var(--accent-bright); }
+
+    /* ── Session history table ── */
+    .history-wrap {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--bg-card);
+    }
+    .history-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .history-table th {
+      text-align: left;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      padding: 0.85rem 1.1rem;
+      background: rgba(199,155,59,0.06);
+      border-bottom: 1px solid var(--accent-line);
+      white-space: nowrap;
+    }
+    .history-table td {
+      padding: 0.8rem 1.1rem;
+      border-bottom: 1px solid var(--line-soft);
+      color: var(--text);
+      vertical-align: middle;
+    }
+    .history-table tr:last-child td { border-bottom: none; }
+    .history-table tbody tr:hover td { background: var(--bg-card-hover); }
+    .history-table .amount { font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .history-table .mentee { font-weight: 600; }
+    .status-pill {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      white-space: nowrap;
+    }
+    .status-Charged  { color: #4caf81; border-color: rgba(76,175,129,0.5); }
+    .status-Pending  { color: #e0a030; border-color: rgba(224,160,48,0.5); }
+    .status-Failed   { color: #e05050; border-color: rgba(224,80,80,0.5); }
+    .status-Package  { color: var(--accent-bright); border-color: var(--accent-line); }
+    .history-empty, .history-loading {
+      padding: 1.6rem 1.1rem;
+      color: var(--accent);
+      font-size: 0.88rem;
+      text-align: center;
+    }
+    @media (max-width: 700px) {
+      .history-table th:nth-child(4), .history-table td:nth-child(4) { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -919,6 +1022,26 @@
           <div class="success-detail" id="success-detail"></div>
         </div>
         <button class="log-another" id="log-another-btn">Log another &rarr;</button>
+      </div>
+    </section>
+
+    <!-- SESSION HISTORY -->
+    <section class="portal-section section-history">
+      <h2 class="section-label">Your logged sessions</h2>
+      <div class="history-wrap">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Mentee</th>
+              <th>Amount</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="history-body">
+            <tr><td colspan="4" class="history-loading">Loading&hellip;</td></tr>
+          </tbody>
+        </table>
       </div>
     </section>
 
