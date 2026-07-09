@@ -48,13 +48,15 @@ exports.handler = async (event) => {
 
   try {
     // ── 1. Every Package mentee ──
+    // No fields[] filter on purpose: "Package Sessions" is optional (default 5),
+    // and asking Airtable for a field that doesn't exist rejects the whole
+    // request. Fetching all fields is safe and reads the override if present.
     const packageMentees = [];
     let offset = null;
     do {
       const formula = encodeURIComponent(`{Billing type}="Package"`);
       const url = `https://api.airtable.com/v0/${AIRTABLE_CORE_BASE_ID}/${AIRTABLE_MENTEE_TABLE_ID}` +
         `?filterByFormula=${formula}` +
-        `&fields[]=Name&fields[]=Package%20Sessions&fields[]=Mentor%20Email%20Plain` +
         (offset ? `&offset=${offset}` : "");
       const res  = await fetch(url, { headers: airtableHeaders });
       const data = await res.json();
@@ -62,23 +64,31 @@ exports.handler = async (event) => {
       offset = data.offset || null;
     } while (offset);
 
-    // ── 2. Every "Package" session, grouped by mentee (by record ID, then name) ──
-    const usedById   = {};
-    const usedByName = {};
+    // ── 2. Every "Package" session. Count by record ID when present, otherwise
+    // by name — so a mentee with a mix of old (name-only) and new (record-ID)
+    // sessions is counted correctly, with no double-count and no undercount. ──
+    const byId       = {};
+    const byNameNoId = {};
     offset = null;
     do {
       const formula = encodeURIComponent(`{Payment Status}="Package"`);
       const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_SESSION_TABLE_ID}` +
         `?filterByFormula=${formula}` +
-        `&fields[]=Mentee%20Name&fields[]=Mentee%20Record%20ID` +
         (offset ? `&offset=${offset}` : "");
       const res  = await fetch(url, { headers: airtableHeaders });
       const data = await res.json();
       for (const s of (data.records || [])) {
+        // A "Package" row that was actually charged (Amount Charged > 0) is the
+        // one-off package PURCHASE, not a delivered session — skip it so it
+        // doesn't eat into the allowance. Delivered sessions carry their value
+        // in Amount Due, and have Amount Charged of 0/blank.
+        const charged = parseFloat(s.fields["Amount Charged"]) || 0;
+        if (charged > 0) continue;
+
         const rid  = s.fields["Mentee Record ID"] || "";
         const name = norm(s.fields["Mentee Name"]);
-        if (rid)  usedById[rid]   = (usedById[rid]   || 0) + 1;
-        if (name) usedByName[name] = (usedByName[name] || 0) + 1;
+        if (rid)       byId[rid]        = (byId[rid]        || 0) + 1;
+        else if (name) byNameNoId[name] = (byNameNoId[name] || 0) + 1;
       }
       offset = data.offset || null;
     } while (offset);
@@ -89,18 +99,24 @@ exports.handler = async (event) => {
     // overrides the default; otherwise 5 is assumed and there's nothing to set.
     const DEFAULT_PACKAGE_SESSIONS = 5;
 
+    const num = (v) => (v === undefined || v === "" || v === null) ? null : (parseInt(v, 10) || 0);
+
     const mentees = packageMentees.map((m) => {
       const id    = m.id;
       const name  = m.fields["Name"] || "Unnamed mentee";
-      const totalRaw = m.fields["Package Sessions"];
-      const total = (totalRaw === undefined || totalRaw === "" || totalRaw === null)
-        ? DEFAULT_PACKAGE_SESSIONS : parseInt(totalRaw, 10);
-      const used  = usedById[id] != null ? usedById[id] : (usedByName[norm(name)] || 0);
+      const total = num(m.fields["Package Sessions"]) ?? DEFAULT_PACKAGE_SESSIONS;
+
+      // Sessions used before logging existed (set per mentee mid-package).
+      const prior  = num(m.fields["Sessions Already Used"]) || 0;
+      const logged = (byId[id] || 0) + (byNameNoId[norm(name)] || 0);
+      const used   = prior + logged;
       const remaining = total - used;
       return {
         name,
         mentor: m.fields["Mentor Email Plain"] || "",
         used,
+        prior,
+        logged,
         total,
         remaining,
         status: remaining <= 0 ? "exhausted"

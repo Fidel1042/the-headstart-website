@@ -43,6 +43,13 @@ exports.handler = async (event) => {
 
   const norm = (s) => (s || "").toString().toLowerCase().trim();
 
+  // Hired-mentor allowlist (the portal's ALLOWED_MENTOR_EMAILS, passed from the
+  // page). Used to keep non-hired mentor candidates out of the summary. If none
+  // is passed, every mentor in the table is shown.
+  const allowedSet = new Set(
+    (Array.isArray(payload.allowlist) ? payload.allowlist : []).map(norm).filter(Boolean)
+  );
+
   try {
     // ── All real mentors ──
     const mentors = [];
@@ -59,7 +66,13 @@ exports.handler = async (event) => {
     const mentorByEmail = {};
     for (const m of mentors) {
       const email = norm(m.fields["Email"]);
-      if (email) mentorByEmail[email] = { email, name: m.fields["Name"] || email, menteeCount: 0, mentees: [] };
+      if (email) mentorByEmail[email] = {
+        email,
+        name: m.fields["Name"] || email,
+        menteeCount: 0,
+        mentees: [],
+        hired: allowedSet.size === 0 || allowedSet.has(email),
+      };
     }
 
     // ── All mentees ──
@@ -99,7 +112,13 @@ exports.handler = async (event) => {
       }
     }
 
-    const summary = Object.values(mentorByEmail).sort((a, b) => a.name.localeCompare(b.name));
+    // Only hired mentors in the summary; unknown-detection above still used the
+    // full mentor table, so mentees under real-but-not-yet-hired mentors aren't
+    // falsely flagged.
+    const summary = Object.values(mentorByEmail)
+      .filter((m) => m.hired)
+      .map(({ hired, ...m }) => m)
+      .sort((a, b) => a.name.localeCompare(b.name));
 
     return {
       statusCode: 200,

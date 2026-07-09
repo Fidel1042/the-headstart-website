@@ -84,7 +84,11 @@ exports.handler = async (event) => {
 
     menteeName      = menteeRecord.fields["Name"] || "Unknown";
     isPackage       = (menteeRecord.fields["Billing type"] || "Per Session") === "Package";
-    sessionPriceAUD = isPackage ? 0 : (parseFloat(menteeRecord.fields["Session Price"]) || 30);
+    // Per-session value. For package mentees this is the recognised value of a
+    // delivered session (e.g. $150 package / 5 = $30) — it is NOT charged (the
+    // weekly run only charges "Pending" rows), it just lets the P&L value each
+    // package session instead of showing $0.
+    sessionPriceAUD = parseFloat(menteeRecord.fields["Session Price"]) || 30;
     mentorName      = mentorData.records?.[0]?.fields?.["Name"] || mentorEmail;
     mentorRate      = parseFloat(mentorData.records?.[0]?.fields?.["Rate"]) || 0;
   } catch (err) {
@@ -106,7 +110,7 @@ exports.handler = async (event) => {
     "Mentee Record ID": menteeRecordId,
     "Date":             sessionDate,
     "Extra Notes":      notes || "",
-    "Amount Due":       isPackage ? 0 : sessionPriceAUD,
+    "Amount Due":       sessionPriceAUD,
     "Mentor Payout":    mentorRate,
     "Payment Status":   isPackage ? "Package" : "Pending",
   };
@@ -152,6 +156,48 @@ exports.handler = async (event) => {
     };
   }
 
+  // ── Package-completion alert ──
+  // When a package mentee's delivered sessions reach the package size, email
+  // Fidel so he can follow up on a renewal. Fires once, on the session that
+  // completes the package. Best-effort: never blocks or fails the log.
+  let packageComplete = false;
+  if (isPackage) {
+    try {
+      const PACKAGE_TOTAL = 5; // default package size
+      const listRes = await fetch(
+        `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_SESSION_TABLE_ID}` +
+        `?filterByFormula=${encodeURIComponent(`AND({Mentee Record ID}="${menteeRecordId}",{Payment Status}="Package")`)}` +
+        `&fields[]=Amount%20Charged`,
+        { headers: airtableHeaders }
+      );
+      const listData = await listRes.json();
+      // Delivered sessions = Package rows that were NOT actually charged. The
+      // one-off $150 purchase row has Amount Charged > 0 and is excluded;
+      // delivered sessions carry their value in Amount Due, not Amount Charged.
+      const delivered = (listData.records || []).filter((r) => {
+        const c = parseFloat(r.fields["Amount Charged"]) || 0;
+        return c <= 0;
+      }).length;
+
+      // Fire only on the transition to complete (or over), so it alerts once.
+      if (delivered >= PACKAGE_TOTAL && (delivered - 1) < PACKAGE_TOTAL) {
+        packageComplete = true;
+        if (process.env.BREVO_API_KEY) {
+          await fetch("https://api.brevo.com/v3/smtp/email", {
+            method: "POST",
+            headers: { "api-key": process.env.BREVO_API_KEY, "Content-Type": "application/json" },
+            body: JSON.stringify({
+              sender:  { name: "The Headstart", email: "theuniheadstart@gmail.com" },
+              to:      [{ email: "fidelhon@gmail.com", name: "Fidel" }],
+              subject: `Package complete — ${menteeName} used all ${PACKAGE_TOTAL} sessions`,
+              htmlContent: `<p><strong>${menteeName}</strong> (mentor ${mentorName}) just completed session ${delivered} of ${PACKAGE_TOTAL} — their package is fully used.</p><p>Time to follow up on a renewal.</p>`,
+            }),
+          }).catch(() => {});
+        }
+      }
+    } catch { /* alert is best-effort; never block logging */ }
+  }
+
   return {
     statusCode: 200,
     headers,
@@ -159,6 +205,7 @@ exports.handler = async (event) => {
       success: true,
       menteeName,
       status: isPackage ? "Package" : "Pending",
+      packageComplete,
       // Present only if the Sessions table is missing fields — a signal to fix
       // the schema. Charging needs "Amount Due" + "Mentee Record ID", so if
       // either is dropped it'll show up here (and as $0 in the weekly preview).

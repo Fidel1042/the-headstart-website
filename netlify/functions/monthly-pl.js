@@ -1,16 +1,3 @@
-const MENTOR_RATES = {
-  "angelicagrace160272@gmail.com": 55,
-  "edrickkoda@gmail.com":          20,
-  "aidanmwibrata@gmail.com":       20,
-  "dhulipatideepika@gmail.com":    20,
-  "wooheehan3@gmail.com":          50,
-  "laljimkf@gmail.com":            45,
-  "raunaqrsa@gmail.com":           20,
-  "jai.arora115@gmail.com":        20,
-  "fidelhon@gmail.com":             0,
-  "kokoro.araki1015@gmail.com":     0,
-};
-
 const FIXED_COSTS = {
   "Claude Pro": 34,   // AUD
   "Make.com":   15,   // AUD approx (9.5 USD)
@@ -55,7 +42,7 @@ exports.handler = async () => {
     const formula      = encodeURIComponent(`AND(YEAR({Date})=${year},MONTH({Date})=${month})`);
     const sessionsRes  = await fetch(
       `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_SESSION_TABLE_ID}` +
-      `?filterByFormula=${formula}&fields[]=Amount%20Charged&fields[]=Mentor%20Email`,
+      `?filterByFormula=${formula}&fields[]=Amount%20Charged&fields[]=Amount%20Due&fields[]=Payment%20Status&fields[]=Mentor%20Payout`,
       { headers: airtableHeaders }
     );
     const sessionsData = await sessionsRes.json();
@@ -67,15 +54,32 @@ exports.handler = async () => {
   let grossRevenue  = 0;
   let stripeFees    = 0;
   let mentorPayouts = 0;
+  let sessionCount  = 0;
 
   for (const s of sessions) {
-    const amount      = parseFloat(s.fields["Amount Charged"]) || 0;
-    const mentorEmail = (s.fields["Mentor Email"] || "").toLowerCase().trim();
+    const status  = s.fields["Payment Status"] || "";
+    const charged = parseFloat(s.fields["Amount Charged"]) || 0;
+    const due     = parseFloat(s.fields["Amount Due"]) || 0;
+    const payout  = parseFloat(s.fields["Mentor Payout"]) || 0;
 
-    if (amount <= 0) continue; // skip failed sessions
-    grossRevenue  += amount;
-    stripeFees    += amount * 0.0325 + 0.30;
-    mentorPayouts += MENTOR_RATES[mentorEmail] ?? 0;
+    // Package PURCHASE row (one-off $150 charge): cash-in only, no revenue/
+    // session recognised here (recognised per delivered session), but it did
+    // incur a real Stripe fee.
+    if (status === "Package" && charged > 0) {
+      stripeFees += charged * 0.0325 + 0.30;
+      continue;
+    }
+
+    // Recognised revenue: per-session at what was charged; delivered package
+    // sessions at their per-session value (Amount Due). Failed/Pending = 0.
+    let revenue = 0;
+    if (status === "Charged")      revenue = charged;
+    else if (status === "Package") revenue = due;
+
+    grossRevenue  += revenue;
+    if (charged > 0) stripeFees += charged * 0.0325 + 0.30;
+    mentorPayouts += payout;
+    sessionCount  += 1;
   }
 
   const grossProfit = grossRevenue - stripeFees - mentorPayouts;
@@ -94,7 +98,7 @@ exports.handler = async () => {
         body: JSON.stringify({
           fields: {
             "Month":           monthLabel,
-            "Session Count":   sessions.length,
+            "Session Count":   sessionCount,
             "Gross Revenue":   round(grossRevenue),
             "Stripe Fees":     round(stripeFees),
             "Mentor Payouts":  round(mentorPayouts),

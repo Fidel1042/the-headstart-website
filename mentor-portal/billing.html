@@ -7,7 +7,7 @@
   <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
   <style id="auth-gate">html:not(.auth-ok) body { visibility: hidden; }</style>
   <script type="module">
-    import { requireAuth, bindSignOutButton } from "./auth.js";
+    import { requireAuth, bindSignOutButton, ALLOWED_MENTOR_EMAILS } from "./auth.js";
 
     let ADMIN_EMAIL = "";
 
@@ -161,24 +161,26 @@
 
       document.title = data.allOk ? BASE_TITLE : `⚠ (${data.failCount}) ${BASE_TITLE}`;
 
-      const banner = data.allOk
-        ? '<p style="color:#4caf81;font-weight:700;margin-bottom:10px;">✓ All good — every field and option is present.</p>'
-        : `<p class="warn" style="margin-bottom:10px;">${data.failCount} issue${data.failCount !== 1 ? "s" : ""} to fix in Airtable:</p>`;
+      if (data.allOk) {
+        out.innerHTML = '<p style="color:#4caf81;font-weight:700;">✓ All good — no schema problems.</p>';
+        btn.disabled = false; btn.textContent = original; return;
+      }
 
+      // Show ONLY the problems — skip everything that passed.
       const groupsHtml = data.groups.map((g) => {
-        const rows = g.checks.map((c) => `
+        const fails = g.checks.filter((c) => !c.ok);
+        if (!fails.length) return "";
+        const rows = fails.map((c) => `
           <div class="row" style="padding:7px 0;">
             <div class="row-main">
-              <span class="row-name" style="font-weight:500;color:${c.ok ? "var(--text)" : "#e0a030"};">
-                ${c.ok ? "✓" : "✗"} ${c.label}
-              </span>
+              <span class="row-name" style="color:#e0a030;">✗ ${c.label}</span>
               ${c.detail ? `<span class="row-sub">${c.detail}</span>` : ""}
             </div>
           </div>`).join("");
         return `<p class="sub-label" style="margin-top:16px;">${g.table}</p><div class="list">${rows}</div>`;
       }).join("");
 
-      out.innerHTML = banner + groupsHtml;
+      out.innerHTML = `<p class="warn" style="margin-bottom:10px;">${data.failCount} issue${data.failCount !== 1 ? "s" : ""} to fix in Airtable:</p>` + groupsHtml;
       btn.disabled = false; btn.textContent = original;
     };
 
@@ -190,9 +192,9 @@
       let data;
       if (isLocal) {
         data = { count: 3, mentees: [
-          { name: "Chen Wei",   mentor: "aidanmwibrata@gmail.com", used: 5, total: 5, remaining: 0, status: "exhausted" },
-          { name: "Sofia Rossi",mentor: "raunaqrsa@gmail.com",     used: 4, total: 5, remaining: 1, status: "low" },
-          { name: "Omar Haddad",mentor: "raunaqrsa@gmail.com",     used: 2, total: 5, remaining: 3, status: "ok" },
+          { name: "Chen Wei",   mentor: "aidanmwibrata@gmail.com", used: 5, prior: 0, logged: 5, total: 5, remaining: 0, status: "exhausted" },
+          { name: "Sofia Rossi",mentor: "raunaqrsa@gmail.com",     used: 4, prior: 3, logged: 1, total: 5, remaining: 1, status: "low" },
+          { name: "Omar Haddad",mentor: "raunaqrsa@gmail.com",     used: 2, prior: 0, logged: 2, total: 5, remaining: 3, status: "ok" },
         ] };
       } else {
         try {
@@ -219,14 +221,19 @@
         return `<span style="color:#4caf81;">${m.remaining} left</span>`;
       };
 
-      out.innerHTML = `<div class="list">${data.mentees.map((m) => `
+      out.innerHTML = `<div class="list">${data.mentees.map((m) => {
+        const breakdown = (m.prior > 0)
+          ? `${m.mentor || "—"} · ${m.prior} prior + ${m.logged} logged`
+          : (m.mentor || "—");
+        return `
         <div class="row">
           <div class="row-main">
             <span class="row-name">${m.name}</span>
-            <span class="row-sub">${m.mentor || "—"}</span>
+            <span class="row-sub">${breakdown}</span>
           </div>
           <span class="row-amount">${m.used}${m.total != null ? " / " + m.total : ""} &nbsp; ${badge(m)}</span>
-        </div>`).join("")}</div>`;
+        </div>`;
+      }).join("")}</div>`;
       btn.disabled = false; btn.textContent = original;
     };
 
@@ -253,7 +260,7 @@
         try {
           const res = await fetch("/.netlify/functions/audit-mentees", {
             method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ adminEmail: ADMIN_EMAIL }),
+            body: JSON.stringify({ adminEmail: ADMIN_EMAIL, allowlist: ALLOWED_MENTOR_EMAILS }),
           });
           data = await res.json();
           if (!res.ok) throw new Error(data.error);
@@ -354,14 +361,6 @@
 
   <main class="page">
 
-    <!-- SCHEMA CHECK -->
-    <div class="card-block">
-      <p class="block-title">Schema Check</p>
-      <p class="block-sub">Confirm Airtable has every field &amp; dropdown option logging needs, before a mentor hits a gap.</p>
-      <button class="btn ghost" id="schema-btn" onclick="runSchemaCheck(this)">Run schema check</button>
-      <div class="result" id="schema-out"></div>
-    </div>
-
     <!-- WEEKLY CHARGE -->
     <div class="card-block">
       <p class="block-title">Weekly Mentee Charge</p>
@@ -398,6 +397,14 @@
       <p class="block-sub">Find mentees missing from a mentor's list, or with no card on file.</p>
       <button class="btn ghost" onclick="runAudit(this)">Run audit</button>
       <div class="result" id="audit-out"></div>
+    </div>
+
+    <!-- SCHEMA CHECK -->
+    <div class="card-block">
+      <p class="block-title">Schema Check</p>
+      <p class="block-sub">Confirm Airtable has every field &amp; dropdown option logging needs, before a mentor hits a gap.</p>
+      <button class="btn ghost" id="schema-btn" onclick="runSchemaCheck(this)">Run schema check</button>
+      <div class="result" id="schema-out"></div>
     </div>
 
   </main>
