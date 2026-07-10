@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>What is your job search costing you? — Headstart Mentoring</title>
+  <meta name="description" content="A quick estimate of what every month of an unfinished job search costs an international student in Australia, in forgone graduate salary and time." />
+  <link rel="canonical" href="https://theheadstartmentoring.com/cost-of-waiting-calculator" />
+  <link rel="stylesheet" href="../css/pages/cost-of-waiting.css" />
+</head>
+<body>
+  <main class="cw">
+    <p class="cw-eyebrow">The cost of waiting</p>
+    <h1 class="cw-title">What is your job search actually costing you?</h1>
+    <p class="cw-sub">Being stuck feels free. It isn't. Every month without an offer is graduate salary you never get back, and time off a visa clock that doesn't stop. Move the sliders to see your number.</p>
+
+    <div class="cw-inputs">
+      <div class="cw-field">
+        <div class="cw-field__top">
+          <label class="cw-field__label" for="cwSalary">The graduate salary you're aiming for</label>
+          <span class="cw-field__val" id="cwSalaryVal">$70,000</span>
+        </div>
+        <input class="cw-range" type="range" id="cwSalary" min="50000" max="120000" step="5000" value="70000" />
+      </div>
+      <div class="cw-field">
+        <div class="cw-field__top">
+          <label class="cw-field__label" for="cwSearched">How long you've been searching</label>
+          <span class="cw-field__val" id="cwSearchedVal">4 months</span>
+        </div>
+        <input class="cw-range" type="range" id="cwSearched" min="0" max="24" step="1" value="4" />
+      </div>
+      <div class="cw-field">
+        <div class="cw-field__top">
+          <label class="cw-field__label" for="cwLeft">Months left before your deadline (visa, savings, plans)</label>
+          <span class="cw-field__val" id="cwLeftVal">20 months</span>
+        </div>
+        <input class="cw-range" type="range" id="cwLeft" min="1" max="24" step="1" value="20" />
+      </div>
+    </div>
+
+    <div class="cw-cards">
+      <div class="cw-card cw-card--hero">
+        <div class="cw-card__label">Salary already gone</div>
+        <div class="cw-card__num" id="cwGone">$23,333</div>
+        <div class="cw-card__note">Forgone while you've been searching. You don't earn this back.</div>
+      </div>
+      <div class="cw-card">
+        <div class="cw-card__label">Every extra month costs</div>
+        <div class="cw-card__num" id="cwPerMonth">$5,833</div>
+        <div class="cw-card__note">That's what one more month stuck takes off the table.</div>
+      </div>
+      <div class="cw-card">
+        <div class="cw-card__label">Your window</div>
+        <div class="cw-bar"><div class="cw-bar__fill" id="cwBarFill"></div></div>
+        <div class="cw-card__note"><strong id="cwRunway">4 of 24</strong> months of your runway already spent.</div>
+      </div>
+    </div>
+
+    <div class="cw-project">
+      Stay stuck <strong id="cwProjMonths">6 more months</strong> figuring it out alone, and that's another <strong id="cwProjAmount">$35,000</strong> gone, on top of what you've already lost.
+    </div>
+
+    <div class="cw-cta">
+      <p class="cw-cta__line">You don't get these months back. A 30-minute Headstart consultation is free, and you'll leave knowing exactly what's blocking your search.</p>
+      <a href="/discovery-call" class="cw-btn">Book your free consultation</a>
+    </div>
+
+    <p class="cw-disclaimer">Rough estimate based on forgone graduate salary and your own timeline. It is not financial, migration, or visa advice.</p>
+  </main>
+
+  <script type="module" src="../js/modules/cost-of-waiting.js"></script>
+</body>
+</html>
