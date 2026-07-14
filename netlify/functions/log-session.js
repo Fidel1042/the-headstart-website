@@ -38,7 +38,7 @@ exports.handler = async (event) => {
     return { statusCode: 400, headers, body: JSON.stringify({ error: "Invalid JSON" }) };
   }
 
-  const { menteeRecordId, mentorEmail, sessionDate, notes } = payload;
+  const { menteeRecordId, mentorEmail, sessionDate, nextSessionDate, notes } = payload;
 
   if (!menteeRecordId || !mentorEmail || !sessionDate) {
     return {
@@ -109,6 +109,7 @@ exports.handler = async (event) => {
     "Mentee Name":      menteeName,
     "Mentee Record ID": menteeRecordId,
     "Date":             sessionDate,
+    "Next Session":     nextSessionDate || "",
     "Extra Notes":      notes || "",
     "Amount Due":       sessionPriceAUD,
     "Mentor Payout":    mentorRate,

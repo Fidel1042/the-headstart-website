@@ -54,9 +54,10 @@
     });
 
     async function initSessionForm(mentorEmail) {
-      const menteeSelect  = document.getElementById("mentee-select");
-      const dateInput     = document.getElementById("session-date");
-      const notesField    = document.getElementById("session-notes");
+      const menteeSelect     = document.getElementById("mentee-select");
+      const dateInput        = document.getElementById("session-date");
+      const nextDateInput    = document.getElementById("next-session-date");
+      const notesField       = document.getElementById("session-notes");
       const submitBtn     = document.getElementById("session-submit-btn");
       const errorEl       = document.getElementById("form-error");
       const logCard       = document.getElementById("log-card");
@@ -152,11 +153,12 @@
       function resetForm() {
         const now   = new Date();
         const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
-        dateInput.value  = local.toISOString().split("T")[0];
-        notesField.value = "";
-        submitBtn.disabled       = false;
-        submitBtn.textContent    = "Log Session →";
-        errorEl.textContent      = "";
+        dateInput.value        = local.toISOString().split("T")[0];
+        nextDateInput.value    = "";
+        notesField.value       = "";
+        submitBtn.disabled     = false;
+        submitBtn.textContent  = "Log Session →";
+        errorEl.textContent    = "";
       }
 
       document.getElementById("session-form").addEventListener("submit", async (e) => {
@@ -185,6 +187,7 @@
                 menteeRecordId,
                 mentorEmail,
                 sessionDate,
+                nextSessionDate: nextDateInput.value || "",
                 notes: notesField.value.trim(),
               }),
             });
@@ -1002,6 +1005,12 @@
             <div class="form-field">
               <label for="session-date">Session Date</label>
               <input type="date" id="session-date" />
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div class="form-field">
+              <label for="next-session-date">Next Session Date <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--accent);opacity:0.6">(optional)</span></label>
+              <input type="date" id="next-session-date" />
             </div>
           </div>
           <div class="form-field">
