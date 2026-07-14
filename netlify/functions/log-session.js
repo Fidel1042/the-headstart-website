@@ -109,12 +109,16 @@ exports.handler = async (event) => {
     "Mentee Name":      menteeName,
     "Mentee Record ID": menteeRecordId,
     "Date":             sessionDate,
-    "Next Session":     nextSessionDate || "",
     "Extra Notes":      notes || "",
     "Amount Due":       sessionPriceAUD,
     "Mentor Payout":    mentorRate,
     "Payment Status":   isPackage ? "Package" : "Pending",
   };
+
+  // "Next Session" is an optional DATE field. Airtable rejects an empty string
+  // on a date field ('Cannot parse date value ""'), which would fail the whole
+  // write — so only include it when the mentor actually picked a date.
+  if (nextSessionDate) fields["Next Session"] = nextSessionDate;
 
   const droppedFields = [];
   let saved = false;
@@ -135,14 +139,23 @@ exports.handler = async (event) => {
       const msg = logBody?.error?.message || `Airtable status ${logRes.status}`;
       lastError = msg;
 
-      // If Airtable names an unknown field, drop it and retry.
-      const match = msg.match(/Unknown field name:\s*"?([^"]+?)"?$/i);
-      if (match && Object.prototype.hasOwnProperty.call(fields, match[1])) {
-        droppedFields.push(match[1]);
-        delete fields[match[1]];
+      // Whenever Airtable names a specific field as the problem, drop that field
+      // and retry — so a mentor is never blocked by a schema or value issue.
+      // Covers both:
+      //   "Unknown field name: \"X\""                    (field doesn't exist)
+      //   "Cannot parse date value \"\" for field X"     (bad value for the field)
+      //   "Invalid value for column X"                   (bad value, other types)
+      const badField =
+        (msg.match(/Unknown field name:\s*"?([^"]+?)"?\.?$/i)   || [])[1] ||
+        (msg.match(/for field\s+"?([^"]+?)"?\.?$/i)             || [])[1] ||
+        (msg.match(/for column\s+"?([^"]+?)"?\.?$/i)            || [])[1];
+
+      if (badField && Object.prototype.hasOwnProperty.call(fields, badField)) {
+        droppedFields.push(badField);
+        delete fields[badField];
         continue;
       }
-      // A different error (auth, table not found, bad value) — stop.
+      // Anything else (auth, table not found) — genuinely can't recover.
       break;
     }
   } catch (e) {
