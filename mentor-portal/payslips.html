@@ -7,7 +7,10 @@
   <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
   <style id="auth-gate">html:not(.auth-ok) body { visibility: hidden; }</style>
   <script type="module">
-    import { requireAuth, bindSignOutButton } from "./auth.js";
+    import { requireAuth } from "./auth.js";
+    import { mountPortalNav, initTheme } from "./portal-ui.js";
+
+    initTheme();
 
     requireAuth((session) => {
       const email = session?.user?.email || "";
@@ -16,9 +19,7 @@
         window.location.replace("/mentor-portal/index.html");
         return;
       }
-      bindSignOutButton("#signout-btn");
-      const chip = document.getElementById("user-chip");
-      if (chip && email) { chip.textContent = email; chip.hidden = false; }
+      mountPortalNav({ email, isOwner: true, active: "payslips" });
       loadPayslips();
     });
 
@@ -188,54 +189,7 @@
 
     [hidden] { display: none !important; }
 
-    /* ── Nav ── */
-    .nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 18px 28px;
-      border-bottom: 1px solid var(--line);
-    }
-    .nav-left { display: flex; align-items: center; gap: 20px; }
-    .nav-logo {
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      background: var(--gold-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      text-decoration: none;
-    }
-    .nav-link {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      text-decoration: none;
-      transition: color 0.15s;
-    }
-    .nav-link:hover { color: var(--accent-bright); }
-    .nav-right { display: flex; align-items: center; gap: 14px; }
-    .user-chip {
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      background: var(--bg-card);
-      border: 1px solid var(--line);
-      border-radius: 99px;
-      padding: 4px 12px;
-    }
-    .nav-btn {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      background: none;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 5px 12px;
-      cursor: pointer;
-      transition: color 0.15s, border-color 0.15s;
-      font-family: inherit;
-    }
-    .nav-btn:hover { color: var(--accent-bright); border-color: var(--accent); }
+    /* Nav chrome is shared — injected by portal-ui.js, styled by portal.css. */
 
     /* ── Page ── */
     .page {
@@ -344,20 +298,11 @@
       padding: 60px 0;
     }
   </style>
+  <link rel="stylesheet" href="portal.css" />
 </head>
 <body>
 
-  <nav class="nav">
-    <div class="nav-left">
-      <a href="/mentor-portal/index.html" class="nav-logo">The Headstart</a>
-      <a href="/mentor-portal/index.html" class="nav-link">Log Session</a>
-      <a href="/mentor-portal/pl.html" class="nav-link">P&amp;L</a>
-    </div>
-    <div class="nav-right">
-      <span class="user-chip" id="user-chip" hidden></span>
-      <button class="nav-btn" id="signout-btn">Sign out</button>
-    </div>
-  </nav>
+  <div id="portal-nav"></div>
 
   <main class="page">
 

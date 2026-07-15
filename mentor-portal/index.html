@@ -9,7 +9,22 @@
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <style id="auth-gate">html:not(.auth-ok) body { visibility: hidden; }</style>
   <script type="module">
-    import { requireAuth, bindSignOutButton, ALLOWED_MENTOR_EMAILS } from "./auth.js";
+    import { requireAuth, ALLOWED_MENTOR_EMAILS } from "./auth.js";
+    import { mountPortalNav, initTheme } from "./portal-ui.js";
+    import { renderMenteeDashboard } from "./mentee-dashboard.js";
+    import { renderSessionHistory } from "./session-history.js";
+
+    initTheme();
+
+    // Dashboard state: render once both mentees + sessions have arrived,
+    // re-render whenever the session history refreshes. Declared before
+    // requireAuth because its callback fires synchronously on localhost.
+    const dash = { mentees: null, sessions: null, mentorEmail: "" };
+    function refreshDashboard() {
+      if (dash.mentees && dash.sessions) {
+        renderMenteeDashboard({ mentees: dash.mentees, sessions: dash.sessions, mentorEmail: dash.mentorEmail });
+      }
+    }
 
     requireAuth((session) => {
       const loginEmail = session?.user?.email || "";
@@ -21,19 +36,14 @@
       const asParam = (new URLSearchParams(location.search).get("as") || "").toLowerCase().trim();
       const mentorEmail = (isOwner && asParam) ? asParam : loginEmail;
 
-      const chip = document.getElementById("user-chip");
-      if (chip && mentorEmail) {
-        chip.textContent = (isOwner && asParam) ? `viewing as ${mentorEmail}` : mentorEmail;
-        chip.hidden = false;
-      }
+      mountPortalNav({
+        email: (isOwner && asParam) ? `viewing as ${mentorEmail}` : mentorEmail,
+        isOwner,
+        active: "home",
+      });
 
       if (isOwner) {
-        ["pl-link", "consult-link", "payslip-btn", "billing-link"].forEach((id) => {
-          const el = document.getElementById(id);
-          if (el) el.style.display = "";
-        });
-
-        // Build the "View as mentor" dropdown.
+        // Build the "View as mentor" dropdown (injected by mountPortalNav).
         const viewAs = document.getElementById("view-as");
         if (viewAs) {
           const opts = ['<option value="">View as… (yourself)</option>']
@@ -49,11 +59,11 @@
         }
       }
 
-      bindSignOutButton("#signout-btn");
       initSessionForm(mentorEmail);
     });
 
     async function initSessionForm(mentorEmail) {
+      dash.mentorEmail = mentorEmail;
       const menteeSelect     = document.getElementById("mentee-select");
       const dateInput        = document.getElementById("session-date");
       const nextDateInput    = document.getElementById("next-session-date");
@@ -78,9 +88,9 @@
         if (isLocal) {
           // Mock data so the portal can be demoed / troubleshot without live functions.
           data = { mentees: [
-            { id: "recMOCK1", name: "Mary Chen",     billingType: "Per Session", hasCard: true  },
-            { id: "recMOCK2", name: "Priya Sharma",  billingType: "Per Session", hasCard: false },
-            { id: "recMOCK3", name: "Chen Wei",      billingType: "Package",     hasCard: true  },
+            { id: "recMOCK1", name: "Mary Chen",    billingType: "Per Session", hasCard: true,  school: "UNSW",   year: "Final year", plan: "Direction, then Foundation", notes: "" },
+            { id: "recMOCK2", name: "Priya Sharma", billingType: "Per Session", hasCard: false, school: "Deakin", year: "2nd year",   plan: "", notes: "Prefers evening sessions" },
+            { id: "recMOCK3", name: "Chen Wei",     billingType: "Package",     hasCard: true,  school: "Monash", year: "Graduate",   plan: "First Rounds into Final Boss", notes: "" },
           ] };
         } else {
           const res = await fetch("/.netlify/functions/get-mentees", {
@@ -100,20 +110,26 @@
             })
             .join("");
         }
+        dash.mentees = data.mentees || [];
+        refreshDashboard();
       } catch {
         menteeSelect.innerHTML = '<option value="">Could not load — refresh page</option>';
       }
 
       async function loadHistory() {
-        const body = document.getElementById("history-body");
-        if (!body) return;
         try {
           let data;
           if (isLocal) {
+            const wc = (offset) => {
+              const d = new Date(); d.setDate(d.getDate() - offset);
+              return d.toISOString().slice(0, 10);
+            };
             data = { sessions: [
-              { date: "2026-07-04", mentee: "Mary Chen",    amount: 30,   status: "Pending" },
-              { date: "2026-07-02", mentee: "Priya Sharma", amount: 30,   status: "Charged" },
-              { date: "2026-06-28", mentee: "Chen Wei",     amount: null, status: "Package" },
+              { date: wc(1),  mentee: "Mary Chen",    status: "Pending", menteeId: "recMOCK1", next: wc(-6) },
+              { date: wc(8),  mentee: "Priya Sharma", status: "Charged", menteeId: "recMOCK2" },
+              { date: wc(9),  mentee: "Mary Chen",    status: "Charged", menteeId: "recMOCK1" },
+              { date: wc(17), mentee: "Chen Wei",     status: "Package", menteeId: "recMOCK3" },
+              { date: wc(24), mentee: "Chen Wei",     status: "Package", menteeId: "recMOCK3" },
             ] };
           } else {
             const res = await fetch("/.netlify/functions/get-sessions", {
@@ -124,28 +140,11 @@
             data = await res.json();
           }
           const rows = data.sessions || [];
-          if (!rows.length) {
-            body.innerHTML = '<tr><td colspan="4" class="history-empty">No sessions logged yet.</td></tr>';
-            return;
-          }
-          const fmt = (d) => {
-            if (!d) return "—";
-            return new Date(d.slice(0, 10) + "T00:00:00").toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" });
-          };
-          body.innerHTML = rows.map((s) => {
-            const amt = s.status === "Package"
-              ? "Package"
-              : (s.amount != null ? `$${Number(s.amount).toFixed(2)}` : "—");
-            const safeStatus = ["Charged", "Pending", "Failed", "Package"].includes(s.status) ? s.status : "";
-            return `<tr>
-              <td>${fmt(s.date)}</td>
-              <td class="mentee">${s.mentee}</td>
-              <td class="amount">${amt}</td>
-              <td><span class="status-pill status-${safeStatus}">${s.status}</span></td>
-            </tr>`;
-          }).join("");
+          dash.sessions = rows;
+          refreshDashboard();
+          renderSessionHistory({ sessions: rows });
         } catch {
-          body.innerHTML = '<tr><td colspan="4" class="history-empty">Could not load history — refresh page.</td></tr>';
+          renderSessionHistory({ error: "Could not load history — refresh page." });
         }
       }
       loadHistory();
@@ -223,196 +222,13 @@
     }
   </script>
   <style>
-    :root {
-      /* Theme tokens — dark (default) */
-      --bg: #000000;
-      --bg-card: rgba(255,255,255,0.04);
-      --bg-card-hover: rgba(255,255,255,0.065);
-      --text: #ffffff;
-      --line: rgba(255,255,255,0.1);
-      --line-soft: rgba(255,255,255,0.07);
-      --accent: #c79b3b;
-      --accent-bright: #f0c75c;
-      --accent-soft: rgba(199,155,59,0.22);
-      --accent-line: rgba(199,155,59,0.4);
-      --gold-gradient: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
-      --shadow-card: 0 12px 32px rgba(0,0,0,0.4);
-      --shadow-glow: 0 0 28px rgba(199,155,59,0.25);
-      --grain-opacity: 0.42;
-      --grain-blend: screen;
-    }
-
-    [data-theme="light"] {
-      --bg: #ffffff;
-      --bg-card: rgba(0,0,0,0.025);
-      --bg-card-hover: rgba(0,0,0,0.05);
-      --text: #000000;
-      --line: rgba(0,0,0,0.1);
-      --line-soft: rgba(0,0,0,0.06);
-      --accent: #a07a1d;
-      --accent-bright: #c79b3b;
-      --accent-soft: rgba(199,155,59,0.14);
-      --accent-line: rgba(199,155,59,0.45);
-      --gold-gradient: linear-gradient(90deg, #8a6210 0%, #b88820 35%, #a07a1d 68%, #c79b3b 100%);
-      --shadow-card: 0 6px 18px rgba(0,0,0,0.08);
-      --shadow-glow: 0 0 24px rgba(199,155,59,0.18);
-      --grain-opacity: 0;
-      --grain-blend: normal;
-    }
-
+    /* Shared tokens, grain, and nav chrome live in portal.css (linked below). */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     html { font-size: 110%; scroll-behavior: smooth; }
     @media (max-width: 700px) { html { font-size: 95%; } }
 
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-      min-height: 100vh;
-      overflow-x: hidden;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      transition: background 0.25s ease, color 0.25s ease;
-    }
-
-    /* Grain overlay (dark mode only) */
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      background-image:
-        radial-gradient(rgba(255,255,255,0.055) 1px, transparent 0),
-        radial-gradient(rgba(255,255,255,0.03) 1px, transparent 0);
-      background-size: 3px 3px, 5px 5px;
-      background-position: 0 0, 1px 1px;
-      opacity: var(--grain-opacity);
-      mix-blend-mode: var(--grain-blend);
-      z-index: 0;
-    }
-
-    /* ── Sticky top nav ── */
-    .top-nav {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: var(--bg);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border-bottom: 1px solid var(--line);
-    }
-    .top-nav-inner {
-      max-width: 1280px;
-      margin: 0 auto;
-      padding: 1rem 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.9rem;
-    }
-    .top-nav img {
-      height: 56px;
-      width: auto;
-      max-width: 180px;
-      object-fit: contain;
-      flex-shrink: 0;
-      display: block;
-    }
-    @media (max-width: 700px) {
-      .top-nav img { height: 44px; max-width: 140px; }
-    }
-    .logo-home {
-      display: inline-flex;
-      align-items: center;
-      text-decoration: none;
-      border-radius: 8px;
-      transition: opacity 0.15s, transform 0.15s;
-    }
-    .logo-home:hover { opacity: 0.82; transform: translateY(-1px); }
-    .logo-home:focus-visible {
-      outline: 2px solid var(--accent-bright);
-      outline-offset: 4px;
-    }
-    .top-nav-text { display: flex; flex-direction: column; gap: 0.1rem; }
-    .top-nav-title {
-      font-size: 0.95rem;
-      font-weight: 700;
-      letter-spacing: 0.01em;
-      color: var(--text);
-    }
-    .top-nav-subtitle {
-      font-size: 0.68rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--accent);
-      font-weight: 700;
-    }
-    .top-nav-actions {
-      margin-left: auto;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-    }
-    .user-chip {
-      font-size: 0.8rem;
-      color: var(--text);
-      padding: 0.35rem 0.75rem;
-      border-radius: 999px;
-      border: 1px solid var(--line);
-      background: var(--bg-card);
-      max-width: 240px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    @media (max-width: 700px) { .user-chip { display: none; } }
-    .signout-btn {
-      padding: 0.45rem 0.95rem;
-      border-radius: 999px;
-      border: 1px solid var(--line);
-      background: transparent;
-      color: var(--text);
-      font-family: inherit;
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: border-color 0.15s, background 0.15s, color 0.15s;
-    }
-    .signout-btn:hover {
-      border-color: var(--accent-line);
-      background: var(--accent-soft);
-      color: var(--accent-bright);
-    }
-    .signout-btn:focus-visible {
-      outline: 2px solid var(--accent-bright);
-      outline-offset: 3px;
-    }
-    .theme-toggle {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      border: 1px solid var(--line);
-      background: transparent;
-      color: var(--accent);
-      font-size: 1.1rem;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      transition: border-color 0.15s, background 0.15s, transform 0.15s;
-    }
-    .theme-toggle:hover {
-      border-color: var(--accent-line);
-      background: var(--accent-soft);
-      transform: rotate(15deg);
-    }
-    .theme-toggle:focus-visible {
-      outline: 2px solid var(--accent-bright);
-      outline-offset: 3px;
-    }
+    body { line-height: 1.6; overflow-x: hidden; }
 
     /* ── Main wrap ── */
     main {
@@ -457,38 +273,20 @@
       max-width: 760px;
     }
 
-    /* ── Section labels (gold, never grey) ── */
-    .section-label {
-      font-size: 0.75rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--accent);
-      font-weight: 700;
-      margin: 0 0 1.1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.7rem;
-    }
-    .section-label::after {
-      content: "";
-      flex: 1;
-      height: 1px;
-      background: var(--accent-line);
-      opacity: 0.4;
-    }
-
     section.portal-section { margin-bottom: 3rem; }
 
     /* ── Ordering: onboarding flips between top and bottom ── */
     main { display: flex; flex-direction: column; }
     .section-onboarding { order: 1; }
     .section-log         { order: 2; }
-    .section-history     { order: 3; }
-    .section-resources   { order: 4; }
+    .section-mentees     { order: 3; }
+    .section-history     { order: 4; }
+    .section-resources   { order: 5; }
     [data-onboarded="true"] .section-onboarding { order: 99; }
     [data-onboarded="true"] .section-log        { order: 1; }
-    [data-onboarded="true"] .section-history    { order: 2; }
-    [data-onboarded="true"] .section-resources  { order: 3; }
+    [data-onboarded="true"] .section-mentees    { order: 2; }
+    [data-onboarded="true"] .section-history    { order: 3; }
+    [data-onboarded="true"] .section-resources  { order: 4; }
 
     /* Onboarding incomplete vs complete states */
     .onboarding-incomplete { display: block; }
@@ -892,7 +690,6 @@
     }
     .history-table tr:last-child td { border-bottom: none; }
     .history-table tbody tr:hover td { background: var(--bg-card-hover); }
-    .history-table .amount { font-variant-numeric: tabular-nums; white-space: nowrap; }
     .history-table .mentee { font-weight: 600; }
     .status-pill {
       display: inline-block;
@@ -914,36 +711,70 @@
       font-size: 0.88rem;
       text-align: center;
     }
-    @media (max-width: 700px) {
-      .history-table th:nth-child(4), .history-table td:nth-child(4) { display: none; }
+
+    /* ── Week-grouped history ── */
+    .history-week { margin-bottom: 1.4rem; }
+    .history-week__title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent-bright);
+      margin-bottom: 0.6rem;
     }
+    .history-none {
+      padding: 1rem 0 0.4rem;
+      color: var(--accent);
+      font-size: 0.88rem;
+    }
+    .history-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+      margin: 0.4rem 0 1.4rem;
+    }
+    .history-select {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--line);
+      color: var(--text);
+      padding: 0.5rem 0.8rem;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .history-select:focus { border-color: var(--accent-line); }
+    .history-select option { background: #1a1a1a; color: #ffffff; }
+    [data-theme="light"] .history-select { background: rgba(0,0,0,0.03); }
+    [data-theme="light"] .history-select option { background: #ffffff; color: #000000; }
+    .history-toggle {
+      background: transparent;
+      border: 1px solid var(--accent-line);
+      color: var(--accent-bright);
+      border-radius: 999px;
+      padding: 0.45rem 1rem;
+      font-family: inherit;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .history-toggle:hover { background: var(--accent-soft); }
+
+    /* Anchor targets land below the sticky nav */
+    .portal-section, .section-anchor { scroll-margin-top: 100px; }
   </style>
+  <link rel="stylesheet" href="portal.css" />
+  <link rel="stylesheet" href="dashboard.css" />
 </head>
 <body>
 
-  <header class="top-nav">
-    <div class="top-nav-inner">
-      <a href="./" class="logo-home" aria-label="Mentor portal home">
-        <img src="../images/headstart-italic-logo.png" alt="The Headstart" />
-      </a>
-      <div class="top-nav-text">
-        <span class="top-nav-title">Mentor Portal</span>
-        <span class="top-nav-subtitle">Internal use only</span>
-      </div>
-      <div class="top-nav-actions">
-        <select id="view-as" class="signout-btn" style="display:none;" title="View the portal as a mentor" aria-label="View as mentor"></select>
-        <a href="/consultation-tool/index.html" id="consult-link" class="signout-btn" style="text-decoration:none;display:none;">Consultation</a>
-        <a href="/mentor-portal/billing.html" id="billing-link" class="signout-btn" style="text-decoration:none;display:none;">Billing</a>
-        <a href="/mentor-portal/pl.html" id="pl-link" class="signout-btn" style="text-decoration:none;display:none;">P&amp;L</a>
-        <a href="/mentor-portal/payslips.html" id="payslip-btn" class="signout-btn" style="display:none;text-decoration:none;">Payslips</a>
-        <span class="user-chip" id="user-chip" hidden></span>
-        <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle light/dark mode" title="Toggle light/dark mode">
-          <span id="theme-icon">&#9788;</span>
-        </button>
-        <button class="signout-btn" id="signout-btn" type="button" title="Sign out">Sign out</button>
-      </div>
-    </div>
-  </header>
+  <div id="portal-nav"></div>
 
   <main>
 
@@ -986,7 +817,7 @@
     </section>
 
     <!-- LOG SESSION (primary daily action) -->
-    <section class="portal-section section-log">
+    <section class="portal-section section-log" id="log-session">
       <h2 class="section-label">After every session</h2>
 
       <div class="primary-card log-card" id="log-card">
@@ -1034,28 +865,21 @@
       </div>
     </section>
 
-    <!-- SESSION HISTORY -->
-    <section class="portal-section section-history">
-      <h2 class="section-label">Your logged sessions</h2>
-      <div class="history-wrap">
-        <table class="history-table">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Mentee</th>
-              <th>Amount</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="history-body">
-            <tr><td colspan="4" class="history-loading">Loading&hellip;</td></tr>
-          </tbody>
-        </table>
-      </div>
+    <!-- MENTEE INFO (rendered by mentee-dashboard.js) -->
+    <section class="portal-section section-mentees" id="mentee-dash-section" hidden>
+      <span id="mentee-info" class="section-anchor"></span>
+      <h2 class="section-label">Mentee info</h2>
+      <div class="mentee-grid" id="mentee-grid"></div>
+    </section>
+
+    <!-- SESSION HISTORY (rendered by session-history.js) -->
+    <section class="portal-section section-history" id="session-history">
+      <h2 class="section-label">Session history</h2>
+      <div id="history-root"><p class="history-none">Loading&hellip;</p></div>
     </section>
 
     <!-- RESOURCES -->
-    <section class="portal-section section-resources">
+    <section class="portal-section section-resources" id="resources">
       <h2 class="section-label">Run your sessions</h2>
       <div class="resource-grid">
         <a class="resource-card" href="../html/tutor-resources.html">
@@ -1087,24 +911,7 @@
     (function () {
       var root = document.documentElement;
 
-      /* ── Theme persistence ── */
-      var THEME_KEY = 'headstart_theme';
-      var themeBtn = document.getElementById('theme-toggle');
-      var themeIcon = document.getElementById('theme-icon');
-
-      function applyTheme(theme) {
-        root.setAttribute('data-theme', theme);
-        themeIcon.innerHTML = theme === 'dark' ? '&#9788;' : '&#9790;';
-        themeBtn.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
-        try { localStorage.setItem(THEME_KEY, theme); } catch (e) {}
-      }
-      var savedTheme = 'dark';
-      try { savedTheme = localStorage.getItem(THEME_KEY) || 'dark'; } catch (e) {}
-      applyTheme(savedTheme);
-      themeBtn.addEventListener('click', function () {
-        var current = root.getAttribute('data-theme') || 'dark';
-        applyTheme(current === 'dark' ? 'light' : 'dark');
-      });
+      /* Theme handling lives in portal-ui.js (shared across all portal pages). */
 
       /* ── Onboarding completion persistence ── */
       var ONB_KEY = 'headstart_onboarded';

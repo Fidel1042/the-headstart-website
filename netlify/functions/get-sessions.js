@@ -33,10 +33,18 @@ exports.handler = async (event) => {
     const records = [];
     let offset = null;
     do {
-      const formula = encodeURIComponent(`LOWER(TRIM({Mentor Email}))="${mentorEmail}"`);
+      // NOTE: deliberately does NOT request Amount Charged / Amount Due.
+      // Mentors must not see what a mentee paid, so the fee never leaves the
+      // server — not in the table, and not in the API response either.
+      // Package purchase rows (status Package with a real charge) are excluded:
+      // they record the payment, not a delivered session.
+      const formula = encodeURIComponent(
+        `AND(LOWER(TRIM({Mentor Email}))="${mentorEmail}",` +
+        `NOT(AND({Payment Status}="Package",{Amount Charged}>0)))`
+      );
       const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_SESSION_TABLE_ID}` +
         `?filterByFormula=${formula}` +
-        `&fields[]=Date&fields[]=Mentee%20Name&fields[]=Amount%20Due&fields[]=Amount%20Charged&fields[]=Payment%20Status` +
+        `&fields[]=Date&fields[]=Mentee%20Name&fields[]=Mentee%20Record%20ID&fields[]=Payment%20Status&fields[]=Next%20Session` +
         (offset ? `&offset=${offset}` : "");
       const res  = await fetch(url, { headers: airtableHeaders });
       const data = await res.json();
@@ -45,22 +53,13 @@ exports.handler = async (event) => {
     } while (offset);
 
     const sessions = records
-      .map((r) => {
-        const status  = r.fields["Payment Status"] || "—";
-        const charged = parseFloat(r.fields["Amount Charged"]);
-        const due     = parseFloat(r.fields["Amount Due"]);
-        // Show the amount that best reflects reality for each state.
-        let amount = null;
-        if (status === "Package")      amount = null;               // pre-paid
-        else if (status === "Charged") amount = isNaN(charged) ? due : charged;
-        else                           amount = isNaN(due) ? charged : due; // Pending / Failed
-        return {
-          date:   r.fields["Date"] || "",
-          mentee: r.fields["Mentee Name"] || "—",
-          amount: isNaN(amount) ? null : amount,
-          status,
-        };
-      })
+      .map((r) => ({
+        date:     r.fields["Date"] || "",
+        mentee:   r.fields["Mentee Name"] || "—",
+        menteeId: r.fields["Mentee Record ID"] || "",
+        status:   r.fields["Payment Status"] || "—",
+        next:     r.fields["Next Session"] || "",
+      }))
       .sort((a, b) => b.date.localeCompare(a.date)); // newest first
 
     return { statusCode: 200, headers, body: JSON.stringify({ sessions }) };

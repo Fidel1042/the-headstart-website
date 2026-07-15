@@ -1,0 +1,250 @@
+/* portal.css — shared tokens + chrome for every portal page. Load AFTER the page's own <style> so shared tokens win. */
+
+:root {
+  --bg: #000000;
+  --bg-card: rgba(255,255,255,0.04);
+  --bg-card-hover: rgba(255,255,255,0.065);
+  --text: #ffffff;
+  --text-muted: rgba(255,255,255,0.45);
+  --line: rgba(255,255,255,0.1);
+  --line-soft: rgba(255,255,255,0.07);
+  --accent: #c79b3b;
+  --accent-bright: #f0c75c;
+  --accent-soft: rgba(199,155,59,0.22);
+  --accent-line: rgba(199,155,59,0.4);
+  --gold-gradient: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
+  --shadow-card: 0 12px 32px rgba(0,0,0,0.4);
+  --shadow-glow: 0 0 28px rgba(199,155,59,0.25);
+  --grain-opacity: 0.42;
+  --grain-blend: screen;
+  --ok: #4caf81;
+  --warn: #e0a030;
+  --bad: #e05050;
+}
+
+[data-theme="light"] {
+  --bg: #ffffff;
+  --bg-card: rgba(0,0,0,0.025);
+  --bg-card-hover: rgba(0,0,0,0.05);
+  --text: #000000;
+  --text-muted: rgba(0,0,0,0.45);
+  --line: rgba(0,0,0,0.1);
+  --line-soft: rgba(0,0,0,0.06);
+  --accent: #a07a1d;
+  --accent-bright: #c79b3b;
+  --accent-soft: rgba(199,155,59,0.14);
+  --accent-line: rgba(199,155,59,0.45);
+  --gold-gradient: linear-gradient(90deg, #8a6210 0%, #b88820 35%, #a07a1d 68%, #c79b3b 100%);
+  --shadow-card: 0 6px 18px rgba(0,0,0,0.08);
+  --shadow-glow: 0 0 24px rgba(199,155,59,0.18);
+  --grain-opacity: 0;
+  --grain-blend: normal;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+/* Grain overlay (dark mode only) */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(rgba(255,255,255,0.055) 1px, transparent 0),
+    radial-gradient(rgba(255,255,255,0.03) 1px, transparent 0);
+  background-size: 3px 3px, 5px 5px;
+  background-position: 0 0, 1px 1px;
+  opacity: var(--grain-opacity);
+  mix-blend-mode: var(--grain-blend);
+  z-index: 0;
+}
+
+/* ── Shared top nav (injected by portal-ui.js) ── */
+.top-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+.top-nav-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+}
+.top-nav img {
+  height: 56px;
+  width: auto;
+  max-width: 180px;
+  object-fit: contain;
+  flex-shrink: 0;
+  display: block;
+}
+/* The logo art is pale gold — darken it in light mode or it vanishes on white. */
+[data-theme="light"] .top-nav img { filter: brightness(0.55) saturate(1.7); }
+.logo-home {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: opacity 0.15s, transform 0.15s;
+}
+.logo-home:hover { opacity: 0.82; transform: translateY(-1px); }
+.logo-home:focus-visible { outline: 2px solid var(--accent-bright); outline-offset: 4px; }
+.top-nav-text { display: flex; flex-direction: column; gap: 0.1rem; }
+.top-nav-title { font-size: 0.95rem; font-weight: 700; letter-spacing: 0.01em; color: var(--text); }
+.top-nav-subtitle {
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+}
+.top-nav-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+.user-chip {
+  font-size: 0.8rem;
+  color: var(--text);
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--bg-card);
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.nav-pill {
+  padding: 0.45rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-decoration: none;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+.nav-pill:hover { border-color: var(--accent-line); background: var(--accent-soft); color: var(--accent-bright); }
+.nav-pill:focus-visible { outline: 2px solid var(--accent-bright); outline-offset: 3px; }
+.nav-pill.is-active { border-color: var(--accent-line); color: var(--accent-bright); background: var(--accent-soft); }
+.top-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  margin-left: 0.6rem;
+  flex-wrap: wrap;
+}
+.nav-link {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.15s;
+}
+.nav-link:hover { color: var(--accent-bright); }
+
+/* ── Shared section label ── */
+.section-label {
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin: 0 0 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+.section-label::after { content: ""; flex: 1; height: 1px; background: var(--accent-line); opacity: 0.4; }
+
+/* ── Shared data table ── */
+.data-table-wrap { border: 1px solid var(--line); border-radius: 14px; overflow-x: auto; background: var(--bg-card); }
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.data-table th {
+  text-align: left;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  padding: 0.85rem 1.1rem;
+  background: rgba(199,155,59,0.06);
+  border-bottom: 1px solid var(--accent-line);
+  white-space: nowrap;
+}
+.data-table td {
+  padding: 0.8rem 1.1rem;
+  border-bottom: 1px solid var(--line-soft);
+  color: var(--text);
+  vertical-align: middle;
+}
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tbody tr:hover td { background: var(--bg-card-hover); }
+.data-table .num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* ── Shared status pill ── */
+.status-pill {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  white-space: nowrap;
+}
+.status-pill--ok { color: var(--ok); border-color: rgba(76,175,129,0.5); }
+.status-pill--warn { color: var(--warn); border-color: rgba(224,160,48,0.5); }
+.status-pill--bad { color: var(--bad); border-color: rgba(224,80,80,0.5); }
+.status-pill--gold { color: var(--accent-bright); border-color: var(--accent-line); }
+
+/* ── Shared loading / empty states ── */
+.state-empty, .state-loading {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  padding: 60px 0;
+}
+.state-loading::after {
+  content: "";
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--line);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: portal-spin 0.7s linear infinite;
+  margin-left: 10px;
+  vertical-align: middle;
+}
+@keyframes portal-spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 700px) {
+  .top-nav img { height: 44px; max-width: 140px; }
+  .user-chip { display: none; }
+}

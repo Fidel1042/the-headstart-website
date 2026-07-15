@@ -1,0 +1,120 @@
+/* admin.css — owner-only mentor overview page. */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 110%; }
+@media (max-width: 700px) { html { font-size: 95%; } }
+[hidden] { display: none !important; }
+
+.admin-page {
+  position: relative;
+  z-index: 1;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 3rem 2rem 6rem;
+}
+
+.admin-title {
+  font-size: clamp(1.8rem, 3.5vw, 2.4rem);
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  margin-bottom: 1.8rem;
+  background: var(--gold-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ── Stat tiles ── */
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 2.2rem;
+}
+.stat-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 1.2rem 1.4rem;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--bg-card);
+}
+.stat-tile__num {
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: var(--accent-bright);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+}
+.stat-tile__label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* ── Mentor table extras ── */
+.data-table .mentor-name { font-weight: 700; white-space: nowrap; }
+.data-table .mentor-email { font-size: 0.75rem; color: var(--text-muted); }
+.data-table td.owed { color: var(--warn); font-weight: 700; }
+.data-table td.owed.zero { color: var(--text-muted); font-weight: 400; }
+.mentor-row { cursor: pointer; }
+
+.expand-caret {
+  display: inline-block;
+  color: var(--accent);
+  font-size: 0.7rem;
+  transition: transform 0.18s;
+}
+.mentor-row.is-open .expand-caret { transform: rotate(90deg); }
+
+/* ── Expanded detail ── */
+.detail-row > td {
+  background: rgba(199,155,59,0.04);
+  padding: 1.2rem 1.4rem 1.5rem;
+}
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.4rem;
+  align-items: start;
+}
+@media (max-width: 950px) { .detail-grid { grid-template-columns: 1fr; } }
+
+.detail-block h4 {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.6rem;
+}
+.detail-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+.detail-table th {
+  text-align: left;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+.detail-table td {
+  padding: 0.45rem 0.6rem;
+  border-bottom: 1px solid var(--line-soft);
+  color: var(--text);
+  white-space: nowrap;
+}
+.detail-table tr:last-child td { border-bottom: none; }
+.paid-check { color: var(--ok); font-weight: 700; }
+.paid-pending { color: var(--warn); font-weight: 700; }
+
+@media (max-width: 900px) {
+  .admin-page { padding: 2rem 1rem 4rem; }
+  .stat-row { grid-template-columns: repeat(2, 1fr); }
+}
