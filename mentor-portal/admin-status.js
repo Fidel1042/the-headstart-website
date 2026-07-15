@@ -6,6 +6,7 @@ const DAY_MS = 86400000;
 
 let bound = false;
 let ownerEmail = "";
+let onChangedCb = null;
 let menteeIndex = new Map(); // id → mentee (for updating lastFollowUp in place)
 
 const fmtDate = (d) => d ? new Date(d.slice(0, 10) + "T00:00:00").toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" }) : "—";
@@ -19,7 +20,10 @@ const sameMentee = (s, m) => (s.menteeId && s.menteeId === m.id) || s.mentee.tri
 function item(m, tone) {
   return `
     <div class="status-item status-item--${tone}">
-      <span class="status-item__name">${m.name}</span>
+      <div class="status-item__head">
+        <span class="status-item__name">${m.name}</span>
+        <button type="button" class="drop-btn" data-id="${m.id}" data-name="${m.name}">Drop</button>
+      </div>
       <span class="status-item__meta">${m.mentor}</span>
       <span class="status-item__meta">${m.last ? `${fmtDate(m.last)} · ${m.days}d ago` : "No sessions yet"}</span>
       <div class="fu-row">
@@ -29,6 +33,29 @@ function item(m, tone) {
         <span class="fu-state" id="fu-state-${m.id}"></span>
       </div>
     </div>`;
+}
+
+async function dropMentee(id, name, btn) {
+  // Setting Client Pipeline = "Dropped" removes them from every acquired count.
+  if (!window.confirm(`Mark ${name} as Dropped? They'll leave the mentee lists and counts.`)) return;
+  btn.disabled = true;
+  btn.textContent = "Dropping…";
+  try {
+    if (!isLocal) {
+      const res = await fetch("/.netlify/functions/admin-update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ kind: "mentee-dropped", recordId: id, ownerEmail }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+    }
+    if (onChangedCb) onChangedCb();
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = "Drop";
+    window.alert(err.message || "Could not update — try again.");
+  }
 }
 
 async function saveFollowUp(id, grid) {
@@ -60,8 +87,9 @@ async function saveFollowUp(id, grid) {
 }
 
 // Active = session within 2 weeks, Nudge = 2–4 weeks, Dropped = 4+ weeks.
-export function renderStatus({ mentees = [], allDelivered = [], rows = [], ownerEmail: email = "" } = {}) {
+export function renderStatus({ mentees = [], allDelivered = [], rows = [], ownerEmail: email = "", onChanged = null } = {}) {
   if (email) ownerEmail = email;
+  if (onChanged) onChangedCb = onChanged;
   const grid = document.getElementById("status-grid");
   if (!grid) return;
 
@@ -83,7 +111,7 @@ export function renderStatus({ mentees = [], allDelivered = [], rows = [], owner
   const col = (title, tone, items) => `
     <div class="status-col">
       <h3 class="status-col__title status-col__title--${tone}">${title} · ${items.length}</h3>
-      ${items.map((m) => item(m, tone)).join("") || '<p class="status-empty">None</p>'}
+      <div class="status-col__items">${items.map((m) => item(m, tone)).join("") || '<p class="status-empty">None</p>'}</div>
     </div>`;
 
   grid.innerHTML =
@@ -95,8 +123,10 @@ export function renderStatus({ mentees = [], allDelivered = [], rows = [], owner
   if (!bound) {
     bound = true;
     grid.addEventListener("click", (e) => {
-      const btn = e.target.closest(".fu-save");
-      if (btn) saveFollowUp(btn.dataset.id, grid);
+      const fu = e.target.closest(".fu-save");
+      if (fu) { saveFollowUp(fu.dataset.id, grid); return; }
+      const drop = e.target.closest(".drop-btn");
+      if (drop) dropMentee(drop.dataset.id, drop.dataset.name, drop);
     });
   }
 }

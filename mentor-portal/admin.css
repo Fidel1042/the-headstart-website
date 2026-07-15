@@ -178,73 +178,9 @@ html { font-size: 110%; }
 .mentor-notes__save:disabled, .fu-save:disabled { opacity: 0.55; cursor: default; }
 .mentor-notes__state, .fu-state { font-size: 0.76rem; color: var(--accent); }
 
-/* ── Follow-up row on a mentee status card ── */
-.fu-row {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.45rem;
-  margin-top: 0.45rem;
-  padding-top: 0.45rem;
-  border-top: 1px solid var(--line-soft);
-}
-.fu-row .status-item__meta { flex-basis: 100%; }
-.fu-date {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  color: var(--text);
-  font-family: inherit;
-  font-size: 0.76rem;
-  padding: 0.28rem 0.45rem;
-  color-scheme: dark;
-}
-[data-theme="light"] .fu-date { background: rgba(0,0,0,0.03); color-scheme: light; }
-.fu-date:focus { outline: none; border-color: var(--accent-line); }
-
-/* ── Mentee status columns ── */
-.status-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.2rem;
-  align-items: start;
-}
-.status-col {
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: var(--bg-card);
-  padding: 1.1rem 1.2rem;
-}
-.status-col__title {
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  margin-bottom: 0.8rem;
-}
-.status-col__title--ok { color: var(--ok); }
-.status-col__title--warn { color: var(--warn); }
-.status-col__title--bad { color: var(--bad); }
-.status-col__title--muted { color: var(--text-muted); }
-.status-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-  padding: 0.6rem 0.75rem;
-  border-radius: 10px;
-  border-left: 3px solid var(--line);
-  background: var(--bg-card-hover);
-  margin-bottom: 0.55rem;
-}
-.status-item--ok { border-left-color: var(--ok); }
-.status-item--warn { border-left-color: var(--warn); }
-.status-item--bad { border-left-color: var(--bad); }
-.status-item__name { font-weight: 700; font-size: 0.9rem; color: var(--text); }
-.status-item__meta { font-size: 0.75rem; color: var(--text-muted); }
-.status-empty { font-size: 0.82rem; color: var(--text-muted); }
+/* Mentee status layout (incl. follow-up row) lives in admin-status.css. */
 
 @media (max-width: 900px) {
   .admin-page { padding: 2rem 1rem 4rem; }
   .stat-row { grid-template-columns: repeat(2, 1fr); }
-  .status-grid { grid-template-columns: 1fr; }
 }

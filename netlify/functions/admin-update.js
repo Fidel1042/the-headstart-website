@@ -44,6 +44,9 @@ exports.handler = async (event) => {
   } else if (kind === "mentor-notes") {
     tableId = AIRTABLE_MENTOR_TABLE_ID;
     fields = { "Admin Notes": typeof payload.notes === "string" ? payload.notes : "" };
+  } else if (kind === "mentee-dropped") {
+    tableId = AIRTABLE_MENTEE_TABLE_ID;
+    fields = { "Client Pipeline": "Dropped" };
   } else {
     return { statusCode: 400, headers, body: JSON.stringify({ error: "Unknown kind" }) };
   }

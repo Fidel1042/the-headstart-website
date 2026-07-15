@@ -68,7 +68,7 @@ async function load(ownerEmail) {
   loading.hidden = true;
   const agg = aggregate(data);
   renderOverview(agg);
-  renderStatus({ ...agg, ownerEmail: OWNER_EMAIL });
+  renderStatus({ ...agg, ownerEmail: OWNER_EMAIL, onChanged: () => load(ownerEmail) });
   initCalendar({
     sessions: data.sessions,
     mentors: data.mentors,
