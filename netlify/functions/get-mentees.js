@@ -45,7 +45,7 @@ exports.handler = async (event) => {
     let offset = null;
     do {
       const formula = encodeURIComponent(`LOWER(TRIM({Mentor Email Plain}))="${wanted}"`);
-      const extraFields = ["University", "University Year", "Suggested Plan", "Mentor Notes"]
+      const extraFields = ["Target Industry", "Major", "University Year", "Suggested Plan", "Mentor Notes"]
         .map((f) => `&fields[]=${encodeURIComponent(f)}`).join("");
       const url = `https://api.airtable.com/v0/${AIRTABLE_CORE_BASE_ID}/${AIRTABLE_MENTEE_TABLE_ID}` +
         `?filterByFormula=${formula}&fields[]=Name&fields[]=Billing%20type&fields[]=Stripe%20Customer%20ID` +
@@ -63,7 +63,8 @@ exports.handler = async (event) => {
         name:        r.fields.Name || "Unnamed mentee",
         billingType: r.fields["Billing type"] || "Per Session",
         hasCard:     Boolean(r.fields["Stripe Customer ID"]),
-        school:      r.fields["University"] || "",
+        industry:    r.fields["Target Industry"] || "",
+        major:       r.fields["Major"] || "",
         year:        r.fields["University Year"] || "",
         plan:        r.fields["Suggested Plan"] || "",
         notes:       r.fields["Mentor Notes"] || "",

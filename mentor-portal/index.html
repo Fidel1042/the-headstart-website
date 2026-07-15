@@ -88,9 +88,9 @@
         if (isLocal) {
           // Mock data so the portal can be demoed / troubleshot without live functions.
           data = { mentees: [
-            { id: "recMOCK1", name: "Mary Chen",    billingType: "Per Session", hasCard: true,  school: "UNSW",   year: "Final year", plan: "Direction, then Foundation", notes: "" },
-            { id: "recMOCK2", name: "Priya Sharma", billingType: "Per Session", hasCard: false, school: "Deakin", year: "2nd year",   plan: "", notes: "Prefers evening sessions" },
-            { id: "recMOCK3", name: "Chen Wei",     billingType: "Package",     hasCard: true,  school: "Monash", year: "Graduate",   plan: "First Rounds into Final Boss", notes: "" },
+            { id: "recMOCK1", name: "Mary Chen",    billingType: "Per Session", hasCard: true,  industry: "Consulting", major: "Commerce",  year: "Final year", plan: "Direction, then Foundation", notes: "" },
+            { id: "recMOCK2", name: "Priya Sharma", billingType: "Per Session", hasCard: false, industry: "Tech",       major: "IT",        year: "2nd year",   plan: "", notes: "Prefers evening sessions" },
+            { id: "recMOCK3", name: "Chen Wei",     billingType: "Package",     hasCard: true,  industry: "Accounting", major: "Accounting", year: "Graduate",  plan: "First Rounds into Final Boss", notes: "" },
           ] };
         } else {
           const res = await fetch("/.netlify/functions/get-mentees", {

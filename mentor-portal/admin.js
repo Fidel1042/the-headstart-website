@@ -1,9 +1,13 @@
-// admin.js — owner-only mentor overview: per-mentor sessions, pay, mentees.
+// admin.js — owner-only overview: mentor table, session calendar, mentee status.
 
 import { requireAuth } from "./auth.js";
 import { mountPortalNav, initTheme } from "./portal-ui.js";
+import { initCalendar } from "./admin-calendar.js";
+import { renderStatus } from "./admin-status.js";
 
 initTheme();
+
+let OWNER_EMAIL = "";
 
 const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com"];
 const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1";
@@ -18,19 +22,24 @@ const daysSince = (d) => {
 };
 // Package purchase rows record a payment, not a delivered session.
 const isPurchase = (s) => s.status === "Package" && s.amountCharged > 0;
+const sameMentee = (s, m) => (s.menteeId && s.menteeId === m.id) || s.mentee.trim().toLowerCase() === m.name.trim().toLowerCase();
 
+const d = (offset) => { const x = new Date(); x.setDate(x.getDate() - offset); return x.toISOString().slice(0, 10); };
 const MOCK = {
   mentors: [
-    { name: "Angelica", email: "angelicagrace160272@gmail.com", rate: 55 },
-    { name: "Aidan", email: "aidanmwibrata@gmail.com", rate: 50 },
+    { id: "recMT1", name: "Angelica", email: "angelica@mock.com", rate: 55, notes: "" },
+    { id: "recMT2", name: "Aidan", email: "aidan@mock.com", rate: 50, notes: "Great with tech mentees" },
   ],
   mentees: [
-    { name: "Priya Sharma", mentorEmail: "angelicagrace160272@gmail.com", billingType: "Per Session" },
-    { name: "Chen Wei", mentorEmail: "aidanmwibrata@gmail.com", billingType: "Package" },
+    { id: "recM1", name: "Priya Sharma", mentorEmail: "angelica@mock.com", billingType: "Per Session", lastFollowUp: d(10) },
+    { id: "recM2", name: "Chen Wei", mentorEmail: "aidan@mock.com", billingType: "Package", lastFollowUp: "" },
+    { id: "recM3", name: "Zara Anderson", mentorEmail: "aidan@mock.com", billingType: "Per Session", lastFollowUp: "" },
   ],
   sessions: [
-    { date: "2026-07-08", mentorEmail: "angelicagrace160272@gmail.com", mentorName: "Angelica", mentee: "Priya Sharma", payout: 55, amountDue: 35, amountCharged: 35, status: "Charged", mentorPaid: false, next: "2026-07-15" },
-    { date: "2026-06-20", mentorEmail: "aidanmwibrata@gmail.com", mentorName: "Aidan", mentee: "Chen Wei", payout: 50, amountDue: 30, amountCharged: 0, status: "Package", mentorPaid: true, next: "" },
+    { date: d(2), mentorEmail: "angelica@mock.com", mentorName: "Angelica", mentee: "Priya Sharma", menteeId: "recM1", payout: 55, amountDue: 35, amountCharged: 35, status: "Charged", mentorPaid: false, next: d(-5) },
+    { date: d(9), mentorEmail: "angelica@mock.com", mentorName: "Angelica", mentee: "Priya Sharma", menteeId: "recM1", payout: 55, amountDue: 35, amountCharged: 35, status: "Charged", mentorPaid: true, next: "" },
+    { date: d(18), mentorEmail: "aidan@mock.com", mentorName: "Aidan", mentee: "Chen Wei", menteeId: "recM2", payout: 50, amountDue: 30, amountCharged: 0, status: "Package", mentorPaid: true, next: "" },
+    { date: d(33), mentorEmail: "aidan@mock.com", mentorName: "Aidan", mentee: "Zara Anderson", menteeId: "recM3", payout: 50, amountDue: 35, amountCharged: 35, status: "Charged", mentorPaid: true, next: "" },
   ],
 };
 
@@ -57,20 +66,26 @@ async function load(ownerEmail) {
     return;
   }
   loading.hidden = true;
-  render(aggregate(data));
+  const agg = aggregate(data);
+  renderOverview(agg);
+  renderStatus({ ...agg, ownerEmail: OWNER_EMAIL });
+  initCalendar({
+    sessions: data.sessions,
+    mentors: data.mentors,
+    mentees: data.mentees,
+    onAdded: () => load(ownerEmail), // refresh everything after a manual add
+  });
+  // Keep whichever tab is active; only reveal overview on first load.
+  if (document.querySelector(".admin-tab.is-active")?.dataset.view === "overview") {
+    document.getElementById("view-overview").hidden = false;
+  }
 }
 
 function aggregate({ mentors = [], mentees = [], sessions = [] }) {
   const byEmail = new Map();
   mentors.forEach((m) => byEmail.set(m.email, { ...m, mentees: [], sessions: [] }));
-  // Sessions from emails missing in the mentor table (e.g. co-founders) still show.
-  sessions.forEach((s) => {
-    if (!byEmail.has(s.mentorEmail)) {
-      byEmail.set(s.mentorEmail, { name: s.mentorName || s.mentorEmail, email: s.mentorEmail, rate: null, mentees: [], sessions: [] });
-    }
-    byEmail.get(s.mentorEmail).sessions.push(s);
-  });
-  mentees.forEach((m) => { if (byEmail.has(m.mentorEmail)) byEmail.get(m.mentorEmail).mentees.push(m); });
+  sessions.forEach((s) => { byEmail.get(s.mentorEmail)?.sessions.push(s); });
+  mentees.forEach((m) => { byEmail.get(m.mentorEmail)?.mentees.push(m); });
 
   const monthStart = new Date().toISOString().slice(0, 8) + "01";
   const today = new Date().toISOString().slice(0, 10);
@@ -93,7 +108,8 @@ function aggregate({ mentors = [], mentees = [], sessions = [] }) {
     return m;
   }).sort((a, b) => (b.stats.last || "").localeCompare(a.stats.last || ""));
 
-  return { rows, totalMentees: mentees.length };
+  const allDelivered = sessions.filter((s) => !isPurchase(s));
+  return { rows, mentees, allDelivered, totalMentees: mentees.length };
 }
 
 function statusPill(days) {
@@ -103,17 +119,11 @@ function statusPill(days) {
   return '<span class="status-pill status-pill--bad">Inactive</span>';
 }
 
-function menteeStats(m, delivered) {
-  const mine = delivered.filter((s) => s.mentee.trim().toLowerCase() === m.name.trim().toLowerCase());
-  const last = mine[0]?.date || "";
-  return { count: mine.length, last };
-}
-
 function detailHTML(m) {
   const menteeRows = m.mentees.length
     ? m.mentees.map((x) => {
-        const st = menteeStats(x, m.delivered);
-        return `<tr><td>${x.name}</td><td>${x.billingType}</td><td>${st.count}</td><td>${fmtDate(st.last)}</td></tr>`;
+        const mine = m.delivered.filter((s) => sameMentee(s, x));
+        return `<tr><td>${x.name}</td><td>${x.billingType}</td><td>${mine.length}</td><td>${fmtDate(mine[0]?.date || "")}</td></tr>`;
       }).join("")
     : '<tr><td colspan="4">No mentees assigned</td></tr>';
   const sessionRows = m.delivered.slice(0, 10).map((s) => `
@@ -138,10 +148,43 @@ function detailHTML(m) {
           <tbody>${sessionRows}</tbody>
         </table>
       </div>
+      <div class="detail-block detail-block--wide">
+        <h4>Admin notes</h4>
+        <textarea class="mentor-notes" data-id="${m.id || ""}" rows="3">${(m.notes || "").replace(/</g, "&lt;")}</textarea>
+        <div class="mentor-notes__row">
+          <button type="button" class="mentor-notes__save" data-id="${m.id || ""}">Save notes</button>
+          <span class="mentor-notes__state" data-state="${m.id || ""}"></span>
+        </div>
+      </div>
     </div>`;
 }
 
-function render({ rows, totalMentees }) {
+async function saveMentorNotes(id, body) {
+  const textarea = body.querySelector(`.mentor-notes[data-id="${id}"]`);
+  const stateEl = body.querySelector(`.mentor-notes__state[data-state="${id}"]`);
+  const btn = body.querySelector(`.mentor-notes__save[data-id="${id}"]`);
+  if (!textarea || !id) return;
+  btn.disabled = true;
+  stateEl.textContent = "Saving…";
+  try {
+    if (!isLocal) {
+      const res = await fetch("/.netlify/functions/admin-update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ kind: "mentor-notes", recordId: id, notes: textarea.value, ownerEmail: OWNER_EMAIL }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+    }
+    stateEl.textContent = "Saved";
+    setTimeout(() => { stateEl.textContent = ""; }, 3000);
+  } catch (err) {
+    stateEl.textContent = err.message || "Could not save";
+  }
+  btn.disabled = false;
+}
+
+function renderOverview({ rows, totalMentees }) {
   const monthCount = rows.reduce((a, m) => a + m.stats.thisMonth, 0);
   const owedTotal = rows.reduce((a, m) => a + m.stats.owed, 0);
   const active = rows.filter((m) => m.stats.days !== null && m.stats.days <= 30).length;
@@ -150,14 +193,13 @@ function render({ rows, totalMentees }) {
   document.getElementById("stat-mentees").textContent = totalMentees;
   document.getElementById("stat-month").textContent = monthCount;
   document.getElementById("stat-owed").textContent = fmtMoney(owedTotal);
-  document.getElementById("stat-row").hidden = false;
 
   const body = document.getElementById("mentor-body");
   body.innerHTML = rows.map((m, i) => `
     <tr class="mentor-row" data-i="${i}">
       <td><span class="expand-caret">&#9654;</span></td>
       <td><div class="mentor-name">${m.name}</div><div class="mentor-email">${m.email}</div></td>
-      <td class="num">${m.rate === null ? "—" : fmtMoney(m.rate)}</td>
+      <td class="num">${fmtMoney(m.rate)}</td>
       <td class="num">${m.mentees.length}</td>
       <td class="num">${m.stats.total}</td>
       <td class="num">${m.stats.thisMonth}</td>
@@ -169,17 +211,27 @@ function render({ rows, totalMentees }) {
     <tr class="detail-row" data-detail="${i}" hidden><td colspan="10">${detailHTML(m)}</td></tr>
   `).join("");
 
-  body.addEventListener("click", (e) => {
+  // Assignment (not addEventListener) so reloads never stack handlers.
+  body.onclick = (e) => {
+    const noteBtn = e.target.closest(".mentor-notes__save");
+    if (noteBtn) { saveMentorNotes(noteBtn.dataset.id, body); return; }
     const row = e.target.closest(".mentor-row");
     if (!row) return;
     const detail = body.querySelector(`[data-detail="${row.dataset.i}"]`);
-    const open = !detail.hidden;
-    detail.hidden = open;
-    row.classList.toggle("is-open", !open);
-  });
-
-  document.getElementById("table-wrap").hidden = false;
+    detail.hidden = !detail.hidden;
+    row.classList.toggle("is-open", !detail.hidden);
+  };
 }
+
+// Tab switching between the three views.
+document.getElementById("admin-tabs").addEventListener("click", (e) => {
+  const tab = e.target.closest(".admin-tab");
+  if (!tab) return;
+  document.querySelectorAll(".admin-tab").forEach((t) => t.classList.toggle("is-active", t === tab));
+  ["overview", "calendar", "mentees"].forEach((v) => {
+    document.getElementById("view-" + v).hidden = v !== tab.dataset.view;
+  });
+});
 
 // Runs last: on localhost requireAuth fires the callback synchronously,
 // so everything the callback touches must already be defined above.
@@ -189,6 +241,7 @@ requireAuth((session) => {
     window.location.replace("/mentor-portal/index.html");
     return;
   }
+  OWNER_EMAIL = email;
   mountPortalNav({ email, isOwner: true, active: "admin" });
   load(email);
 });

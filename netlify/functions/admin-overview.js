@@ -55,26 +55,36 @@ exports.handler = async (event) => {
   try {
     const [mentorRecs, menteeRecs, sessionRecs] = await Promise.all([
       fetchAll(AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTOR_TABLE_ID,
-        ["Name", "Email", "Rate"], AIRTABLE_API_TOKEN),
+        ["Name", "Email", "Rate", "Status", "Admin Notes"], AIRTABLE_API_TOKEN),
       fetchAll(AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTEE_TABLE_ID,
-        ["Name", "Mentor Email Plain", "Billing type"], AIRTABLE_API_TOKEN),
+        ["Name", "Mentor Email Plain", "Billing type", "Client Pipeline", "Last Followed Up"], AIRTABLE_API_TOKEN),
       fetchAll(AIRTABLE_BASE_ID, AIRTABLE_SESSION_TABLE_ID,
-        ["Date", "Mentor Email", "Mentor Name", "Mentee Name", "Mentor Payout",
+        ["Date", "Mentor Email", "Mentor Name", "Mentee Name", "Mentee Record ID", "Mentor Payout",
          "Amount Due", "Amount Charged", "Payment Status", "Mentor Paid", "Next Session"],
         AIRTABLE_API_TOKEN),
     ]);
 
-    const mentors = mentorRecs.map((r) => ({
-      name:  r.fields["Name"] || "",
-      email: (r.fields["Email"] || "").toLowerCase().trim(),
-      rate:  parseFloat(r.fields["Rate"]) || 0,
-    }));
+    // Only mentors actually on the team.
+    const mentors = mentorRecs
+      .filter((r) => (r.fields["Status"] || "") === "Hired")
+      .map((r) => ({
+        id:    r.id,
+        name:  r.fields["Name"] || "",
+        email: (r.fields["Email"] || "").toLowerCase().trim(),
+        rate:  parseFloat(r.fields["Rate"]) || 0,
+        notes: r.fields["Admin Notes"] || "",
+      }));
 
-    const mentees = menteeRecs.map((r) => ({
-      name:        r.fields["Name"] || "",
-      mentorEmail: (r.fields["Mentor Email Plain"] || "").toLowerCase().trim(),
-      billingType: r.fields["Billing type"] || "Per Session",
-    }));
+    // Only paying clients count as mentees (leads/consults stay out).
+    const mentees = menteeRecs
+      .filter((r) => (r.fields["Client Pipeline"] || "") === "Acquired")
+      .map((r) => ({
+        id:           r.id,
+        name:         r.fields["Name"] || "",
+        mentorEmail:  (r.fields["Mentor Email Plain"] || "").toLowerCase().trim(),
+        billingType:  r.fields["Billing type"] || "Per Session",
+        lastFollowUp: r.fields["Last Followed Up"] || "",
+      }));
 
     const sessions = sessionRecs.map((r) => {
       const f = r.fields;
@@ -83,6 +93,7 @@ exports.handler = async (event) => {
         mentorEmail:   (f["Mentor Email"] || "").toLowerCase().trim(),
         mentorName:    f["Mentor Name"] || "",
         mentee:        f["Mentee Name"] || "—",
+        menteeId:      f["Mentee Record ID"] || "",
         payout:        parseFloat(f["Mentor Payout"]) || 0,
         amountDue:     parseFloat(f["Amount Due"]) || 0,
         amountCharged: parseFloat(f["Amount Charged"]) || 0,

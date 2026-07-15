@@ -77,7 +77,8 @@ function card(mentee, s) {
       <div class="mentee-card__rows">
         <div class="info-row"><span class="info-row__label">Last session</span><span class="info-row__val">${s.last ? `${fmtDate(s.last)}` : "—"}</span></div>
         <div class="info-row"><span class="info-row__label">Next session</span><span class="info-row__val">${s.next ? fmtDate(s.next) : "Not booked"}</span></div>
-        <div class="info-row"><span class="info-row__label">School</span><span class="info-row__val">${esc(mentee.school) || "—"}</span></div>
+        <div class="info-row"><span class="info-row__label">Target industry</span><span class="info-row__val">${esc(mentee.industry) || "—"}</span></div>
+        <div class="info-row"><span class="info-row__label">Major</span><span class="info-row__val">${esc(mentee.major) || "—"}</span></div>
         <div class="info-row"><span class="info-row__label">Year</span><span class="info-row__val">${esc(mentee.year) || "—"}</span></div>
       </div>
       <details class="mentee-card__more">

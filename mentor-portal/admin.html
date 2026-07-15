@@ -8,6 +8,7 @@
   <style id="auth-gate">html:not(.auth-ok) body { visibility: hidden; }</style>
   <link rel="stylesheet" href="portal.css" />
   <link rel="stylesheet" href="admin.css" />
+  <link rel="stylesheet" href="admin-calendar.css" />
 </head>
 <body>
 
@@ -15,49 +16,85 @@
 
   <main class="admin-page">
 
-    <h1 class="admin-title">Mentor Overview</h1>
-
-    <div class="stat-row" id="stat-row" hidden>
-      <div class="stat-tile">
-        <span class="stat-tile__num" id="stat-active">—</span>
-        <span class="stat-tile__label">Active mentors (30d)</span>
-      </div>
-      <div class="stat-tile">
-        <span class="stat-tile__num" id="stat-mentees">—</span>
-        <span class="stat-tile__label">Mentees</span>
-      </div>
-      <div class="stat-tile">
-        <span class="stat-tile__num" id="stat-month">—</span>
-        <span class="stat-tile__label">Sessions this month</span>
-      </div>
-      <div class="stat-tile">
-        <span class="stat-tile__num" id="stat-owed">—</span>
-        <span class="stat-tile__label">Payouts owed</span>
+    <div class="admin-head">
+      <h1 class="admin-title">Mentor Overview</h1>
+      <div class="admin-tabs" id="admin-tabs">
+        <button type="button" class="admin-tab is-active" data-view="overview">Overview</button>
+        <button type="button" class="admin-tab" data-view="calendar">Calendar</button>
+        <button type="button" class="admin-tab" data-view="mentees">Mentee status</button>
       </div>
     </div>
 
     <p class="state-loading" id="loading">Loading</p>
     <p class="state-empty" id="error" hidden></p>
 
-    <div class="data-table-wrap" id="table-wrap" hidden>
-      <table class="data-table" id="mentor-table">
-        <thead>
-          <tr>
-            <th></th>
-            <th>Mentor</th>
-            <th>Rate</th>
-            <th>Mentees</th>
-            <th>Sessions</th>
-            <th>This month</th>
-            <th>Last session</th>
-            <th>Next session</th>
-            <th>Owed</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody id="mentor-body"></tbody>
-      </table>
+    <!-- OVERVIEW -->
+    <section id="view-overview" hidden>
+      <div class="stat-row">
+        <div class="stat-tile">
+          <span class="stat-tile__num" id="stat-active">—</span>
+          <span class="stat-tile__label">Active mentors (30d)</span>
+        </div>
+        <div class="stat-tile">
+          <span class="stat-tile__num" id="stat-mentees">—</span>
+          <span class="stat-tile__label">Acquired mentees</span>
+        </div>
+        <div class="stat-tile">
+          <span class="stat-tile__num" id="stat-month">—</span>
+          <span class="stat-tile__label">Sessions this month</span>
+        </div>
+        <div class="stat-tile">
+          <span class="stat-tile__num" id="stat-owed">—</span>
+          <span class="stat-tile__label">Payouts owed</span>
+        </div>
+      </div>
+
+      <div class="data-table-wrap">
+        <table class="data-table" id="mentor-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Mentor</th>
+              <th>Rate</th>
+              <th>Mentees</th>
+              <th>Sessions</th>
+              <th>This month</th>
+              <th>Last session</th>
+              <th>Next session</th>
+              <th>Owed</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="mentor-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- CALENDAR -->
+    <section id="view-calendar" hidden>
+      <div class="cal-controls">
+        <button type="button" class="cal-btn" id="cal-prev" aria-label="Previous month">&#8249;</button>
+        <button type="button" class="cal-btn" id="cal-next" aria-label="Next month">&#8250;</button>
+        <button type="button" class="cal-btn cal-btn--today" id="cal-today">Today</button>
+        <h2 class="cal-title" id="cal-title"></h2>
+        <button type="button" class="cal-btn cal-btn--add" id="cal-add">+ Add session</button>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+      <div class="cal-legend" id="cal-legend"></div>
+    </section>
+
+    <!-- Calendar detail / add-session popup -->
+    <div class="cal-modal" id="cal-modal" hidden>
+      <div class="cal-modal__box">
+        <button type="button" class="cal-modal__close" id="cal-modal-close" aria-label="Close">&times;</button>
+        <div id="cal-modal-body"></div>
+      </div>
     </div>
+
+    <!-- MENTEE STATUS -->
+    <section id="view-mentees" hidden>
+      <div class="status-grid" id="status-grid"></div>
+    </section>
 
   </main>
 
