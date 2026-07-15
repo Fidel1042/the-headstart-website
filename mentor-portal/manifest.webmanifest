@@ -1,0 +1,30 @@
+{
+  "name": "Headstart Mentor Portal",
+  "short_name": "Headstart",
+  "description": "Log sessions, track your mentees, and access mentor resources.",
+  "start_url": "/mentor-portal/index.html",
+  "scope": "/mentor-portal/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "/mentor-portal/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/mentor-portal/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/mentor-portal/icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

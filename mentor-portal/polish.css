@@ -1,0 +1,83 @@
+/* polish.css — PWA polish for every portal page: safe areas for notched
+   phones, mobile tap/zoom fixes, and light micro-animations.
+   Loaded last so its fixes win. */
+
+/* ── Standalone (installed app) + notch safe areas ── */
+.top-nav { padding-top: env(safe-area-inset-top, 0px); }
+.top-nav-inner {
+  padding-left: calc(1.5rem + env(safe-area-inset-left, 0px));
+  padding-right: calc(1.5rem + env(safe-area-inset-right, 0px));
+}
+main, .page, .admin-page {
+  padding-bottom: calc(3rem + env(safe-area-inset-bottom, 0px));
+}
+
+/* ── General mobile-app niceties ── */
+html { overscroll-behavior-y: none; }
+body { -webkit-tap-highlight-color: rgba(199,155,59,0.18); }
+button, a, summary { touch-action: manipulation; } /* kills the 300ms double-tap zoom delay */
+
+:focus-visible { outline: 2px solid var(--accent-bright, #f0c75c); outline-offset: 2px; }
+
+/* ── Micro-animations (CSS only, subtle) ── */
+@media (prefers-reduced-motion: no-preference) {
+  button, .nav-pill, .primary-cta, .session-submit, .cal-btn, .admin-tab,
+  .auth-primary, .oauth-btn, .history-toggle {
+    transition-property: transform, background, border-color, color, box-shadow, filter, opacity;
+    transition-duration: 0.15s;
+  }
+  button:active, .nav-pill:active, .primary-cta:active, .session-submit:active,
+  .auth-primary:active, .oauth-btn:active {
+    transform: scale(0.97);
+  }
+
+  /* Cards drift in once on page load */
+  .mentee-card, .resource-card, .stat-tile, .s-card, .status-item, .mentor-card {
+    animation: portal-rise 0.4s ease-out backwards;
+  }
+  .mentee-card:nth-child(2), .resource-card:nth-child(2), .stat-tile:nth-child(2) { animation-delay: 0.05s; }
+  .mentee-card:nth-child(3), .resource-card:nth-child(3), .stat-tile:nth-child(3) { animation-delay: 0.1s; }
+  .mentee-card:nth-child(4), .stat-tile:nth-child(4) { animation-delay: 0.15s; }
+
+  .cal-modal__box { animation: portal-pop 0.18s ease-out; }
+  details[open] > *:not(summary) { animation: portal-fade 0.25s ease-out; }
+}
+
+@keyframes portal-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes portal-pop {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes portal-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Mobile QA fixes ── */
+@media (max-width: 700px) {
+  /* iOS zooms into any focused control under 16px — keep all inputs at 16px */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+
+  /* Minimum 44px tap targets (Apple HIG) for every same-role control */
+  .nav-pill, .signout-btn, .cal-btn, .admin-tab, .history-toggle,
+  .session-submit, .auth-primary, .oauth-btn, .primary-cta,
+  .mentee-notes__save, .mentor-notes__save, .fu-save, .drop-btn,
+  .log-another, .mark-link, .preview-btn {
+    min-height: 44px;
+  }
+  .mentee-notes__save, .mentor-notes__save, .fu-save, .drop-btn {
+    padding-top: 0.55rem;
+    padding-bottom: 0.55rem;
+  }
+
+  /* Calendar cells shrink on phones; keep chips tappable */
+  .cal-chip { min-height: 30px; display: flex; align-items: center; }
+
+  /* Modal sits above the keyboard comfortably */
+  .cal-modal { align-items: flex-start; padding-top: 3rem; }
+}
