@@ -74,10 +74,7 @@ function render(contacts) {
 
 function updateCount() {
   const n = document.querySelectorAll(".contact-card").length;
-  const el = document.getElementById("contacts-count");
-  el.textContent = n
-    ? `${n} new mentee${n === 1 ? "" : "s"} to add. Tap Save contact, then Message to say hi, then Mark done.`
-    : "All caught up. No new mentees to add right now.";
+  document.getElementById("contacts-count").textContent = n ? `${n} to add` : "";
   if (!n) document.getElementById("empty").hidden = false;
 }
 

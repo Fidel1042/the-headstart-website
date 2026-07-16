@@ -7,3 +7,9 @@
 
 [functions."monthly-pl"]
   schedule = "0 0 1 * *"
+
+# Mentor reminders. Runs hourly at :00 and :15; the function only sends at the
+# right Melbourne local time (weekdays 5:15pm, weekends 10am) and exits fast
+# otherwise. Hourly is needed so it stays correct across daylight saving.
+[functions."session-reminders"]
+  schedule = "0,15 * * * *"

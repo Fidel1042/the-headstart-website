@@ -16,7 +16,33 @@
   <meta name="description" content="Private mentor portal for The Headstart mentoring platform." />
   <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
-  <style id="auth-gate">html:not(.auth-ok) body { visibility: hidden; }</style>
+  <style id="auth-gate">
+    html:not(.auth-ok) body { visibility: hidden; }
+    html:not(.auth-ok) { background: #000; }
+    html:not(.auth-ok)::after {
+      content: ""; position: fixed; top: 50%; left: 50%;
+      width: 30px; height: 30px; margin: -15px 0 0 -15px;
+      border-radius: 50%; border: 3px solid rgba(255,255,255,0.18);
+      border-top-color: #c79b3b; animation: auth-spin 0.7s linear infinite;
+    }
+    @keyframes auth-spin { to { transform: rotate(360deg); } }
+  </style>
+  <script>
+    /* Failsafe: if the login check has not finished in 12s (e.g. the auth
+       library failed to load on a weak connection) swap the blank screen for
+       a reload prompt so nobody is ever stuck on a black screen. */
+    setTimeout(function () {
+      var r = document.documentElement;
+      if (!r.classList.contains("auth-ok")) {
+        r.classList.add("auth-ok");
+        if (document.body) document.body.innerHTML =
+          '<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;text-align:center;background:#000;color:#fff;font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif">' +
+          '<p style="font-size:1.05rem;max-width:340px;line-height:1.5">This page is taking too long to load. Check your internet, then reload.</p>' +
+          '<button onclick="location.reload()" style="padding:12px 26px;border-radius:999px;border:1px solid #c79b3b;background:transparent;color:#f0c75c;font-weight:700;font-size:0.9rem;cursor:pointer">Reload</button>' +
+          '</div>';
+      }
+    }, 12000);
+  </script>
   <script type="module">
     import { requireAuth, ALLOWED_MENTOR_EMAILS } from "./auth.js";
     import { mountPortalNav, initTheme } from "./portal-ui.js";
@@ -205,7 +231,7 @@
 
           logCard.hidden = true;
           successCard.hidden = false;
-          successDetail.textContent = `Session logged for ${result.menteeName}. It'll be billed in this week's charge run.`;
+          successDetail.textContent = `Logged for ${result.menteeName}.`;
           loadHistory();
 
           clearTimeout(window._successTimer);
@@ -282,26 +308,57 @@
       max-width: 760px;
     }
 
-    section.portal-section { margin-bottom: 3rem; }
+    /* ── Tabs ── */
+    .tab-panel { display: none; }
+    .tab-panel.is-active { display: block; }
 
-    /* ── Ordering: onboarding flips between top and bottom ── */
-    main { display: flex; flex-direction: column; }
-    .section-onboarding { order: 1; }
-    .section-log         { order: 2; }
-    .section-mentees     { order: 3; }
-    .section-history     { order: 4; }
-    .section-resources   { order: 5; }
-    [data-onboarded="true"] .section-onboarding { order: 99; }
-    [data-onboarded="true"] .section-log        { order: 1; }
-    [data-onboarded="true"] .section-mentees    { order: 2; }
-    [data-onboarded="true"] .section-history    { order: 3; }
-    [data-onboarded="true"] .section-resources  { order: 4; }
+    .tabbar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      z-index: 90;
+      display: flex;
+      justify-content: center;
+      background: var(--bg);
+      border-top: 1px solid var(--line);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    .tabbar__btn {
+      flex: 1 1 0;
+      max-width: 160px;
+      padding: 0.85rem 0.3rem;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: color 0.15s;
+    }
+    .tabbar__btn.is-active { color: var(--accent-bright); }
 
-    /* Onboarding incomplete vs complete states */
-    .onboarding-incomplete { display: block; }
-    .onboarding-complete { display: none; }
+    /* Clear the fixed tab bar (higher specificity than polish.css main rule) */
+    body main { padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px)) !important; }
+
+    /* Compact onboarding banner (shown on the Log tab until done) */
+    .onboarding-incomplete { display: block; margin-bottom: 1.2rem; }
+    .onboarding-complete { display: none; margin-bottom: 0.8rem; }
     [data-onboarded="true"] .onboarding-incomplete { display: none; }
     [data-onboarded="true"] .onboarding-complete { display: block; }
+    .ob-banner {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+      padding: 0.9rem 1.1rem;
+      border-radius: 12px;
+      border: 1px solid var(--accent-line);
+      background: rgba(199,155,59,0.05);
+    }
+    .ob-banner__text { flex: 1 1 160px; font-size: 0.9rem; color: var(--text); }
+    .ob-banner .primary-cta { padding: 0.6rem 1rem; }
 
     /* ── Primary card (Log Session + featured Onboarding) ── */
     .primary-card {
@@ -788,79 +845,42 @@
 
   <main>
 
-    <section class="hero">
-      <h1>Welcome to Headstart Mentor Portal</h1>
-      <p>This portal holds your onboarding module and all mentor resources. Bookmark it in your browser for quick access.</p>
-    </section>
-
-    <!-- ONBOARDING (top before completion, bottom after) -->
-    <section class="portal-section section-onboarding">
+    <!-- LOG -->
+    <section class="tab-panel is-active" data-panel="log">
       <div class="onboarding-incomplete">
-        <h2 class="section-label">Start here, before your first session</h2>
-        <div class="primary-card">
-          <div class="primary-card-content">
-            <div class="primary-card-eyebrow">Step 1 &middot; do this once</div>
-            <h2>Complete your mentor onboarding</h2>
-            <p>Three short modules: professional standards, how Headstart works, and session logs &amp; payment. Read these before you take your first mentee.</p>
-          </div>
-          <a class="primary-cta" href="../html/mentor-onboarding.html">
-            Start Onboarding <span class="arrow">&rarr;</span>
-          </a>
-        </div>
-        <div class="mark-link-wrap">
-          <button class="mark-link" id="mark-complete" type="button">I&rsquo;ve finished onboarding &mdash; mark as completed</button>
+        <div class="ob-banner">
+          <span class="ob-banner__text">Finish onboarding before your first session.</span>
+          <a class="primary-cta" href="../html/mentor-onboarding.html">Start <span class="arrow">&rarr;</span></a>
+          <button class="mark-link" id="mark-complete" type="button">Mark done</button>
         </div>
       </div>
-
       <div class="onboarding-complete">
-        <h2 class="section-label">Completed</h2>
-        <div class="completed-card">
-          <div class="completed-check">&#10003;</div>
-          <div class="text">
-            <div class="label">Onboarding done</div>
-            <div class="title">Mentor onboarding complete</div>
-          </div>
-          <a class="review" href="../html/mentor-onboarding.html">Review</a>
-          <button class="mark-link" id="mark-incomplete" type="button">Undo</button>
-        </div>
+        <button class="mark-link" id="mark-incomplete" type="button">Redo onboarding</button>
       </div>
-    </section>
-
-    <!-- LOG SESSION (primary daily action) -->
-    <section class="portal-section section-log" id="log-session">
-      <h2 class="section-label">After every session</h2>
 
       <div class="primary-card log-card" id="log-card">
-        <div class="primary-card-content">
-          <div class="primary-card-eyebrow">Within 24 hours &middot; required</div>
-          <h2>Log your session</h2>
-        </div>
         <form class="session-form" id="session-form">
           <div class="form-row-2">
             <div class="form-field">
               <label for="mentee-select">Mentee</label>
-              <select id="mentee-select">
-                <option value="">Loading&hellip;</option>
-              </select>
+              <select id="mentee-select"><option value="">Loading&hellip;</option></select>
             </div>
             <div class="form-field">
-              <label for="session-date">Session Date</label>
+              <label for="session-date">Session date</label>
               <input type="date" id="session-date" />
             </div>
           </div>
           <div class="form-row-2">
             <div class="form-field">
-              <label for="next-session-date">Next Session Date <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--accent);opacity:0.6">- Put tentative date if not confirmed</span></label>
+              <label for="next-session-date">Next session <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--accent);opacity:0.6">- tentative is fine</span></label>
               <input type="date" id="next-session-date" />
             </div>
           </div>
           <div class="form-field">
-            <label for="session-notes">Notes (optional)</label>
-            <textarea id="session-notes" placeholder="What did you cover? Any follow-ups for next session?"></textarea>
+            <label for="session-notes">Notes</label>
+            <textarea id="session-notes"></textarea>
           </div>
-          <button type="submit" class="session-submit" id="session-submit-btn">
-            Log Session &rarr;
-          </button>
+          <button type="submit" class="session-submit" id="session-submit-btn">Log session &rarr;</button>
           <p class="form-error" id="form-error" aria-live="polite"></p>
         </form>
       </div>
@@ -868,54 +888,49 @@
       <div class="success-card" id="success-card" hidden>
         <div class="success-icon">&#10003;</div>
         <div>
-          <div class="success-title">Session logged</div>
+          <div class="success-title">Logged</div>
           <div class="success-detail" id="success-detail"></div>
         </div>
         <button class="log-another" id="log-another-btn">Log another &rarr;</button>
       </div>
     </section>
 
-    <!-- MENTEE INFO (rendered by mentee-dashboard.js) -->
-    <section class="portal-section section-mentees" id="mentee-dash-section" hidden>
-      <span id="mentee-info" class="section-anchor"></span>
-      <h2 class="section-label">Mentee info</h2>
+    <!-- MENTEES -->
+    <section class="tab-panel" data-panel="mentees" id="mentee-dash-section">
       <div class="mentee-grid" id="mentee-grid"></div>
     </section>
 
-    <!-- SESSION HISTORY (rendered by session-history.js) -->
-    <section class="portal-section section-history" id="session-history">
-      <h2 class="section-label">Session history</h2>
+    <!-- HISTORY -->
+    <section class="tab-panel" data-panel="history">
       <div id="history-root"><p class="history-none">Loading&hellip;</p></div>
     </section>
 
     <!-- RESOURCES -->
-    <section class="portal-section section-resources" id="resources">
-      <h2 class="section-label">Run your sessions</h2>
+    <section class="tab-panel" data-panel="resources">
       <div class="resource-grid">
         <a class="resource-card" href="../html/tutor-resources.html">
-          <div class="resource-meta">
-            <span class="resource-num">01</span>
-          </div>
+          <div class="resource-meta"><span class="resource-num">01</span></div>
           <h3>Mentor Resource Hub</h3>
-          <p>Resume, LinkedIn, cover letter, networking, coffee chats, and the full interview question bank. Share specific sections with mentees as needed.</p>
-          <span class="resource-arrow">Open hub <span class="arrow-icon">&rarr;</span></span>
+          <p>Resume, LinkedIn, cover letters, networking, interview questions.</p>
+          <span class="resource-arrow">Open <span class="arrow-icon">&rarr;</span></span>
         </a>
-
         <a class="resource-card" href="https://docs.google.com/document/d/1D_OHsA1uESXiiDrlh8nydSpFhxg8RlTP17M97_UWejM/edit?usp=sharing" target="_blank" rel="noopener">
-          <div class="resource-meta">
-            <span class="resource-num">02</span>
-            <span class="resource-ext">Google Doc</span>
-          </div>
+          <div class="resource-meta"><span class="resource-num">02</span><span class="resource-ext">Google Doc</span></div>
           <h3>Stand Out &amp; Break In Tracker</h3>
-          <p>Per-mentee progress tracker. Copy this doc for each new mentee, fill it in together, and revisit every session.</p>
-          <span class="resource-arrow">Open tracker <span class="arrow-icon">&rarr;</span></span>
+          <p>Per-mentee progress tracker. Copy one per mentee.</p>
+          <span class="resource-arrow">Open <span class="arrow-icon">&rarr;</span></span>
         </a>
       </div>
     </section>
 
-    <p class="footer-note">Private to Headstart mentors &middot; Do not share outside the team</p>
-
   </main>
+
+  <nav class="tabbar" id="tabbar" aria-label="Sections">
+    <button class="tabbar__btn is-active" type="button" data-tab="log">Log</button>
+    <button class="tabbar__btn" type="button" data-tab="mentees">Mentees</button>
+    <button class="tabbar__btn" type="button" data-tab="history">History</button>
+    <button class="tabbar__btn" type="button" data-tab="resources">Resources</button>
+  </nav>
 
   <script>
     (function () {
@@ -943,6 +958,35 @@
       document.getElementById('mark-incomplete').addEventListener('click', function () {
         applyOnboarded(false);
       });
+
+      /* ── Bottom tabs ── */
+      var TAB_KEY = 'headstart_portal_tab';
+      var tabbar = document.getElementById('tabbar');
+      function showTab(name) {
+        var panels = document.querySelectorAll('.tab-panel');
+        var found = false;
+        panels.forEach(function (p) {
+          var on = p.getAttribute('data-panel') === name;
+          p.classList.toggle('is-active', on);
+          if (on) found = true;
+        });
+        if (!found) name = 'log';
+        document.querySelectorAll('.tab-panel').forEach(function (p) {
+          p.classList.toggle('is-active', p.getAttribute('data-panel') === name);
+        });
+        tabbar.querySelectorAll('.tabbar__btn').forEach(function (b) {
+          b.classList.toggle('is-active', b.getAttribute('data-tab') === name);
+        });
+        try { localStorage.setItem(TAB_KEY, name); } catch (e) {}
+        window.scrollTo(0, 0);
+      }
+      tabbar.addEventListener('click', function (e) {
+        var b = e.target.closest('.tabbar__btn');
+        if (b) showTab(b.getAttribute('data-tab'));
+      });
+      var savedTab = 'log';
+      try { savedTab = localStorage.getItem(TAB_KEY) || 'log'; } catch (e) {}
+      showTab(savedTab);
     })();
   </script>
 

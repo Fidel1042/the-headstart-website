@@ -1,0 +1,158 @@
+// session-reminders.js — scheduled job that emails mentors:
+//   1. Upcoming: a session they booked for tomorrow.
+//   2. Reach out: an active mentee whose last session was 10+ days ago with no
+//      future session booked. Nudged weekly (day 10, 17, 24 ...) so it is not
+//      a daily nag.
+// Runs hourly (netlify.toml) but only sends at the Melbourne send window:
+// weekdays 5:15pm, weekends 10am. Sends via Brevo, same sender as the payslips.
+// Manual dry run (no emails, ignores the time window):
+//   /.netlify/functions/session-reminders?dryRun=1
+
+const SENDER = { name: "The Headstart", email: "theuniheadstart@gmail.com" };
+const TZ = "Australia/Sydney";
+const REACH_OUT_DAYS = 10;
+const PORTAL = "https://theheadstartmentoring.com/mentor-portal/";
+
+const ymd = (date) =>
+  new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" }).format(date);
+
+// Melbourne local weekday + hour + minute (the job runs hourly at :00 and :15
+// UTC; Melbourne is a whole-hour offset so the minutes line up).
+function melbNow() {
+  const p = new Intl.DateTimeFormat("en-US", { timeZone: TZ, weekday: "short", hour: "2-digit", minute: "2-digit", hour12: false }).formatToParts(new Date());
+  const get = (t) => (p.find((x) => x.type === t) || {}).value;
+  return { weekday: get("weekday"), hour: parseInt(get("hour"), 10) % 24, minute: parseInt(get("minute"), 10) };
+}
+const addDays = (s, n) => { const d = new Date(s + "T00:00:00Z"); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+const daysBetween = (a, b) => Math.round((new Date(b + "T00:00:00Z") - new Date(a + "T00:00:00Z")) / 86400000);
+const esc = (s) => String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const firstName = (n) => String(n || "there").trim().split(/\s+/)[0];
+
+async function fetchAll(baseId, tableId, fields, token) {
+  const records = [];
+  let offset = null;
+  do {
+    const url = `https://api.airtable.com/v0/${baseId}/${tableId}` +
+      `?${fields.map((f) => `fields[]=${encodeURIComponent(f)}`).join("&")}` +
+      (offset ? `&offset=${offset}` : "");
+    const res = await fetch(url, { headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message || "Airtable error");
+    records.push(...(data.records || []));
+    offset = data.offset || null;
+  } while (offset);
+  return records;
+}
+
+async function sendEmail(apiKey, to, name, subject, html) {
+  await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: { "api-key": apiKey, "Content-Type": "application/json" },
+    body: JSON.stringify({ sender: SENDER, to: [{ email: to, name }], subject, htmlContent: html }),
+  });
+}
+
+function buildEmail(b) {
+  let h = `<p>Hi ${esc(firstName(b.name))},</p>`;
+  if (b.tomorrow.length) {
+    h += `<p><strong>Session${b.tomorrow.length > 1 ? "s" : ""} booked for tomorrow:</strong></p><ul>` +
+      b.tomorrow.map((n) => `<li>${esc(n)}</li>`).join("") + `</ul>`;
+  }
+  if (b.reachout.length) {
+    h += `<p><strong>Time to reach out.</strong> No session is booked and their last one was a while ago:</p><ul>` +
+      b.reachout.map((r) => `<li>${esc(r.name)}, last session ${r.gap} days ago</li>`).join("") + `</ul>` +
+      `<p>Send them a message to lock in the next session.</p>`;
+  }
+  h += `<p>Log your sessions in the <a href="${PORTAL}">Mentor Portal</a>.</p>`;
+  return h;
+}
+
+exports.handler = async (event) => {
+  const {
+    AIRTABLE_API_TOKEN, AIRTABLE_CORE_BASE_ID, AIRTABLE_BASE_ID,
+    AIRTABLE_MENTEE_TABLE_ID, AIRTABLE_SESSION_TABLE_ID, BREVO_API_KEY,
+  } = process.env;
+
+  const dryRun = Boolean(event && event.queryStringParameters && event.queryStringParameters.dryRun);
+
+  // Send window: weekdays 5:15pm, weekends 10:00am Melbourne. Every other
+  // hourly run exits here before touching Airtable. Dry runs bypass the gate.
+  const m = melbNow();
+  const isWeekend = m.weekday === "Sat" || m.weekday === "Sun";
+  const inWindow = isWeekend ? (m.hour === 10 && m.minute === 0) : (m.hour === 17 && m.minute === 15);
+  if (!dryRun && !inWindow) {
+    return { statusCode: 200, body: JSON.stringify({ skipped: true, melb: m }) };
+  }
+
+  const today = ymd(new Date());
+  const tomorrow = addDays(today, 1);
+
+  try {
+    // Active, acquired mentees with a mentor assigned.
+    const menteeRecs = await fetchAll(AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTEE_TABLE_ID,
+      ["Name", "Client Pipeline", "Mentor Email Plain", "Mentor Name"], AIRTABLE_API_TOKEN);
+    const active = new Map();
+    menteeRecs.forEach((r) => {
+      const f = r.fields;
+      const email = (f["Mentor Email Plain"] || "").toLowerCase().trim();
+      if ((f["Client Pipeline"] || "") === "Acquired" && email) {
+        const mn = f["Mentor Name"];
+        active.set(r.id, {
+          name: f["Name"] || "",
+          mentorEmail: email,
+          mentorName: (Array.isArray(mn) ? mn[0] : mn) || email,
+        });
+      }
+    });
+
+    // Session history for those mentees.
+    const rows = await fetchAll(AIRTABLE_BASE_ID, AIRTABLE_SESSION_TABLE_ID,
+      ["Date", "Next Session", "Mentee Record ID", "Payment Status", "Amount Charged"], AIRTABLE_API_TOKEN);
+    const agg = new Map(); // menteeId -> { lastDate, hasFuture, tomorrow }
+    rows.forEach((r) => {
+      const f = r.fields;
+      const id = f["Mentee Record ID"] || "";
+      if (!active.has(id)) return;
+      const purchase = f["Payment Status"] === "Package" && (parseFloat(f["Amount Charged"]) || 0) > 0;
+      const date = (f["Date"] || "").slice(0, 10);
+      const next = (f["Next Session"] || "").slice(0, 10);
+      const a = agg.get(id) || { lastDate: "", hasFuture: false, tomorrow: false };
+      if (date && !purchase && date > a.lastDate) a.lastDate = date;
+      if (next && next >= today) a.hasFuture = true;
+      if (next === tomorrow) a.tomorrow = true;
+      agg.set(id, a);
+    });
+
+    // Group reminders by mentor.
+    const byMentor = new Map();
+    const bucket = (email, name) => {
+      if (!byMentor.has(email)) byMentor.set(email, { name, tomorrow: [], reachout: [] });
+      return byMentor.get(email);
+    };
+    active.forEach((m, id) => {
+      const a = agg.get(id);
+      if (!a) return;
+      if (a.tomorrow) bucket(m.mentorEmail, m.mentorName).tomorrow.push(m.name);
+      if (a.lastDate && !a.hasFuture) {
+        const gap = daysBetween(a.lastDate, today);
+        if (gap >= REACH_OUT_DAYS && (gap - REACH_OUT_DAYS) % 7 === 0) {
+          bucket(m.mentorEmail, m.mentorName).reachout.push({ name: m.name, gap });
+        }
+      }
+    });
+
+    // Send (or preview on a dry run).
+    const summary = [];
+    let sent = 0;
+    for (const [email, b] of byMentor) {
+      if (!b.tomorrow.length && !b.reachout.length) continue;
+      const subject = b.tomorrow.length ? "Reminder: you have a session tomorrow" : "A mentee to reach out to";
+      summary.push({ mentor: email, tomorrow: b.tomorrow, reachout: b.reachout.map((r) => r.name) });
+      if (!dryRun && BREVO_API_KEY) { await sendEmail(BREVO_API_KEY, email, b.name, subject, buildEmail(b)); sent++; }
+    }
+
+    return { statusCode: 200, body: JSON.stringify({ date: today, dryRun, mentorsEmailed: sent, summary }) };
+  } catch (err) {
+    return { statusCode: 500, body: JSON.stringify({ error: err.message || "Reminder job failed" }) };
+  }
+};

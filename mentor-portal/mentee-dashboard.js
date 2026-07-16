@@ -25,6 +25,13 @@ function fmtDate(dateStr) {
   return d.toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" });
 }
 
+function fmtShort(dateStr) {
+  if (!dateStr) return "";
+  const d = new Date(dateStr.slice(0, 10) + "T00:00:00");
+  if (isNaN(d)) return "";
+  return d.toLocaleDateString("en-AU", { day: "numeric", month: "short" });
+}
+
 // Green within 1 week, yellow 1–2 weeks, red past 2 weeks.
 function cadence(days) {
   if (days === null) return { tone: "", label: "No sessions yet" };
@@ -53,44 +60,37 @@ const esc = (s) => String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").
 function card(mentee, s) {
   const pill = cadence(s.days);
   const isPackage = mentee.billingType === "Package";
-  const sessionsNum = isPackage ? `${s.count}/${PACKAGE_TOTAL}` : `${s.count}`;
-  const sessionsLabel = isPackage ? "package sessions" : `session${s.count === 1 ? "" : "s"} done`;
+  const sessions = isPackage ? `${s.count}/${PACKAGE_TOTAL} sessions` : `${s.count} session${s.count === 1 ? "" : "s"}`;
+  const daysTxt = s.days === null ? "no sessions" : `${s.days}d since`;
+  const nextTxt = s.next ? `next ${fmtShort(s.next)}` : "no next date";
   return `
     <article class="mentee-card">
       <div class="mentee-card__head">
-        <div>
-          <h3 class="mentee-card__name">${esc(mentee.name)}</h3>
-          <p class="mentee-card__billing">${isPackage ? `Package · ${s.count}/${PACKAGE_TOTAL} used` : "Per session"}</p>
-        </div>
+        <h3 class="mentee-card__name">${esc(mentee.name)}</h3>
         <span class="status-pill ${pill.tone ? "status-pill--" + pill.tone : ""}">${pill.label}</span>
       </div>
-      <div class="mentee-card__stats">
-        <div class="mentee-stat">
-          <span class="mentee-stat__num">${sessionsNum}</span>
-          <span class="mentee-stat__label">${sessionsLabel}</span>
-        </div>
-        <div class="mentee-stat">
-          <span class="mentee-stat__num${pill.tone ? " tone-" + pill.tone : ""}">${s.days === null ? "—" : s.days + "d"}</span>
-          <span class="mentee-stat__label">since last</span>
-        </div>
-      </div>
-      <div class="mentee-card__rows">
-        <div class="info-row"><span class="info-row__label">Last session</span><span class="info-row__val">${s.last ? `${fmtDate(s.last)}` : "—"}</span></div>
-        <div class="info-row"><span class="info-row__label">Next session</span><span class="info-row__val">${s.next ? fmtDate(s.next) : "Not booked"}</span></div>
-        <div class="info-row"><span class="info-row__label">Target industry</span><span class="info-row__val">${esc(mentee.industry) || "—"}</span></div>
-        <div class="info-row"><span class="info-row__label">Major</span><span class="info-row__val">${esc(mentee.major) || "—"}</span></div>
-        <div class="info-row"><span class="info-row__label">Year</span><span class="info-row__val">${esc(mentee.year) || "—"}</span></div>
-      </div>
+      <p class="mentee-card__line">${sessions} <span class="sep">&middot;</span> <span class="${pill.tone ? "tone-" + pill.tone : ""}">${daysTxt}</span> <span class="sep">&middot;</span> ${nextTxt}</p>
       <details class="mentee-card__more">
-        <summary>Recommended structure</summary>
-        <p class="mentee-card__plan">${esc(mentee.plan) || "—"}</p>
-      </details>
-      <details class="mentee-card__more">
-        <summary>Notes</summary>
-        <textarea class="mentee-notes" data-id="${mentee.id}" rows="4">${esc(mentee.notes)}</textarea>
-        <div class="mentee-notes__row">
-          <button type="button" class="mentee-notes__save" data-id="${mentee.id}">Save notes</button>
-          <span class="mentee-notes__state" data-state="${mentee.id}"></span>
+        <summary>Details</summary>
+        <div class="mentee-detail">
+          <div class="info-row"><span class="info-row__label">Billing</span><span class="info-row__val">${isPackage ? `Package ${s.count}/${PACKAGE_TOTAL}` : "Per session"}</span></div>
+          <div class="info-row"><span class="info-row__label">Last session</span><span class="info-row__val">${s.last ? fmtDate(s.last) : "—"}</span></div>
+          <div class="info-row"><span class="info-row__label">Next session</span><span class="info-row__val">${s.next ? fmtDate(s.next) : "Not booked"}</span></div>
+          <div class="info-row"><span class="info-row__label">Target industry</span><span class="info-row__val">${esc(mentee.industry) || "—"}</span></div>
+          <div class="info-row"><span class="info-row__label">Major</span><span class="info-row__val">${esc(mentee.major) || "—"}</span></div>
+          <div class="info-row"><span class="info-row__label">Year</span><span class="info-row__val">${esc(mentee.year) || "—"}</span></div>
+          <div class="mentee-detail__block">
+            <span class="info-row__label">Recommended structure</span>
+            <p class="mentee-card__plan">${esc(mentee.plan) || "—"}</p>
+          </div>
+          <div class="mentee-detail__block">
+            <span class="info-row__label">Notes</span>
+            <textarea class="mentee-notes" data-id="${mentee.id}" rows="3">${esc(mentee.notes)}</textarea>
+            <div class="mentee-notes__row">
+              <button type="button" class="mentee-notes__save" data-id="${mentee.id}">Save</button>
+              <span class="mentee-notes__state" data-state="${mentee.id}"></span>
+            </div>
+          </div>
         </div>
       </details>
     </article>`;
@@ -123,13 +123,11 @@ async function saveNotes(id, grid) {
 
 /** Render the dashboard. Safe to call repeatedly (e.g. after logging a session). */
 export function renderMenteeDashboard({ mentees = [], sessions = [], mentorEmail = "" } = {}) {
-  const section = document.getElementById("mentee-dash-section");
   const grid = document.getElementById("mentee-grid");
-  if (!section || !grid) return;
+  if (!grid) return;
   if (mentorEmail) currentMentorEmail = mentorEmail;
 
-  if (!mentees.length) { section.hidden = true; return; }
-  section.hidden = false;
+  if (!mentees.length) { grid.innerHTML = '<p class="history-none">No mentees yet.</p>'; return; }
 
   // Re-renders happen after logging a session — keep any unsaved notes text
   // and open/closed state so the mentor doesn't lose what they were typing.

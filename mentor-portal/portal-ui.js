@@ -20,14 +20,6 @@ export function initTheme() {
   applyTheme(saved);
 }
 
-// Section links every mentor sees; they all live on the portal home page.
-const SECTION_LINKS = [
-  { href: "/mentor-portal/index.html#log-session", label: "Session Log" },
-  { href: "/mentor-portal/index.html#mentee-info", label: "Mentee Info" },
-  { href: "/mentor-portal/index.html#session-history", label: "Session History" },
-  { href: "/mentor-portal/index.html#resources", label: "Resources" },
-];
-
 const OWNER_LINKS = [
   { href: "/consultation-tool/index.html", label: "Consultation", page: "consultation" },
   { href: "/mentor-portal/contacts.html", label: "Contacts", page: "contacts" },
@@ -54,10 +46,6 @@ export function mountPortalNav({ email = "", isOwner = false, active = "" } = {}
       ).join("")
     : "";
 
-  const sectionLinks = SECTION_LINKS
-    .map((l) => `<a href="${l.href}" class="nav-link">${l.label}</a>`)
-    .join("");
-
   mount.innerHTML = `
     <header class="top-nav">
       <div class="top-nav-inner">
@@ -68,7 +56,6 @@ export function mountPortalNav({ email = "", isOwner = false, active = "" } = {}
           <span class="top-nav-title">Mentor Portal</span>
           <span class="top-nav-subtitle">Internal use only</span>
         </div>
-        <nav class="top-nav-links" aria-label="Portal sections">${sectionLinks}</nav>
         <div class="top-nav-actions">
           <select id="view-as" class="nav-pill" style="display:none;" title="View the portal as a mentor" aria-label="View as mentor"></select>
           ${ownerLinks}

@@ -1,136 +1,93 @@
-/* dashboard.css — "Mentee info" cards on the portal home. */
+/* dashboard.css — compact mentee list on the Mentees tab.
+   Industry pattern: a scannable summary row per mentee, full detail on tap. */
 
 .mentee-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-  gap: 1.1rem;
-  align-items: stretch;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 0.6rem;
+  align-items: start;
 }
 
 .mentee-card {
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-  padding: 1.4rem 1.5rem;
-  border-radius: 16px;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
   border: 1px solid var(--line);
   background: var(--bg-card);
-  transition: border-color 0.18s, background 0.18s;
+  transition: border-color 0.15s, background 0.15s;
 }
 .mentee-card:hover { border-color: var(--accent-line); background: var(--bg-card-hover); }
 
 .mentee-card__head {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 0.6rem;
-  /* reserve name + billing line so stats align across sibling cards */
-  min-height: 3em;
 }
 .mentee-card__name {
-  font-size: 1.05rem;
+  font-size: 0.98rem;
   font-weight: 700;
-  line-height: 1.3;
   color: var(--text);
   letter-spacing: -0.01em;
 }
-.mentee-card__billing {
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin-top: 0.15rem;
-}
 .mentee-card__head .status-pill { flex-shrink: 0; }
 
-.mentee-card__stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
+/* One-line summary: sessions, days since (colour-coded), next date */
+.mentee-card__line {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 0.3rem;
 }
-.mentee-stat {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-  padding: 0.65rem 0.85rem;
-  border-radius: 10px;
-  border: 1px solid var(--line-soft);
-  background: rgba(199,155,59,0.05);
-}
-.mentee-stat__num {
-  font-size: 1.35rem;
-  font-weight: 800;
-  color: var(--accent-bright);
-  font-variant-numeric: tabular-nums;
-  line-height: 1.15;
-}
-.mentee-stat__num.tone-ok   { color: var(--ok); }
-.mentee-stat__num.tone-warn { color: var(--warn); }
-.mentee-stat__num.tone-bad  { color: var(--bad); }
-.mentee-stat__label {
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--accent);
-}
+.mentee-card__line .sep { opacity: 0.4; margin: 0 0.15rem; }
+.mentee-card__line .tone-ok { color: var(--ok); font-weight: 600; }
+.mentee-card__line .tone-warn { color: var(--warn); font-weight: 600; }
+.mentee-card__line .tone-bad { color: var(--bad); font-weight: 600; }
 
-/* ── Labeled info rows (dates, school, year) ── */
-.mentee-card__rows {
-  display: flex;
-  flex-direction: column;
-  border-top: 1px solid var(--line-soft);
-}
-.info-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 0.8rem;
-  padding: 0.42rem 0;
-  border-bottom: 1px solid var(--line-soft);
-}
-.info-row:last-child { border-bottom: none; }
-.info-row__label {
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: var(--accent);
-  white-space: nowrap;
-}
-.info-row__val {
-  font-size: 0.85rem;
-  color: var(--text);
-  text-align: right;
-}
-
-/* ── Expandable structure + notes ── */
-.mentee-card__more {
-  border-top: 1px solid var(--line-soft);
-  padding-top: 0.6rem;
-}
-.mentee-card__more:first-of-type { margin-top: auto; } /* pin the group to the card bottom */
+/* Details on tap */
+.mentee-card__more { margin-top: 0.5rem; }
 .mentee-card__more summary {
   cursor: pointer;
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.09em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--accent);
   list-style-position: inside;
 }
 .mentee-card__more summary:hover { color: var(--accent-bright); }
+.mentee-detail { padding-top: 0.5rem; }
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.8rem;
+  padding: 0.38rem 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+.info-row:last-child { border-bottom: none; }
+.info-row__label {
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.info-row__val { font-size: 0.84rem; color: var(--text); text-align: right; }
+
+.mentee-detail__block { padding: 0.55rem 0; border-bottom: 1px solid var(--line-soft); }
+.mentee-detail__block:last-child { border-bottom: none; }
 .mentee-card__plan {
-  font-size: 0.85rem;
-  line-height: 1.6;
+  font-size: 0.84rem;
+  line-height: 1.55;
   color: var(--text);
-  padding: 0.6rem 0 0.2rem;
+  padding-top: 0.3rem;
   white-space: pre-line;
 }
+
 .mentee-notes {
   width: 100%;
-  margin-top: 0.6rem;
+  margin-top: 0.4rem;
   background: rgba(255,255,255,0.05);
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -138,34 +95,25 @@
   font-family: inherit;
   font-size: 0.85rem;
   line-height: 1.5;
-  padding: 0.6rem 0.75rem;
+  padding: 0.55rem 0.7rem;
   resize: vertical;
 }
 [data-theme="light"] .mentee-notes { background: rgba(0,0,0,0.03); }
-.mentee-notes:focus {
-  outline: none;
-  border-color: var(--accent-line);
-  box-shadow: 0 0 0 2px var(--accent-soft);
-}
-.mentee-notes__row {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  margin-top: 0.5rem;
-}
+.mentee-notes:focus { outline: none; border-color: var(--accent-line); box-shadow: 0 0 0 2px var(--accent-soft); }
+.mentee-notes__row { display: flex; align-items: center; gap: 0.7rem; margin-top: 0.45rem; }
 .mentee-notes__save {
   background: transparent;
   border: 1px solid var(--accent-line);
   color: var(--accent-bright);
   border-radius: 999px;
-  padding: 0.35rem 0.9rem;
+  padding: 0.3rem 0.9rem;
   font-family: inherit;
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.15s;
 }
 .mentee-notes__save:hover { background: var(--accent-soft); }
 .mentee-notes__save:disabled { opacity: 0.55; cursor: default; }
@@ -173,5 +121,5 @@
 
 @media (max-width: 700px) {
   .mentee-grid { grid-template-columns: 1fr; }
-  .mentee-card__head { min-height: 0; }
+  .mentee-notes__save { min-height: 40px; }
 }
