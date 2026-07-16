@@ -8,10 +8,9 @@
 // Manual dry run (no emails, ignores the time window):
 //   /.netlify/functions/session-reminders?dryRun=1
 
-const SENDER = { name: "The Headstart", email: "theuniheadstart@gmail.com" };
+const SENDER = { name: "The Headstart", email: "fidel@theheadstartmentoring.com" };
 const TZ = "Australia/Sydney";
 const REACH_OUT_DAYS = 10;
-const PORTAL = "https://theheadstartmentoring.com/mentor-portal/";
 
 const ymd = (date) =>
   new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" }).format(date);
@@ -52,18 +51,32 @@ async function sendEmail(apiKey, to, name, subject, html) {
   });
 }
 
+function boldNames(names) {
+  const b = names.map((n) => `<strong>${esc(n)}</strong>`);
+  if (b.length === 1) return b[0];
+  return b.slice(0, -1).join(", ") + " and " + b[b.length - 1];
+}
+
+// A ready-to-paste message the mentor can copy into the group.
+function copyBox(name) {
+  const msg = `Hi ${firstName(name)}, hope everything is well! Just checking in to set up another session date so we keep up with the momentum. How does [insert available time yourself] sound?`;
+  return `<div style="margin:8px 0 18px;padding:12px 14px;border:1px solid #d9d3c4;border-radius:8px;background:#faf8f2;color:#333;white-space:pre-wrap">${esc(msg)}</div>`;
+}
+
 function buildEmail(b) {
   let h = `<p>Hi ${esc(firstName(b.name))},</p>`;
   if (b.tomorrow.length) {
-    h += `<p><strong>Session${b.tomorrow.length > 1 ? "s" : ""} booked for tomorrow:</strong></p><ul>` +
-      b.tomorrow.map((n) => `<li>${esc(n)}</li>`).join("") + `</ul>`;
+    const s = b.tomorrow.length === 1
+      ? `a session with ${boldNames(b.tomorrow)}`
+      : `sessions with ${boldNames(b.tomorrow)}`;
+    h += `<p>You have ${s} tomorrow!<br>Reach out in the whatsapp group if you need to reschedule.</p>`;
   }
-  if (b.reachout.length) {
-    h += `<p><strong>Time to reach out.</strong> No session is booked and their last one was a while ago:</p><ul>` +
-      b.reachout.map((r) => `<li>${esc(r.name)}, last session ${r.gap} days ago</li>`).join("") + `</ul>` +
-      `<p>Send them a message to lock in the next session.</p>`;
-  }
-  h += `<p>Log your sessions in the <a href="${PORTAL}">Mentor Portal</a>.</p>`;
+  b.reachout.forEach((r, i) => {
+    const lead = (i === 0 && b.tomorrow.length) ? "Also, just a heads up" : "Just a heads up";
+    h += `<p>${lead} - <strong>${esc(r.name)}'s</strong> last session was ${r.gap} days ago and nothing's booked yet.</p>` +
+      `<p>Might be worth reaching out to check in with them!<br>Here's a message you can send to the group:</p>` +
+      copyBox(r.name);
+  });
   return h;
 }
 

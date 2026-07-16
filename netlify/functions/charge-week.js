@@ -226,7 +226,7 @@ exports.handler = async (event) => {
       method: "POST",
       headers: { "api-key": BREVO_API_KEY, "Content-Type": "application/json" },
       body: JSON.stringify({
-        sender:  { name: "The Headstart", email: "theuniheadstart@gmail.com" },
+        sender:  { name: "The Headstart", email: "fidel@theheadstartmentoring.com" },
         to:      [{ email: "fidelhon@gmail.com", name: "Fidel" }],
         subject: `Weekly charge — $${chargedTotal.toFixed(2)} charged${failed.length ? `, ${failed.length} to do manually` : ""}`,
         htmlContent: html,

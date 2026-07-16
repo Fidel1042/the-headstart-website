@@ -201,7 +201,7 @@ exports.handler = async (event) => {
             method: "POST",
             headers: { "api-key": process.env.BREVO_API_KEY, "Content-Type": "application/json" },
             body: JSON.stringify({
-              sender:  { name: "The Headstart", email: "theuniheadstart@gmail.com" },
+              sender:  { name: "The Headstart", email: "fidel@theheadstartmentoring.com" },
               to:      [{ email: "fidelhon@gmail.com", name: "Fidel" }],
               subject: `Package complete — ${menteeName} used all ${PACKAGE_TOTAL} sessions`,
               htmlContent: `<p><strong>${menteeName}</strong> (mentor ${mentorName}) just completed session ${delivered} of ${PACKAGE_TOTAL} — their package is fully used.</p><p>Time to follow up on a renewal.</p>`,

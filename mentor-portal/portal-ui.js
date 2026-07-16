@@ -57,8 +57,11 @@ export function mountPortalNav({ email = "", isOwner = false, active = "" } = {}
           <span class="top-nav-subtitle">Internal use only</span>
         </div>
         <div class="top-nav-actions">
-          <select id="view-as" class="nav-pill" style="display:none;" title="View the portal as a mentor" aria-label="View as mentor"></select>
-          ${ownerLinks}
+          ${isOwner ? '<button class="nav-burger" id="nav-burger" type="button" aria-label="Menu">&#9776;</button>' : ""}
+          <div class="nav-owner" id="nav-owner">
+            <select id="view-as" class="nav-pill" style="display:none;" title="View the portal as a mentor" aria-label="View as mentor"></select>
+            ${ownerLinks}
+          </div>
           <span class="user-chip" id="user-chip" ${email ? "" : "hidden"}></span>
           <button class="nav-pill" id="theme-toggle" type="button" title="Switch between light and dark mode">Light mode</button>
           <button class="nav-pill" id="signout-btn" type="button" title="Sign out">Sign out</button>
@@ -80,6 +83,15 @@ export function mountPortalNav({ email = "", isOwner = false, active = "" } = {}
     e.preventDefault();
     signOut();
   });
+
+  // Mobile hamburger: the owner links collapse into a dropdown so they do not
+  // stack across the top bar on a phone.
+  const burger = document.getElementById("nav-burger");
+  if (burger) {
+    const nav = mount.querySelector(".top-nav");
+    burger.addEventListener("click", (e) => { e.stopPropagation(); nav.classList.toggle("menu-open"); });
+    document.addEventListener("click", () => nav.classList.remove("menu-open"));
+  }
 
   return mount;
 }
