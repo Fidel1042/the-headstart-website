@@ -30,6 +30,7 @@ const SECTION_LINKS = [
 
 const OWNER_LINKS = [
   { href: "/consultation-tool/index.html", label: "Consultation", page: "consultation" },
+  { href: "/mentor-portal/contacts.html", label: "Contacts", page: "contacts" },
   { href: "/mentor-portal/billing.html", label: "Billing", page: "billing" },
   { href: "/mentor-portal/pl.html", label: "P&amp;L", page: "pl" },
   { href: "/mentor-portal/payslips.html", label: "Payslips", page: "payslips" },

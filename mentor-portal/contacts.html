@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <title>Contacts to add – The Headstart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#000000" />
+  <link rel="manifest" href="/mentor-portal/manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="/mentor-portal/icons/icon-180.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name="apple-mobile-web-app-title" content="Headstart" />
+  <meta name="format-detection" content="telephone=no" />
+  <script defer src="/mentor-portal/pwa.js"></script>
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+  <style id="auth-gate">html:not(.auth-ok) body { visibility: hidden; }</style>
+  <link rel="stylesheet" href="portal.css" />
+  <link rel="stylesheet" href="contacts.css" />
+  <link rel="stylesheet" href="/mentor-portal/polish.css" />
+</head>
+<body>
+
+  <div id="portal-nav"></div>
+
+  <main class="contacts-page">
+    <h1 class="contacts-title">Contacts to add</h1>
+    <p class="contacts-intro" id="contacts-count">New mentees to save into WhatsApp. Tap Save contact, then Message to say hi, then Mark done.</p>
+
+    <p class="state-loading" id="loading">Loading</p>
+    <p class="state-empty" id="empty" hidden>All caught up. No new mentees to add right now.</p>
+    <p class="state-empty" id="error" hidden></p>
+
+    <div class="contact-list" id="contact-list"></div>
+  </main>
+
+  <script type="module" src="contacts.js"></script>
+
+</body>
+</html>
