@@ -50,6 +50,21 @@ export function isAllowedEmail(email) {
     .includes(email.trim().toLowerCase());
 }
 
+/**
+ * Ask the browser to remember this login so the phone can autofill it behind
+ * Face ID / fingerprint next time. Uses the Credential Management API where
+ * available (Chrome, Android); on iOS Safari the browser's own save prompt
+ * handles it through the form's autocomplete attributes. Never blocks login.
+ */
+export async function saveCredential(id, password) {
+  try {
+    if (window.PasswordCredential && id && password) {
+      const cred = new window.PasswordCredential({ id, password });
+      await navigator.credentials.store(cred);
+    }
+  } catch (_) { /* saving is a convenience, never surface an error */ }
+}
+
 /** Get the current session (or null). */
 export async function getSession() {
   const { data, error } = await supabase.auth.getSession();

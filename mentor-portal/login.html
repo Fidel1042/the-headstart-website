@@ -62,7 +62,7 @@
   </main>
 
   <script type="module">
-    import { supabase, getSession } from "./auth.js";
+    import { supabase, getSession, saveCredential } from "./auth.js";
 
     const params = new URLSearchParams(window.location.search);
     const nextPath = params.get("next") || "./";
@@ -106,6 +106,8 @@
         showError(error.message || "Could not sign in. Check your email and password.");
         return;
       }
+      // Prompt the phone to remember this login for Face ID autofill next time.
+      await saveCredential(email, password);
       window.location.replace(nextPath);
     });
 

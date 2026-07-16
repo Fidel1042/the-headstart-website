@@ -12,6 +12,14 @@ main, .page, .admin-page {
   padding-bottom: calc(3rem + env(safe-area-inset-bottom, 0px));
 }
 
+/* ── Never let the page rock sideways ──
+   overflow-x: clip stops horizontal drift WITHOUT creating a scroll container,
+   so the sticky nav keeps working (plain overflow-x: hidden would break it).
+   Wide content (tables, calendar) scrolls inside its own strip instead. */
+html, body { overflow-x: clip; }
+img, video { max-width: 100%; height: auto; }
+/* Wide tables must keep their natural width so their wrapper can scroll them. */
+
 /* ── General mobile-app niceties ── */
 html { overscroll-behavior-y: none; }
 body { -webkit-tap-highlight-color: rgba(199,155,59,0.18); }
@@ -80,4 +88,53 @@ button, a, summary { touch-action: manipulation; } /* kills the 300ms double-tap
 
   /* Modal sits above the keyboard comfortably */
   .cal-modal { align-items: flex-start; padding-top: 3rem; }
+
+  /* ── Nav: compact two rows instead of a tall wrapping pile ── */
+  .top-nav-inner { padding: 0.7rem 1rem; gap: 0.5rem 0.6rem; row-gap: 0.55rem; }
+  .top-nav-subtitle { display: none; }            /* "Internal use only" not needed on a phone */
+  .top-nav img { height: 38px; }
+  .top-nav-title { font-size: 0.9rem; }
+
+  /* Section links become a horizontal scroll strip on their own full-width row,
+     the same pattern the main site uses for the mentor cards. Never pushes the page. */
+  .top-nav-links {
+    order: 10;
+    flex-basis: 100%;
+    width: 100%;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0.15rem 0 0.1rem;
+    scrollbar-width: none;
+    border-top: 1px solid var(--line);
+  }
+  .top-nav-links::-webkit-scrollbar { display: none; }
+  .top-nav-links .nav-link {
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: 0.35rem 0.1rem;
+  }
+
+  /* Actions stay on the top row beside the logo and wrap only if truly needed */
+  .top-nav-actions { gap: 0.4rem; row-gap: 0.4rem; }
+  .nav-pill { padding: 0.5rem 0.75rem; font-size: 0.72rem; }
+
+  /* ── Breathing room, not cramming (bottom keeps the notch safe-area) ── */
+  main { padding: 1.6rem 1rem calc(3rem + env(safe-area-inset-bottom, 0px)) !important; }
+  .hero { margin-bottom: 1.8rem; }
+  .hero h1 { font-size: 1.7rem; }
+  .hero p { font-size: 1rem; }
+  section.portal-section { margin-bottom: 2rem; }
+  .section-label { margin-bottom: 0.8rem; }
+  .primary-card { padding: 1.3rem 1.2rem !important; }
+
+  /* ── Wide content scrolls inside its own strip, page stays still ── */
+  .data-table-wrap, .history-wrap { -webkit-overflow-scrolling: touch; }
+
+  /* ── Calendar controls wrap cleanly ── */
+  .cal-controls { flex-wrap: wrap; gap: 0.45rem; }
+  .cal-btn--add { margin-left: 0; }
+  .cal-title { margin-left: 0.2rem; font-size: 1.05rem; }
 }

@@ -64,7 +64,7 @@
   </main>
 
   <script type="module">
-    import { supabase, isAllowedEmail, getSession } from "./auth.js";
+    import { supabase, isAllowedEmail, getSession, saveCredential } from "./auth.js";
 
     const params = new URLSearchParams(window.location.search);
     const nextPath = params.get("next") || "./";
@@ -118,6 +118,7 @@
         return;
       }
       // Supabase by default sends a confirmation email
+      await saveCredential(email, password);
       if (data.session) {
         window.location.replace(nextPath);
       } else {
