@@ -58,10 +58,10 @@
 
       mountPortalNav({ email, isOwner: true, active: "pl" });
 
-      loadPL();
+      loadPL(email);
     });
 
-    async function loadPL() {
+    async function loadPL(ownerEmail) {
       const selector   = document.getElementById("month-selector");
       const statement  = document.getElementById("statement");
       const emptyState = document.getElementById("empty-state");
@@ -76,7 +76,7 @@
         const res  = await fetch("/.netlify/functions/get-pl", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({}),
+          body: JSON.stringify({ ownerEmail }),
         });
         const data = await res.json();
         records = data.records || [];
@@ -117,7 +117,7 @@
           const res  = await fetch("/.netlify/functions/preview-pl", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({}),
+            body: JSON.stringify({ ownerEmail }),
           });
           const data = await res.json();
           selector.hidden = true;

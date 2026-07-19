@@ -22,16 +22,13 @@ function weekStart(dateStr) {
 
 function table(rows) {
   if (!rows.length) return '<p class="history-none">No sessions logged this week yet.</p>';
-  const body = rows.map((s) => {
-    const safe = ["Charged", "Pending", "Failed", "Package"].includes(s.status) ? s.status : "";
-    return `<tr>
+  // Mentors never see billing/charging info: date and mentee only.
+  const body = rows.map((s) => `<tr>
       <td>${fmtDate(s.date)}</td>
       <td class="mentee">${s.mentee}</td>
-      <td><span class="status-pill status-${safe}">${s.status}</span></td>
-    </tr>`;
-  }).join("");
+    </tr>`).join("");
   return `<div class="history-wrap"><table class="history-table">
-    <thead><tr><th>Date</th><th>Mentee</th><th>Status</th></tr></thead>
+    <thead><tr><th>Date</th><th>Mentee</th></tr></thead>
     <tbody>${body}</tbody></table></div>`;
 }
 

@@ -42,9 +42,12 @@ exports.handler = async (event) => {
         `AND(LOWER(TRIM({Mentor Email}))="${mentorEmail}",` +
         `NOT(AND({Payment Status}="Package",{Amount Charged}>0)))`
       );
+      // Payment Status is referenced by the filter formula (server-side) but is
+      // never requested as an output field or returned: mentors must not see
+      // any billing/charging state, only their own session dates and mentees.
       const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_SESSION_TABLE_ID}` +
         `?filterByFormula=${formula}` +
-        `&fields[]=Date&fields[]=Mentee%20Name&fields[]=Mentee%20Record%20ID&fields[]=Payment%20Status&fields[]=Next%20Session` +
+        `&fields[]=Date&fields[]=Mentee%20Name&fields[]=Mentee%20Record%20ID&fields[]=Next%20Session` +
         (offset ? `&offset=${offset}` : "");
       const res  = await fetch(url, { headers: airtableHeaders });
       const data = await res.json();
@@ -57,7 +60,6 @@ exports.handler = async (event) => {
         date:     r.fields["Date"] || "",
         mentee:   r.fields["Mentee Name"] || "—",
         menteeId: r.fields["Mentee Record ID"] || "",
-        status:   r.fields["Payment Status"] || "—",
         next:     r.fields["Next Session"] || "",
       }))
       .sort((a, b) => b.date.localeCompare(a.date)); // newest first

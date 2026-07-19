@@ -58,6 +58,14 @@
   color: #a8a8a8;
   font-weight: 500;
 }
+/* Per-session working. min-height keeps both boxes' price rows aligned even
+   when the single-session box leaves this empty. */
+.pricing-box__calc {
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: #c9a84c;
+  min-height: 1.5em;
+}
 .pricing-box__cta {
   display: inline-flex;
   align-items: center;

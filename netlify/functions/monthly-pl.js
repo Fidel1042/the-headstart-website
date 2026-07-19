@@ -117,8 +117,10 @@ exports.handler = async () => {
     return { statusCode: 502, body: JSON.stringify({ error: "Airtable unreachable writing P&L record", detail: err.message }) };
   }
 
+  // Do not return any dollar figure: this endpoint is unauthenticated (it runs
+  // on a schedule) so its response must not reveal financials.
   return {
     statusCode: 200,
-    body: JSON.stringify({ success: true, month: monthLabel, netProfit: round(netProfit) }),
+    body: JSON.stringify({ success: true, month: monthLabel }),
   };
 };

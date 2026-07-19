@@ -5,9 +5,18 @@ const headers = {
   "Content-Type": "application/json",
 };
 
+const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com"];
+
 exports.handler = async (event) => {
   if (event.httpMethod === "OPTIONS") return { statusCode: 204, headers, body: "" };
   if (event.httpMethod !== "POST")    return { statusCode: 405, headers, body: JSON.stringify({ error: "Method not allowed" }) };
+
+  // Owners only: this returns revenue, which would reveal mentee pricing.
+  let ownerEmail = "";
+  try { ownerEmail = (JSON.parse(event.body || "{}").ownerEmail || "").toLowerCase().trim(); } catch {}
+  if (!OWNERS.includes(ownerEmail)) {
+    return { statusCode: 403, headers, body: JSON.stringify({ error: "Owners only" }) };
+  }
 
   const {
     AIRTABLE_API_TOKEN,

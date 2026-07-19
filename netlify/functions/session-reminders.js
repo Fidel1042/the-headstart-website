@@ -57,9 +57,10 @@ function boldNames(names) {
   return b.slice(0, -1).join(", ") + " and " + b[b.length - 1];
 }
 
-// A ready-to-paste message the mentor can copy into the group.
+// A ready-to-paste message the mentor can copy into the group. The bracketed
+// bits are placeholders the mentor fills in before sending.
 function copyBox(name) {
-  const msg = `Hi ${firstName(name)}, hope everything is well! Just checking in to set up another session date so we keep up with the momentum. How does [insert available time yourself] sound?`;
+  const msg = `Hi ${firstName(name)}, it's been a while since our last session, but we should really work on [Next steps based on last session] next for you to land a role in time. How does [Insert your availability] work for you for our next session?`;
   return `<div style="margin:8px 0 18px;padding:12px 14px;border:1px solid #d9d3c4;border-radius:8px;background:#faf8f2;color:#333;white-space:pre-wrap">${esc(msg)}</div>`;
 }
 
