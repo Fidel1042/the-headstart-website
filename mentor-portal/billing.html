@@ -220,6 +220,42 @@
       btn.disabled = false; btn.textContent = original;
     };
 
+    // ── Card link ──
+    window.makeCardLink = async function (btn) {
+      const email = document.getElementById("card-email").value.trim();
+      const out = document.getElementById("card-out");
+      if (!email) { out.innerHTML = '<span style="color:#e0a030;">Enter the mentee\'s email first.</span>'; return; }
+      const original = btn.textContent; btn.disabled = true; btn.textContent = "Generating…";
+      out.textContent = "";
+
+      if (isLocal) {
+        const url = "https://checkout.stripe.com/c/pay/cs_test_MOCK_link_example";
+        out.innerHTML = cardLinkHtml("Mary Chen", url);
+        btn.disabled = false; btn.textContent = original; return;
+      }
+      try {
+        const res = await fetch("/.netlify/functions/create-card-link", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ adminEmail: ADMIN_EMAIL, email }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Could not generate link");
+        out.innerHTML = cardLinkHtml(data.mentee, data.url);
+      } catch (e) {
+        out.innerHTML = `<span style="color:#e05050;">${e.message}</span>`;
+      }
+      btn.disabled = false; btn.textContent = original;
+    };
+
+    function cardLinkHtml(mentee, url) {
+      return `
+        <p style="margin-bottom:8px;">Card link for <strong>${mentee}</strong> (valid ~24h). Send it to them:</p>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <input readonly value="${url}" onclick="this.select()" style="flex:1;min-width:200px;background:rgba(255,255,255,0.05);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:9px 11px;font-size:0.8rem;font-family:inherit;" />
+          <button class="btn" onclick="navigator.clipboard.writeText('${url}').then(()=>{this.textContent='Copied ✓'})">Copy</button>
+        </div>`;
+    }
+
     // ── Package tracker ──
     window.loadPackages = async function (btn) {
       const out = document.getElementById("package-out");
@@ -401,6 +437,17 @@
         </div>
         <p class="result" id="charge-result"></p>
       </div>
+    </div>
+
+    <!-- CARD LINK -->
+    <div class="card-block">
+      <p class="block-title">Send Card Link</p>
+      <p class="block-sub">Generate a Stripe card-save link for a mentee (separate from the agreement). Send it, they add their card, it's ready for the weekly charge.</p>
+      <div class="charge-row">
+        <input type="email" class="passcode-input" id="card-email" placeholder="Mentee's email (their Gmail on file)" autocomplete="off" />
+        <button class="btn ghost" onclick="makeCardLink(this)">Generate link</button>
+      </div>
+      <div class="result" id="card-out"></div>
     </div>
 
     <!-- PACKAGE TRACKER -->
