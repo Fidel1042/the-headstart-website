@@ -312,35 +312,37 @@
     .tab-panel { display: none; }
     .tab-panel.is-active { display: block; }
 
+    /* Top tab strip (same on mobile and desktop) */
     .tabbar {
-      position: fixed;
-      bottom: 0; left: 0; right: 0;
-      z-index: 90;
       display: flex;
       justify-content: center;
+      gap: 0.2rem;
       background: var(--bg);
-      border-top: 1px solid var(--line);
-      padding-bottom: env(safe-area-inset-bottom, 0px);
+      border-bottom: 1px solid var(--line);
+      padding: 0 1rem;
+      overflow-x: auto;
+      scrollbar-width: none;
     }
+    .tabbar::-webkit-scrollbar { display: none; }
     .tabbar__btn {
-      flex: 1 1 0;
-      max-width: 160px;
-      padding: 0.85rem 0.3rem;
+      flex: 0 0 auto;
+      padding: 0.9rem 1.1rem;
       background: none;
       border: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
       color: var(--text-muted);
       font-family: inherit;
-      font-size: 0.72rem;
+      font-size: 0.78rem;
       font-weight: 700;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.05em;
       text-transform: uppercase;
+      white-space: nowrap;
       cursor: pointer;
-      transition: color 0.15s;
+      transition: color 0.15s, border-color 0.15s;
     }
-    .tabbar__btn.is-active { color: var(--accent-bright); }
-
-    /* Clear the fixed tab bar (higher specificity than polish.css main rule) */
-    body main { padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px)) !important; }
+    .tabbar__btn:hover { color: var(--text); }
+    .tabbar__btn.is-active { color: var(--accent-bright); border-bottom-color: var(--accent-bright); }
 
     /* Compact onboarding banner (shown on the Log tab until done) */
     .onboarding-incomplete { display: block; margin-bottom: 1.2rem; }
@@ -848,6 +850,13 @@
 
   <div id="portal-nav"></div>
 
+  <nav class="tabbar" id="tabbar" aria-label="Sections">
+    <button class="tabbar__btn is-active" type="button" data-tab="log">Log</button>
+    <button class="tabbar__btn" type="button" data-tab="mentees">Mentees</button>
+    <button class="tabbar__btn" type="button" data-tab="history">History</button>
+    <button class="tabbar__btn" type="button" data-tab="resources">Resources</button>
+  </nav>
+
   <main>
 
     <!-- LOG -->
@@ -929,13 +938,6 @@
     </section>
 
   </main>
-
-  <nav class="tabbar" id="tabbar" aria-label="Sections">
-    <button class="tabbar__btn is-active" type="button" data-tab="log">Log</button>
-    <button class="tabbar__btn" type="button" data-tab="mentees">Mentees</button>
-    <button class="tabbar__btn" type="button" data-tab="history">History</button>
-    <button class="tabbar__btn" type="button" data-tab="resources">Resources</button>
-  </nav>
 
   <script>
     (function () {

@@ -1,0 +1,168 @@
+/* Ask a Mentor — community question form.
+   Mirrors the job-alerts signup form styling (kept self-contained to this page). */
+
+/* Standalone page: no top nav, so drop the global fixed-header offset. */
+body.ask-page { padding-top: 0; }
+
+/* ── PAGE LAYOUT ── */
+.signup-page-wrap {
+  min-height: 60vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 3rem 1.25rem 5rem;
+}
+.signup-inner {
+  width: 100%;
+  max-width: 520px;
+}
+
+/* ── HERO COPY ── */
+.signup-eyebrow {
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #f7d879;
+  margin-bottom: 0.75rem;
+}
+.signup-headline {
+  font-size: clamp(1.6rem, 4vw, 2.1rem);
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.2;
+  margin: 0 0 1rem;
+}
+.signup-desc {
+  font-size: 0.96rem;
+  color: rgba(255,255,255,0.72);
+  line-height: 1.65;
+  margin: 0 0 0.6rem;
+}
+.signup-proof {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.2rem;
+  margin: 0 0 2rem;
+  list-style: none;
+  padding: 0;
+}
+.signup-proof li {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.55);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.signup-proof li::before {
+  content: "✓";
+  color: #c79b3b;
+  font-weight: 700;
+}
+
+/* ── FORM ── */
+.email-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.email-form input[type="email"],
+.email-form input[type="text"],
+.email-form textarea {
+  width: 100%;
+  padding: 0.88rem 1.1rem;
+  background: rgba(255,255,255,0.05);
+  border: 1.5px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  color: #fff;
+  font-size: 0.92rem;
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+.email-form textarea {
+  min-height: 150px;
+  resize: vertical;
+  line-height: 1.55;
+}
+.email-form input[type="email"]:focus,
+.email-form input[type="text"]:focus,
+.email-form textarea:focus {
+  outline: none;
+  border-color: #c79b3b;
+}
+.email-form input::placeholder,
+.email-form textarea::placeholder { color: rgba(255,255,255,0.35); }
+
+.form-question { display: flex; flex-direction: column; gap: 0.6rem; }
+.form-question-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.6);
+}
+.chip-group { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+.chip {
+  padding: 0.42rem 0.9rem;
+  border: 1.5px solid rgba(255,255,255,0.14);
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #fff;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+  user-select: none;
+}
+.chip:hover { border-color: rgba(199,155,59,0.5); }
+.chip.selected {
+  border-color: #c79b3b;
+  background: rgba(199,155,59,0.12);
+  color: #f7d879;
+}
+
+.email-submit {
+  width: 100%;
+  padding: 0.95rem;
+  background: linear-gradient(135deg, #c79b3b, #f7d37d);
+  color: #2b1b09;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: opacity 0.18s;
+  font-family: inherit;
+  margin-top: 0.5rem;
+}
+.email-submit:hover { opacity: 0.88; }
+
+.email-success {
+  display: none;
+  padding: 1.4rem 1.8rem;
+  background: rgba(199,155,59,0.08);
+  border: 1px solid rgba(199,155,59,0.2);
+  border-radius: 12px;
+  text-align: center;
+}
+.email-success p { color: #fff; font-size: 0.9rem; line-height: 1.65; margin: 0; }
+.email-success strong { color: #f7d879; }
+
+.signup-back-link {
+  display: block;
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.45);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.signup-back-link:hover { color: rgba(255,255,255,0.75); }
+
+@media (max-width: 600px) {
+  .signup-page-wrap { padding: 2rem 1rem 4rem; }
+}

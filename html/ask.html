@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SMH2KVMJT2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag("js", new Date());
+    gtag("config", "G-SMH2KVMJT2");
+  </script>
+  <title>Ask a Mentor | Headstart Mentoring</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta name="description" content="Drop your job-search or career question and get it answered by mentors who landed roles in Australia as international students." />
+  <meta name="robots" content="noindex, follow" />
+  <link rel="canonical" href="https://theheadstartmentoring.com/ask/" />
+  <meta property="og:site_name" content="Headstart Mentoring" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Ask a Mentor | Headstart Mentoring" />
+  <meta property="og:description" content="Drop your job-search or career question and get it answered by mentors who landed roles in Australia as international students." />
+  <meta property="og:url" content="https://theheadstartmentoring.com/ask/" />
+  <meta property="og:image" content="https://theheadstartmentoring.com/images/website-logo.png" />
+  <link rel="stylesheet" href="../style.css?v=7" />
+  <link rel="stylesheet" href="../css/pages/ask.css?v=2" />
+</head>
+<body class="ask-page">
+
+  <main>
+    <div class="signup-page-wrap">
+      <div class="signup-inner">
+
+        <p class="signup-eyebrow">Ask a Mentor</p>
+        <h1 class="signup-headline">Stuck on something in your job search?</h1>
+        <p class="signup-desc">Drop your biggest career or job-search question below. We read every single one, and the best questions get answered directly and turned into tips that help the whole community.</p>
+        <ul class="signup-proof">
+          <li>Answered by mentors who landed roles as international students</li>
+          <li>No question is too small</li>
+          <li>Free, always</li>
+        </ul>
+
+        <form name="community-questions" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="email-form" id="askForm">
+          <input type="hidden" name="form-name" value="community-questions" />
+          <input type="hidden" name="industries" id="hiddenIndustries" />
+          <input type="hidden" name="source" value="whatsapp-community" />
+          <p style="display:none;"><label>Don't fill this out: <input name="bot-field" /></label></p>
+
+          <input type="text" name="name" id="askName" placeholder="Your name" required autocomplete="name" />
+          <input type="email" name="email" id="askEmail" placeholder="Your email address" required autocomplete="email" />
+
+          <div class="form-question">
+            <p class="form-question-label">Your field</p>
+            <div class="chip-group" id="industryChips">
+              <button type="button" class="chip" data-value="finance">Finance</button>
+              <button type="button" class="chip" data-value="accounting">Accounting</button>
+              <button type="button" class="chip" data-value="tech">Tech</button>
+              <button type="button" class="chip" data-value="marketing">Marketing</button>
+              <button type="button" class="chip" data-value="consulting">Consulting</button>
+              <button type="button" class="chip" data-value="data">Data &amp; Analytics</button>
+            </div>
+          </div>
+
+          <div class="form-question">
+            <p class="form-question-label">Your question</p>
+            <textarea name="question" id="askQuestion" placeholder="e.g. How do I answer 'tell me about yourself' without sounding rehearsed?" required></textarea>
+          </div>
+
+          <button type="submit" class="email-submit">Send my question</button>
+        </form>
+
+        <div class="email-success" id="askSuccess">
+          <p><strong>Question received.</strong><br>Keep an eye on the community, we'll get to it. If it's time-sensitive, we'll reply to your email.</p>
+        </div>
+
+        <a href="/job-alerts" class="signup-back-link">Browse this week's hand-picked job alerts</a>
+
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <span>&copy; <span id="year"></span> Headstart Mentoring. All rights reserved.</span>
+    <span>Contact: <a href="mailto:theuniheadstart@gmail.com">theuniheadstart@gmail.com</a></span>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    // Industry chip multi-select (required — validated on submit)
+    document.querySelectorAll("#industryChips .chip").forEach(function(chip) {
+      chip.addEventListener("click", function() {
+        chip.classList.toggle("selected");
+        var selected = Array.from(document.querySelectorAll("#industryChips .chip.selected"))
+          .map(function(c) { return c.dataset.value; });
+        document.getElementById("hiddenIndustries").value = selected.join(",");
+      });
+    });
+
+    // Form submit — name / email / question are required, so the browser
+    // blocks submit until they're filled. We POST to Netlify Forms manually.
+    document.getElementById("askForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      var industriesVal = (document.getElementById("hiddenIndustries").value || "").trim();
+      if (!industriesVal) {
+        alert("Please select your field before submitting.");
+        document.getElementById("industryChips").scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+
+      var data = new FormData(this);
+      fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams(data).toString()
+      }).catch(function() {});
+
+      this.style.display = "none";
+      document.getElementById("askSuccess").style.display = "block";
+
+      if (typeof gtag === "function") {
+        gtag("event", "generate_lead", {
+          form_id: "community_question",
+          industries: (document.getElementById("hiddenIndustries").value || "")
+        });
+      }
+    });
+  </script>
+  <script src="../js/silk-bg.js?v=5"></script>
+</body>
+</html>
