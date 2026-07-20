@@ -1191,7 +1191,8 @@ function initialCat() {
 }
 let activeCat = initialCat();
 let activeCity = "all";
-let q =
+let q = "";
+
 function rowHTML(j) {
   const safe = (s) => String(s || "").replace(/"/g, "&quot;");
   return `
@@ -1213,7 +1214,8 @@ function rowHTML(j) {
 const PREVIEW = 3;
 
 function typeGroupHTML(jobs, key) {
-  let html =  jobs.slice(0, PREVIEW).forEach(j => html += rowHTML(j));
+  let html = "";
+  jobs.slice(0, PREVIEW).forEach(j => html += rowHTML(j));
   if (jobs.length > PREVIEW) {
     const extra = jobs.slice(PREVIEW);
     const n = extra.length;
@@ -1256,7 +1258,7 @@ function render() {
     return;
   }
 
-  let html =
+  let html = "";
   if (activeCat !== "all" && !sq) {
     const interns  = filtered.filter(j => j.type === "intern");
     const grads    = filtered.filter(j => j.type === "graduate");
@@ -1397,7 +1399,8 @@ function openConsultModal() {
 }
 function closeConsultModal() {
   consultModal.classList.remove("is-open");
-  document.body.style.overflow =}
+  document.body.style.overflow = "";
+}
 consultClose.addEventListener("click", closeConsultModal);
 consultBackdrop.addEventListener("click", closeConsultModal);
 document.addEventListener("keydown", function(e) {
@@ -1444,7 +1447,9 @@ document.getElementById("emailForm").addEventListener("submit", function(e) {
   }
 
   // Carry forward name/email/intStudent into the consult modal's hidden fields
-  document.getElementById("consultName").value = document.getElementById("signupName").value ||  document.getElementById("consultEmail").value = document.getElementById("signupEmail").value ||  document.getElementById("consultIntStudent").value = document.getElementById("hiddenIntStudent").value ||||
+  document.getElementById("consultName").value = document.getElementById("signupName").value || "";
+  document.getElementById("consultEmail").value = document.getElementById("signupEmail").value || "";
+  document.getElementById("consultIntStudent").value = document.getElementById("hiddenIntStudent").value || "";
   // Slight delay so the success message renders first, then the modal pops
   setTimeout(openConsultModal, 350);
 });

@@ -15,7 +15,11 @@ exports.handler = async (event) => {
   const today     = new Date();
   const weekLabel = `Outstanding as of ${today.toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" })}`;
 
-  const formula = encodeURIComponent(`AND({Mentor Paid}=0, IS_AFTER({Date}, DATEADD(TODAY(), -7, 'days')))`);
+  // Every UNPAID session, regardless of age. "Mentor Paid" is the source of
+  // truth for what's already been paid (marked "Yes" after a payslip run), so
+  // no date window is needed — and a date window would silently orphan any
+  // session that missed its 7-day slot (which is how Koda's got skipped).
+  const formula = encodeURIComponent(`NOT({Mentor Paid}="Yes")`);
 
   let sessions;
   try {

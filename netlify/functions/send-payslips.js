@@ -32,7 +32,10 @@ exports.handler = async (event) => {
   };
 
   // All sessions not yet paid to mentor, regardless of mentee payment status
-  const formula = encodeURIComponent(`AND({Mentor Paid}=0, IS_AFTER({Date}, DATEADD(TODAY(), -7, 'days')))`);
+  // Every UNPAID session, regardless of age. "Mentor Paid" (set to "Yes" after
+  // payment) is the source of truth, so no date window — a window would silently
+  // orphan any session that missed its 7-day slot (how Koda's $20 got skipped).
+  const formula = encodeURIComponent(`NOT({Mentor Paid}="Yes")`);
 
   const res  = await fetch(
     `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_SESSION_TABLE_ID}` +
