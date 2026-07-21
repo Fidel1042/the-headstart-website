@@ -754,10 +754,13 @@
     /* Pricing two-box grid */
     .pricing-grid {
       display: grid;
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, 1fr);
       gap: 1.2rem;
-      max-width: 440px;
+      max-width: 900px;
       margin: 0 auto;
+    }
+    @media (max-width: 760px) {
+      .pricing-grid { grid-template-columns: 1fr; }
     }
     .pricing-box {
       background: rgba(10,10,10,0.75);
@@ -1212,6 +1215,7 @@
       </button>
       <nav class="nav-links" id="navLinks">
         <a href="/mentors">Mentors</a>
+        <a href="/#pricing">Pricing</a>
         <a href="/reviews">Reviews</a>
         <a href="/job-alerts">Job Alerts</a>
         <div class="nav-more">
@@ -1498,6 +1502,47 @@
         </div>
       </section>
 
+      <!-- ── Pricing ── -->
+      <section class="section pricing-section" id="pricing">
+        <div class="section-inner">
+          <div class="pricing-head reveal reveal--up">
+            <p class="mentoring-eyebrow">Pricing</p>
+          </div>
+          <div class="pricing-grid">
+            <div class="pricing-box reveal" style="--reveal-delay:0s">
+              <span class="pricing-box__eyebrow">Step 1</span>
+              <h3 class="pricing-box__title">Initial Consultation</h3>
+              <p class="pricing-box__sub">A free call to understand where you're stuck and match you with a mentor.</p>
+              <ul class="pricing-box__list">
+                <li>20-minute online meeting</li>
+                <li>Walk through your current approach</li>
+                <li>Match with the right mentor for you</li>
+              </ul>
+              <div class="pricing-box__price">
+                <span class="pricing-box__amount">Free</span>
+              </div>
+              <a class="pricing-box__cta" href="/discovery-call">Book a free call &rarr;</a>
+            </div>
+
+            <div class="pricing-box reveal reveal--right" style="--reveal-delay:0.1s">
+              <span class="pricing-box__eyebrow">Step 2</span>
+              <h3 class="pricing-box__title">Ongoing Mentoring</h3>
+              <p class="pricing-box__sub"> 1-on-1 sessions with your matched mentor.</p>
+              <ul class="pricing-box__list">
+                <li>Mentors who were once International Students</li>
+                <li>Currently working in Australia</li>
+                <li>Change mentors at no extra cost</li>
+              </ul>
+              <div class="pricing-box__price">
+                <span class="pricing-box__amount">$55</span><span class="pricing-box__unit">/session</span>
+              </div>
+              <a class="pricing-box__cta" href="/discovery-call">Book a free call &rarr;</a>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
       <!-- ── Highlighted reviews ── -->
       <section class="section home-reviews">
         <div class="section-inner">
@@ -1628,7 +1673,7 @@
               <span class="cost-calc__total-label">Total cost of staying stuck</span>
               <span class="cost-calc__total-value" id="home-calc-grand">$14,700+</span>
             </div>
-            <p class="cost-calc__note">This is the money you're losing by waiting.</p>
+            <p class="cost-calc__note">Our sessions are $55 each. <span id="home-calc-note-months">2 months</span> without a job costs you roughly <strong class="cost-calc__multiplier" id="home-calc-multiplier">164x</strong> that in salary alone.</p>
           </div>
         </div>
       </section>
@@ -1779,7 +1824,7 @@
       if (noteEl) noteEl.textContent = monthLabel;
       var newSal   = Math.round(HOME_SALARY * months);
       var newGrand = newSal + HOME_VISA;
-      var newMult  = Math.round(newSal / 50);
+      var newMult  = Math.round(newSal / 55);
       homeTween("salary", document.getElementById("home-calc-salary"), newSal,   "", "");
       homeTween("grand",  document.getElementById("home-calc-grand"),  newGrand, "", "+");
       // Tween multiplier

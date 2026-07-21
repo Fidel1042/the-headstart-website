@@ -51,6 +51,15 @@ async function sendEmail(apiKey, to, name, subject, html) {
   });
 }
 
+// Stamp today's date so the mentee is not nudged again for another 7 days.
+async function markReminded(baseId, tableId, recordId, date, token) {
+  await fetch(`https://api.airtable.com/v0/${baseId}/${tableId}/${recordId}`, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ fields: { "Last Reminded": date } }),
+  }).catch(() => {});
+}
+
 function boldNames(names) {
   const b = names.map((n) => `<strong>${esc(n)}</strong>`);
   if (b.length === 1) return b[0];
@@ -104,28 +113,35 @@ exports.handler = async (event) => {
   try {
     // Active, acquired mentees with a mentor assigned.
     const menteeRecs = await fetchAll(AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTEE_TABLE_ID,
-      ["Name", "Client Pipeline", "Mentor Email Plain", "Mentor Name"], AIRTABLE_API_TOKEN);
+      ["Name", "Client Pipeline", "Mentor Email Plain", "Mentor Name", "Last Reminded"], AIRTABLE_API_TOKEN);
     const active = new Map();
+    const byName = new Map(); // lowercased mentee name -> record id (for older
+                              // session rows whose Mentee Record ID is blank)
     menteeRecs.forEach((r) => {
       const f = r.fields;
       const email = (f["Mentor Email Plain"] || "").toLowerCase().trim();
       if ((f["Client Pipeline"] || "") === "Acquired" && email) {
         const mn = f["Mentor Name"];
+        const name = f["Name"] || "";
         active.set(r.id, {
-          name: f["Name"] || "",
+          name,
           mentorEmail: email,
           mentorName: (Array.isArray(mn) ? mn[0] : mn) || email,
+          lastReminded: (f["Last Reminded"] || "").slice(0, 10),
         });
+        if (name) byName.set(name.trim().toLowerCase(), r.id);
       }
     });
 
     // Session history for those mentees.
     const rows = await fetchAll(AIRTABLE_BASE_ID, AIRTABLE_SESSION_TABLE_ID,
-      ["Date", "Next Session", "Mentee Record ID", "Payment Status", "Amount Charged"], AIRTABLE_API_TOKEN);
+      ["Date", "Next Session", "Mentee Record ID", "Mentee Name", "Payment Status", "Amount Charged"], AIRTABLE_API_TOKEN);
     const agg = new Map(); // menteeId -> { lastDate, hasFuture, tomorrow }
     rows.forEach((r) => {
       const f = r.fields;
-      const id = f["Mentee Record ID"] || "";
+      // Match by record id; fall back to mentee name when the id is blank.
+      let id = f["Mentee Record ID"] || "";
+      if (!active.has(id)) id = byName.get((f["Mentee Name"] || "").trim().toLowerCase()) || "";
       if (!active.has(id)) return;
       const purchase = f["Payment Status"] === "Package" && (parseFloat(f["Amount Charged"]) || 0) > 0;
       const date = (f["Date"] || "").slice(0, 10);
@@ -149,8 +165,10 @@ exports.handler = async (event) => {
       if (a.tomorrow) bucket(m.mentorEmail, m.mentorName).tomorrow.push(m.name);
       if (a.lastDate && !a.hasFuture) {
         const gap = daysBetween(a.lastDate, today);
-        if (gap >= REACH_OUT_DAYS && (gap - REACH_OUT_DAYS) % 7 === 0) {
-          bucket(m.mentorEmail, m.mentorName).reachout.push({ name: m.name, gap });
+        // Nudge once overdue, then again every 7 days until they book or drop.
+        const dueForNudge = !m.lastReminded || daysBetween(m.lastReminded, today) >= 7;
+        if (gap >= REACH_OUT_DAYS && dueForNudge) {
+          bucket(m.mentorEmail, m.mentorName).reachout.push({ id, name: m.name, gap });
         }
       }
     });
@@ -162,7 +180,14 @@ exports.handler = async (event) => {
       if (!b.tomorrow.length && !b.reachout.length) continue;
       const subject = b.tomorrow.length ? "Reminder: you have a session tomorrow" : "A mentee to reach out to";
       summary.push({ mentor: email, tomorrow: b.tomorrow, reachout: b.reachout.map((r) => r.name) });
-      if (!dryRun && BREVO_API_KEY) { await sendEmail(BREVO_API_KEY, email, b.name, subject, buildEmail(b)); sent++; }
+      if (!dryRun && BREVO_API_KEY) {
+        await sendEmail(BREVO_API_KEY, email, b.name, subject, buildEmail(b));
+        sent++;
+        // Stamp each nudged mentee so it waits 7 days before the next nudge.
+        for (const r of b.reachout) {
+          await markReminded(AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTEE_TABLE_ID, r.id, today, AIRTABLE_API_TOKEN);
+        }
+      }
     }
 
     return { statusCode: 200, body: JSON.stringify({ date: today, dryRun, mentorsEmailed: sent, summary }) };
