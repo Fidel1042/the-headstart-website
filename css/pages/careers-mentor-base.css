@@ -80,11 +80,7 @@
 
 .mentor-role-headline {
   display: inline-block;
-  background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
+  color: #f7d37d;
 }
 
 .role-compact-section {
@@ -115,11 +111,7 @@
   margin-bottom: 0.45rem;
   font-weight: 700;
   line-height: 1.2;
-  background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
+  color: #f7d37d;
 }
 
 .role-compact-card p {

@@ -24,8 +24,7 @@ body {
 }
 .cw-title {
   font-size: 2.5rem; line-height: 1.14; font-weight: 750;
-  background: var(--gold-grad);
-  -webkit-background-clip: text; background-clip: text;
+  color: #f7d37d;
   -webkit-text-fill-color: transparent; color: transparent;
   margin-bottom: 0.7rem;
 }
@@ -78,8 +77,7 @@ body {
 }
 .cw-card__num {
   font-size: 2rem; font-weight: 800; line-height: 1.05;
-  background: var(--gold-grad);
-  -webkit-background-clip: text; background-clip: text;
+  color: #f7d37d;
   -webkit-text-fill-color: transparent; color: transparent;
 }
 .cw-card__note { font-size: 0.82rem; color: #777; line-height: 1.5; margin-top: 0.5rem; min-height: 3.2em; }

@@ -88,10 +88,7 @@
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  background: linear-gradient(135deg, #fff0a0 0%, #f0c030 50%, #b87800 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: #f7d37d;
   border: 1px solid rgba(218,165,32,0.4);
   border-radius: 20px;
   padding: 0.18rem 0.6rem;
@@ -106,31 +103,19 @@
 
 /* Gradient text on price number */
 .pricing-tier--bronze .pricing-tier__price-number {
-  background: linear-gradient(135deg, #fff0a0 0%, #f0c030 50%, #b87800 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: #f7d37d;
 }
 
 .pricing-tier--silver .pricing-tier__price-number {
-  background: linear-gradient(135deg, #fff0a0 0%, #f0c030 50%, #b87800 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: #f7d37d;
 }
 
 .pricing-tier--linkedin .pricing-tier__price-number {
-  background: linear-gradient(135deg, #fff0a0 0%, #f0c030 50%, #b87800 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: #f7d37d;
 }
 
 .pricing-tier--gold .pricing-tier__price-number {
-  background: linear-gradient(135deg, #fff0a0 0%, #f0c030 50%, #b87800 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: #f7d37d;
 }
 
 .pricing-tier__price {

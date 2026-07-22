@@ -95,7 +95,7 @@
   }
   </script>
 
-  <link rel="stylesheet" href="style.css?v=7" />
+  <link rel="stylesheet" href="style.css?v=11" />
   <style>
     body > header {
       position: fixed !important;
@@ -274,10 +274,7 @@
       line-height: 1.65;
     }
     .cost-calc__multiplier {
-      background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: #f7d37d;
       font-weight: 800;
       font-size: 1.15rem;
     }
@@ -373,10 +370,7 @@
       line-height: 1.1;
     }
     .hero-rotating-title #painType {
-      background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: #f7d37d;
       display: inline-block;
       transition: opacity 0.45s ease, transform 0.45s ease;
     }
@@ -416,11 +410,7 @@
       color: #ffffff;
     }
     .btn-hero-primary__arrow {
-      background: linear-gradient(135deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      color: transparent;
+      color: #f7d37d;
       font-weight: 800;
       display: inline-block;
       transition: transform 0.2s ease;
@@ -619,10 +609,7 @@
       font-weight: 700;
       margin: 0 0 0.6rem;
       text-wrap: balance;
-      background: linear-gradient(135deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: #f7d37d;
     }
     .journey-detail__desc {
       color: #c8c8c8;
@@ -739,10 +726,7 @@
       line-height: 1.5;
     }
     .pricing-meet-mentors a {
-      background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: #f7d37d;
       text-decoration: none;
       font-weight: 600;
       border-bottom: 1px solid rgba(199,155,59,0.45);
@@ -820,10 +804,7 @@
       font-size: 2.2rem;
       font-weight: 800;
       line-height: 1;
-      background: linear-gradient(135deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: #f7d37d;
     }
     .pricing-box__unit {
       font-size: 0.95rem;
@@ -901,7 +882,10 @@
       letter-spacing: -0.01em;
       margin: 0;
     }
+    /* The Gilt Budget: the one deliberate gradient-text element on this page.
+       Solid colour first so the word survives if background-clip fails. */
     .hero-gold {
+      color: #f5d060;
       background: linear-gradient(135deg, #d4a030 0%, #f5d060 45%, #d4a84c 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;

@@ -25,11 +25,7 @@ html { font-size: 110%; }
   font-size: clamp(1.8rem, 3.5vw, 2.4rem);
   font-weight: 800;
   letter-spacing: -0.015em;
-  background: var(--gold-gradient);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
+  color: var(--accent);
 }
 
 /* ── View tabs ── */
@@ -81,8 +77,6 @@ html { font-size: 110%; }
 .stat-tile__label {
   font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
   color: var(--accent);
 }
 
@@ -117,8 +111,6 @@ html { font-size: 110%; }
 .detail-block h4 {
   font-size: 0.68rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
   color: var(--accent);
   margin-bottom: 0.6rem;
 }
@@ -127,8 +119,6 @@ html { font-size: 110%; }
   text-align: left;
   font-size: 0.62rem;
   font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
   color: var(--text-muted);
   padding: 0.4rem 0.6rem;
   border-bottom: 1px solid var(--line);

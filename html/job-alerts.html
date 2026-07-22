@@ -26,7 +26,7 @@
   <meta name="twitter:title" content="Graduate Job Alerts Australia | Headstart Mentoring" />
   <meta name="twitter:description" content="Graduate and internship job alerts for international students in Australia. Entry-level roles across Sydney, Melbourne, and Brisbane, updated weekly." />
   <meta name="twitter:image" content="https://theheadstartmentoring.com/images/website-logo.png" />
-  <link rel="stylesheet" href="../style.css?v=7" />
+  <link rel="stylesheet" href="../style.css?v=11" />
   <link rel="preconnect" href="https://calendly.com" crossorigin />
   <link rel="preconnect" href="https://assets.calendly.com" crossorigin />
   <link rel="dns-prefetch" href="//calendly.com" />
@@ -51,19 +51,20 @@
     .hero-email-cta {
       display: inline-flex; align-items: center;
       margin-top: 1.1rem;
-      padding: 0.55rem 1rem;
-      background: rgba(199,155,59,0.1);
-      border: 1px solid rgba(199,155,59,0.3);
-      border-radius: 8px;
-      font-size: 1rem; font-weight: 600;
-      color: #f7d879;
+      width: 100%;
+      max-width: 340px;
+      padding: 0.62rem 1rem;
+      background: transparent;
+      border: 1.5px solid rgba(199,155,59,0.45);
+      border-radius: 10px;
+      font-size: 0.95rem; font-weight: 600;
+      color: #ffffff;
       text-decoration: none;
-      transition: background 0.15s, border-color 0.15s, transform 0.15s;
+      transition: border-color 0.15s, background 0.15s;
     }
     .hero-email-cta:hover {
-      background: rgba(199,155,59,0.18);
-      border-color: rgba(199,155,59,0.55);
-      transform: translateY(-1px);
+      border-color: #c79b3b;
+      background: rgba(199,155,59,0.08);
     }
     html { scroll-behavior: smooth; }
 
@@ -72,10 +73,10 @@
       max-width: 1200px; margin: 0 auto;
       padding: 0 2rem 0;
     }
-    .search-wrap { position: relative; max-width: 520px; }
+    .search-wrap { position: relative; max-width: 340px; }
     .search-input {
       width: 100%;
-      padding: 0.92rem 3rem 0.92rem 1.3rem;
+      padding: 0.62rem 2.4rem 0.62rem 1rem;
       background: rgba(255,255,255,0.04);
       border: 1.5px solid rgba(255,255,255,0.13);
       border-radius: 10px; color: #fff;
@@ -280,10 +281,7 @@
     .conversion-cta h3 {
       font-size: 1.25rem; font-weight: 800;
       margin-bottom: 0.55rem; line-height: 1.3;
-      background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
+      color: #f7d37d;
       display: inline-block;
     }
     .conversion-cta p {
@@ -322,8 +320,8 @@
     .email-section h2 {
       font-size: clamp(1.55rem, 3vw, 2rem); font-weight: 800;
       line-height: 1.2; margin-bottom: 0.75rem;
-      background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
+      color: #f7d37d;
+      color: #f7d37d;
     }
     .email-section p { font-size: 0.93rem; color: #fff; line-height: 1.7; margin-bottom: 2rem; }
     .email-eyebrow {
@@ -1015,48 +1013,50 @@ const JOBS = [
   { title: "Accountant",                                              company: "Golding Contractors",          city: "Brisbane",  cat: "accounting", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=d4a330d955ecce56", posted: "2026-07-16" },
 
   // ── Tech · Sydney · Intern ──
-  { title: "Data Scientist Intern – AI/LLM Data Application (2026 Start, BS/MS)", company: "TikTok",       city: "Sydney",    cat: "tech", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4405389325/", posted: "2026-07-03" },
-  { title: "nbn Summer Internship Program",                        company: "nbn",                          city: "Sydney",    cat: "tech", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4435514648/", posted: "2026-07-03" },
-  { title: "AI Innovation Systems Intern (Part Time, 12 months Fixed)", company: "Vitaco Group",           city: "Sydney",    cat: "tech", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4431999858/", posted: "2026-07-03" },
-  { title: "IT Intern",                                            company: "Sungrow",                      city: "Sydney",    cat: "tech", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4432911922/", posted: "2026-07-03" },
-  { title: "Network Development Engineer Intern – Core Networking", company: "Amazon",                       city: "Sydney",    cat: "tech", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4431700118/", posted: "2026-07-03" },
-  { title: "Software Engineering Internship – Summer 2026/2027",   company: "MongoDB",                      city: "Sydney",    cat: "tech", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4415597090/", posted: "2026-07-03" },
-  { title: "Computer Engineering Internship",                      company: "Ace Talent Recruitment",       city: "Sydney",    cat: "tech", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4432331741/", posted: "2026-07-03" },
-  { title: "Software Engineering Internship (Dec 2026 – March 2027)", company: "Freelancer.com",           city: "Sydney",    cat: "tech", type: "intern",   source: "Seek",     url: "https://au.seek.com/job/93067561", posted: "2026-07-03" },
+  { title: "Machine Learning Intern",                                      company: "Vontier",                           city: "Sydney",    cat: "tech", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4422685850/", posted: "2026-07-22" },
+  { title: "Intern",                                                       company: "ConnectWise",                       city: "Sydney",    cat: "tech", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4442023490/", posted: "2026-07-22" },
+  { title: "Network Development Engineer Intern, Core Networking",         company: "Amazon",                            city: "Sydney",    cat: "tech", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4443043146/", posted: "2026-07-22" },
+  { title: "Software Engineer Intern",                                     company: "swipejobs",                         city: "Sydney",    cat: "tech", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4440608873/", posted: "2026-07-22" },
+  { title: "ICT & Security Engineering Intern (Nov 2026)",                 company: "AECOM",                             city: "Sydney",    cat: "tech", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4437969684/", posted: "2026-07-22" },
+  { title: "Forward Deployed Engineer Intern",                             company: "Lyra",                              city: "Sydney",    cat: "tech", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4442040050/", posted: "2026-07-22" },
+  { title: "2026 Australia Software Engineering Internship",               company: "The Trade Desk",                    city: "Sydney",    cat: "tech", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4365804755/", posted: "2026-07-22" },
+  { title: "AI Product Intern",                                            company: "St Trinity Property Group",         city: "Sydney",    cat: "tech", type: "intern",   source: "Seek",     url: "https://au.seek.com/job/93234590", posted: "2026-07-22" },
+  { title: "2027 Applied Science Intern (Computer Vision)",                company: "Amazon",                            city: "Sydney",    cat: "tech", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4443033531/", posted: "2026-07-22" },
+  { title: "Internship Program 2027 – Data, Knowledge & Innovation", company: "Urbis Ltd",                         city: "Sydney",    cat: "tech", type: "intern",   source: "Seek",     url: "https://au.seek.com/job/93388453", posted: "2026-07-22" },
 
   // ── Tech · Sydney · Graduate ──
-  { title: "Data Center Technician",                               company: "Microsoft",                    city: "Sydney",    cat: "tech", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4431236558/", posted: "2026-07-03" },
-  { title: "Technology Graduate",                                  company: "The GPT Group",                city: "Sydney",    cat: "tech", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4435531001/", posted: "2026-07-03" },
-  { title: "Graduate – IT Project Management",                     company: "Seven Consulting",             city: "Sydney",    cat: "tech", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4431212237/", posted: "2026-07-03" },
-  { title: "Digital (IT) Graduate",                                company: "NSW Government",               city: "Sydney",    cat: "tech", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/93105307", posted: "2026-07-03" },
-  { title: "IT Support Analyst",                                   company: "AC3",                          city: "Sydney",    cat: "tech", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=418f398069f306a0", posted: "2026-07-03" },
-  { title: "IT Support",                                           company: "Harry Design Studio",          city: "Sydney",    cat: "tech", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=d51c6682bb85a2fe", posted: "2026-07-03" },
-  { title: "Junior IT Development & Support Analyst",              company: "The Law Society of NSW",       city: "Sydney",    cat: "tech", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=72d869fd99ac9723", posted: "2026-07-03" },
-  { title: "Graduate IT Support & AI Solutions Analyst",           company: "Eight Ball Tech Group",        city: "Sydney",    cat: "tech", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=68d55721ba5520cd", posted: "2026-07-03" },
+  { title: "Technical Support Officer",                                    company: "Taronga Conservation Society Australia", city: "Sydney", cat: "tech", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4438613029/", posted: "2026-07-22" },
+  { title: "Software Engineer Graduate (LiveStreaming Player, C++)",       company: "TikTok",                            city: "Sydney",    cat: "tech", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4438977639/", posted: "2026-07-22" },
+  { title: "Junior IT Operations Engineer",                                company: "TFS Australia Pty Ltd",             city: "Sydney",    cat: "tech", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/93226135", posted: "2026-07-22" },
+  { title: "Trainee Software Developer",                                   company: "ABC",                               city: "Sydney",    cat: "tech", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/93258373", posted: "2026-07-22" },
+  { title: "Junior IT & Administration Officer",                           company: "O-BANK CO., LTD.",                  city: "Sydney",    cat: "tech", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=6a5eaefd7ad9f87d", posted: "2026-07-22" },
+  { title: "IT Support Trainee",                                           company: "Flipside IT",                       city: "Sydney",    cat: "tech", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=520d534dee84535e", posted: "2026-07-22" },
+  { title: "Product Support Expert – Level 1",                        company: "Meltwater",                         city: "Sydney",    cat: "tech", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4431217774/", posted: "2026-07-22" },
+  { title: "Digital Retail Engineering & Operations Graduate Program 2027", company: "IAG",                              city: "Sydney",    cat: "tech", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4442565222/", posted: "2026-07-22" },
+  { title: "Graduate / Junior Full Stack Developer (AI & Agile)",          company: "Expedient Software",                city: "Sydney",    cat: "tech", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/93236885", posted: "2026-07-22" },
+  { title: "Technical Support Officer – Education",                   company: "OZCOM TECHNOLOGY GROUP",            city: "Sydney",    cat: "tech", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=8878e623e03608a0", posted: "2026-07-22" },
+  { title: "Technical & Network Support Technician",                       company: "Telnetworks",                       city: "Sydney",    cat: "tech", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=24bb56a740b7765f", posted: "2026-07-22" },
+  { title: "IT / Desktop Support Engineer (Level -1)",                     company: "ADVANCE GLOBAL IT SUPPORT",         city: "Sydney",    cat: "tech", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=d6ff7569bf65c4d2", posted: "2026-07-22" },
 
   // ── Tech · Melbourne · Intern ──
-  { title: "Trainee Software Developer",                           company: "Australian Broadcasting Corporation (ABC)", city: "Melbourne", cat: "tech", type: "intern", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4426782185/", posted: "2026-07-03" },
-  { title: "Software Engineering Internship – Start Your Tech Career", company: "Springtek",                city: "Melbourne", cat: "tech", type: "intern",   source: "Seek",     url: "https://au.seek.com/job/93074734", posted: "2026-07-03" },
-  { title: "AustralianSuper 2026/27 Intern Program – Technology, Digital & Data (Enterprise stream)", company: "AustralianSuper", city: "Melbourne", cat: "tech", type: "intern", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4430373564/", posted: "2026-07-03" },
+  { title: "Cyber Security Intern",                                        company: "CAREER PANACEA",                    city: "Melbourne", cat: "tech", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4441946454/", posted: "2026-07-22" },
+  { title: "Junior Systems Administrator Intern – AI & Telecommunications", company: "YesRewards",               city: "Melbourne", cat: "tech", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4441135737/", posted: "2026-07-22" },
+  { title: "Intern AI Engineer",                                           company: "DXC Technology",                    city: "Melbourne", cat: "tech", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4441169871/", posted: "2026-07-22" },
 
   // ── Tech · Melbourne · Graduate ──
-  { title: "Tech Support – First Nations ICT Trainee Programme",   company: "Datacom",                      city: "Melbourne", cat: "tech", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4436141490/", posted: "2026-07-03" },
-  { title: "Graduate – IT Project Management",                     company: "Seven Consulting",             city: "Melbourne", cat: "tech", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4431203635/", posted: "2026-07-03" },
-  { title: "Junior Graduate IT Opportunities – Newcastle",         company: "FinXL IT Professional Services", city: "Melbourne", cat: "tech", type: "graduate", source: "Seek",   url: "https://au.seek.com/job/93085035", posted: "2026-07-03" },
-  { title: "Graduate Software Technician",                         company: "Inject",                       city: "Melbourne", cat: "tech", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/92970050", posted: "2026-07-03" },
-  { title: "IT Technician",                                        company: "Teknik Consulting",            city: "Melbourne", cat: "tech", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=512c28fa07feb7b0", posted: "2026-07-03" },
-  { title: "Production Tech",                                      company: "Trek Bicycle Corp (Australia)", city: "Melbourne", cat: "tech", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=031e69e92062426d", posted: "2026-07-03" },
-  { title: "Data Center Operations Technician Trainee (6 months)", company: "Amazon Corporate Services",    city: "Melbourne", cat: "tech", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=f0d57678bf43166d", posted: "2026-07-03" },
-  { title: "Desktop Troubleshooting Technician (Students Welcome)", company: "PC Care Service",             city: "Melbourne", cat: "tech", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=3697988e372a6552", posted: "2026-07-03" },
-
-  // ── Tech · Brisbane · Intern ──
-  { title: "Software Automation Engineer Intern",                  company: "Caterpillar of Australia",     city: "Brisbane",  cat: "tech", type: "intern",   source: "Seek",     url: "https://au.seek.com/job/92916959", posted: "2026-07-03" },
+  { title: "Graduate",                                                     company: "Transurban",                        city: "Melbourne", cat: "tech", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4439783372/", posted: "2026-07-22" },
+  { title: "Desktop Support Officer",                                      company: "Centorrino Technologies",           city: "Melbourne", cat: "tech", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=6fc11b326db97d65", posted: "2026-07-22" },
 
   // ── Tech · Brisbane · Graduate ──
-  { title: "Software Development Graduate – 2027 (Stores)",        company: "Amazon",                       city: "Brisbane",  cat: "tech", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4411173445/", posted: "2026-07-03" },
-  { title: "Graduate Software Engineer",                           company: "Bentley Systems",              city: "Brisbane",  cat: "tech", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4431836528/", posted: "2026-07-03" },
-  { title: "Associate Software Engineer",                          company: "Versent",                      city: "Brisbane",  cat: "tech", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4436357349/", posted: "2026-07-03" },
-  { title: "Junior Embedded Software Engineer – Mining Operational Technology", company: "Task Recruitment", city: "Brisbane", cat: "tech", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4426025837/", posted: "2026-07-03" },
+  { title: "Software Development Graduate (2026, Stores)",                 company: "Amazon",                            city: "Brisbane",  cat: "tech", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4443053395/", posted: "2026-07-22" },
+  { title: "Artificial Intelligence (AI) Product Graduate",                company: "Stanwell Corporation Limited",      city: "Brisbane",  cat: "tech", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4442000202/", posted: "2026-07-22" },
+  { title: "Desktop Support Engineer",                                     company: "Datacom",                           city: "Brisbane",  cat: "tech", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4440912519/", posted: "2026-07-22" },
+  { title: "Junior Software Quality Assurance Engineer",                   company: "Megaport",                          city: "Brisbane",  cat: "tech", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4439115622/", posted: "2026-07-22" },
+  { title: "Junior QA Engineer",                                           company: "BLACKROC Recruitment",              city: "Brisbane",  cat: "tech", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4439939842/", posted: "2026-07-22" },
+  { title: "Junior Software Engineer",                                     company: "Flight Centre Travel Group",        city: "Brisbane",  cat: "tech", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4441436385/", posted: "2026-07-22" },
+  { title: "Support Technician",                                           company: "First Focus IT P/L",                city: "Brisbane",  cat: "tech", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/93279303", posted: "2026-07-22" },
+  { title: "Technology Support Officer",                                   company: "Leukaemia Foundation",              city: "Brisbane",  cat: "tech", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/93483614", posted: "2026-07-22" },
+  { title: "IT Coordinator",                                               company: "JBS Australia Pty Ltd",             city: "Brisbane",  cat: "tech", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=e07409f1ab264a17", posted: "2026-07-22" },
 
   // ── Consulting · Sydney · Intern ──
   { title: "Strategy Intern",                                       company: "Altman Solon",                 city: "Sydney",    cat: "consulting", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4422858009/", posted: "2026-07-07" },
@@ -1168,7 +1168,7 @@ function isFresh(j) {
 // The most recently refreshed category, updated by hand whenever a new batch
 // is uploaded (see CHECK 7C in Skills/job-alerts-data-checker.md). initialCat()
 // uses this so the freshest content always lands users on its tab first.
-const LAST_UPDATED_CAT = "finance";
+const LAST_UPDATED_CAT = "tech";
 
 // Default category, can be overridden by ?cat= URL parameter so email links
 // like /job-alerts?cat=marketing land users directly on that tab.

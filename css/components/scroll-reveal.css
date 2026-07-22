@@ -38,11 +38,7 @@
   letter-spacing: 0.05em;
   text-transform: uppercase;
   border: none;
-  background: linear-gradient(120deg, #f5d591, #c79b3b);
-  color: transparent;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #f7d37d;
   cursor: pointer;
   padding: 0;
   display: inline-flex;

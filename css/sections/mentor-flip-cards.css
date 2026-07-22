@@ -204,10 +204,7 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   line-height: 1.25;
-  background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: #f7d37d;
   margin: 0 0 0.2rem;
   min-height: 0;
   text-wrap: balance;

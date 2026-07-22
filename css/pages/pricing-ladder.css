@@ -65,10 +65,7 @@
 .pricing-tiers--ladder .pricing-tier__name {
   font-size: 1.15rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #fff0a0 0%, #f0c030 50%, #b87800 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: #f7d37d;
 }
 
 /* Glyph styling */

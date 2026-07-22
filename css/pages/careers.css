@@ -93,11 +93,7 @@
 
 .job-post-role {
   color: #f7d37d;
-  background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
+  color: #f7d37d;
 }
 
 .job-post-company {

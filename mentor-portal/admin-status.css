@@ -15,8 +15,6 @@
 .status-col__title {
   font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
   margin-bottom: 0.8rem;
 }
 .status-col__title--ok { color: var(--ok); }
@@ -37,12 +35,14 @@
   gap: 0.1rem;
   padding: 0.6rem 0.75rem;
   border-radius: 10px;
-  border-left: 3px solid var(--line);
+  border: 1px solid var(--line);
   background: var(--bg-card-hover);
 }
-.status-item--ok { border-left-color: var(--ok); }
-.status-item--warn { border-left-color: var(--warn); }
-.status-item--bad { border-left-color: var(--bad); }
+/* Status reads from the column heading; the card carries a quiet tint of the
+   same tone on its full border rather than a side stripe. */
+.status-item--ok { border-color: color-mix(in srgb, var(--ok) 40%, var(--line)); }
+.status-item--warn { border-color: color-mix(in srgb, var(--warn) 40%, var(--line)); }
+.status-item--bad { border-color: color-mix(in srgb, var(--bad) 40%, var(--line)); }
 .status-item__head {
   display: flex;
   align-items: flex-start;

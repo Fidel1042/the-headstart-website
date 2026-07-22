@@ -16,11 +16,7 @@ html { font-size: 110%; }
   font-size: clamp(1.7rem, 3.5vw, 2.2rem);
   font-weight: 800;
   letter-spacing: -0.015em;
-  background: var(--gold-gradient);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
+  color: var(--accent);
   margin-bottom: 0.5rem;
 }
 .contacts-intro {

@@ -89,11 +89,7 @@ body::before {
   line-height: 1.2;
   letter-spacing: -0.01em;
   margin-bottom: 0.4rem;
-  background: var(--gold-gradient);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
+  color: var(--accent);
 }
 
 .auth-sub {
@@ -109,7 +105,7 @@ body::before {
   margin-bottom: 1.1rem;
   font-size: 0.92rem;
   line-height: 1.5;
-  border-left: 3px solid;
+  border: 1px solid;
 }
 .auth-error {
   background: var(--error-bg);
@@ -162,8 +158,6 @@ body::before {
   color: var(--accent);
   font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
 }
 .auth-divider::before,
 .auth-divider::after {
@@ -179,9 +173,7 @@ body::before {
 .auth-field > span {
   font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
   color: var(--accent);
-  text-transform: uppercase;
 }
 .auth-field input {
   font-family: inherit;
@@ -219,7 +211,7 @@ body::before {
 .auth-primary:hover:not(:disabled) {
   transform: translateY(-2px);
   border-color: var(--accent-bright);
-  box-shadow: 0 0 28px rgba(199,155,59,0.32);
+  box-shadow: 0 0 28px rgba(199,155,59,0.24);
   background: linear-gradient(135deg, rgba(199,155,59,0.55), rgba(199,155,59,0.22));
 }
 .auth-primary:disabled { opacity: 0.6; cursor: not-allowed; }

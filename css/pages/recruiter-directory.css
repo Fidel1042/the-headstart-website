@@ -23,8 +23,7 @@ body {
 }
 .rd-title {
   font-size: 2.5rem; line-height: 1.14; font-weight: 750;
-  background: var(--gold-grad);
-  -webkit-background-clip: text; background-clip: text;
+  color: #f7d37d;
   -webkit-text-fill-color: transparent; color: transparent;
   margin-bottom: 0.7rem;
 }
@@ -86,8 +85,7 @@ body {
 .rd-section__head { display: flex; align-items: baseline; gap: 0.7rem; margin-bottom: 0.3rem; }
 .rd-section__title {
   font-size: 1.3rem; font-weight: 750;
-  background: var(--gold-grad);
-  -webkit-background-clip: text; background-clip: text;
+  color: #f7d37d;
   -webkit-text-fill-color: transparent; color: transparent;
 }
 .rd-section__chip {

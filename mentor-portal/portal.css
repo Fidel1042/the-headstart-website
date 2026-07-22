@@ -14,7 +14,7 @@
   --accent-line: rgba(199,155,59,0.4);
   --gold-gradient: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
   --shadow-card: 0 12px 32px rgba(0,0,0,0.4);
-  --shadow-glow: 0 0 28px rgba(199,155,59,0.25);
+  --shadow-glow: 0 0 28px rgba(199,155,59,0.24);
   --grain-opacity: 0.42;
   --grain-blend: screen;
   --ok: #4caf81;
@@ -30,8 +30,10 @@
   --text-muted: rgba(0,0,0,0.45);
   --line: rgba(0,0,0,0.1);
   --line-soft: rgba(0,0,0,0.06);
-  --accent: #a07a1d;
-  --accent-bright: #c79b3b;
+  /* On white, emphasis reads darker, not lighter. Both pass AA for small text
+     (5.5:1 and 7.7:1); the old pair failed at 3.97:1 and 2.57:1. */
+  --accent: #8a6210;
+  --accent-bright: #6f4d0d;
   --accent-soft: rgba(199,155,59,0.14);
   --accent-line: rgba(199,155,59,0.45);
   --gold-gradient: linear-gradient(90deg, #8a6210 0%, #b88820 35%, #a07a1d 68%, #c79b3b 100%);
@@ -109,8 +111,6 @@ body::before {
 .top-nav-title { font-size: 0.95rem; font-weight: 700; letter-spacing: 0.01em; color: var(--text); }
 .top-nav-subtitle {
   font-size: 0.68rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
   color: var(--accent);
   font-weight: 700;
 }
@@ -187,8 +187,6 @@ body::before {
 /* ── Shared section label ── */
 .section-label {
   font-size: 0.75rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
   color: var(--accent);
   font-weight: 700;
   margin: 0 0 1.1rem;
@@ -205,8 +203,6 @@ body::before {
   text-align: left;
   font-size: 0.68rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
   color: var(--accent);
   padding: 0.85rem 1.1rem;
   background: rgba(199,155,59,0.06);

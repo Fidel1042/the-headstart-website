@@ -44,10 +44,7 @@
 }
 
 .pricing-tier__price-number--free {
-  background: linear-gradient(135deg, #fff0a0 0%, #f0c030 50%, #b87800 100%) !important;
-  -webkit-background-clip: text !important;
-  background-clip: text !important;
-  color: transparent !important;
+  color: #f7d37d;
   font-size: 2.2rem;
   font-weight: 800;
 }
@@ -56,10 +53,7 @@
 .svc-price {
   font-size: 0.85rem;
   font-weight: 600;
-  background: linear-gradient(90deg, var(--accent), #f5d591);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: #f7d37d;
   margin-left: 0.5rem;
   white-space: nowrap;
 }

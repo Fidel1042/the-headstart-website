@@ -51,8 +51,6 @@
   padding: 0.6rem 0.7rem;
   font-size: 0.65rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
   color: var(--accent);
   background: rgba(199,155,59,0.06);
   border-bottom: 1px solid var(--accent-line);
@@ -84,7 +82,9 @@
   color: var(--text);
   padding: 0.16rem 0.4rem;
   border-radius: 5px;
-  border-left: 3px solid var(--c);
+  /* Mentor colour is meaningful (see legend), carried on a full hairline
+     border plus tint rather than a side stripe. */
+  border: 1px solid color-mix(in srgb, var(--c) 55%, transparent);
   background: color-mix(in srgb, var(--c) 14%, transparent);
   white-space: nowrap;
   overflow: hidden;
@@ -92,7 +92,6 @@
 }
 .cal-chip--next {
   border: 1px dashed var(--c);
-  border-left: 3px dashed var(--c);
   background: transparent;
   color: var(--text-muted);
 }
@@ -179,8 +178,6 @@
 .cal-modal__row span:first-child {
   font-size: 0.68rem;
   font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
   color: var(--accent);
   align-self: center;
   white-space: nowrap;
@@ -195,8 +192,6 @@
   gap: 0.3rem;
   font-size: 0.68rem;
   font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
   color: var(--accent);
 }
 .cal-form select, .cal-form input, .cal-form textarea {

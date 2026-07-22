@@ -36,10 +36,7 @@
   font-weight: 800;
   letter-spacing: 0.04em;
   line-height: 1;
-  background: linear-gradient(135deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: #f7d37d;
 }
 
 .svc-row__icon {
@@ -139,19 +136,13 @@
 }
 
 .icy-highlight {
-  background: linear-gradient(90deg, #d1f1ff 0%, #79c8ff 40%, #2fa1ff 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: #f7d37d;
 }
 
 .gradient-link {
   font-weight: 600;
   text-decoration: underline;
-  background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: #f7d37d;
 }
 
 .gradient-link:focus,
