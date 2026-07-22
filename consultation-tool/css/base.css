@@ -70,10 +70,7 @@ a { color: inherit; text-decoration: none; }
 }
 .tool-nav__link:hover { color: #fff; }
 .tool-nav__link.is-current {
-  background: var(--gold-grad);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--accent);
 }
 @media (max-width: 700px) {
   .tool-nav__inner { padding: 0.6rem 1.2rem; gap: 0.9rem; overflow-x: auto; }
@@ -96,10 +93,7 @@ a { color: inherit; text-decoration: none; }
   font-size: clamp(2rem, 4.5vw, 2.9rem);
   font-weight: 750;
   line-height: 1.12;
-  background: var(--gold-grad);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--accent);
 }
 .page-sub {
   margin-top: 0.9rem;

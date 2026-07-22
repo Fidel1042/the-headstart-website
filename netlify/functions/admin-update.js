@@ -50,6 +50,9 @@ exports.handler = async (event) => {
   } else if (kind === "mentee-contact-added") {
     tableId = AIRTABLE_MENTEE_TABLE_ID;
     fields = { "WhatsApp Added": payload.added !== false };
+  } else if (kind === "mentee-consult-saved") {
+    tableId = AIRTABLE_MENTEE_TABLE_ID;
+    fields = { "Consult Contact Saved": payload.added !== false };
   } else {
     return { statusCode: 400, headers, body: JSON.stringify({ error: "Unknown kind" }) };
   }

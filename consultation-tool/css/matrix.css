@@ -127,10 +127,7 @@
   transition: background 0.25s ease, color 0.25s ease;
 }
 .persona-box.is-selected .persona-box__title {
-  background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--accent);
 }
 
 .persona-box__tag {
@@ -179,10 +176,7 @@
 .persona-box__stat-num {
   font-size: clamp(1.8rem, 2.5vw, 2.5rem);
   font-weight: 800;
-  background: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--accent);
 }
 .persona-box__stat-label {
   font-size: clamp(0.84rem, 1vw, 1rem);

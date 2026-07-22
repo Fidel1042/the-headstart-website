@@ -51,13 +51,36 @@
 
   <main class="contacts-page">
     <h1 class="contacts-title">Contacts to add</h1>
-    <p class="contacts-intro" id="contacts-count"></p>
 
     <p class="state-loading" id="loading">Loading</p>
-    <p class="state-empty" id="empty" hidden>All caught up.</p>
     <p class="state-empty" id="error" hidden></p>
 
-    <div class="contact-list" id="contact-list"></div>
+    <section class="contact-group" id="group-matched" hidden>
+      <h2 class="contact-group__title">Matched with a mentor <span class="contact-group__count" id="count-matched"></span></h2>
+
+      <div class="copy-block">
+        <pre class="copy-block__text" id="welcome-text">[WELCOME]
+Hi guys! This is Koko - your support person from Headstart. Excited to get you guys kickstarted! Before your first session, action below prior to your session:
+
+@
+1. Prepare any questions prior to your first session
+2. Send your resume for review
+
+@
+1. Propose a few dates + time
+2. Send the meeting link</pre>
+        <button type="button" class="c-btn c-btn--save" id="copy-welcome" data-copy="welcome-text">Copy message</button>
+      </div>
+
+      <div class="contact-list" id="list-matched"></div>
+      <p class="contact-group__empty" id="empty-matched" hidden>All caught up.</p>
+    </section>
+
+    <section class="contact-group" id="group-consults" hidden>
+      <h2 class="contact-group__title">Initial consultation done <span class="contact-group__count" id="count-consults"></span></h2>
+      <div class="contact-list" id="list-consults"></div>
+      <p class="contact-group__empty" id="empty-consults" hidden>All caught up.</p>
+    </section>
   </main>
 
   <script type="module" src="contacts.js"></script>

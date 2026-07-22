@@ -25,6 +25,36 @@ html { font-size: 110%; }
   margin-bottom: 1.8rem;
 }
 
+.contact-group { margin-bottom: 2.4rem; }
+.contact-group:last-child { margin-bottom: 0; }
+.contact-group__title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  padding-bottom: 0.6rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--line);
+}
+.contact-group__count { color: var(--accent); font-variant-numeric: tabular-nums; }
+.contact-group__empty { font-size: 0.9rem; color: var(--text-muted); }
+
+/* Ready-to-send welcome message Koko copies into the group */
+.copy-block {
+  margin-bottom: 1.2rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg-card);
+}
+.copy-block__text {
+  font-family: inherit;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--text);
+  white-space: pre-wrap;
+  margin-bottom: 0.85rem;
+}
+
 .contact-list {
   display: flex;
   flex-direction: column;

@@ -48,10 +48,7 @@
   font-size: 2.2rem;
   font-weight: 800;
   line-height: 1;
-  background: linear-gradient(135deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--accent);
 }
 .pricing-box__unit {
   font-size: 0.95rem;

@@ -12,6 +12,13 @@ const headers = {
 const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com"];
 // Only paying, acquired mentees need adding to WhatsApp.
 const ACTIVE_STAGES = ["Acquired"];
+// Post-consultation list only shows calls from the last couple of days, so it
+// stays a short to-do rather than the whole historical backlog.
+const CONSULT_WINDOW_DAYS = 2;
+const TZ = "Australia/Sydney";
+
+const ymd = (d) =>
+  new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" }).format(d);
 
 async function fetchAll(baseId, tableId, fields, token) {
   const records = [];
@@ -50,7 +57,8 @@ exports.handler = async (event) => {
   try {
     const [menteeRecs, mentorRecs] = await Promise.all([
       fetchAll(AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTEE_TABLE_ID,
-        ["Name", "Phone Number", "Aussie Number", "Client Pipeline", "Mentor Email Plain", "WhatsApp Added", "Last Modified"],
+        ["Name", "Phone Number", "Aussie Number", "Client Pipeline", "Mentor Email Plain",
+         "WhatsApp Added", "Raw Notes", "Consult Contact Saved", "Last Modified"],
         AIRTABLE_API_TOKEN),
       fetchAll(AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTOR_TABLE_ID,
         ["Name", "Email"], AIRTABLE_API_TOKEN),
@@ -62,29 +70,51 @@ exports.handler = async (event) => {
       if (e) mentorName.set(e, r.fields["Name"] || e);
     });
 
-    const contacts = menteeRecs
+    const shape = (r) => {
+      const f = r.fields;
+      const mentorEmail = (f["Mentor Email Plain"] || "").toLowerCase().trim();
+      return {
+        id:       r.id,
+        name:     f["Name"] || "Unnamed mentee",
+        phone:    normalizePhone(f["Phone Number"] || "", f["Aussie Number"] || ""),
+        stage:    f["Client Pipeline"] || "",
+        mentor:   mentorEmail ? (mentorName.get(mentorEmail) || mentorEmail) : "Not matched yet",
+        modified: f["Last Modified"] || "",
+      };
+    };
+    const newestFirst = (a, b) => (b.modified || "").localeCompare(a.modified || "");
+
+    // Koko's list: acquired, a mentor is assigned, not yet added to WhatsApp.
+    const matched = menteeRecs
       .filter((r) => {
         const f = r.fields;
-        // Acquired, a mentor is assigned, and not yet added to WhatsApp.
         return ACTIVE_STAGES.includes(f["Client Pipeline"] || "")
           && (f["Mentor Email Plain"] || "").trim() !== ""
           && !f["WhatsApp Added"];
       })
-      .map((r) => {
-        const f = r.fields;
-        const mentorEmail = (f["Mentor Email Plain"] || "").toLowerCase().trim();
-        return {
-          id:       r.id,
-          name:     f["Name"] || "Unnamed mentee",
-          phone:    normalizePhone(f["Phone Number"] || "", f["Aussie Number"] || ""),
-          stage:    f["Client Pipeline"] || "",
-          mentor:   mentorEmail ? (mentorName.get(mentorEmail) || mentorEmail) : "Not matched yet",
-          modified: f["Last Modified"] || "",
-        };
-      })
-      .sort((a, b) => (b.modified || "").localeCompare(a.modified || "")); // newest first
+      .map(shape).sort(newestFirst);
 
-    return { statusCode: 200, headers, body: JSON.stringify({ contacts }) };
+    // Fidel's list: the initial consultation is done (Raw Notes written up),
+    // the call was in the last CONSULT_WINDOW_DAYS days, and the contact has
+    // not been saved yet. Meeting Time is the real call time; Last Modified is
+    // the fallback when a record has no booking on it.
+    const today = ymd(new Date());
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - CONSULT_WINDOW_DAYS);
+    const cutoff = ymd(cutoffDate);
+
+    const consults = menteeRecs
+      .filter((r) => {
+        const f = r.fields;
+        if ((f["Raw Notes"] || "").trim() === "" || f["Consult Contact Saved"]) return false;
+        const when = f["Meeting Time"] || f["Last Modified"] || "";
+        if (!when) return false;
+        const callDate = ymd(new Date(when));
+        return callDate >= cutoff && callDate <= today;
+      })
+      .map(shape).sort(newestFirst);
+
+    return { statusCode: 200, headers, body: JSON.stringify({ matched, consults }) };
   } catch (err) {
     return { statusCode: 502, headers, body: JSON.stringify({ error: err.message || "Could not reach Airtable" }) };
   }
