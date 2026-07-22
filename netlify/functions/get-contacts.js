@@ -20,20 +20,50 @@ const TZ = "Australia/Sydney";
 const ymd = (d) =>
   new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" }).format(d);
 
+// Self-healing read: an optional field that does not exist yet (such as
+// "Notes Filled At" before it is added in Airtable) is dropped and the request
+// retried, so a missing field degrades gracefully instead of 422-ing.
 async function fetchAll(baseId, tableId, fields, token) {
   const records = [];
   let offset = null;
-  do {
+  let use = [...fields];
+  while (true) {
     const url = `https://api.airtable.com/v0/${baseId}/${tableId}` +
-      `?${fields.map((f) => `fields[]=${encodeURIComponent(f)}`).join("&")}` +
+      `?${use.map((f) => `fields[]=${encodeURIComponent(f)}`).join("&")}` +
       (offset ? `&offset=${offset}` : "");
     const res = await fetch(url, { headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } });
     const data = await res.json();
-    if (data.error) throw new Error(data.error.message || "Airtable error");
+    if (data.error) {
+      const msg = String(data.error.message || "");
+      const unknown = msg.match(/Unknown field name:\s*"?([^"]+?)"?\.?$/i);
+      if (unknown && use.includes(unknown[1])) {
+        use = use.filter((f) => f !== unknown[1]);
+        continue;
+      }
+      throw new Error(msg || "Airtable error");
+    }
     records.push(...(data.records || []));
     offset = data.offset || null;
-  } while (offset);
+    if (!offset) break;
+  }
   return records;
+}
+
+// Pull the WhatsApp follow-up out of the generated Drafts field.
+// New records hold one message and nothing else, so the whole field is the
+// message. Older records hold several labelled blocks, and the model was not
+// consistent about writing the "##" markdown markers, so the heading is matched
+// with or without them and everything up to the next heading is taken.
+const HEADING = /^\s*#*\s*(whatsapp|gmail|email)\s+(follow-?up|nudge)\s*:?\s*$/i;
+
+function whatsappFollowUp(drafts) {
+  if (!drafts) return "";
+  const lines = drafts.split(/\r?\n/);
+  const start = lines.findIndex((l) => HEADING.test(l) && /whatsapp/i.test(l) && !/nudge/i.test(l));
+  if (start === -1) return drafts.trim();
+  const rest = lines.slice(start + 1);
+  const end = rest.findIndex((l) => HEADING.test(l));
+  return (end === -1 ? rest : rest.slice(0, end)).join("\n").trim();
 }
 
 exports.handler = async (event) => {
@@ -58,7 +88,8 @@ exports.handler = async (event) => {
     const [menteeRecs, mentorRecs] = await Promise.all([
       fetchAll(AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTEE_TABLE_ID,
         ["Name", "Phone Number", "Aussie Number", "Client Pipeline", "Mentor Email Plain",
-         "WhatsApp Added", "Raw Notes", "Consult Contact Saved", "Last Modified"],
+         "WhatsApp Added", "Raw Notes", "Consult Contact Saved", "Last Modified",
+         "Drafts", "Meeting Time", "Notes filled at"],
         AIRTABLE_API_TOKEN),
       fetchAll(AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTOR_TABLE_ID,
         ["Name", "Email"], AIRTABLE_API_TOKEN),
@@ -80,6 +111,7 @@ exports.handler = async (event) => {
         stage:    f["Client Pipeline"] || "",
         mentor:   mentorEmail ? (mentorName.get(mentorEmail) || mentorEmail) : "Not matched yet",
         modified: f["Last Modified"] || "",
+        message:  whatsappFollowUp(f["Drafts"] || ""),
       };
     };
     const newestFirst = (a, b) => (b.modified || "").localeCompare(a.modified || "");
@@ -94,10 +126,14 @@ exports.handler = async (event) => {
       })
       .map(shape).sort(newestFirst);
 
-    // Fidel's list: the initial consultation is done (Raw Notes written up),
-    // the call was in the last CONSULT_WINDOW_DAYS days, and the contact has
-    // not been saved yet. Meeting Time is the real call time; Last Modified is
-    // the fallback when a record has no booking on it.
+    // Fidel's list. The trigger is Fathom writing the Raw Notes after a call.
+    //   - Raw Notes present, contact not saved yet
+    //   - a booked call exists (no booking means it was not a real consult)
+    //   - the notes landed inside the window
+    // Dated by "Notes filled at" (a Last-Modified-Time field watching ONLY Raw
+    // Notes), falling back to the booked call time. The record's own Last
+    // Modified is never used: any edit resets it, including automated ones,
+    // which would resurrect months-old mentees into this list.
     const today = ymd(new Date());
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - CONSULT_WINDOW_DAYS);
@@ -107,8 +143,8 @@ exports.handler = async (event) => {
       .filter((r) => {
         const f = r.fields;
         if ((f["Raw Notes"] || "").trim() === "" || f["Consult Contact Saved"]) return false;
-        const when = f["Meeting Time"] || f["Last Modified"] || "";
-        if (!when) return false;
+        if (!f["Meeting Time"]) return false;
+        const when = f["Notes filled at"] || f["Meeting Time"];
         const callDate = ymd(new Date(when));
         return callDate >= cutoff && callDate <= today;
       })

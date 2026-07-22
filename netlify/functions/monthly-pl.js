@@ -1,7 +1,4 @@
-const FIXED_COSTS = {
-  "Claude Pro": 34,   // AUD
-  "Make.com":   15,   // AUD approx (9.5 USD)
-};
+const { FIXED_COSTS, TOTAL_OPEX, OPEX_BREAKDOWN } = require("../shared/pl-costs");
 
 exports.handler = async () => {
   const {
@@ -42,7 +39,9 @@ exports.handler = async () => {
     const formula      = encodeURIComponent(`AND(YEAR({Date})=${year},MONTH({Date})=${month})`);
     const sessionsRes  = await fetch(
       `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_SESSION_TABLE_ID}` +
-      `?filterByFormula=${formula}&fields[]=Amount%20Charged&fields[]=Amount%20Due&fields[]=Payment%20Status&fields[]=Mentor%20Payout`,
+      `?filterByFormula=${formula}` +
+      ["Amount Charged", "Amount Due", "Payment Status", "Mentor Payout", "Stripe Payment ID"]
+        .map((f) => `&fields[]=${encodeURIComponent(f)}`).join(""),
       { headers: airtableHeaders }
     );
     const sessionsData = await sessionsRes.json();
@@ -62,11 +61,18 @@ exports.handler = async () => {
     const due     = parseFloat(s.fields["Amount Due"]) || 0;
     const payout  = parseFloat(s.fields["Mentor Payout"]) || 0;
 
-    // Package PURCHASE row (one-off $150 charge): cash-in only, no revenue/
-    // session recognised here (recognised per delivered session), but it did
-    // incur a real Stripe fee.
+    // A Stripe payment ID is the only reliable marker that money actually moved
+    // through Stripe. When a card fails, Fidel collects manually and logs the
+    // amount with no payment ID, so those rows must not be charged the
+    // 3.25% + 30c. Must match preview-pl.js.
+    const viaStripe = Boolean(s.fields["Stripe Payment ID"]);
+    const fee       = (charged > 0 && viaStripe) ? charged * 0.0325 + 0.30 : 0;
+
+    // Package PURCHASE row (one-off up-front charge): cash-in only, no revenue
+    // or session recognised here (recognised per delivered session), but it did
+    // incur a real Stripe fee when it went through Stripe.
     if (status === "Package" && charged > 0) {
-      stripeFees += charged * 0.0325 + 0.30;
+      stripeFees += fee;
       continue;
     }
 
@@ -77,14 +83,13 @@ exports.handler = async () => {
     else if (status === "Package") revenue = due;
 
     grossRevenue  += revenue;
-    if (charged > 0) stripeFees += charged * 0.0325 + 0.30;
+    stripeFees    += fee;
     mentorPayouts += payout;
     sessionCount  += 1;
   }
 
   const grossProfit = grossRevenue - stripeFees - mentorPayouts;
-  const totalOpex   = Object.values(FIXED_COSTS).reduce((a, b) => a + b, 0);
-  const netProfit   = grossProfit - totalOpex;
+  const netProfit   = grossProfit - TOTAL_OPEX;
 
   const round = (n) => parseFloat(n.toFixed(2));
   const pct   = (n) => grossRevenue > 0 ? parseFloat(((n / grossRevenue) * 100).toFixed(1)) : 0;
@@ -104,9 +109,9 @@ exports.handler = async () => {
             "Mentor Payouts":  round(mentorPayouts),
             "Gross Profit":    round(grossProfit),
             "Gross Margin %":  pct(grossProfit),
-            "Claude Pro":      FIXED_COSTS["Claude Pro"],
-            "Make.com":        FIXED_COSTS["Make.com"],
-            "Total Opex":      totalOpex,
+            ...FIXED_COSTS,
+            "Opex Breakdown":  OPEX_BREAKDOWN,
+            "Total Opex":      TOTAL_OPEX,
             "Net Profit":      round(netProfit),
             "Net Margin %":    pct(netProfit),
           },

@@ -75,10 +75,10 @@ async function load(ownerEmail) {
     mentees: data.mentees,
     onAdded: () => load(ownerEmail), // refresh everything after a manual add
   });
-  // Keep whichever tab is active; only reveal overview on first load.
-  if (document.querySelector(".admin-tab.is-active")?.dataset.view === "overview") {
-    document.getElementById("view-overview").hidden = false;
-  }
+  // Reveal whichever tab is marked active in the markup, so the default view is
+  // changed by moving is-active in admin.html and nothing here needs touching.
+  const active = document.querySelector(".admin-tab.is-active")?.dataset.view;
+  if (active) document.getElementById("view-" + active).hidden = false;
 }
 
 function aggregate({ mentors = [], mentees = [], sessions = [] }) {

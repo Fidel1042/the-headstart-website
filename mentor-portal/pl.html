@@ -150,6 +150,31 @@
       return `${sign}$${abs.toLocaleString("en-AU", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     }
 
+    const esc = (s) => String(s == null ? "" : s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+    // Subscription lines for a month, whatever shape the data arrives in.
+    // The live preview sends opexLines directly. A closed month stored in
+    // Airtable carries "Opex Breakdown" text ("Claude Pro 34.00; Netlify 12.87"),
+    // which is parsed so a subscription added later still itemises correctly on
+    // old records. Named columns are the last resort, for months written before
+    // the breakdown column existed.
+    function opexLines(r) {
+      if (Array.isArray(r.opexLines) && r.opexLines.length) return r.opexLines;
+      if (r.opexBreakdown) {
+        return r.opexBreakdown.split(";").map((part) => {
+          const m = part.trim().match(/^(.*?)\s+([\d.]+)$/);
+          return m ? { name: m[1], cost: parseFloat(m[2]) } : null;
+        }).filter(Boolean);
+      }
+      return [
+        { name: "Claude Pro", cost: r.claudePro },
+        { name: "Make.com",   cost: r.makeCom },
+        { name: "Netlify",    cost: r.netlify },
+        { name: "Airtable",   cost: r.airtable },
+      ].filter((o) => o.cost > 0);
+    }
+
     function renderStatement(r) {
       const el = (id) => document.getElementById(id);
 
@@ -160,8 +185,11 @@
       el("s-payouts").textContent       = fmt(-r.mentorPayouts);
       el("s-gross-profit").textContent  = fmt(r.grossProfit);
       el("s-gross-margin").textContent  = `${r.grossMargin}%`;
-      el("s-claude").textContent        = fmt(-r.claudePro);
-      el("s-makecom").textContent       = fmt(-r.makeCom);
+      el("s-opex-lines").innerHTML = opexLines(r).map((o) => `
+        <div class="stmt-row">
+          <span class="stmt-row-label indent">${esc(o.name)}</span>
+          <span class="stmt-row-value deduction">${fmt(-o.cost)}</span>
+        </div>`).join("");
       el("s-total-opex").textContent    = fmt(-r.totalOpex);
       el("s-net-profit").textContent    = fmt(r.netProfit);
       el("s-net-margin").textContent    = `${r.netMargin}%`;
@@ -170,6 +198,72 @@
       const netEl = el("s-net-profit");
       netEl.classList.toggle("positive", r.netProfit >= 0);
       netEl.classList.toggle("negative", r.netProfit < 0);
+
+      renderDetail(r);
+      renderUncharged(r);
+    }
+
+    // Sessions where nothing was collected. Shown across a 60 day window, not
+    // just this month, so an unpaid session does not vanish on the 1st.
+    function renderUncharged(r) {
+      const box = document.getElementById("uncharged");
+      const rows = r.needsCharging || [];
+      if (!rows.length) {
+        box.hidden = true;
+        return;
+      }
+      box.hidden = false;
+
+      document.getElementById("u-count").textContent =
+        `${rows.length} session${rows.length === 1 ? "" : "s"}`;
+
+      document.getElementById("u-rows").innerHTML = rows.map((l) => `
+        <tr>
+          <td>${esc(l.date)}</td>
+          <td>${esc(l.mentee)}</td>
+          <td>${esc(l.mentor)}</td>
+          <td>${esc(l.status || "no status")}</td>
+          <td class="num">${l.payout ? fmt(l.payout) : "&mdash;"}</td>
+        </tr>`).join("");
+
+      const owed = rows.reduce((a, l) => a + l.payout, 0);
+      document.getElementById("u-note").textContent = owed > 0
+        ? `${fmt(owed)} has already gone out to mentors on these sessions. Add the amount in Airtable once collected, or set the status to Failed if it was written off.`
+        : `Add the amount in Airtable once collected, or set the status to Failed if it was written off.`;
+    }
+
+    // Line-item detail. Only the live preview carries per-session rows; a closed
+    // month is stored as totals only, so the section stays hidden for those.
+    function renderDetail(r) {
+      const detail = document.getElementById("detail");
+      if (!Array.isArray(r.lines) || !r.lines.length) {
+        detail.hidden = true;
+        return;
+      }
+      detail.hidden = false;
+
+      const sign = (n) => n < 0 ? "negative" : "";
+
+      document.getElementById("d-mentors").innerHTML = (r.mentors || []).map((m) => `
+        <tr>
+          <td>${esc(m.mentor)}</td>
+          <td class="num">${m.sessions}</td>
+          <td class="num">${fmt(m.revenue)}</td>
+          <td class="num">${fmt(-m.payout)}</td>
+          <td class="num ${sign(m.margin)}">${fmt(m.margin)}</td>
+        </tr>`).join("");
+
+      document.getElementById("d-sessions").innerHTML = r.lines.map((l) => `
+        <tr${l.kind === "purchase" ? ' class="is-purchase"' : ""}>
+          <td>${esc(l.date)}</td>
+          <td>${esc(l.mentee)}${l.kind === "purchase" ? ' <span class="tag">package purchase</span>' : ""}</td>
+          <td>${esc(l.mentor)}</td>
+          <td>${l.method === "Manual" ? '<span class="tag">manual</span>' : "Stripe"}</td>
+          <td class="num">${fmt(l.revenue)}</td>
+          <td class="num">${l.fee ? fmt(-l.fee) : "&mdash;"}</td>
+          <td class="num">${l.payout ? fmt(-l.payout) : "&mdash;"}</td>
+          <td class="num ${sign(l.margin)}">${fmt(l.margin)}</td>
+        </tr>`).join("");
     }
   </script>
   <style>
@@ -185,6 +279,9 @@
       --accent-soft: rgba(199,155,59,0.18);
       --gold-gradient: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
       --shadow-card: 0 12px 32px rgba(0,0,0,0.4);
+      --warn-bg: rgba(224,104,95,0.08);
+      --warn-line: rgba(224,104,95,0.32);
+      --warn-text: #f0938b;
     }
     [data-theme="light"] {
       --bg: #ffffff;
@@ -198,6 +295,10 @@
       --accent-soft: rgba(199,155,59,0.12);
       --gold-gradient: linear-gradient(90deg, #8a6210 0%, #b88820 35%, #a07a1d 68%, #c79b3b 100%);
       --shadow-card: 0 6px 18px rgba(0,0,0,0.08);
+      /* Darker on white so the warning text clears 4.5:1 on its tinted panel. */
+      --warn-bg: rgba(193,58,47,0.06);
+      --warn-line: rgba(193,58,47,0.28);
+      --warn-text: #9e2b21;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -404,6 +505,83 @@
       vertical-align: middle;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Uncharged sessions. Money that should have come in and did not, so it
+       reads as a warning rather than another neutral panel. */
+    .alert {
+      margin-bottom: 28px;
+      padding: 18px 20px;
+      border: 1px solid var(--warn-line);
+      border-radius: 12px;
+      background: var(--warn-bg);
+    }
+    .alert-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .alert-title { font-size: 0.95rem; font-weight: 700; color: var(--warn-text); }
+    .alert-count { font-size: 0.8rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+    .alert-note { margin-top: 12px; font-size: 0.78rem; line-height: 1.5; color: var(--text-muted); max-width: 62ch; }
+    .alert .dtable { min-width: 460px; }
+    .alert .dtable th { border-bottom-color: var(--warn-line); }
+    .alert .dtable td { border-bottom-color: var(--warn-line); }
+
+    /* Line-item detail */
+    .detail { margin-top: 40px; display: flex; flex-direction: column; gap: 32px; }
+    .detail-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text);
+      padding-bottom: 10px;
+      margin-bottom: 4px;
+      border-bottom: 1px solid var(--line);
+    }
+    /* Wide tables scroll inside their own box so the page never scrolls sideways. */
+    .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .dtable {
+      width: 100%;
+      min-width: 520px;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+    .dtable th {
+      text-align: left;
+      font-weight: 600;
+      color: var(--text-muted);
+      padding: 10px 12px 10px 0;
+      border-bottom: 1px solid var(--line);
+      white-space: nowrap;
+    }
+    .dtable td {
+      padding: 11px 12px 11px 0;
+      border-bottom: 1px solid var(--line-soft);
+      color: var(--text);
+      white-space: nowrap;
+    }
+    .dtable tr:last-child td { border-bottom: none; }
+    .dtable .num { text-align: right; font-variant-numeric: tabular-nums; padding-right: 0; }
+    .dtable th.num { text-align: right; }
+    .dtable .negative { color: #e0685f; }
+    .dtable .is-purchase td { color: var(--text-muted); }
+    .tag {
+      display: inline-block;
+      margin-left: 6px;
+      padding: 2px 7px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-size: 0.66rem;
+      color: var(--text-muted);
+    }
+    .detail-note {
+      margin-top: 12px;
+      font-size: 0.78rem;
+      line-height: 1.5;
+      color: var(--text-muted);
+      max-width: 62ch;
+    }
   </style>
   <link rel="stylesheet" href="portal.css" />
   <link rel="stylesheet" href="/mentor-portal/polish.css" />
@@ -422,6 +600,22 @@
       </div>
     </div>
     <p id="live-badge" hidden style="font-size:0.75rem;font-weight:700;letter-spacing:0.1em;color:var(--accent);text-transform:uppercase;margin-bottom:20px;">Live preview</p>
+
+    <section class="alert" id="uncharged" hidden>
+      <div class="alert-head">
+        <h2 class="alert-title">Not charged yet</h2>
+        <span class="alert-count" id="u-count"></span>
+      </div>
+      <div class="table-scroll">
+        <table class="dtable">
+          <thead>
+            <tr><th>Date</th><th>Mentee</th><th>Mentor</th><th>Status</th><th class="num">Paid to mentor</th></tr>
+          </thead>
+          <tbody id="u-rows"></tbody>
+        </table>
+      </div>
+      <p class="alert-note" id="u-note"></p>
+    </section>
 
     <p class="loading" id="loading" hidden>Loading</p>
     <p class="empty-state" id="empty-state" hidden>No P&amp;L records yet. The first statement generates on the 1st of next month.</p>
@@ -461,14 +655,7 @@
       <hr class="stmt-divider thick" />
 
       <p class="stmt-section-label">Operating Expenses</p>
-      <div class="stmt-row">
-        <span class="stmt-row-label indent">Claude Pro</span>
-        <span class="stmt-row-value deduction" id="s-claude"></span>
-      </div>
-      <div class="stmt-row">
-        <span class="stmt-row-label indent">Make.com</span>
-        <span class="stmt-row-value deduction" id="s-makecom"></span>
-      </div>
+      <div id="s-opex-lines"></div>
       <div class="stmt-row" style="padding-top:10px;">
         <span class="stmt-row-label" style="font-weight:600;">Total Opex</span>
         <span class="stmt-row-value deduction" id="s-total-opex" style="font-weight:600;"></span>
@@ -483,6 +670,33 @@
       <p class="stmt-net-margin" id="s-net-margin"></p>
 
     </div>
+
+    <section class="detail" id="detail" hidden>
+      <div class="detail-block">
+        <h2 class="detail-title">By mentor</h2>
+        <div class="table-scroll">
+          <table class="dtable">
+            <thead>
+              <tr><th>Mentor</th><th class="num">Sessions</th><th class="num">Revenue</th><th class="num">Payout</th><th class="num">Margin</th></tr>
+            </thead>
+            <tbody id="d-mentors"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="detail-block">
+        <h2 class="detail-title">Every session</h2>
+        <div class="table-scroll">
+          <table class="dtable">
+            <thead>
+              <tr><th>Date</th><th>Mentee</th><th>Mentor</th><th>Paid by</th><th class="num">Revenue</th><th class="num">Fee</th><th class="num">Payout</th><th class="num">Margin</th></tr>
+            </thead>
+            <tbody id="d-sessions"></tbody>
+          </table>
+        </div>
+        <p class="detail-note">Package purchase rows show the up-front charge. Their revenue is counted on the sessions as they are delivered, so those rows show revenue of zero and carry only the Stripe fee.</p>
+      </div>
+    </section>
 
   </main>
 

@@ -68,6 +68,7 @@ function card(c, kind) {
       </div>
       <div class="contact-card__actions">
         <button type="button" class="c-btn c-btn--save" data-act="save" data-id="${c.id}" ${hasPhone ? "" : "disabled"}>Save contact</button>
+        ${c.message ? `<button type="button" class="c-btn" data-act="copymsg" data-id="${c.id}">Copy message</button>` : ""}
         <a class="c-btn c-btn--msg${hasPhone ? "" : " is-disabled"}" ${hasPhone ? `href="https://wa.me/${c.phone}" target="_blank" rel="noopener"` : 'aria-disabled="true"'}>Message</a>
         <button type="button" class="c-btn c-btn--done" data-act="done" data-id="${c.id}" data-kind="${kind}">Mark done</button>
       </div>
@@ -139,19 +140,19 @@ async function markDone(id, kind, btn) {
   }
 }
 
-// One-tap copy for the welcome message. Falls back to selecting the text when
-// the clipboard API is unavailable (e.g. an insecure context).
-async function copyText(btn) {
-  const el = document.getElementById(btn.dataset.copy);
-  if (!el) return;
+// One-tap copy. Falls back to selecting the source element when the clipboard
+// API is unavailable (e.g. an insecure context).
+async function copyToClipboard(btn, text, srcEl) {
   try {
-    await navigator.clipboard.writeText(el.textContent);
+    await navigator.clipboard.writeText(text);
   } catch {
-    const range = document.createRange();
-    range.selectNodeContents(el);
-    const sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(range);
+    if (srcEl) {
+      const range = document.createRange();
+      range.selectNodeContents(srcEl);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
   }
   const original = btn.textContent;
   btn.textContent = "Copied";
@@ -160,11 +161,16 @@ async function copyText(btn) {
 
 document.querySelector(".contacts-page").addEventListener("click", (e) => {
   const copyBtn = e.target.closest("[data-copy]");
-  if (copyBtn) { copyText(copyBtn); return; }
+  if (copyBtn) {
+    const el = document.getElementById(copyBtn.dataset.copy);
+    if (el) copyToClipboard(copyBtn, el.textContent, el);
+    return;
+  }
   const btn = e.target.closest("[data-act]");
   if (!btn) return;
   const c = byId.get(btn.dataset.id);
   if (btn.dataset.act === "save" && c) saveContact(c);
+  if (btn.dataset.act === "copymsg" && c) copyToClipboard(btn, c.message);
   if (btn.dataset.act === "done") markDone(btn.dataset.id, btn.dataset.kind, btn);
 });
 

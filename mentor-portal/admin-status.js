@@ -108,17 +108,23 @@ export function renderStatus({ mentees = [], allDelivered = [], rows = [], owner
     else buckets.dropped.push(it);
   });
 
-  const col = (title, tone, items) => `
-    <div class="status-col">
-      <h3 class="status-col__title status-col__title--${tone}">${title} · ${items.length}</h3>
+  // Groups are ordered by how much they need doing something about, and only
+  // the two that need action open on load. Active is the biggest group and the
+  // one needing nothing, so leaving it expanded buried the rest.
+  const col = (title, tone, items, open) => `
+    <details class="status-col"${open ? " open" : ""}>
+      <summary class="status-col__title status-col__title--${tone}">
+        <span>${title}</span>
+        <span class="status-col__count">${items.length}</span>
+      </summary>
       <div class="status-col__items">${items.map((m) => item(m, tone)).join("") || '<p class="status-empty">None</p>'}</div>
-    </div>`;
+    </details>`;
 
   grid.innerHTML =
-    col("Active", "ok", buckets.active) +
-    col("Nudge", "warn", buckets.nudge) +
-    col("Dropped", "bad", buckets.dropped) +
-    (buckets.none.length ? col("No sessions yet", "muted", buckets.none) : "");
+    col("Nudge", "warn", buckets.nudge, true) +
+    (buckets.none.length ? col("No sessions yet", "muted", buckets.none, true) : "") +
+    col("Dropped", "bad", buckets.dropped, false) +
+    col("Active", "ok", buckets.active, false);
 
   if (!bound) {
     bound = true;

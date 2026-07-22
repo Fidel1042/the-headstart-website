@@ -87,6 +87,11 @@ function buildEmail(b) {
       `<p>Might be worth reaching out to check in with them!<br>Here's a message you can send to the group:</p>` +
       copyBox(r.name);
   });
+  // Closing nudge, only on the inactive-mentee email. Payouts are worked out
+  // from logged sessions, so an unlogged session is an unpaid one.
+  if (b.reachout.length) {
+    h += `<p>If you haven't logged any sessions in the past few weeks, <strong>we won't be able to pay you</strong>, so log them now!</p>`;
+  }
   return h;
 }
 
