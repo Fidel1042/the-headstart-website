@@ -4,9 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
-  <title>Session structure — Headstart</title>
+  <title>ROI — Headstart</title>
   <link rel="stylesheet" href="css/base.css" />
-  <link rel="stylesheet" href="css/structure.css" />
+  <link rel="stylesheet" href="css/roi.css" />
   <style id="auth-gate">
     html:not(.auth-ok) body { visibility: hidden; }
     html:not(.auth-ok) { background: #000; }
@@ -57,34 +57,83 @@
       <a class="tool-nav__link" href="/mentor-portal/index.html" style="opacity:0.55;">← Portal</a>
       <a class="tool-nav__link" href="index.html">Notes</a>
       <a class="tool-nav__link" href="matrix.html">Where you are</a>
-      <a class="tool-nav__link is-current" href="structure.html">Session structure</a>
+      <a class="tool-nav__link" href="structure.html">Session structure</a>
       <a class="tool-nav__link" href="mentors.html">Mentors</a>
-      <a class="tool-nav__link" href="roi.html">ROI</a>
+      <a class="tool-nav__link is-current" href="roi.html">ROI</a>
       <a class="tool-nav__link" href="pricing.html">Pricing</a>
       <button class="tool-nav__live" onclick="location.href=location.pathname+'?v='+Date.now()"><span class="tool-nav__live__icon">&#8635;</span> Live</button>
     </div>
   </nav>
 
   <main class="shell">
-    <div class="persona-switch" id="personaSwitch"></div>
-    <div class="struct-head" id="structHead"></div>
-    <div class="stage-list" id="stageList"></div>
+    <header class="page-head">
+      <h1 class="page-title">Return on mentorship</h1>
+    </header>
 
-    <div class="struct-ctas">
-      <a class="btn btn--gold" id="mentorCta" href="mentors.html">See your recommended tutor &rarr;</a>
-      <a class="btn" href="pricing.html">View pricing</a>
+    <div class="roi-grid">
+      <section class="roi-panel">
+        <div class="roi-field">
+          <div class="roi-field__top">
+            <label class="roi-field__label" for="roiSalary">Expected starting salary</label>
+            <span class="roi-field__val" id="roiSalaryVal">$70,000</span>
+          </div>
+          <input class="roi-range" type="range" id="roiSalary" min="45000" max="140000" step="1000" value="70000" />
+        </div>
+
+        <div class="roi-field">
+          <div class="roi-field__top">
+            <label class="roi-field__label" for="roiMonths">Hired sooner with mentorship</label>
+            <span class="roi-field__val" id="roiMonthsVal">3 months</span>
+          </div>
+          <input class="roi-range" type="range" id="roiMonths" min="1" max="6" step="1" value="3" />
+        </div>
+
+        <div class="roi-field">
+          <div class="roi-field__top">
+            <label class="roi-field__label" for="roiSessions">Sessions</label>
+            <span class="roi-field__val" id="roiSessionsVal">5 sessions</span>
+          </div>
+          <input class="roi-range" type="range" id="roiSessions" min="1" max="12" step="1" value="5" />
+        </div>
+      </section>
+
+      <section class="roi-panel">
+        <div class="roi-line">
+          <span class="roi-line__label">
+            Mentorship investment
+            <span class="roi-line__sub" id="roiInvestSub">5 x $49</span>
+          </span>
+          <span class="roi-line__val roi-line__val--out" id="roiInvestVal">-$245</span>
+        </div>
+        <div class="roi-line">
+          <span class="roi-line__label">
+            <span id="roiGainedLabel">Take-home gained (3 months)</span>
+            <span class="roi-line__sub">after 18% tax</span>
+          </span>
+          <span class="roi-line__val roi-line__val--in" id="roiGainedVal">+$14,350</span>
+        </div>
+        <div class="roi-net">
+          <span class="roi-net__label">Net gain</span>
+          <span class="roi-net__val" id="roiNetVal">$14,105</span>
+        </div>
+        <div class="roi-return">
+          <span class="roi-return__label">Return</span>
+          <span class="roi-return__val" id="roiReturnVal">59x</span>
+        </div>
+        <p class="roi-note" id="roiNote">Covered after about 2 days of earning.</p>
+      </section>
     </div>
 
-    <a class="back-link" href="matrix.html">&larr; Back to the four situations</a>
+    <a class="back-link" href="pricing.html">Pricing &rarr;</a>
   </main>
 
   <footer class="tool-foot">
     <div class="shell">Headstart Mentoring — internal consultation resource.</div>
   </footer>
 
+  <script src="js/roi.js"></script>
   <script>// Propagate ?v= to all nav links so every navigation is cache-fresh
 (function(){var v=new URLSearchParams(location.search).get("v");if(!v)return;document.querySelectorAll(".tool-nav__link").forEach(function(a){var u=new URL(a.href,location.href);u.searchParams.set("v",v);a.href=u.pathname+"?v="+v;});})();
 </script>
-  <script type="module">const v=new URLSearchParams(location.search).get("v")||"0";await import(`./js/structure.js?v=${v}`);</script>
 </body>
 </html>
