@@ -1,0 +1,178 @@
+/* admin-chart.css — stacked mentor/mentee session chart on the admin overview. */
+
+.work-chart {
+  position: relative;
+  margin-bottom: 1.6rem;
+  padding: 1.3rem 1.4rem 1.5rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--bg-card);
+}
+.wc-head { margin-bottom: 1.1rem; }
+.wc-title { font-size: 1rem; font-weight: 700; color: var(--text); }
+.wc-sub { margin-top: 0.25rem; font-size: 0.78rem; color: var(--text-muted); max-width: 62ch; }
+.wc-none { font-size: 0.85rem; color: var(--text-muted); }
+
+.wc-rows { display: flex; flex-direction: column; }
+
+/* name | bar | total, with the detail spanning all three when open */
+.wc-row {
+  display: grid;
+  grid-template-columns: minmax(96px, 150px) 1fr auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.42rem 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+.wc-row:last-child { border-bottom: none; }
+.wc-row.is-open { background: var(--bg-card-hover); }
+
+.wc-name {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+  padding: 0.25rem 0;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+.wc-name__text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wc-name:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+.wc-caret {
+  width: 0.34rem; height: 0.34rem;
+  border-right: 1.5px solid var(--text-muted);
+  border-bottom: 1.5px solid var(--text-muted);
+  transform: rotate(-45deg);
+  transition: transform 0.15s ease;
+  flex-shrink: 0;
+}
+.wc-row.is-open .wc-caret { transform: rotate(45deg); }
+
+.wc-track { min-width: 0; }
+.wc-bar {
+  display: flex;
+  gap: 2px;
+  height: 26px;
+  min-width: 0;
+}
+/* Four tints of the brand gold, cycled. Colour separates neighbouring blocks;
+   it never carries meaning on its own, the label and tooltip do that. */
+.wc-seg {
+  flex-basis: 0;
+  min-width: 24px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #2b1b09;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: filter 0.12s ease, transform 0.12s ease;
+}
+.wc-seg:hover, .wc-seg:focus-visible { filter: brightness(1.12); transform: translateY(-1px); }
+.wc-seg:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+.wc-seg--0 { background: #f0c75c; }
+.wc-seg--1 { background: #c79b3b; }
+.wc-seg--2 { background: #e0b04a; }
+.wc-seg--3 { background: #a87f28; }
+.wc-seg__n { pointer-events: none; }
+
+.wc-total {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  font-size: 0.82rem;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.wc-total__all { font-size: 0.7rem; color: var(--text-muted); }
+
+/* ── Per-mentee breakdown ── */
+.wc-detail { grid-column: 1 / -1; padding: 0.5rem 0 0.7rem; }
+.wc-branch { list-style: none; margin: 0; padding: 0 0 0 1.1rem; border-left: 1px solid var(--line); }
+.wc-twig {
+  display: grid;
+  grid-template-columns: minmax(90px, 1.4fr) minmax(60px, 1fr) auto auto;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.3rem 0 0.3rem 0.8rem;
+  position: relative;
+  font-size: 0.76rem;
+}
+/* Short connector from the trunk to each mentee. */
+.wc-twig::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 50%;
+  width: 0.65rem;
+  border-top: 1px solid var(--line);
+}
+.wc-twig__name { color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wc-twig__track { height: 6px; border-radius: 3px; background: var(--line-soft); overflow: hidden; }
+.wc-twig__fill { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
+.wc-twig__nums { display: flex; align-items: baseline; gap: 0.3rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.wc-twig__month { font-weight: 700; color: var(--text); }
+.wc-twig__all { font-size: 0.7rem; color: var(--text-muted); }
+.wc-twig__last { font-size: 0.7rem; color: var(--text-muted); white-space: nowrap; }
+.wc-twig__last--warn { color: var(--warn); }
+.wc-twig__last--bad { color: var(--bad); }
+
+.wc-idle {
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.75rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+.wc-idle strong { color: var(--text); font-weight: 600; }
+
+/* ── Tooltip ── */
+.wc-tip {
+  position: absolute;
+  z-index: 20;
+  transform: translateX(-50%);
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.72rem;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.28);
+}
+
+@media (max-width: 700px) {
+  .work-chart { padding: 1rem 0.9rem 1.2rem; }
+  /* Name above the bar, so neither gets squeezed on a phone. */
+  .wc-row {
+    grid-template-columns: 1fr auto;
+    gap: 0.35rem 0.6rem;
+    padding: 0.6rem 0;
+  }
+  .wc-name { grid-column: 1; }
+  .wc-total { grid-column: 2; grid-row: 1; }
+  .wc-track { grid-column: 1 / -1; }
+  .wc-twig {
+    grid-template-columns: 1fr auto;
+    gap: 0.2rem 0.6rem;
+  }
+  .wc-twig__track { grid-column: 1 / -1; order: 3; }
+  .wc-twig__last { grid-column: 1 / -1; order: 4; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wc-caret, .wc-seg { transition: none; }
+  .wc-seg:hover, .wc-seg:focus-visible { transform: none; }
+}

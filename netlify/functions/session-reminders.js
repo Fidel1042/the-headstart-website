@@ -11,6 +11,18 @@
 const SENDER = { name: "The Headstart", email: "fidel@theheadstartmentoring.com" };
 const TZ = "Australia/Sydney";
 const REACH_OUT_DAYS = 10;
+// A mentee qualifies for Koko's check 10 days after their mentor's FIRST nudge
+// about them. It has to key off the first nudge, not "Last Reminded": that one
+// is re-stamped every 7 days while the nudge cycle runs, so a 10 day gap from
+// it never arrives.
+//
+// Every mentee has their own clock, so qualifying dates are scattered across
+// the week. Sending on each qualifying date would mean several one-line emails.
+// Instead the digest goes out on one fixed day and carries everyone who has
+// qualified by then, so Koko gets exactly one list a week.
+const KOKO_CHECK_DAYS = 10;
+const KOKO_DIGEST_DAY = "Mon";
+const KOKO = { email: "kokoro.araki1015@gmail.com", name: "Koko" };
 
 const ymd = (date) =>
   new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" }).format(date);
@@ -51,12 +63,11 @@ async function sendEmail(apiKey, to, name, subject, html) {
   });
 }
 
-// Stamp today's date so the mentee is not nudged again for another 7 days.
-async function markReminded(baseId, tableId, recordId, date, token) {
+async function patchMentee(baseId, tableId, recordId, fields, token) {
   await fetch(`https://api.airtable.com/v0/${baseId}/${tableId}/${recordId}`, {
     method: "PATCH",
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ fields: { "Last Reminded": date } }),
+    body: JSON.stringify({ fields }),
   }).catch(() => {});
 }
 
@@ -95,6 +106,29 @@ function buildEmail(b) {
   return h;
 }
 
+// Koko's check-in. One digest listing every mentee whose mentor was nudged 10+
+// days ago and who still has nothing booked, so she can check the mentor
+// actually followed up rather than each of them getting a separate email.
+function buildKokoEmail(list) {
+  const rows = list.map((k) => `
+    <tr>
+      <td style="padding:8px 14px 8px 0;border-bottom:1px solid #e6e1d5">${esc(k.name)}</td>
+      <td style="padding:8px 14px 8px 0;border-bottom:1px solid #e6e1d5">${esc(k.mentor)}</td>
+      <td style="padding:8px 14px 8px 0;border-bottom:1px solid #e6e1d5">${k.gap} days</td>
+      <td style="padding:8px 0;border-bottom:1px solid #e6e1d5">${k.since} days ago</td>
+    </tr>`).join("");
+
+  return `<p>Hi Koko,</p>` +
+    `<p>These mentees still have nothing booked, and their mentor was first asked to reach out at least ${KOKO_CHECK_DAYS} days ago.</p>` +
+    `<table style="border-collapse:collapse;font-size:14px">` +
+    `<tr><th align="left" style="padding:0 14px 8px 0;border-bottom:2px solid #d9d3c4">Mentee</th>` +
+    `<th align="left" style="padding:0 14px 8px 0;border-bottom:2px solid #d9d3c4">Mentor</th>` +
+    `<th align="left" style="padding:0 14px 8px 0;border-bottom:2px solid #d9d3c4">Last session</th>` +
+    `<th align="left" style="padding:0 0 8px;border-bottom:2px solid #d9d3c4">Mentor nudged</th></tr>` +
+    rows + `</table>` +
+    `<p>Worth checking whether the mentor actually messaged them.</p>`;
+}
+
 exports.handler = async (event) => {
   const {
     AIRTABLE_API_TOKEN, AIRTABLE_CORE_BASE_ID, AIRTABLE_BASE_ID,
@@ -118,7 +152,8 @@ exports.handler = async (event) => {
   try {
     // Active, acquired mentees with a mentor assigned.
     const menteeRecs = await fetchAll(AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTEE_TABLE_ID,
-      ["Name", "Client Pipeline", "Mentor Email Plain", "Mentor Name", "Last Reminded"], AIRTABLE_API_TOKEN);
+      ["Name", "Client Pipeline", "Mentor Email Plain", "Mentor Name",
+       "Last Reminded", "First Reminded", "Koko Checked At"], AIRTABLE_API_TOKEN);
     const active = new Map();
     const byName = new Map(); // lowercased mentee name -> record id (for older
                               // session rows whose Mentee Record ID is blank)
@@ -132,7 +167,9 @@ exports.handler = async (event) => {
           name,
           mentorEmail: email,
           mentorName: (Array.isArray(mn) ? mn[0] : mn) || email,
-          lastReminded: (f["Last Reminded"] || "").slice(0, 10),
+          lastReminded:  (f["Last Reminded"]   || "").slice(0, 10),
+          firstReminded: (f["First Reminded"]  || "").slice(0, 10),
+          kokoChecked:   (f["Koko Checked At"] || "").slice(0, 10),
         });
         if (name) byName.set(name.trim().toLowerCase(), r.id);
       }
@@ -164,17 +201,39 @@ exports.handler = async (event) => {
       if (!byMentor.has(email)) byMentor.set(email, { name, tomorrow: [], reachout: [] });
       return byMentor.get(email);
     };
+    const kokoList = [];  // mentees to escalate to Koko
+    const toReset  = [];  // booked again: clear the stamps so the cycle restarts
     active.forEach((m, id) => {
       const a = agg.get(id);
       if (!a) return;
       if (a.tomorrow) bucket(m.mentorEmail, m.mentorName).tomorrow.push(m.name);
-      if (a.lastDate && !a.hasFuture) {
-        const gap = daysBetween(a.lastDate, today);
-        // Nudge once overdue, then again every 7 days until they book or drop.
-        const dueForNudge = !m.lastReminded || daysBetween(m.lastReminded, today) >= 7;
-        if (gap >= REACH_OUT_DAYS && dueForNudge) {
-          bucket(m.mentorEmail, m.mentorName).reachout.push({ id, name: m.name, gap });
-        }
+
+      // Booked again. Clear the stamps, otherwise a mentee who goes quiet months
+      // later would look like they had been chased since the old date and Koko
+      // would be escalated to on the very first nudge.
+      if (a.hasFuture) {
+        if (m.lastReminded || m.firstReminded || m.kokoChecked) toReset.push(id);
+        return;
+      }
+      if (!a.lastDate) return;
+
+      const gap = daysBetween(a.lastDate, today);
+      // Nudge once overdue, then again every 7 days until they book or drop.
+      const dueForNudge = !m.lastReminded || daysBetween(m.lastReminded, today) >= 7;
+      if (gap >= REACH_OUT_DAYS && dueForNudge) {
+        bucket(m.mentorEmail, m.mentorName).reachout.push({ id, name: m.name, gap, first: !m.firstReminded });
+      }
+
+      // Qualifies for Koko's weekly digest once the mentor's first nudge is 10+
+      // days old and still nothing is booked. They stay on the list every week
+      // until they book, with "nudged X days ago" climbing so a mentee going
+      // nowhere becomes more obvious each time rather than blending in.
+      if (m.firstReminded && daysBetween(m.firstReminded, today) >= KOKO_CHECK_DAYS) {
+        kokoList.push({
+          id, name: m.name, mentor: m.mentorName, gap,
+          since: daysBetween(m.firstReminded, today),
+          lastChecked: m.kokoChecked,
+        });
       }
     });
 
@@ -189,13 +248,41 @@ exports.handler = async (event) => {
         await sendEmail(BREVO_API_KEY, email, b.name, subject, buildEmail(b));
         sent++;
         // Stamp each nudged mentee so it waits 7 days before the next nudge.
+        // "First Reminded" is written once and never overwritten: it is the
+        // clock Koko's check-in counts from.
         for (const r of b.reachout) {
-          await markReminded(AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTEE_TABLE_ID, r.id, today, AIRTABLE_API_TOKEN);
+          const fields = { "Last Reminded": today };
+          if (r.first) fields["First Reminded"] = today;
+          await patchMentee(AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTEE_TABLE_ID, r.id, fields, AIRTABLE_API_TOKEN);
         }
       }
     }
 
-    return { statusCode: 200, body: JSON.stringify({ date: today, dryRun, mentorsEmailed: sent, summary }) };
+    // Koko's check-in: did the mentors actually chase these mentees? One digest
+    // on the fixed day, sorted worst first.
+    kokoList.sort((a, b) => b.since - a.since);
+    const kokoDay = m.weekday === KOKO_DIGEST_DAY;
+    if (kokoList.length && kokoDay && !dryRun && BREVO_API_KEY) {
+      await sendEmail(BREVO_API_KEY, KOKO.email, KOKO.name,
+        `${kokoList.length} mentee${kokoList.length === 1 ? "" : "s"} to check on`, buildKokoEmail(kokoList));
+      for (const k of kokoList) {
+        await patchMentee(AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTEE_TABLE_ID, k.id,
+          { "Koko Checked At": today }, AIRTABLE_API_TOKEN);
+      }
+    }
+
+    if (!dryRun) {
+      for (const id of toReset) {
+        await patchMentee(AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTEE_TABLE_ID, id,
+          { "Last Reminded": null, "First Reminded": null, "Koko Checked At": null }, AIRTABLE_API_TOKEN);
+      }
+    }
+
+    return { statusCode: 200, body: JSON.stringify({
+      date: today, dryRun, mentorsEmailed: sent, summary,
+      kokoDigestDay: KOKO_DIGEST_DAY, kokoSendsToday: kokoDay,
+      kokoCheck: kokoList, stampsCleared: toReset.length,
+    }) };
   } catch (err) {
     return { statusCode: 500, body: JSON.stringify({ error: err.message || "Reminder job failed" }) };
   }

@@ -38,4 +38,19 @@ const OPEX_BREAKDOWN = Object.entries(FIXED_COSTS)
 // Line-item form, for the detailed view in the portal.
 const OPEX_LINES = Object.entries(FIXED_COSTS).map(([name, cost]) => ({ name, cost }));
 
-module.exports = { USD_AUD, FIXED_COSTS, TOTAL_OPEX, OPEX_BREAKDOWN, OPEX_LINES };
+// Founder sessions carry no payout, so on paper they look far more profitable
+// than the same session run by a mentor. That flatters the business and hides
+// what it costs to replace Fidel at the mentoring desk. The notional cost below
+// never enters real expenses (owner time is not a deductible cost); it is shown
+// as a separate "what if this were paid out" figure for decision making.
+const FOUNDER_EMAILS = ["fidelhon@gmail.com"];
+const FOUNDER_SESSION_COST = 20;   // AUD, the standard mentor payout per session
+
+const isFounder = (email, name) =>
+  FOUNDER_EMAILS.includes(String(email || "").toLowerCase().trim()) ||
+  String(name || "").trim().toLowerCase() === "fidel";
+
+module.exports = {
+  USD_AUD, FIXED_COSTS, TOTAL_OPEX, OPEX_BREAKDOWN, OPEX_LINES,
+  FOUNDER_SESSION_COST, isFounder,
+};

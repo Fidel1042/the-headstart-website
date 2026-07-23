@@ -1,4 +1,6 @@
-const { FIXED_COSTS, TOTAL_OPEX, OPEX_BREAKDOWN } = require("../shared/pl-costs");
+const {
+  FIXED_COSTS, TOTAL_OPEX, OPEX_BREAKDOWN, FOUNDER_SESSION_COST, isFounder,
+} = require("../shared/pl-costs");
 
 exports.handler = async () => {
   const {
@@ -40,7 +42,8 @@ exports.handler = async () => {
     const sessionsRes  = await fetch(
       `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_SESSION_TABLE_ID}` +
       `?filterByFormula=${formula}` +
-      ["Amount Charged", "Amount Due", "Payment Status", "Mentor Payout", "Stripe Payment ID"]
+      ["Amount Charged", "Amount Due", "Payment Status", "Mentor Payout",
+       "Stripe Payment ID", "Mentor Email", "Mentor Name"]
         .map((f) => `&fields[]=${encodeURIComponent(f)}`).join(""),
       { headers: airtableHeaders }
     );
@@ -54,6 +57,7 @@ exports.handler = async () => {
   let stripeFees    = 0;
   let mentorPayouts = 0;
   let sessionCount  = 0;
+  let founderSessions = 0;
 
   for (const s of sessions) {
     const status  = s.fields["Payment Status"] || "";
@@ -81,6 +85,13 @@ exports.handler = async () => {
     let revenue = 0;
     if (status === "Charged")      revenue = charged;
     else if (status === "Package") revenue = due;
+
+    // Founder sessions carry no payout. Counted so the notional replacement
+    // cost can be shown separately; never added to real expenses. Must match
+    // preview-pl.js.
+    if (payout === 0 && isFounder(s.fields["Mentor Email"], s.fields["Mentor Name"])) {
+      founderSessions += 1;
+    }
 
     grossRevenue  += revenue;
     stripeFees    += fee;
@@ -114,6 +125,8 @@ exports.handler = async () => {
             "Total Opex":      TOTAL_OPEX,
             "Net Profit":      round(netProfit),
             "Net Margin %":    pct(netProfit),
+            "Founder Sessions": founderSessions,
+            "Founder Cost":     round(founderSessions * FOUNDER_SESSION_COST),
           },
         }),
       }

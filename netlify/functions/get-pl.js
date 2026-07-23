@@ -48,6 +48,8 @@ exports.handler = async (event) => {
       totalOpex:      r.fields["Total Opex"]     || 0,
       netProfit:      r.fields["Net Profit"]     || 0,
       netMargin:      r.fields["Net Margin %"]   || 0,
+      founderSessions: r.fields["Founder Sessions"] || 0,
+      founderCost:     r.fields["Founder Cost"]     || 0,
     }));
 
     return { statusCode: 200, headers, body: JSON.stringify({ records }) };

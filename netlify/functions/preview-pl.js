@@ -1,4 +1,4 @@
-const { TOTAL_OPEX, OPEX_LINES } = require("../shared/pl-costs");
+const { TOTAL_OPEX, OPEX_LINES, FOUNDER_SESSION_COST, isFounder } = require("../shared/pl-costs");
 
 const headers = {
   "Access-Control-Allow-Origin":  "*",
@@ -43,7 +43,7 @@ exports.handler = async (event) => {
       `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_SESSION_TABLE_ID}` +
       `?filterByFormula=${formula}` +
       ["Amount Charged", "Amount Due", "Payment Status", "Mentor Payout",
-       "Date", "Mentee Name", "Mentor Name", "Stripe Payment ID"]
+       "Date", "Mentee Name", "Mentor Name", "Mentor Email", "Stripe Payment ID"]
         .map((f) => `&fields[]=${encodeURIComponent(f)}`).join("") +
       `&sort[0][field]=Date&sort[0][direction]=asc`,
       { headers: { Authorization: `Bearer ${AIRTABLE_API_TOKEN}`, "Content-Type": "application/json" } }
@@ -58,6 +58,7 @@ exports.handler = async (event) => {
   let stripeFees    = 0;
   let mentorPayouts = 0;
   let sessionCount  = 0;
+  let founderSessions = 0;
   const lines = [];   // one row per session this month, for the breakdown
   const needsCharging = [];   // any session in the window with nothing collected
 
@@ -103,14 +104,25 @@ exports.handler = async (event) => {
     if (status === "Charged")      revenue = charged;
     else if (status === "Package") revenue = due;
 
-    // Nothing collected on a session that is not covered by a package. Either
-    // the charge never ran, it failed, or it was written off. Surfaced so it can
-    // be chased rather than quietly absorbed as a loss.
-    if (revenue === 0 && status !== "Package") {
+    // Nothing collected on a session that is not covered by a package: the
+    // charge never ran, or it failed. Surfaced so it can be chased rather than
+    // quietly absorbed as a loss.
+    //
+    // "Written Off" is a deliberate decision not to charge, so it is excluded.
+    // Without it a written-off session sits in the alert forever and the alert
+    // stops being something worth reading. (Add the option to the Payment
+    // Status field in Airtable; this line already handles it.)
+    if (revenue === 0 && status !== "Package" && status !== "Written Off") {
       needsCharging.push({ ...line, revenue: 0, margin: -fee - payout, kind: "session" });
     }
 
     if (!inMonth) continue;
+
+    // Founder sessions with no payout recorded. If Fidel ever does pay himself,
+    // that payout is already a real cost, so it must not be counted twice.
+    if (payout === 0 && isFounder(s.fields["Mentor Email"], s.fields["Mentor Name"])) {
+      founderSessions += 1;
+    }
 
     grossRevenue  += revenue;
     stripeFees    += fee;
@@ -151,6 +163,12 @@ exports.handler = async (event) => {
       totalOpex:     TOTAL_OPEX,
       netProfit:     round(netProfit),
       netMargin:     pct(netProfit),
+      // Shown separately, never mixed into costs above.
+      founderSessions,
+      founderRate:   FOUNDER_SESSION_COST,
+      founderCost:   round(founderSessions * FOUNDER_SESSION_COST),
+      netAfterFounder: round(netProfit - founderSessions * FOUNDER_SESSION_COST),
+      netAfterFounderMargin: pct(netProfit - founderSessions * FOUNDER_SESSION_COST),
       // Detailed breakdown
       lines:   lines.map((l) => ({
         ...l,

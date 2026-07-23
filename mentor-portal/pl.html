@@ -199,8 +199,36 @@
       netEl.classList.toggle("positive", r.netProfit >= 0);
       netEl.classList.toggle("negative", r.netProfit < 0);
 
+      renderFounder(r);
       renderDetail(r);
       renderUncharged(r);
+    }
+
+    // What the month looks like with Fidel's own sessions costed at the standard
+    // mentor payout. Shown apart from the statement: owner time is not a real
+    // expense, but ignoring it makes the business look better than it is.
+    function renderFounder(r) {
+      const box = document.getElementById("founder");
+      const n = r.founderSessions || 0;
+      const cost = r.founderCost || 0;
+      if (!n || !cost) { box.hidden = true; return; }
+      box.hidden = false;
+
+      const rate = r.founderRate || (cost / n);
+      const net = r.netAfterFounder != null ? r.netAfterFounder : r.netProfit - cost;
+      const margin = r.netAfterFounderMargin != null
+        ? r.netAfterFounderMargin
+        : (r.grossRevenue > 0 ? Number(((net / r.grossRevenue) * 100).toFixed(1)) : 0);
+
+      document.getElementById("f-desc").textContent =
+        `${n} founder session${n === 1 ? "" : "s"} at ${fmt(rate)}`;
+      document.getElementById("f-cost").textContent = fmt(-cost);
+      document.getElementById("f-net").textContent  = fmt(net);
+      document.getElementById("f-margin").textContent = `${margin}%`;
+
+      const netEl = document.getElementById("f-net");
+      netEl.classList.toggle("positive", net >= 0);
+      netEl.classList.toggle("negative", net < 0);
     }
 
     // Sessions where nothing was collected. Shown across a 60 day window, not
@@ -506,6 +534,27 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* Notional founder cost. Sits inside the statement but visually detached,
+       so it never reads as one of the real expense lines above it. */
+    .founder {
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px dashed var(--line);
+    }
+    .founder-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .founder-note {
+      margin-top: 10px;
+      font-size: 0.75rem;
+      line-height: 1.5;
+      color: var(--text-muted);
+      max-width: 58ch;
+    }
+
     /* Uncharged sessions. Money that should have come in and did not, so it
        reads as a warning rather than another neutral panel. */
     .alert {
@@ -668,6 +717,20 @@
         <span class="stmt-net-value" id="s-net-profit"></span>
       </div>
       <p class="stmt-net-margin" id="s-net-margin"></p>
+
+      <div class="founder" id="founder" hidden>
+        <p class="founder-label">If founder sessions were paid out</p>
+        <div class="stmt-row">
+          <span class="stmt-row-label indent" id="f-desc"></span>
+          <span class="stmt-row-value deduction" id="f-cost"></span>
+        </div>
+        <div class="stmt-row" style="padding-top:8px;">
+          <span class="stmt-row-label" style="font-weight:600;">Net profit</span>
+          <span class="stmt-row-value" id="f-net" style="font-weight:600;"></span>
+        </div>
+        <p class="stmt-margin" id="f-margin"></p>
+        <p class="founder-note">Not a real cost, so it stays out of the statement above. This is what the month looks like once your own mentoring is priced at what a mentor would be paid.</p>
+      </div>
 
     </div>
 

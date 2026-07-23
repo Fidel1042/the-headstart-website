@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
-  <title>Notes — Headstart</title>
+  <title>Call Flow — Headstart</title>
   <link rel="stylesheet" href="css/base.css" />
   <style id="auth-gate">
     html:not(.auth-ok) body { visibility: hidden; }
@@ -49,46 +49,54 @@
     })();
   </script>
   <style>
-    body { background: #f5f5f5; color: #111; }
-    .notes-shell {
-      max-width: 780px;
-      margin: 0 auto;
-      padding: 2.4rem 2rem 4rem;
+    body { background: #f4f3ef; color: #17170f; }
+    .flow-shell { max-width: 720px; margin: 0 auto; padding: 1.7rem 1.3rem 5rem; }
+    .flow-head {
+      font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase;
+      color: #a08a48; font-weight: 700; margin: 0 0 1.7rem;
     }
-    .notes-doc {
-      display: flex;
-      flex-direction: column;
-      gap: 2.8rem;
+
+    /* Vertical stage timeline */
+    .stage { position: relative; padding: 0 0 2.1rem 3.4rem; }
+    .stage::before {
+      content: ""; position: absolute; left: 1.15rem; top: 0.5rem; bottom: -0.4rem;
+      width: 2px; background: #e2d9bd;
     }
-    .notes-block__label {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #111;
-      margin: 0 0 0.7rem;
+    .stage:last-child::before { display: none; }
+    .stage__num {
+      position: absolute; left: 0; top: 0;
+      width: 2.4rem; height: 2.4rem; border-radius: 50%;
+      background: #c79b3b; color: #fff; font-size: 1rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 6px rgba(199,155,59,0.35);
     }
-    .notes-block__area {
-      width: 100%;
-      min-height: 120px;
-      background: #fff;
-      border: 1.5px solid #ddd;
-      border-radius: 10px;
-      padding: 1rem 1.2rem;
-      color: #111;
-      font: inherit;
-      font-size: 1rem;
-      line-height: 1.65;
-      resize: none;
-      outline: none;
-      transition: border-color 0.2s ease;
-      overflow: hidden;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    .stage__name { font-size: 1.24rem; font-weight: 700; margin: 0.25rem 0 0.15rem; }
+    .stage__goal { font-size: 0.85rem; color: #6d6d5f; margin: 0 0 0.95rem; line-height: 1.45; }
+
+    /* Say block — the lines to actually say */
+    .say {
+      background: #fff; border: 1px solid #e7e5d8;
+      border-radius: 9px; padding: 0.85rem 1.05rem; margin-bottom: 0.7rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
     }
-    .notes-block__area:focus {
-      border-color: #c9a84c;
+    .say__label {
+      font-size: 0.61rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: #a08a48; font-weight: 700; display: block; margin-bottom: 0.55rem;
     }
-    .notes-block__area::placeholder {
-      color: #bbb;
+    .say__line { font-size: 1.02rem; line-height: 1.5; margin: 0 0 0.55rem; }
+    .say__line:last-child { margin-bottom: 0; }
+    .say__do { font-size: 0.85rem; color: #6d6d5f; font-style: italic; }
+    .ph { color: #b07d0a; font-weight: 600; }
+
+    /* Objection callout — amber */
+    .obj {
+      background: #fbf2e2; border: 1px solid #eeddbd;
+      border-radius: 9px; padding: 0.8rem 1.05rem; margin-bottom: 0.7rem;
     }
+    .obj__if { font-size: 0.88rem; font-weight: 700; color: #8a5a10; margin: 0 0 0.35rem; }
+    .obj__then { font-size: 1.02rem; line-height: 1.5; margin: 0; color: #17170f; }
+
+    .never { font-size: 0.85rem; color: #a23b3b; font-weight: 600; margin: 0.35rem 0 0; }
   </style>
 </head>
 <body>
@@ -96,7 +104,7 @@
     <div class="tool-nav__inner">
       <a class="tool-nav__brand" href="index.html"><img src="../images/headstart-italic-logo.png" alt="Headstart" class="tool-nav__logo" style="height:70px;width:auto;display:block;" /></a>
       <a class="tool-nav__link" href="/mentor-portal/index.html" style="opacity:0.55;">← Portal</a>
-      <a class="tool-nav__link is-current" href="index.html">Notes</a>
+      <a class="tool-nav__link is-current" href="index.html">Flow</a>
       <a class="tool-nav__link" href="matrix.html">Where you are</a>
       <a class="tool-nav__link" href="structure.html">Session structure</a>
       <a class="tool-nav__link" href="mentors.html">Mentors</a>
@@ -106,40 +114,136 @@
     </div>
   </nav>
 
-  <main class="notes-shell">
-    <div class="notes-doc">
+  <main class="flow-shell">
+    <p class="flow-head">Sales call &middot; 6 stages &middot; questions, objections, what to say</p>
 
-      <div class="notes-block">
-        <p class="notes-block__label">Small Talk + Which year are they in?</p>
-        <textarea class="notes-block__area" placeholder="Type here…"></textarea>
+    <!-- 1 OPEN -->
+    <section class="stage">
+      <div class="stage__num">1</div>
+      <h2 class="stage__name">Open</h2>
+      <p class="stage__goal">Warm them up, then set the agenda. About one minute.</p>
+      <div class="say">
+        <span class="say__label">Say</span>
+        <p class="say__line">"Hey <span class="ph">[name]</span>, how are you? Whereabouts are you based?"</p>
+        <p class="say__line">"I'll ask you a few things to understand where you're at, then show you exactly how we'd help. Sound good?"</p>
+        <p class="say__line say__do">Get the little "yeah" before you start asking. That's your permission.</p>
       </div>
+    </section>
 
-      <div class="notes-block">
-        <p class="notes-block__label">What industry would you like to enter? Why?</p>
-        <textarea class="notes-block__area" placeholder="Type here…"></textarea>
+    <!-- 2 DIAGNOSE -->
+    <section class="stage">
+      <div class="stage__num">2</div>
+      <h2 class="stage__name">Diagnose</h2>
+      <p class="stage__goal">Understand their goal, situation and pain. They talk, you listen. Take notes, do not pitch yet.</p>
+      <div class="say">
+        <span class="say__label">Ask, in order</span>
+        <p class="say__line">"What are you aiming for, role and industry?"</p>
+        <p class="say__line">"Where are you at with study and your visa?"</p>
+        <p class="say__line">"What have you tried so far, and what actually happens when you apply?"</p>
+        <p class="say__line">"How are you feeling about it all right now?"</p>
+        <p class="say__line say__do">After each question, go quiet. Let them fill the silence.</p>
       </div>
-
-      <div class="notes-block">
-        <p class="notes-block__label">How did you find us?</p>
-        <textarea class="notes-block__area" placeholder="Type here…"></textarea>
+      <div class="obj">
+        <p class="obj__if">If they fish for tactics — "what did you do to get your offers?"</p>
+        <p class="obj__then">"I'll show you exactly, but first I want to get your full picture." Do not give the playbook away for free here.</p>
       </div>
+    </section>
 
-      <div class="notes-block">
-        <p class="notes-block__label">Tell me the stage of job searching that you are stuck at?</p>
-        <textarea class="notes-block__area" placeholder="Type here…"></textarea>
+    <!-- 3 VERDICT -->
+    <section class="stage">
+      <div class="stage__num">3</div>
+      <h2 class="stage__name">Verdict</h2>
+      <p class="stage__goal">Make them feel understood, then give one honest diagnosis. Understand fully before you challenge anything.</p>
+      <div class="say">
+        <span class="say__label">Say — mirror first</span>
+        <p class="say__line">"So I see you want to get into <span class="ph">[industry]</span>, right now you're <span class="ph">[current situation]</span>, and you're feeling <span class="ph">[how they feel]</span>."</p>
       </div>
+      <div class="say">
+        <span class="say__label">Then name the gap</span>
+        <p class="say__line">"Here's what I think is really going on. You're competing through the front door everyone uses. That's almost never an effort problem. The gap is <span class="ph">[their barrier]</span>, and it's fixable."</p>
+      </div>
+      <div class="obj">
+        <p class="obj__if">If they have big or unrealistic aims, or argue back (e.g. "only top-tier")</p>
+        <p class="obj__then">Hear them out fully first. Then: "I hear you. Here's the realistic way in..." Never half-disqualify them on the spot.</p>
+      </div>
+    </section>
 
-    </div>
+    <!-- 4 PITCH -->
+    <section class="stage">
+      <div class="stage__num">4</div>
+      <h2 class="stage__name">Pitch — proof, then mentor</h2>
+      <p class="stage__goal">This is exactly what we fix, and here is who fixes it.</p>
+      <div class="say">
+        <span class="say__label">Say — bridge and proof</span>
+        <p class="say__line">"That's exactly what we fix. We started in February and have already placed 12 students into internships and grad roles, six of them international like you. Koko and I were international students stuck for months too, that's why we get it."</p>
+      </div>
+      <div class="say">
+        <span class="say__label">Then the mentor — one name, full conviction</span>
+        <p class="say__line">"The person for you is <span class="ph">[mentor]</span>. <span class="ph">[One-line story tied to their field]</span>. He's especially strong on <span class="ph">[their gap]</span>."</p>
+        <p class="say__line">"Most people in your spot take around 12 to 15 sessions to land a role."</p>
+      </div>
+      <div class="obj">
+        <p class="obj__if">If "does networking actually work?"</p>
+        <p class="obj__then">"It's how I got my first two offers. Around half of roles go through referrals, not the front door."</p>
+      </div>
+      <p class="never">Never offer two mentors. Never say "I'm torn."</p>
+    </section>
+
+    <!-- 5 PRICE -->
+    <section class="stage">
+      <div class="stage__num">5</div>
+      <h2 class="stage__name">Price</h2>
+      <p class="stage__goal">State it flat and confident, then stop talking.</p>
+      <div class="say">
+        <span class="say__label">Say</span>
+        <p class="say__line">"It's $55 a session, only charged after each one, no lock-in. If you prepay 5, it's $49 a session."</p>
+        <p class="say__line say__do">Then go silent. Let them react first.</p>
+      </div>
+      <div class="obj">
+        <p class="obj__if">If "why not $35, the website showed $35?"</p>
+        <p class="obj__then">"That was our launch price in February. Since then we've placed 12 students, brought on mentors, and built the resources and tracking that come with every session. The price reflects what's in it now."</p>
+      </div>
+      <div class="obj">
+        <p class="obj__if">If money worry, or "it's a lot"</p>
+        <p class="obj__then">"12 sessions is about $660 to land a role paying $70k plus. And you only pay per session, as you go." Open the ROI tab and run their numbers.</p>
+      </div>
+      <p class="never">Never say "we charge reasonably." Never walk the number down.</p>
+    </section>
+
+    <!-- 6 CLOSE -->
+    <section class="stage">
+      <div class="stage__num">6</div>
+      <h2 class="stage__name">Close</h2>
+      <p class="stage__goal">Get the commitment on the call.</p>
+      <div class="say">
+        <span class="say__label">Say — authority first, then close</span>
+        <p class="say__line">"Quick one, are you the one who decides on this, or is it a chat with your parents?"</p>
+        <p class="say__line">"Any reason we couldn't get you started with <span class="ph">[mentor]</span> next week?"</p>
+        <p class="say__line say__do">Then stay silent. Do not fill it with more value.</p>
+      </div>
+      <div class="obj">
+        <p class="obj__if">If "let me think"</p>
+        <p class="obj__then">"Totally fair. Is it the price, the timing, or are you unsure it'll work?" Then handle the real one.</p>
+      </div>
+      <div class="obj">
+        <p class="obj__if">If parents pay</p>
+        <p class="obj__then">"Love that. Let me give you what you need to make it an easy yes for them. I'll send the parent resources." Set a firm deadline.</p>
+      </div>
+      <div class="obj">
+        <p class="obj__if">If buying signal — "when can I start?"</p>
+        <p class="obj__then">Stop selling. "Great, I'll send the agreement now, takes 30 seconds, and I'll lock <span class="ph">[mentor]</span> in for you."</p>
+      </div>
+      <div class="say">
+        <span class="say__label">Logistics</span>
+        <p class="say__line">Send the agreement link plus card details. Open a WhatsApp group with the mentor. Set the first session time.</p>
+      </div>
+      <p class="never">Never cave when they pause. Never joke about scams or trust.</p>
+    </section>
+
   </main>
 
   <script>
-    // Auto-grow textareas
-    document.querySelectorAll(".notes-block__area").forEach(function(ta) {
-      function grow() { ta.style.height = "auto"; ta.style.height = ta.scrollHeight + "px"; }
-      ta.addEventListener("input", grow);
-      grow();
-    });
-    // Propagate ?v= to nav links
+    // Propagate ?v= to nav links so the Live button keeps everything fresh
     (function(){var v=new URLSearchParams(location.search).get("v");if(!v)return;document.querySelectorAll(".tool-nav__link").forEach(function(a){var u=new URL(a.href,location.href);u.searchParams.set("v",v);a.href=u.pathname+"?v="+v;});})();
   </script>
 </body>

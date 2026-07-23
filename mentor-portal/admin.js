@@ -4,6 +4,7 @@ import { requireAuth } from "./auth.js";
 import { mountPortalNav, initTheme } from "./portal-ui.js";
 import { initCalendar } from "./admin-calendar.js";
 import { renderStatus } from "./admin-status.js";
+import { renderChart } from "./admin-chart.js";
 
 initTheme();
 
@@ -193,6 +194,8 @@ function renderOverview({ rows, totalMentees }) {
   document.getElementById("stat-mentees").textContent = totalMentees;
   document.getElementById("stat-month").textContent = monthCount;
   document.getElementById("stat-owed").textContent = fmtMoney(owedTotal);
+
+  renderChart(rows);
 
   const body = document.getElementById("mentor-body");
   body.innerHTML = rows.map((m, i) => `
