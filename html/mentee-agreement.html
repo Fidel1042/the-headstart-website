@@ -309,7 +309,8 @@
 
         <div>
           <label for="full-name">Full Name (required)</label>
-          <input type="text" id="full-name" name="full_name" autocomplete="name" required />
+          <input type="text" id="full-name" name="full_name" autocomplete="name" required
+                 pattern="\s*\S+(\s+\S+)+\s*" title="Please enter your first and last name." />
         </div>
 
         <div>
@@ -460,9 +461,14 @@
           return;
         }
 
-        const fullName = (document.getElementById("full-name").value || "").trim();
+        const fullNameField = document.getElementById("full-name");
+        const fullName = (fullNameField.value || "").trim();
         const emailValue = (document.getElementById("email").value || "").trim();
-        if (!fullName) return;
+        if (fullName.split(/\s+/).filter(Boolean).length < 2) {
+          if (errorField) errorField.textContent = "Please enter your first and last name.";
+          fullNameField.focus();
+          return;
+        }
 
         isSubmitting = true;
         if (submitBtn) {

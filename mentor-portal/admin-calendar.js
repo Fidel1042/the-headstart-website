@@ -1,12 +1,87 @@
 // admin-calendar.js — monthly session calendar, colour-coded per mentor.
 // Chips open a detail popup; "+ Add session" logs a session via log-session.
+// Detail popup and add-session form live in admin-calendar-modal.js.
+
+import { showDetail, showAddForm, closeModal } from "./admin-calendar-modal.js";
 
 const PALETTE = ["#4caf81", "#5b9bd5", "#e0a030", "#c96fc0", "#e05050", "#4fc3c3", "#a3d977", "#f0c75c", "#8f7be8", "#e08c5a"];
-const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1";
 
 let month = null;
 let state = null; // { byDate, upcoming, colors, names, mentees, registry, onAdded }
 let bound = false;
+let filterEmail = "";      // "" = all mentors; otherwise show only this mentor
+let menteeColors = new Map(); // mentee key -> colour, when a mentor is selected
+
+// Key by the displayed name, not the record id: some session rows carry a
+// Mentee Record ID and some are blank, so keying by id would give one person
+// two colours. The chip shows the name, so same name must mean same colour.
+const menteeKey = (s) => (s.mentee || "").trim().toLowerCase() || s.menteeId;
+
+// When one mentor is selected, each of their mentees gets its own colour so
+// the month reads as "who this mentor is seeing", not "which mentor".
+function buildMenteeColors(email) {
+  const m = new Map();
+  if (!email) return m;
+  state.registry.forEach(({ s }) => {
+    if (s.mentorEmail !== email) return;
+    const k = menteeKey(s);
+    if (k && !m.has(k)) m.set(k, PALETTE[m.size % PALETTE.length]);
+  });
+  return m;
+}
+
+// [menteeName, colour] pairs for the selected mentor's legend, in the same
+// order colours were assigned.
+function nameForMentees() {
+  const label = new Map();
+  state.registry.forEach(({ s }) => {
+    if (s.mentorEmail !== filterEmail) return;
+    const k = menteeKey(s);
+    if (k && !label.has(k)) label.set(k, s.mentee || k);
+  });
+  return [...menteeColors.entries()].map(([k, c]) => [label.get(k) || k, c]);
+}
+
+function populateFilter() {
+  const sel = document.getElementById("cal-filter");
+  const list = document.getElementById("cal-mentor-names");
+  if (!sel) return;
+  const mentors = [...state.names.entries()].sort((a, b) => (a[1] || "").localeCompare(b[1] || ""));
+  sel.innerHTML = '<option value="">All mentors</option>' +
+    mentors.map(([email, name]) =>
+      `<option value="${esc(email)}"${email === filterEmail ? " selected" : ""}>${esc(name || email)}</option>`).join("");
+  if (list) {
+    list.innerHTML = mentors.map(([, name]) => `<option value="${esc(name || "")}"></option>`).join("");
+  }
+  const search = document.getElementById("cal-search");
+  if (search) search.value = filterEmail ? (state.names.get(filterEmail) || "") : "";
+}
+
+// Applies a mentor filter from either control and keeps both in sync, so the
+// dropdown and the search box always agree on who is selected.
+function setFilter(email) {
+  filterEmail = email;
+  menteeColors = buildMenteeColors(filterEmail);
+  const sel = document.getElementById("cal-filter");
+  const search = document.getElementById("cal-search");
+  if (sel) sel.value = filterEmail;
+  if (search) search.value = filterEmail ? (state.names.get(filterEmail) || "") : "";
+  draw();
+}
+
+// Resolve typed text to a mentor: exact name match first (picking a datalist
+// suggestion, or a name that happens to be unambiguous), otherwise the single
+// mentor whose name contains the text. Ambiguous or empty text clears the
+// filter rather than guessing, so it never silently locks onto the wrong person.
+function matchMentorByName(text) {
+  const q = text.trim().toLowerCase();
+  if (!q) return "";
+  const all = [...state.names.entries()];
+  const exact = all.find(([, name]) => (name || "").trim().toLowerCase() === q);
+  if (exact) return exact[0];
+  const partial = all.filter(([, name]) => (name || "").toLowerCase().includes(q));
+  return partial.length === 1 ? partial[0][0] : null; // null = no unique match yet
+}
 
 const pad = (n) => String(n).padStart(2, "0");
 const key = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
@@ -52,18 +127,38 @@ export function initCalendar({ sessions = [], mentors = [], mentees = [], onAdde
 
   state = { byDate, upcoming, colors, names, mentees, registry, onAdded };
   if (!month) { month = new Date(); month.setDate(1); }
+  // A mentor filtered before a refresh may no longer have data; fall back to all.
+  if (filterEmail && !colors.has(filterEmail)) filterEmail = "";
+  menteeColors = buildMenteeColors(filterEmail);
+  populateFilter();
 
   if (!bound) {
     bound = true;
     document.getElementById("cal-prev").addEventListener("click", () => { month.setMonth(month.getMonth() - 1); draw(); });
     document.getElementById("cal-next").addEventListener("click", () => { month.setMonth(month.getMonth() + 1); draw(); });
     document.getElementById("cal-today").addEventListener("click", () => { month = new Date(); month.setDate(1); draw(); });
-    document.getElementById("cal-add").addEventListener("click", showAddForm);
+    document.getElementById("cal-filter").addEventListener("change", (e) => setFilter(e.target.value));
+    document.getElementById("cal-search").addEventListener("input", (e) => {
+      const match = matchMentorByName(e.target.value);
+      // A non-null result (including "") is a resolved choice, apply it. `null`
+      // means the text is ambiguous or matches nobody yet, so leave the
+      // calendar as-is and let the user keep typing rather than flicker.
+      // The search box's own value is never rewritten here, otherwise typing a
+      // partial name would get overwritten mid-keystroke.
+      if (match !== null) {
+        filterEmail = match;
+        menteeColors = buildMenteeColors(filterEmail);
+        const sel = document.getElementById("cal-filter");
+        if (sel) sel.value = filterEmail;
+        draw();
+      }
+    });
+    document.getElementById("cal-add").addEventListener("click", () => showAddForm(state));
     document.getElementById("cal-modal-close").addEventListener("click", closeModal);
     document.getElementById("cal-modal").addEventListener("click", (e) => { if (e.target.id === "cal-modal") closeModal(); });
     document.getElementById("cal-grid").addEventListener("click", (e) => {
       const chip = e.target.closest("[data-k]");
-      if (chip) showDetail(state.registry[Number(chip.dataset.k)]);
+      if (chip) showDetail(state, state.registry[Number(chip.dataset.k)]);
     });
   }
   draw();
@@ -71,7 +166,11 @@ export function initCalendar({ sessions = [], mentors = [], mentees = [], onAdde
 
 function chip(entry, dashed) {
   const { k, s } = entry;
-  const c = state.colors.get(s.mentorEmail) || "#888";
+  // When a mentor is selected, hide everyone else and colour by mentee instead.
+  if (filterEmail && s.mentorEmail !== filterEmail) return "";
+  const c = filterEmail
+    ? (menteeColors.get(menteeKey(s)) || "#888")
+    : (state.colors.get(s.mentorEmail) || "#888");
   return `<button type="button" class="cal-chip${dashed ? " cal-chip--next" : ""}" style="--c:${c}" data-k="${k}">${esc(s.mentee)}</button>`;
 }
 
@@ -102,86 +201,14 @@ function draw() {
   const dow = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => `<div class="cal-dow">${d}</div>`).join("");
   document.getElementById("cal-grid").innerHTML = dow + cells;
 
-  document.getElementById("cal-legend").innerHTML = [...state.colors.entries()]
-    .map(([email, c]) => `<span class="cal-legend__item"><span class="cal-swatch" style="--c:${c}"></span>${esc(state.names.get(email) || email)}</span>`)
+  // Legend follows the colour mode: mentors when showing everyone, this
+  // mentor's mentees when one is selected.
+  const legendPairs = filterEmail
+    ? nameForMentees()
+    : [...state.colors.entries()].map(([email, c]) => [state.names.get(email) || email, c]);
+  document.getElementById("cal-legend").innerHTML = legendPairs
+    .map(([label, c]) => `<span class="cal-legend__item"><span class="cal-swatch" style="--c:${c}"></span>${esc(label)}</span>`)
     .join("") +
     `<span class="cal-legend__item"><span class="cal-swatch cal-swatch--next"></span>Booked (not logged yet)</span>`;
 }
 
-// ── Detail popup ──
-function menteeFor(s) {
-  return state.mentees.find((m) => (s.menteeId && m.id === s.menteeId) || m.name.trim().toLowerCase() === s.mentee.trim().toLowerCase());
-}
-
-function showDetail({ type, s }) {
-  const mentor = state.names.get(s.mentorEmail) || s.mentorName || s.mentorEmail;
-  const billing = menteeFor(s)?.billingType || "—";
-  const rows = type === "booked"
-    ? [["Mentee", esc(s.mentee)], ["Mentor", esc(mentor)], ["Booked for", fmtDate(s.next)], ["Status", "Not logged yet"], ["Payment type", esc(billing)]]
-    : [["Mentee", esc(s.mentee)], ["Mentor", esc(mentor)], ["Date", fmtDate(s.date)], ["Session fee", fmtMoney(s.amountDue)], ["Payment status", esc(s.status)], ["Payment type", esc(billing)]];
-  openModal(`
-    <h3 class="cal-modal__title">${type === "booked" ? "Booked session" : "Logged session"}</h3>
-    ${rows.map(([l, v]) => `<div class="cal-modal__row"><span>${l}</span><span>${v}</span></div>`).join("")}`);
-}
-
-// ── Manual add ──
-function showAddForm() {
-  const opts = state.mentees
-    .map((m) => `<option value="${m.id}">${esc(m.name)} — ${esc(state.names.get(m.mentorEmail) || m.mentorEmail)}</option>`)
-    .join("");
-  const today = new Date().toISOString().slice(0, 10);
-  openModal(`
-    <h3 class="cal-modal__title">Add session</h3>
-    <form id="cal-add-form" class="cal-form">
-      <label>Mentee<select name="mentee" required><option value="">Select&hellip;</option>${opts}</select></label>
-      <label>Session date<input type="date" name="date" value="${today}" required /></label>
-      <label>Next session date (optional)<input type="date" name="next" /></label>
-      <label>Notes (optional)<textarea name="notes" rows="2"></textarea></label>
-      <div class="cal-form__row">
-        <button type="submit" class="cal-btn cal-btn--today" id="cal-add-submit">Log session</button>
-        <span class="cal-form__state" id="cal-add-state"></span>
-      </div>
-    </form>`);
-  document.getElementById("cal-add-form").addEventListener("submit", submitAdd);
-}
-
-async function submitAdd(e) {
-  e.preventDefault();
-  const fd = new FormData(e.target);
-  const mentee = state.mentees.find((m) => m.id === fd.get("mentee"));
-  const stateEl = document.getElementById("cal-add-state");
-  const btn = document.getElementById("cal-add-submit");
-  if (!mentee) { stateEl.textContent = "Pick a mentee."; return; }
-  btn.disabled = true;
-  stateEl.textContent = "Logging…";
-  try {
-    if (!isLocal) {
-      const res = await fetch("/.netlify/functions/log-session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          menteeRecordId: mentee.id,
-          mentorEmail: mentee.mentorEmail,
-          sessionDate: fd.get("date"),
-          nextSessionDate: fd.get("next") || "",
-          notes: (fd.get("notes") || "").trim(),
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-    }
-    closeModal();
-    if (state.onAdded) state.onAdded();
-  } catch (err) {
-    stateEl.textContent = err.message || "Could not log — try again.";
-    btn.disabled = false;
-  }
-}
-
-function openModal(html) {
-  document.getElementById("cal-modal-body").innerHTML = html;
-  document.getElementById("cal-modal").hidden = false;
-}
-function closeModal() {
-  document.getElementById("cal-modal").hidden = true;
-}

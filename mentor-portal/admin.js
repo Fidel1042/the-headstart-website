@@ -5,6 +5,9 @@ import { mountPortalNav, initTheme } from "./portal-ui.js";
 import { initCalendar } from "./admin-calendar.js";
 import { renderStatus } from "./admin-status.js";
 import { renderChart } from "./admin-chart.js";
+import { renderTable } from "./admin-table.js";
+import { renderPerformance } from "./admin-performance.js";
+import { fmtMoney, daysSince, isPurchase, daysAgoISO } from "./admin-utils.js";
 
 initTheme();
 
@@ -12,18 +15,6 @@ let OWNER_EMAIL = "";
 
 const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com"];
 const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1";
-const DAY_MS = 86400000;
-
-const fmtMoney = (n) => "$" + (n || 0).toLocaleString("en-AU", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const fmtDate = (d) => d ? new Date(d.slice(0, 10) + "T00:00:00").toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" }) : "—";
-const daysSince = (d) => {
-  if (!d) return null;
-  const t = new Date(); t.setHours(0, 0, 0, 0);
-  return Math.max(0, Math.round((t - new Date(d.slice(0, 10) + "T00:00:00")) / DAY_MS));
-};
-// Package purchase rows record a payment, not a delivered session.
-const isPurchase = (s) => s.status === "Package" && s.amountCharged > 0;
-const sameMentee = (s, m) => (s.menteeId && s.menteeId === m.id) || s.mentee.trim().toLowerCase() === m.name.trim().toLowerCase();
 
 const d = (offset) => { const x = new Date(); x.setDate(x.getDate() - offset); return x.toISOString().slice(0, 10); };
 const MOCK = {
@@ -83,21 +74,43 @@ async function load(ownerEmail) {
 }
 
 function aggregate({ mentors = [], mentees = [], sessions = [] }) {
+  const norm = (s) => String(s || "").toLowerCase().trim();
+  const buckets = mentors.map((m) => ({ ...m, mentees: [], sessions: [] }));
+
+  // Index by email AND by name, but never by a blank value. A mentor with no
+  // email in Airtable (Khaleel) would otherwise own the "" key and collect
+  // every orphan session and mentee whose mentor-email is also blank.
   const byEmail = new Map();
-  mentors.forEach((m) => byEmail.set(m.email, { ...m, mentees: [], sessions: [] }));
-  sessions.forEach((s) => { byEmail.get(s.mentorEmail)?.sessions.push(s); });
-  mentees.forEach((m) => { byEmail.get(m.mentorEmail)?.mentees.push(m); });
+  const byName = new Map();
+  buckets.forEach((m) => {
+    if (norm(m.email)) byEmail.set(norm(m.email), m);
+    if (norm(m.name))  byName.set(norm(m.name), m);
+  });
+  // Resolve by email first, then fall back to mentor name (some session rows
+  // carry a Mentor Name but no email). A record that matches neither is
+  // genuinely unassigned and attaches to nobody.
+  const resolve = (email, name) => byEmail.get(norm(email)) || byName.get(norm(name)) || null;
+
+  sessions.forEach((s) => { resolve(s.mentorEmail, s.mentorName)?.sessions.push(s); });
+  mentees.forEach((m)  => { resolve(m.mentorEmail, m.mentorName)?.mentees.push(m); });
 
   const monthStart = new Date().toISOString().slice(0, 8) + "01";
   const today = new Date().toISOString().slice(0, 10);
+  // Rolling windows: last 30 days, and the 30 days before that for comparison.
+  const back30 = daysAgoISO(30);
+  const back60 = daysAgoISO(60);
 
-  const rows = [...byEmail.values()].map((m) => {
+  // Iterate the buckets, not byEmail: a mentor with no email is still a real
+  // mentor and must appear (as idle), just no longer as an orphan magnet.
+  const rows = buckets.map((m) => {
     const delivered = m.sessions.filter((s) => !isPurchase(s)).sort((a, b) => b.date.localeCompare(a.date));
     const last = delivered[0]?.date || "";
     const nextDates = m.sessions.map((s) => (s.next || "").slice(0, 10)).filter((n) => n >= today).sort();
     m.stats = {
       total: delivered.length,
       thisMonth: delivered.filter((s) => s.date >= monthStart).length,
+      last30: delivered.filter((s) => s.date > back30).length,
+      prev30: delivered.filter((s) => s.date > back60 && s.date <= back30).length,
       last,
       days: daysSince(last),
       next: nextDates[0] || "",
@@ -107,57 +120,10 @@ function aggregate({ mentors = [], mentees = [], sessions = [] }) {
     };
     m.delivered = delivered;
     return m;
-  }).sort((a, b) => (b.stats.last || "").localeCompare(a.stats.last || ""));
+  });
 
   const allDelivered = sessions.filter((s) => !isPurchase(s));
   return { rows, mentees, allDelivered, totalMentees: mentees.length };
-}
-
-function statusPill(days) {
-  if (days === null) return '<span class="status-pill">No sessions</span>';
-  if (days <= 14) return '<span class="status-pill status-pill--ok">Active</span>';
-  if (days <= 30) return '<span class="status-pill status-pill--warn">Quiet</span>';
-  return '<span class="status-pill status-pill--bad">Inactive</span>';
-}
-
-function detailHTML(m) {
-  const menteeRows = m.mentees.length
-    ? m.mentees.map((x) => {
-        const mine = m.delivered.filter((s) => sameMentee(s, x));
-        return `<tr><td>${x.name}</td><td>${x.billingType}</td><td>${mine.length}</td><td>${fmtDate(mine[0]?.date || "")}</td></tr>`;
-      }).join("")
-    : '<tr><td colspan="4">No mentees assigned</td></tr>';
-  const sessionRows = m.delivered.slice(0, 10).map((s) => `
-    <tr>
-      <td>${fmtDate(s.date)}</td><td>${s.mentee}</td>
-      <td>${fmtMoney(s.payout)}</td><td>${s.status}</td>
-      <td>${s.mentorPaid ? '<span class="paid-check">Paid</span>' : '<span class="paid-pending">Owed</span>'}</td>
-    </tr>`).join("") || '<tr><td colspan="5">No sessions logged</td></tr>';
-  return `
-    <div class="detail-grid">
-      <div class="detail-block">
-        <h4>Mentees</h4>
-        <table class="detail-table">
-          <thead><tr><th>Name</th><th>Billing</th><th>Sessions</th><th>Last</th></tr></thead>
-          <tbody>${menteeRows}</tbody>
-        </table>
-      </div>
-      <div class="detail-block">
-        <h4>Last 10 sessions · lifetime paid ${fmtMoney(m.stats.paid)} · collected ${fmtMoney(m.stats.collected)}</h4>
-        <table class="detail-table">
-          <thead><tr><th>Date</th><th>Mentee</th><th>Payout</th><th>Status</th><th>Pay</th></tr></thead>
-          <tbody>${sessionRows}</tbody>
-        </table>
-      </div>
-      <div class="detail-block detail-block--wide">
-        <h4>Admin notes</h4>
-        <textarea class="mentor-notes" data-id="${m.id || ""}" rows="3">${(m.notes || "").replace(/</g, "&lt;")}</textarea>
-        <div class="mentor-notes__row">
-          <button type="button" class="mentor-notes__save" data-id="${m.id || ""}">Save notes</button>
-          <span class="mentor-notes__state" data-state="${m.id || ""}"></span>
-        </div>
-      </div>
-    </div>`;
 }
 
 async function saveMentorNotes(id, body) {
@@ -186,44 +152,19 @@ async function saveMentorNotes(id, body) {
 }
 
 function renderOverview({ rows, totalMentees }) {
-  const monthCount = rows.reduce((a, m) => a + m.stats.thisMonth, 0);
+  // Rolling 30 days across all mentors, so the tile matches the table column.
+  const last30 = rows.reduce((a, m) => a + m.stats.last30, 0);
   const owedTotal = rows.reduce((a, m) => a + m.stats.owed, 0);
   const active = rows.filter((m) => m.stats.days !== null && m.stats.days <= 30).length;
 
   document.getElementById("stat-active").textContent = active;
   document.getElementById("stat-mentees").textContent = totalMentees;
-  document.getElementById("stat-month").textContent = monthCount;
+  document.getElementById("stat-month").textContent = last30;
   document.getElementById("stat-owed").textContent = fmtMoney(owedTotal);
 
   renderChart(rows);
-
-  const body = document.getElementById("mentor-body");
-  body.innerHTML = rows.map((m, i) => `
-    <tr class="mentor-row" data-i="${i}">
-      <td><span class="expand-caret">&#9654;</span></td>
-      <td><div class="mentor-name">${m.name}</div><div class="mentor-email">${m.email}</div></td>
-      <td class="num">${fmtMoney(m.rate)}</td>
-      <td class="num">${m.mentees.length}</td>
-      <td class="num">${m.stats.total}</td>
-      <td class="num">${m.stats.thisMonth}</td>
-      <td>${fmtDate(m.stats.last)}${m.stats.days !== null ? ` <span class="mentor-email">(${m.stats.days}d)</span>` : ""}</td>
-      <td>${fmtDate(m.stats.next)}</td>
-      <td class="num owed${m.stats.owed ? "" : " zero"}">${fmtMoney(m.stats.owed)}</td>
-      <td>${statusPill(m.stats.days)}</td>
-    </tr>
-    <tr class="detail-row" data-detail="${i}" hidden><td colspan="10">${detailHTML(m)}</td></tr>
-  `).join("");
-
-  // Assignment (not addEventListener) so reloads never stack handlers.
-  body.onclick = (e) => {
-    const noteBtn = e.target.closest(".mentor-notes__save");
-    if (noteBtn) { saveMentorNotes(noteBtn.dataset.id, body); return; }
-    const row = e.target.closest(".mentor-row");
-    if (!row) return;
-    const detail = body.querySelector(`[data-detail="${row.dataset.i}"]`);
-    detail.hidden = !detail.hidden;
-    row.classList.toggle("is-open", !detail.hidden);
-  };
+  renderTable({ rows, ownerEmail: OWNER_EMAIL, onSaveNotes: saveMentorNotes });
+  renderPerformance(rows);
 }
 
 // Tab switching between the three views.
@@ -231,7 +172,7 @@ document.getElementById("admin-tabs").addEventListener("click", (e) => {
   const tab = e.target.closest(".admin-tab");
   if (!tab) return;
   document.querySelectorAll(".admin-tab").forEach((t) => t.classList.toggle("is-active", t === tab));
-  ["overview", "calendar", "mentees"].forEach((v) => {
+  ["overview", "calendar", "mentees", "performance"].forEach((v) => {
     document.getElementById("view-" + v).hidden = v !== tab.dataset.view;
   });
 });

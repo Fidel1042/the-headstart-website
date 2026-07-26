@@ -2,7 +2,7 @@
 // into any page with a <div id="portal-nav"></div> mount point.
 // Keeps every portal page's header identical: edit here, updates everywhere.
 
-import { signOut } from "./auth.js";
+import { signOut, ownerCanSee } from "./auth.js";
 
 const THEME_KEY = "headstart_theme";
 
@@ -32,18 +32,23 @@ const OWNER_LINKS = [
 /**
  * Render the shared nav.
  * @param {object} opts
- * @param {string}  opts.email   text for the user chip (email or "viewing as …")
- * @param {boolean} opts.isOwner show owner-only links
- * @param {string}  opts.active  page key to highlight: home|billing|pl|payslips|admin
+ * @param {string}  opts.email      text for the user chip (email or "viewing as …")
+ * @param {boolean} opts.isOwner    show owner-only links
+ * @param {string}  opts.active     page key to highlight: home|billing|pl|payslips|admin
+ * @param {string}  opts.loginEmail the real signed-in owner, for link filtering
+ *                                  (defaults to email; matters when email is a
+ *                                  "viewing as …" label)
  */
-export function mountPortalNav({ email = "", isOwner = false, active = "" } = {}) {
+export function mountPortalNav({ email = "", isOwner = false, active = "", loginEmail = "" } = {}) {
   const mount = document.getElementById("portal-nav");
   if (!mount) return;
 
+  const roleEmail = loginEmail || email;
   const ownerLinks = isOwner
-    ? OWNER_LINKS.map((l) =>
-        `<a href="${l.href}" class="nav-pill${l.page === active ? " is-active" : ""}">${l.label}</a>`
-      ).join("")
+    ? OWNER_LINKS.filter((l) => ownerCanSee(roleEmail, l.page))
+        .map((l) =>
+          `<a href="${l.href}" class="nav-pill${l.page === active ? " is-active" : ""}">${l.label}</a>`
+        ).join("")
     : "";
 
   mount.innerHTML = `

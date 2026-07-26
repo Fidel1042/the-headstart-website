@@ -782,7 +782,7 @@
           <input type="hidden" name="industries" id="hiddenIndustries" />
           <input type="hidden" name="role-type" id="hiddenRoleType" />
 
-          <input type="text" name="name" id="signupName" placeholder="Your name" required autocomplete="name" />
+          <input type="text" name="name" id="signupName" placeholder="Your name" required autocomplete="name" pattern="\s*\S+(\s+\S+)+\s*" title="Please enter your first and last name." />
           <input type="email" name="email" id="signupEmail" placeholder="Your email address" required autocomplete="email" />
 
           <div class="form-question">

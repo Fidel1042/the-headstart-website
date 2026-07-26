@@ -3,6 +3,7 @@
 .cal-controls {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 0.6rem;
   margin-bottom: 1rem;
 }
@@ -23,7 +24,6 @@
 .cal-btn:hover { border-color: var(--accent-line); color: var(--accent-bright); }
 .cal-btn--today { font-size: 0.78rem; letter-spacing: 0.05em; text-transform: uppercase; }
 .cal-btn--add {
-  margin-left: auto;
   font-size: 0.78rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -31,6 +31,44 @@
   color: var(--accent-bright);
 }
 .cal-btn--add:hover { background: var(--accent-soft); }
+
+/* Search, filter and add sit together on the right; the search box takes the
+   free space so it has room to type in, and wraps to its own line on a phone
+   rather than squeezing the month arrows. */
+.cal-search {
+  margin-left: auto;
+  min-width: 160px;
+  flex: 1 1 160px;
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.8rem;
+  padding: 0.34rem 0.9rem;
+}
+.cal-search::placeholder { color: var(--text-muted); }
+.cal-search:hover { border-color: var(--accent-line); }
+.cal-search:focus { outline: none; border-color: var(--accent-line); }
+
+.cal-filter {
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.8rem;
+  padding: 0.34rem 0.7rem;
+  cursor: pointer;
+  color-scheme: dark;
+}
+[data-theme="light"] .cal-filter { color-scheme: light; }
+.cal-filter:hover { border-color: var(--accent-line); }
+.cal-filter:focus { outline: none; border-color: var(--accent-line); }
+
+@media (max-width: 700px) {
+  .cal-search { flex-basis: 100%; margin-left: 0; }
+}
 .cal-title {
   margin-left: 0.6rem;
   font-size: 1.15rem;
@@ -127,95 +165,7 @@
 }
 .cal-chip:hover { filter: brightness(1.25); }
 
-/* ── Detail / add-session popup ── */
-.cal-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 200;
-  background: rgba(0,0,0,0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.2rem;
-}
-.cal-modal__box {
-  position: relative;
-  width: 100%;
-  max-width: 420px;
-  background: var(--bg);
-  border: 1px solid var(--accent-line);
-  border-radius: 16px;
-  padding: 1.6rem 1.7rem;
-  box-shadow: var(--shadow-card);
-}
-.cal-modal__close {
-  position: absolute;
-  top: 0.7rem;
-  right: 0.9rem;
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  font-size: 1.4rem;
-  cursor: pointer;
-  line-height: 1;
-}
-.cal-modal__close:hover { color: var(--accent-bright); }
-.cal-modal__title {
-  font-size: 1.05rem;
-  font-weight: 800;
-  color: var(--accent-bright);
-  margin-bottom: 0.9rem;
-}
-.cal-modal__row {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid var(--line-soft);
-  font-size: 0.88rem;
-}
-.cal-modal__row:last-child { border-bottom: none; }
-.cal-modal__row span:first-child {
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: var(--accent);
-  align-self: center;
-  white-space: nowrap;
-}
-.cal-modal__row span:last-child { color: var(--text); text-align: right; }
-
-/* ── Add-session form ── */
-.cal-form { display: flex; flex-direction: column; gap: 0.8rem; }
-.cal-form label {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: var(--accent);
-}
-.cal-form select, .cal-form input, .cal-form textarea {
-  font-family: inherit;
-  font-size: 0.9rem;
-  color: var(--text);
-  background: rgba(255,255,255,0.05);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 0.55rem 0.7rem;
-  color-scheme: dark;
-}
-[data-theme="light"] .cal-form select,
-[data-theme="light"] .cal-form input,
-[data-theme="light"] .cal-form textarea { background: rgba(0,0,0,0.03); color-scheme: light; }
-.cal-form select option { background: #1a1a1a; color: #fff; }
-[data-theme="light"] .cal-form select option { background: #fff; color: #000; }
-.cal-form select:focus, .cal-form input:focus, .cal-form textarea:focus {
-  outline: none;
-  border-color: var(--accent-line);
-  box-shadow: 0 0 0 2px var(--accent-soft);
-}
-.cal-form__row { display: flex; align-items: center; gap: 0.8rem; margin-top: 0.2rem; }
-.cal-form__state { font-size: 0.8rem; color: var(--accent); }
+/* Detail popup + add-session form styles live in admin-calendar-modal.css. */
 
 @media (max-width: 900px) {
   .cal-cell { min-height: 64px; }

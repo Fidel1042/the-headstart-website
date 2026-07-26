@@ -49,45 +49,97 @@
 .status-col__title--bad { color: var(--bad); }
 .status-col__title--muted { color: var(--text-muted); }
 
+/* Compact list: one row per mentee so ~10 fit in a 1440-tall view. */
 .status-col__items {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 0.7rem;
-  align-items: stretch;
-}
-
-.status-item {
   display: flex;
   flex-direction: column;
-  gap: 0.1rem;
-  padding: 0.6rem 0.75rem;
-  border-radius: 10px;
-  border: 1px solid var(--line);
-  background: var(--bg-card-hover);
 }
-/* Status reads from the column heading; the card carries a quiet tint of the
-   same tone on its full border rather than a side stripe. */
-.status-item--ok { border-color: color-mix(in srgb, var(--ok) 40%, var(--line)); }
-.status-item--warn { border-color: color-mix(in srgb, var(--warn) 40%, var(--line)); }
-.status-item--bad { border-color: color-mix(in srgb, var(--bad) 40%, var(--line)); }
-.status-item__head {
+
+.status-mentee:last-child .status-row { border-bottom: none; }
+
+.status-row {
+  display: grid;
+  grid-template-columns: minmax(150px, 1.6fr) minmax(90px, 0.9fr) minmax(110px, 1fr) auto;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.55rem 0.2rem 0.55rem 0.4rem;
+  border-bottom: 1px solid var(--line);
+}
+
+/* No per-row status colour: every row already sits under its colour-coded
+   section header (Nudge / No sessions / Dropped / Active), so a row tint would
+   just repeat that. Tone modifier kept as a no-op hook for future use. */
+.status-row--ok, .status-row--warn, .status-row--bad, .status-row--muted {}
+
+.status-row__who { display: flex; flex-direction: column; min-width: 0; }
+
+/* The name doubles as the history expand/collapse control. */
+.status-row__toggle {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.5rem;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
 }
-/* Long names ("Abdiaziz Abdi Ibrahim Ahmef") wrap to 2 lines and pushed every
-   line below them out of step with the neighbouring cards. Reserving 2 lines
-   keeps the mentor, date and follow-up rows on one baseline across the row. */
-.status-item__name {
+.status-row__toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+.status-row__caret {
+  width: 0.34rem;
+  height: 0.34rem;
+  border-right: 1.5px solid var(--text-muted);
+  border-bottom: 1.5px solid var(--text-muted);
+  transform: rotate(-45deg);
+  transition: transform 0.15s ease;
+  flex-shrink: 0;
+}
+.status-row__toggle[aria-expanded="true"] .status-row__caret { transform: rotate(45deg); }
+.status-row__name {
   font-weight: 700;
-  font-size: 0.9rem;
-  line-height: 1.3;
-  min-height: 2.6em;
+  font-size: 0.86rem;
   color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.status-item__meta { font-size: 0.75rem; color: var(--text-muted); }
-.status-empty { font-size: 0.82rem; color: var(--text-muted); }
+.status-row__toggle:hover .status-row__name { color: var(--accent-bright); }
+.status-row__mentor { font-size: 0.72rem; color: var(--text-muted); }
+
+.status-row__lastcol { display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
+.status-row__last { font-size: 0.76rem; color: var(--text); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.status-row__ago { color: var(--text-muted); }
+.status-row__freq { font-size: 0.68rem; color: var(--text-muted); white-space: nowrap; }
+
+.status-row__fu { font-size: 0.73rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.status-empty { font-size: 0.82rem; color: var(--text-muted); padding: 0.4rem 0.7rem; }
+
+/* ── Session history panel ── */
+.status-history {
+  padding: 0.6rem 0.2rem 0.9rem 1.6rem;
+  border-bottom: 1px solid var(--line);
+}
+.status-mentee:last-child .status-history { border-bottom: none; }
+.status-history__count { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.4rem; }
+.status-history__empty { font-size: 0.76rem; color: var(--text-muted); }
+.status-history__list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.7rem;
+  font-size: 0.74rem;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  max-height: 8.5em;
+  overflow-y: auto;
+}
+.status-history__list li { white-space: nowrap; }
+
+@media (prefers-reduced-motion: reduce) {
+  .status-row__caret { transition: none; }
+}
 
 .drop-btn {
   background: transparent;
@@ -107,30 +159,54 @@
 .drop-btn:hover { background: rgba(224,80,80,0.12); }
 .drop-btn:disabled { opacity: 0.55; cursor: default; }
 
-/* ── Follow-up row ── */
-.fu-row {
+/* ── Actions cell ── */
+.status-row__actions {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 0.45rem;
-  margin-top: auto; /* same baseline across cards in the row */
-  padding-top: 0.45rem;
-  border-top: 1px solid var(--line-soft);
+  gap: 0.4rem;
+  justify-content: flex-end;
 }
-.fu-row .status-item__meta { flex-basis: 100%; }
 .fu-date {
   background: rgba(255,255,255,0.05);
   border: 1px solid var(--line);
   border-radius: 8px;
   color: var(--text);
   font-family: inherit;
-  font-size: 0.76rem;
-  padding: 0.28rem 0.45rem;
+  font-size: 0.72rem;
+  padding: 0.22rem 0.4rem;
   color-scheme: dark;
 }
 [data-theme="light"] .fu-date { background: rgba(0,0,0,0.03); color-scheme: light; }
 .fu-date:focus { outline: none; border-color: var(--accent-line); }
+.fu-save {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--text-muted);
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  font-family: inherit;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.fu-save:hover { border-color: var(--accent-line); color: var(--accent-bright); }
+.fu-state { font-size: 0.7rem; color: var(--text-muted); }
 
+/* Stack each row into a compact card on a phone; the grid columns would be
+   far too narrow otherwise. Placed after the base rules so it wins on mobile. */
 @media (max-width: 700px) {
-  .status-col__items { grid-template-columns: 1fr; }
+  .status-row {
+    grid-template-columns: 1fr auto;
+    gap: 0.35rem 0.6rem;
+    padding: 0.7rem 0.2rem;
+  }
+  .status-row__who { grid-column: 1; }
+  .status-row__lastcol { grid-column: 2; grid-row: 1; align-items: flex-end; text-align: right; }
+  .status-row__fu { grid-column: 1 / -1; }
+  .status-row__actions { grid-column: 1 / -1; justify-content: flex-start; }
+  .status-history { padding-left: 0.9rem; }
+  .fu-date, .fu-save, .drop-btn { min-height: 40px; }
 }

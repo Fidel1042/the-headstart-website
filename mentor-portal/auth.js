@@ -29,6 +29,19 @@ export const ALLOWED_MENTOR_EMAILS = [
   "shriyanssh@gmail.com",
 ];
 
+// Owners who see a reduced portal. Koko runs mentee support, not money, so the
+// billing (charging mentees) and payslips (paying mentors) pages are hidden
+// from her nav and blocked if she reaches the URL directly. Keyed by page id.
+export const LIMITED_OWNERS = {
+  "kokoro.araki1015@gmail.com": ["billing", "payslips"],
+};
+
+/** Whether an owner is allowed to see a given owner page. */
+export function ownerCanSee(email, page) {
+  const hidden = LIMITED_OWNERS[String(email || "").toLowerCase().trim()] || [];
+  return !hidden.includes(page);
+}
+
 // ─── CLIENT ───────────────────────────────────────────────────────────────────
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 

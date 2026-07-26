@@ -71,19 +71,27 @@
       const asParam = (new URLSearchParams(location.search).get("as") || "").toLowerCase().trim();
       const mentorEmail = (isOwner && asParam) ? asParam : loginEmail;
 
+      // When viewing as another OWNER (Koko), preview their nav too, so their
+      // reduced link set is visible. Viewing as a regular mentor keeps your own
+      // owner nav, so you never lose the dropdown to switch back.
+      const viewingOwner = isOwner && asParam && OWNERS.includes(asParam);
+
       mountPortalNav({
         email: (isOwner && asParam) ? `viewing as ${mentorEmail}` : mentorEmail,
         isOwner,
         active: "home",
+        loginEmail: viewingOwner ? mentorEmail : loginEmail,
       });
 
       if (isOwner) {
         // Build the "View as mentor" dropdown (injected by mountPortalNav).
         const viewAs = document.getElementById("view-as");
         if (viewAs) {
+          // Exclude only yourself, not every owner: Koko is both an owner and a
+          // mentor, so Fidel needs her in the list to view her portal.
           const opts = ['<option value="">View as… (yourself)</option>']
             .concat(ALLOWED_MENTOR_EMAILS
-              .filter((e) => !OWNERS.includes(e))
+              .filter((e) => e !== loginEmail)
               .map((e) => `<option value="${e}"${e === asParam ? " selected" : ""}>${e}</option>`));
           viewAs.innerHTML = opts.join("");
           viewAs.style.display = "";

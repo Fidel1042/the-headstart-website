@@ -168,6 +168,49 @@ html { font-size: 110%; }
 .mentor-notes__save:disabled, .fu-save:disabled { opacity: 0.55; cursor: default; }
 .mentor-notes__state, .fu-state { font-size: 0.76rem; color: var(--accent); }
 
+/* ── Sortable headers ── */
+.th-sort { cursor: pointer; user-select: none; }
+.th-sort:hover { color: var(--accent-bright); }
+/* Arrow only on the active column; reserves space so headers do not shift. */
+.th-sort.is-sorted::after {
+  content: "▲";
+  font-size: 0.7em;
+  margin-left: 0.35em;
+  vertical-align: middle;
+}
+.th-sort.is-sorted[data-dir="desc"]::after { content: "▼"; }
+.th-sort.num.is-sorted::after { margin-left: 0.25em; }
+
+/* ── Rolling 30-day trend cell ── */
+.t30-cell { white-space: nowrap; }
+.t30 { font-weight: 700; }
+.t30-delta {
+  margin-left: 0.4rem;
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+}
+.t30-delta--up { color: var(--ok); }
+.t30-delta--down { color: var(--bad); }
+.t30-delta--flat { color: var(--text-muted); }
+.t30-prev { color: var(--text-muted); }
+
+/* ── Performance view: retention bar ── */
+.perf-ret { display: flex; align-items: center; gap: 0.6rem; min-width: 150px; }
+.perf-ret__bar {
+  flex: 1;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--line-soft);
+  overflow: hidden;
+}
+.perf-ret__fill { display: block; height: 100%; border-radius: 999px; }
+.perf-ret__fill--ok { background: var(--ok); }
+.perf-ret__fill--warn { background: var(--warn); }
+.perf-ret__fill--bad { background: var(--bad); }
+.perf-ret__val { font-size: 0.82rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.perf-ret__sub { color: var(--text-muted); font-size: 0.72rem; }
+.perf-none { color: var(--text-muted); font-size: 0.82rem; }
+
 /* Mentee status layout (incl. follow-up row) lives in admin-status.css. */
 
 @media (max-width: 900px) {

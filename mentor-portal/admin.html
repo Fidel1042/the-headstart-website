@@ -44,6 +44,7 @@
   <link rel="stylesheet" href="portal.css" />
   <link rel="stylesheet" href="admin.css" />
   <link rel="stylesheet" href="admin-calendar.css" />
+  <link rel="stylesheet" href="admin-calendar-modal.css" />
   <link rel="stylesheet" href="admin-status.css" />
   <link rel="stylesheet" href="admin-chart.css" />
   <link rel="stylesheet" href="/mentor-portal/polish.css" />
@@ -59,6 +60,7 @@
       <div class="admin-tabs" id="admin-tabs">
         <button type="button" class="admin-tab is-active" data-view="mentees">Mentee status</button>
         <button type="button" class="admin-tab" data-view="overview">Overview</button>
+        <button type="button" class="admin-tab" data-view="performance">Performance</button>
         <button type="button" class="admin-tab" data-view="calendar">Calendar</button>
       </div>
     </div>
@@ -79,7 +81,7 @@
         </div>
         <div class="stat-tile">
           <span class="stat-tile__num" id="stat-month">—</span>
-          <span class="stat-tile__label">Sessions this month</span>
+          <span class="stat-tile__label">Sessions (last 30 days)</span>
         </div>
         <div class="stat-tile">
           <span class="stat-tile__num" id="stat-owed">—</span>
@@ -94,15 +96,15 @@
           <thead>
             <tr>
               <th></th>
-              <th>Mentor</th>
-              <th>Rate</th>
-              <th>Mentees</th>
-              <th>Sessions</th>
-              <th>This month</th>
-              <th>Last session</th>
-              <th>Next session</th>
-              <th>Owed</th>
-              <th>Status</th>
+              <th class="th-sort" data-sort="name">Mentor</th>
+              <th class="th-sort num" data-sort="rate">Rate</th>
+              <th class="th-sort num" data-sort="mentees">Mentees</th>
+              <th class="th-sort num" data-sort="last30" title="Sessions in the last 30 days">Last 30 days</th>
+              <th class="th-sort num" data-sort="prev30" title="Sessions in the 30 days before that">Prev 30 days</th>
+              <th class="th-sort" data-sort="last">Last session</th>
+              <th class="th-sort" data-sort="next">Next session</th>
+              <th class="th-sort num" data-sort="owed">Owed</th>
+              <th class="th-sort" data-sort="status">Status</th>
             </tr>
           </thead>
           <tbody id="mentor-body"></tbody>
@@ -117,6 +119,12 @@
         <button type="button" class="cal-btn" id="cal-next" aria-label="Next month">&#8250;</button>
         <button type="button" class="cal-btn cal-btn--today" id="cal-today">Today</button>
         <h2 class="cal-title" id="cal-title"></h2>
+        <input type="text" class="cal-search" id="cal-search" list="cal-mentor-names"
+               placeholder="Search mentor…" aria-label="Search mentor by name" autocomplete="off" />
+        <datalist id="cal-mentor-names"></datalist>
+        <select class="cal-filter" id="cal-filter" aria-label="Filter by mentor">
+          <option value="">All mentors</option>
+        </select>
         <button type="button" class="cal-btn cal-btn--add" id="cal-add">+ Add session</button>
       </div>
       <div class="cal-grid" id="cal-grid"></div>
@@ -134,6 +142,26 @@
     <!-- MENTEE STATUS -->
     <section id="view-mentees" hidden>
       <div class="status-grid" id="status-grid"></div>
+    </section>
+
+    <!-- PERFORMANCE -->
+    <section id="view-performance" hidden>
+      <div class="data-table-wrap">
+        <table class="data-table" id="perf-table">
+          <thead>
+            <tr>
+              <th class="th-sort" data-sort="name">Mentor</th>
+              <th class="th-sort num" data-sort="mentees" title="Distinct mentees ever taught">Mentees</th>
+              <th class="th-sort num" data-sort="sessions" title="All sessions ever delivered">Sessions</th>
+              <th class="th-sort num" data-sort="avg" title="Average sessions per mentee">Avg / mentee</th>
+              <th class="th-sort" data-sort="retention" title="Share of mentees with 3+ sessions, once they are past their first month">Retention</th>
+              <th class="th-sort" data-sort="frequency" title="Average gap between sessions, for mentees who have had a 2nd session">Usual frequency</th>
+              <th class="th-sort num" data-sort="active" title="Mentees with a session in the last 30 days">Active (30d)</th>
+            </tr>
+          </thead>
+          <tbody id="perf-body"></tbody>
+        </table>
+      </div>
     </section>
 
   </main>
