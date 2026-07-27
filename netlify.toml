@@ -11,7 +11,29 @@
   for = "/guides/*"
   [headers.values]
     X-Robots-Tag = "noindex, nofollow, noarchive, nosnippet"
-    Content-Disposition = "inline"
+
+# The URLs stay random so they cannot be guessed, but these give each file a
+# human name, so it opens as "Stage 1" and saves as "Stage 1.pdf" rather than
+# as the random string. Keep in sync with Lead Magnet/LINKS.md when rotating.
+[[headers]]
+  for = "/guides/4ec5108ee6d094cd73a65ddb.pdf"
+  [headers.values]
+    Content-Disposition = 'inline; filename="Stage 1.pdf"'
+
+[[headers]]
+  for = "/guides/2dfc6f2dccc42a5f07dabfb0.pdf"
+  [headers.values]
+    Content-Disposition = 'inline; filename="Stage 2.pdf"'
+
+[[headers]]
+  for = "/guides/8b16d7c5beb2e0c528e8b563.pdf"
+  [headers.values]
+    Content-Disposition = 'inline; filename="Stage 3.pdf"'
+
+[[headers]]
+  for = "/guides/4864dbf7f4521178ced29d1e.pdf"
+  [headers.values]
+    Content-Disposition = 'inline; filename="Stage 4.pdf"'
 
 [functions."monthly-pl"]
   schedule = "0 0 1 * *"
@@ -21,3 +43,9 @@
 # otherwise. Hourly is needed so it stays correct across daylight saving.
 [functions."session-reminders"]
   schedule = "0,15 * * * *"
+
+# Declined-card chase list. Runs hourly on the hour; the function itself only
+# sends in the Melbourne 9am window, so a failure from yesterday's 5:15pm
+# charge run reaches Fidel first thing the next morning.
+[functions."payment-reminders"]
+  schedule = "0 * * * *"

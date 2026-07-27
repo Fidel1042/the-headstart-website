@@ -11,7 +11,7 @@
 
 const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com", "dev@localhost"];
 
-const SESSION_FIELDS = ["Mentee Name", "Mentee Record ID", "Date", "Amount Due"];
+const SESSION_FIELDS = ["Mentee Name", "Mentee Record ID", "Date", "Amount Due", "Failure Reason"];
 
 /** Owner allowlist plus the billing passphrase. Returns an error string, or null. */
 function authorise(payload) {
@@ -57,14 +57,20 @@ function groupByMentee(records) {
     const name = s.fields["Mentee Name"] || "Unknown";
     const amount = parseFloat(s.fields["Amount Due"]) || 0;
     const key = recId || `name:${name}`;
-    if (!byMentee[key]) byMentee[key] = { recordId: recId, name, sessionIds: [], total: 0 };
+    if (!byMentee[key]) byMentee[key] = { recordId: recId, name, sessionIds: [], total: 0, reason: "" };
     byMentee[key].sessionIds.push(s.id);
     byMentee[key].total += amount;
+    // Keep the first decline reason: they are the same across a mentee's rows,
+    // and it decides how the chase message explains the problem.
+    if (!byMentee[key].reason && s.fields["Failure Reason"]) {
+      byMentee[key].reason = s.fields["Failure Reason"];
+    }
   }
   return Object.values(byMentee);
 }
 
-async function customerFor(recordId) {
+/** One mentee record from the Client table, or null. */
+async function menteeRecord(recordId) {
   if (!recordId) return null;
   const { AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTEE_TABLE_ID } = process.env;
   try {
@@ -73,10 +79,27 @@ async function customerFor(recordId) {
       { headers: airtableHeaders() }
     );
     const data = await res.json();
-    return data.fields?.["Stripe Customer ID"] || null;
+    return data.fields ? data : null;
   } catch {
     return null;
   }
+}
+
+async function customerFor(recordId) {
+  const rec = await menteeRecord(recordId);
+  return rec?.fields?.["Stripe Customer ID"] || null;
+}
+
+// wa.me wants digits only, no plus. AU locals (04...) become 614....
+function normalizePhone(raw, aussie) {
+  if (!raw) return "";
+  const s = String(raw).trim().replace(/[\s\-()]/g, "");
+  if (s.startsWith("+")) return s.replace(/^\+/, "");
+  if (s.startsWith("00")) return s.slice(2);
+  if (s.startsWith("0")) return "61" + s.slice(1);
+  if (/^4\d{8}$/.test(s)) return "61" + s;
+  if (aussie === "Aussie" && /^\d{8,9}$/.test(s)) return "61" + s.replace(/^0/, "");
+  return s.replace(/\D/g, "");
 }
 
 /**
@@ -174,6 +197,6 @@ const summarise = (results) => {
 };
 
 module.exports = {
-  OWNERS, authorise, airtableHeaders,
+  OWNERS, authorise, airtableHeaders, menteeRecord, normalizePhone,
   fetchByStatus, groupByMentee, chargeGroups, writeResults, summarise,
 };

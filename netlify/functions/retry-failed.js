@@ -13,9 +13,10 @@
 
 const Stripe = require("stripe");
 const {
-  OWNERS, authorise, fetchByStatus, groupByMentee,
+  OWNERS, authorise, fetchByStatus, groupByMentee, menteeRecord, normalizePhone,
   chargeGroups, writeResults, summarise,
 } = require("../shared/charge-engine");
+const { chaseMessage } = require("../shared/chase-message");
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -47,15 +48,25 @@ exports.handler = async (event) => {
   // Preview needs no passcode: it reads only, and seeing the list is what
   // tells Fidel who to chase before spending anything.
   if (payload.preview) {
+    // Pull each mentee's phone so the page can offer a WhatsApp button, and
+    // build the chase message here so the wording matches the reminder email.
+    const mentees = [];
+    for (const g of groups) {
+      const rec = await menteeRecord(g.recordId);
+      mentees.push({
+        name: g.name,
+        sessions: g.sessionIds.length,
+        total: parseFloat(g.total.toFixed(2)),
+        reason: g.reason || "",
+        phone: normalizePhone(rec?.fields?.["Phone Number"] || "", rec?.fields?.["Aussie Number"] || ""),
+        message: chaseMessage(g.name, g.total, g.reason),
+      });
+    }
     return json(200, {
       preview: true,
       count: groups.length,
       total: parseFloat(groups.reduce((s, g) => s + g.total, 0).toFixed(2)),
-      mentees: groups.map((g) => ({
-        name: g.name,
-        sessions: g.sessionIds.length,
-        total: parseFloat(g.total.toFixed(2)),
-      })),
+      mentees,
     });
   }
 

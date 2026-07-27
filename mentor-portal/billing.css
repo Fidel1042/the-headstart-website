@@ -38,3 +38,32 @@
     .result { font-size:0.85rem; margin-top:14px; line-height:1.5; }
     .loading, .empty { text-align:center; color:var(--text-muted); font-size:0.9rem; padding:32px 0; }
     .sub-label { font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--accent); font-weight:700; margin-bottom:10px; }
+
+/* ── Chase popup (failed payments) ── */
+.chase-btn { flex-shrink: 0; margin-left: 0.6rem; font-size: 0.7rem; padding: 0.3rem 0.7rem; }
+.chase-modal {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.6);
+  display: flex; align-items: center; justify-content: center; padding: 1.2rem;
+}
+.chase-modal__box {
+  position: relative; width: 100%; max-width: 460px;
+  background: var(--bg); border: 1px solid var(--accent-line);
+  border-radius: 16px; padding: 1.6rem 1.7rem; box-shadow: var(--shadow-card);
+}
+.chase-modal__close {
+  position: absolute; top: 0.7rem; right: 0.9rem;
+  background: none; border: none; color: var(--text-muted);
+  font-size: 1.4rem; line-height: 1; cursor: pointer;
+}
+.chase-modal__close:hover { color: var(--accent-bright); }
+.chase-title { font-size: 1.05rem; font-weight: 800; color: var(--accent-bright); margin-bottom: 0.2rem; }
+.chase-meta { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.9rem; }
+.chase-text {
+  font-family: inherit; font-size: 0.85rem; line-height: 1.55; color: var(--text);
+  white-space: pre-wrap; background: var(--bg-card); border: 1px solid var(--line);
+  border-radius: 10px; padding: 0.9rem 1rem; margin-bottom: 0.9rem;
+}
+.chase-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.chase-nophone { font-size: 0.8rem; color: var(--warn); align-self: center; }
+.chase-note { margin-top: 0.9rem; font-size: 0.75rem; line-height: 1.5; color: var(--text-muted); }

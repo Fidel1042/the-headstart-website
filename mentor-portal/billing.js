@@ -6,6 +6,7 @@
 import { requireAuth, ALLOWED_MENTOR_EMAILS } from "./auth.js";
 import { mountPortalNav, initTheme } from "./portal-ui.js";
 import { setToolsAdmin } from "./billing-tools.js";
+import { setFailed } from "./chase-modal.js";
 
 initTheme();
 
@@ -147,13 +148,17 @@ async function loadFailed() {
   loading.hidden = true;
   if (!data.mentees || !data.mentees.length) { empty.hidden = false; return; }
 
-  document.getElementById("retry-list").innerHTML = data.mentees.map((m) => `
+  // Kept so the chase popup can read a mentee by index, rather than stuffing a
+  // whole message into a DOM attribute and having to escape it.
+  setFailed(data.mentees);
+  document.getElementById("retry-list").innerHTML = data.mentees.map((m, i) => `
     <div class="row">
       <div class="row-main">
         <span class="row-name">${m.name}</span>
-        <span class="row-sub">${m.sessions} session${m.sessions !== 1 ? "s" : ""} · previously declined</span>
+        <span class="row-sub">${m.sessions} session${m.sessions !== 1 ? "s" : ""} · ${m.reason || "declined"}</span>
       </div>
       <span class="row-amount">$${m.total.toFixed(2)}</span>
+      <button class="btn ghost chase-btn" onclick="openChase(${i})">Chase</button>
     </div>`).join("");
   document.getElementById("retry-total").textContent = `$${data.total.toFixed(2)} AUD`;
   content.hidden = false;
