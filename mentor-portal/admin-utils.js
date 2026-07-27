@@ -38,10 +38,9 @@ export function avgGapDays(datesAsc) {
   return total / (datesAsc.length - 1);
 }
 
-// Human label for a gap in days: weeks once it is roomy enough, days otherwise.
+// Human label for a gap in days. Always whole days, never a fuzzy "~1.9 wk".
 export function fmtFrequency(days) {
   if (days == null) return null;
-  const weeks = days / 7;
   const d = Math.round(days);
-  return weeks >= 1.3 ? `~${weeks.toFixed(1)} wk` : `~${d} day${d === 1 ? "" : "s"}`;
+  return `every ${d} day${d === 1 ? "" : "s"}`;
 }

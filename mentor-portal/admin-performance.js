@@ -92,8 +92,7 @@ function retentionCell(p) {
 
 function frequencyCell(p) {
   const label = fmtFrequency(p.frequency);
-  if (!label) return '<span class="perf-none">—</span>';
-  return `${label} <span class="perf-ret__sub">between sessions</span>`;
+  return label || '<span class="perf-none">—</span>';
 }
 
 function sorted(data) {

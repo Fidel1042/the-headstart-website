@@ -49,19 +49,42 @@
 .status-col__title--bad { color: var(--bad); }
 .status-col__title--muted { color: var(--text-muted); }
 
-/* Compact list: one row per mentee so ~10 fit in a 1440-tall view. */
+/* Compact list: one row per mentee so ~10 fit in a 1440-tall view.
+   One grid owns the column tracks and the header plus every row inherit them
+   through subgrid. Giving each row its own grid would let each size its own
+   columns, so values would drift out from under their headings. */
 .status-col__items {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(150px, 1.6fr) minmax(90px, 0.9fr) minmax(110px, 1fr) auto;
+  column-gap: 0.9rem;
 }
+.status-head,
+.status-mentee,
+.status-row {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+}
+.status-history { grid-column: 1 / -1; }
+
+/* Column labels. Matches the Overview and Performance table headers so the
+   whole admin area reads as one system. Left/right padding must match
+   .status-row exactly, or the subgrid tracks shift under the labels. */
+.status-head {
+  align-items: end;
+  padding: 0.1rem 0.2rem 0.5rem 0.4rem;
+  border-bottom: 1px solid var(--accent-line);
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.status-head__actions { text-align: right; }
 
 .status-mentee:last-child .status-row { border-bottom: none; }
 
 .status-row {
-  display: grid;
-  grid-template-columns: minmax(150px, 1.6fr) minmax(90px, 0.9fr) minmax(110px, 1fr) auto;
   align-items: center;
-  gap: 0.9rem;
   padding: 0.55rem 0.2rem 0.55rem 0.4rem;
   border-bottom: 1px solid var(--line);
 }
@@ -114,7 +137,19 @@
 .status-row__freq { font-size: 0.68rem; color: var(--text-muted); white-space: nowrap; }
 
 .status-row__fu { font-size: 0.73rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.status-empty { font-size: 0.82rem; color: var(--text-muted); padding: 0.4rem 0.7rem; }
+/* A booked date that has passed with no session logged: needs rebooking. */
+.status-row__stale { color: var(--warn); cursor: help; }
+
+/* Flash a row that has just been re-homed at the bottom after booking. */
+.status-mentee.is-moved .status-row { animation: status-moved 1.2s ease-out; }
+@keyframes status-moved {
+  0%   { background: var(--accent-soft); }
+  100% { background: transparent; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .status-mentee.is-moved .status-row { animation: none; background: var(--accent-soft); }
+}
+.status-empty { grid-column: 1 / -1; font-size: 0.82rem; color: var(--text-muted); padding: 0.4rem 0.7rem; }
 
 /* ── Session history panel ── */
 .status-history {
@@ -141,63 +176,27 @@
   .status-row__caret { transition: none; }
 }
 
-.drop-btn {
-  background: transparent;
-  border: 1px solid rgba(224,80,80,0.5);
-  color: var(--bad);
-  border-radius: 999px;
-  padding: 0.18rem 0.65rem;
-  font-family: inherit;
-  font-size: 0.64rem;
-  font-weight: 700;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: background 0.15s;
-}
-.drop-btn:hover { background: rgba(224,80,80,0.12); }
-.drop-btn:disabled { opacity: 0.55; cursor: default; }
 
-/* ── Actions cell ── */
-.status-row__actions {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  justify-content: flex-end;
+/* Older browsers without subgrid: fall back to the previous layout, where each
+   row sizes its own columns. Slightly less precise under the headings, but it
+   stays a readable list instead of collapsing into one column. */
+@supports not (grid-template-columns: subgrid) {
+  .status-col__items { display: flex; flex-direction: column; }
+  .status-mentee { display: block; }
+  .status-head,
+  .status-row {
+    grid-template-columns: minmax(150px, 1.6fr) minmax(90px, 0.9fr) minmax(110px, 1fr) auto;
+    column-gap: 0.9rem;
+  }
 }
-.fu-date {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  color: var(--text);
-  font-family: inherit;
-  font-size: 0.72rem;
-  padding: 0.22rem 0.4rem;
-  color-scheme: dark;
-}
-[data-theme="light"] .fu-date { background: rgba(0,0,0,0.03); color-scheme: light; }
-.fu-date:focus { outline: none; border-color: var(--accent-line); }
-.fu-save {
-  background: transparent;
-  border: 1px solid var(--line);
-  color: var(--text-muted);
-  border-radius: 999px;
-  padding: 0.2rem 0.6rem;
-  font-family: inherit;
-  font-size: 0.64rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
-}
-.fu-save:hover { border-color: var(--accent-line); color: var(--accent-bright); }
-.fu-state { font-size: 0.7rem; color: var(--text-muted); }
 
 /* Stack each row into a compact card on a phone; the grid columns would be
    far too narrow otherwise. Placed after the base rules so it wins on mobile. */
 @media (max-width: 700px) {
+  .status-col__items { display: flex; flex-direction: column; }
+  .status-mentee { display: block; }
+  /* Stacked cards have no columns, so column labels would describe nothing. */
+  .status-head { display: none; }
   .status-row {
     grid-template-columns: 1fr auto;
     gap: 0.35rem 0.6rem;

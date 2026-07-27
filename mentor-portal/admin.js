@@ -23,9 +23,9 @@ const MOCK = {
     { id: "recMT2", name: "Aidan", email: "aidan@mock.com", rate: 50, notes: "Great with tech mentees" },
   ],
   mentees: [
-    { id: "recM1", name: "Priya Sharma", mentorEmail: "angelica@mock.com", billingType: "Per Session", lastFollowUp: d(10) },
-    { id: "recM2", name: "Chen Wei", mentorEmail: "aidan@mock.com", billingType: "Package", lastFollowUp: "" },
-    { id: "recM3", name: "Zara Anderson", mentorEmail: "aidan@mock.com", billingType: "Per Session", lastFollowUp: "" },
+    { id: "recM1", name: "Priya Sharma", mentorEmail: "angelica@mock.com", billingType: "Per Session", nextSession: d(-5) },
+    { id: "recM2", name: "Chen Wei", mentorEmail: "aidan@mock.com", billingType: "Package", nextSession: "" },
+    { id: "recM3", name: "Zara Anderson", mentorEmail: "aidan@mock.com", billingType: "Per Session", nextSession: d(3) },
   ],
   sessions: [
     { date: d(2), mentorEmail: "angelica@mock.com", mentorName: "Angelica", mentee: "Priya Sharma", menteeId: "recM1", payout: 55, amountDue: 35, amountCharged: 35, status: "Charged", mentorPaid: false, next: d(-5) },

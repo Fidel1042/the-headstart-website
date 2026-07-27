@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SMH2KVMJT2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag("js", new Date());
+    gtag("config", "G-SMH2KVMJT2");
+  </script>
+  <title>Free Job Search Audit | Headstart Mentoring</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta name="description" content="Answer four quick questions and get a free, tailored audit of your job search from Headstart Mentoring." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://theheadstartmentoring.com/job-search-audit/" />
+  <meta property="og:site_name" content="Headstart Mentoring" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Free Job Search Audit | Headstart Mentoring" />
+  <meta property="og:description" content="Answer four quick questions and get a free, tailored audit of your job search." />
+  <meta property="og:url" content="https://theheadstartmentoring.com/job-search-audit/" />
+  <meta property="og:image" content="https://theheadstartmentoring.com/images/website-logo.png" />
+  <link rel="stylesheet" href="../style.css?v=11" />
+  <style>
+    /* ── PAGE LAYOUT ── */
+    .audit-page-wrap {
+      min-height: 60vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 3rem 1.25rem 5rem;
+    }
+    .audit-inner { width: 100%; max-width: 560px; }
+
+    /* ── HERO COPY ── */
+    .audit-eyebrow {
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #f7d879;
+      margin-bottom: 0.75rem;
+    }
+    .audit-headline {
+      font-size: clamp(1.6rem, 4vw, 2.1rem);
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.2;
+      margin: 0 0 1rem;
+      text-wrap: balance;
+    }
+    .audit-desc {
+      font-size: 0.96rem;
+      color: rgba(255,255,255,0.72);
+      line-height: 1.65;
+      margin: 0 0 2rem;
+    }
+
+    /* ── FORM ── */
+    .audit-form { display: flex; flex-direction: column; gap: 1.5rem; }
+    .audit-form input[type="email"],
+    .audit-form input[type="text"],
+    .audit-form input[type="number"] {
+      width: 100%;
+      padding: 0.88rem 1.1rem;
+      background: rgba(255,255,255,0.05);
+      border: 1.5px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 0.95rem;
+      font-family: inherit;
+      box-sizing: border-box;
+      transition: border-color 0.2s;
+    }
+    .audit-form input:focus { outline: none; border-color: #c79b3b; }
+    .audit-form input::placeholder { color: rgba(255,255,255,0.35); }
+
+    /* Grouped qualifier questions */
+    .audit-q { display: flex; flex-direction: column; gap: 0.5rem; }
+    .audit-q__label {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: #fff;
+      line-height: 1.4;
+    }
+    .audit-q__hint { color: rgba(255,255,255,0.5); font-weight: 400; }
+    .audit-q input[type="number"] { max-width: 130px; }
+
+    .audit-divider {
+      height: 1px;
+      background: rgba(255,255,255,0.09);
+      margin: 0.25rem 0;
+    }
+
+    .audit-submit {
+      width: 100%;
+      padding: 0.95rem;
+      background: linear-gradient(135deg, #c79b3b, #f7d37d);
+      color: #2b1b09;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: opacity 0.18s;
+      font-family: inherit;
+      margin-top: 0.5rem;
+    }
+    .audit-submit:hover { opacity: 0.88; }
+
+    .audit-success {
+      display: none;
+      padding: 1.4rem 1.8rem;
+      background: rgba(199,155,59,0.08);
+      border: 1px solid rgba(199,155,59,0.2);
+      border-radius: 12px;
+      text-align: center;
+    }
+    .audit-success p { color: #fff; font-size: 0.95rem; line-height: 1.65; margin: 0; }
+    .audit-success strong { color: #f7d879; }
+
+    .audit-back-link {
+      display: block;
+      margin-top: 1.5rem;
+      text-align: center;
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.45);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .audit-back-link:hover { color: rgba(255,255,255,0.75); }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="nav">
+      <a href="/" class="nav-left nav-home">
+        <img src="../images/headstart-italic-logo.png" decoding="async" alt="Headstart Mentoring logo" class="nav-logo-icon" />
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+      </button>
+      <nav class="nav-links" id="navLinks">
+        <a href="/mentors">Mentors</a>
+        <a href="/#pricing">Pricing</a>
+        <a href="/reviews">Reviews</a>
+        <a href="/job-alerts">Job Alerts</a>
+        <div class="nav-more">
+          <button class="nav-more__trigger" type="button">More <span class="nav-more__arrow">▾</span></button>
+          <div class="nav-more__menu">
+            <a href="/blog">Blog</a>
+            <a href="/careers">Careers</a>
+            <a href="/job-search-audit" class="active">Free Audit</a>
+          </div>
+        </div>
+      </nav>
+      <a href="/discovery-call" class="nav-cta nav-cta--gold">Free Strategy Call</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="audit-page-wrap">
+      <div class="audit-inner">
+
+        <!-- PLACEHOLDER COPY: eyebrow / headline / desc are functional stand-ins; edit to taste. -->
+        <p class="audit-eyebrow">Free Job Search Audit</p>
+        <h1 class="audit-headline">Get your free job search audit</h1>
+        <p class="audit-desc">Answer four quick questions so we can tailor the right audit for where you're at.</p>
+
+        <form name="job-search-audit" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="audit-form" id="auditForm">
+          <input type="hidden" name="form-name" value="job-search-audit" />
+          <p hidden><label>Don't fill this out: <input name="bot-field" /></label></p>
+
+          <input type="text" name="name" id="auditName" placeholder="Your name" required autocomplete="name"
+                 pattern="\s*\S+(\s+\S+)+\s*" title="Please enter your first and last name." />
+          <input type="email" name="email" id="auditEmail" placeholder="Your email address" required autocomplete="email" />
+          <input type="tel" name="phone" id="auditPhone" placeholder="Your phone number" required autocomplete="tel" inputmode="tel" />
+
+          <div class="audit-divider"></div>
+
+          <div class="audit-q">
+            <label class="audit-q__label" for="q-screening">How many screening calls do you have?</label>
+            <input type="number" id="q-screening" name="screening_calls" min="0" step="1" inputmode="numeric" placeholder="0" required />
+          </div>
+
+          <div class="audit-q">
+            <label class="audit-q__label" for="q-second">How many second round interviews? <span class="audit-q__hint">(passed the screening call)</span></label>
+            <input type="number" id="q-second" name="second_round_interviews" min="0" step="1" inputmode="numeric" placeholder="0" required />
+          </div>
+
+          <div class="audit-q">
+            <label class="audit-q__label" for="q-coffee">How many coffee chats do you have?</label>
+            <input type="number" id="q-coffee" name="coffee_chats" min="0" step="1" inputmode="numeric" placeholder="0" required />
+          </div>
+
+          <div class="audit-q">
+            <label class="audit-q__label" for="q-final">How many final round interviews do you have?</label>
+            <input type="number" id="q-final" name="final_round_interviews" min="0" step="1" inputmode="numeric" placeholder="0" required />
+          </div>
+
+          <button type="submit" class="audit-submit">Get my free audit</button>
+        </form>
+
+        <div class="audit-success" id="auditSuccess">
+          <p><strong>Thanks, we've got your answers.</strong><br>We'll put together your tailored audit and be in touch shortly.</p>
+        </div>
+
+        <a href="/" class="audit-back-link">Back to Headstart Mentoring</a>
+
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <span>&copy; <span id="year"></span> Headstart Mentoring. All rights reserved.</span>
+    <span>Contact: <a href="mailto:theuniheadstart@gmail.com">theuniheadstart@gmail.com</a></span>
+  </footer>
+
+  <script>
+    document.getElementById("auditForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var form = this;
+      var data = new FormData(form);
+      fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams(data).toString()
+      }).catch(function () {});
+
+      if (typeof gtag === "function") {
+        gtag("event", "generate_lead", { form_id: "job_search_audit" });
+      }
+
+      form.style.display = "none";
+      document.getElementById("auditSuccess").style.display = "block";
+    });
+
+    var y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+  <script src="../js/nav-hamburger.js" defer></script>
+  <script src="../js/silk-bg.js?v=5"></script>
+</body>
+</html>

@@ -57,7 +57,8 @@ exports.handler = async (event) => {
       fetchAll(AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTOR_TABLE_ID,
         ["Name", "Email", "Rate", "Status", "Admin Notes"], AIRTABLE_API_TOKEN),
       fetchAll(AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTEE_TABLE_ID,
-        ["Name", "Mentor Email Plain", "Billing type", "Client Pipeline", "Last Followed Up"], AIRTABLE_API_TOKEN),
+        ["Name", "Mentor Email Plain", "Billing type", "Client Pipeline",
+         "Last Followed Up", "Next Session"], AIRTABLE_API_TOKEN),
       fetchAll(AIRTABLE_BASE_ID, AIRTABLE_SESSION_TABLE_ID,
         ["Date", "Mentor Email", "Mentor Name", "Mentee Name", "Mentee Record ID", "Mentor Payout",
          "Amount Due", "Amount Charged", "Payment Status", "Mentor Paid", "Next Session"],
@@ -84,6 +85,8 @@ exports.handler = async (event) => {
         mentorEmail:  (r.fields["Mentor Email Plain"] || "").toLowerCase().trim(),
         billingType:  r.fields["Billing type"] || "Per Session",
         lastFollowUp: r.fields["Last Followed Up"] || "",
+        // Admin-booked next session, set by Koko from the mentee status view.
+        nextSession:  (r.fields["Next Session"] || "").slice(0, 10),
       }));
 
     const sessions = sessionRecs.map((r) => {

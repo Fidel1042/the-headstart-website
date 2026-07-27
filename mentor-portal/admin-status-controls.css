@@ -1,0 +1,57 @@
+/* admin-status-controls.css — the per-row controls in the mentee status list:
+   the next-session date picker, its Set button, and Drop.
+   Split out of admin-status.css to stay under the 250-line file cap. */
+
+.drop-btn {
+  background: transparent;
+  border: 1px solid rgba(224,80,80,0.5);
+  color: var(--bad);
+  border-radius: 999px;
+  padding: 0.18rem 0.65rem;
+  font-family: inherit;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.drop-btn:hover { background: rgba(224,80,80,0.12); }
+.drop-btn:disabled { opacity: 0.55; cursor: default; }
+
+/* ── Actions cell ── */
+.status-row__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  justify-content: flex-end;
+}
+.fu-date {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.72rem;
+  padding: 0.22rem 0.4rem;
+  color-scheme: dark;
+}
+[data-theme="light"] .fu-date { background: rgba(0,0,0,0.03); color-scheme: light; }
+.fu-date:focus { outline: none; border-color: var(--accent-line); }
+.fu-save {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--text-muted);
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  font-family: inherit;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.fu-save:hover { border-color: var(--accent-line); color: var(--accent-bright); }
+.fu-state { font-size: 0.7rem; color: var(--text-muted); }

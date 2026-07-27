@@ -24,6 +24,8 @@ const KOKO_CHECK_DAYS = 10;
 const KOKO_DIGEST_DAY = "Mon";
 const KOKO = { email: "kokoro.araki1015@gmail.com", name: "Koko" };
 
+const { buildEmail, buildKokoEmail } = require("../shared/reminder-emails");
+
 const ymd = (date) =>
   new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" }).format(date);
 
@@ -36,8 +38,6 @@ function melbNow() {
 }
 const addDays = (s, n) => { const d = new Date(s + "T00:00:00Z"); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
 const daysBetween = (a, b) => Math.round((new Date(b + "T00:00:00Z") - new Date(a + "T00:00:00Z")) / 86400000);
-const esc = (s) => String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-const firstName = (n) => String(n || "there").trim().split(/\s+/)[0];
 
 async function fetchAll(baseId, tableId, fields, token) {
   const records = [];
@@ -71,64 +71,6 @@ async function patchMentee(baseId, tableId, recordId, fields, token) {
   }).catch(() => {});
 }
 
-function boldNames(names) {
-  const b = names.map((n) => `<strong>${esc(n)}</strong>`);
-  if (b.length === 1) return b[0];
-  return b.slice(0, -1).join(", ") + " and " + b[b.length - 1];
-}
-
-// A ready-to-paste message the mentor can copy into the group. The bracketed
-// bits are placeholders the mentor fills in before sending.
-function copyBox(name) {
-  const msg = `Hi ${firstName(name)}, it's been a while since our last session, but we should really work on [Next steps based on last session] next for you to land a role in time. How does [Insert your availability] work for you for our next session?`;
-  return `<div style="margin:8px 0 18px;padding:12px 14px;border:1px solid #d9d3c4;border-radius:8px;background:#faf8f2;color:#333;white-space:pre-wrap">${esc(msg)}</div>`;
-}
-
-function buildEmail(b) {
-  let h = `<p>Hi ${esc(firstName(b.name))},</p>`;
-  if (b.tomorrow.length) {
-    const s = b.tomorrow.length === 1
-      ? `a session with ${boldNames(b.tomorrow)}`
-      : `sessions with ${boldNames(b.tomorrow)}`;
-    h += `<p>You have ${s} tomorrow!<br>Reach out in the whatsapp group if you need to reschedule.</p>`;
-  }
-  b.reachout.forEach((r, i) => {
-    const lead = (i === 0 && b.tomorrow.length) ? "Also, just a heads up" : "Just a heads up";
-    h += `<p>${lead} - <strong>${esc(r.name)}'s</strong> last session was ${r.gap} days ago and nothing's booked yet.</p>` +
-      `<p>Might be worth reaching out to check in with them!<br>Here's a message you can send to the group:</p>` +
-      copyBox(r.name);
-  });
-  // Closing nudge, only on the inactive-mentee email. Payouts are worked out
-  // from logged sessions, so an unlogged session is an unpaid one.
-  if (b.reachout.length) {
-    h += `<p>If you haven't logged any sessions in the past few weeks, <strong>we won't be able to pay you</strong>, so log them now!</p>`;
-  }
-  return h;
-}
-
-// Koko's check-in. One digest listing every mentee whose mentor was nudged 10+
-// days ago and who still has nothing booked, so she can check the mentor
-// actually followed up rather than each of them getting a separate email.
-function buildKokoEmail(list) {
-  const rows = list.map((k) => `
-    <tr>
-      <td style="padding:8px 14px 8px 0;border-bottom:1px solid #e6e1d5">${esc(k.name)}</td>
-      <td style="padding:8px 14px 8px 0;border-bottom:1px solid #e6e1d5">${esc(k.mentor)}</td>
-      <td style="padding:8px 14px 8px 0;border-bottom:1px solid #e6e1d5">${k.gap} days</td>
-      <td style="padding:8px 0;border-bottom:1px solid #e6e1d5">${k.since} days ago</td>
-    </tr>`).join("");
-
-  return `<p>Hi Koko,</p>` +
-    `<p>These mentees still have nothing booked, and their mentor was first asked to reach out at least ${KOKO_CHECK_DAYS} days ago.</p>` +
-    `<table style="border-collapse:collapse;font-size:14px">` +
-    `<tr><th align="left" style="padding:0 14px 8px 0;border-bottom:2px solid #d9d3c4">Mentee</th>` +
-    `<th align="left" style="padding:0 14px 8px 0;border-bottom:2px solid #d9d3c4">Mentor</th>` +
-    `<th align="left" style="padding:0 14px 8px 0;border-bottom:2px solid #d9d3c4">Last session</th>` +
-    `<th align="left" style="padding:0 0 8px;border-bottom:2px solid #d9d3c4">Mentor nudged</th></tr>` +
-    rows + `</table>` +
-    `<p>Worth checking whether the mentor actually messaged them.</p>`;
-}
-
 exports.handler = async (event) => {
   const {
     AIRTABLE_API_TOKEN, AIRTABLE_CORE_BASE_ID, AIRTABLE_BASE_ID,
@@ -153,7 +95,7 @@ exports.handler = async (event) => {
     // Active, acquired mentees with a mentor assigned.
     const menteeRecs = await fetchAll(AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTEE_TABLE_ID,
       ["Name", "Client Pipeline", "Mentor Email Plain", "Mentor Name",
-       "Last Reminded", "First Reminded", "Koko Checked At"], AIRTABLE_API_TOKEN);
+       "Last Reminded", "First Reminded", "Koko Checked At", "Next Session"], AIRTABLE_API_TOKEN);
     const active = new Map();
     const byName = new Map(); // lowercased mentee name -> record id (for older
                               // session rows whose Mentee Record ID is blank)
@@ -170,6 +112,9 @@ exports.handler = async (event) => {
           lastReminded:  (f["Last Reminded"]   || "").slice(0, 10),
           firstReminded: (f["First Reminded"]  || "").slice(0, 10),
           kokoChecked:   (f["Koko Checked At"] || "").slice(0, 10),
+          // Booked by Koko from the admin view rather than by the mentor on a
+          // session row. Counts exactly the same for reminders below.
+          adminNext:     (f["Next Session"]    || "").slice(0, 10),
         });
         if (name) byName.set(name.trim().toLowerCase(), r.id);
       }
@@ -192,6 +137,17 @@ exports.handler = async (event) => {
       if (date && !purchase && date > a.lastDate) a.lastDate = date;
       if (next && next >= today) a.hasFuture = true;
       if (next === tomorrow) a.tomorrow = true;
+      agg.set(id, a);
+    });
+
+    // Fold in sessions Koko booked from the admin view. Done after the session
+    // rows so a mentee with no sessions yet still gets an entry: without this
+    // they are skipped entirely below and their first booking never reminds.
+    active.forEach((m, id) => {
+      if (!m.adminNext) return;
+      const a = agg.get(id) || { lastDate: "", hasFuture: false, tomorrow: false };
+      if (m.adminNext >= today) a.hasFuture = true;
+      if (m.adminNext === tomorrow) a.tomorrow = true;
       agg.set(id, a);
     });
 
@@ -264,7 +220,7 @@ exports.handler = async (event) => {
     const kokoDay = m.weekday === KOKO_DIGEST_DAY;
     if (kokoList.length && kokoDay && !dryRun && BREVO_API_KEY) {
       await sendEmail(BREVO_API_KEY, KOKO.email, KOKO.name,
-        `${kokoList.length} mentee${kokoList.length === 1 ? "" : "s"} to check on`, buildKokoEmail(kokoList));
+        `${kokoList.length} mentee${kokoList.length === 1 ? "" : "s"} to check on`, buildKokoEmail(kokoList, KOKO_CHECK_DAYS));
       for (const k of kokoList) {
         await patchMentee(AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTEE_TABLE_ID, k.id,
           { "Koko Checked At": today }, AIRTABLE_API_TOKEN);

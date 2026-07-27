@@ -41,6 +41,13 @@ exports.handler = async (event) => {
   if (kind === "mentee-followup") {
     tableId = AIRTABLE_MENTEE_TABLE_ID;
     fields = { "Last Followed Up": payload.date || null };
+  } else if (kind === "mentee-next-session") {
+    // Koko books the next session from the admin view. Mentors record the same
+    // thing on the session row they log, but a mentee with no sessions yet has
+    // no row to write to, so the admin-set date lives on the mentee record and
+    // readers merge the two sources.
+    tableId = AIRTABLE_MENTEE_TABLE_ID;
+    fields = { "Next Session": payload.date || null };
   } else if (kind === "mentor-notes") {
     tableId = AIRTABLE_MENTOR_TABLE_ID;
     fields = { "Admin Notes": typeof payload.notes === "string" ? payload.notes : "" };
