@@ -5,6 +5,14 @@
 [functions]
   node_bundler = "esbuild"
 
+# Private lead magnet PDFs. Random filenames only, never linked from the site.
+# Tell search engines not to index or archive them even if a link leaks.
+[[headers]]
+  for = "/guides/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive, nosnippet"
+    Content-Disposition = "inline"
+
 [functions."monthly-pl"]
   schedule = "0 0 1 * *"
 

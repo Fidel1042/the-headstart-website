@@ -43,7 +43,7 @@ export function showAddForm(state) {
     <form id="cal-add-form" class="cal-form">
       <label>Mentee<select name="mentee" required><option value="">Select&hellip;</option>${opts}</select></label>
       <label>Session date<input type="date" name="date" value="${today}" required /></label>
-      <label>Next session date (optional)<input type="date" name="next" /></label>
+      <label>Next session date (tentative is fine)<input type="date" name="next" required /></label>
       <label>Notes (optional)<textarea name="notes" rows="2"></textarea></label>
       <div class="cal-form__row">
         <button type="submit" class="cal-btn cal-btn--today" id="cal-add-submit">Log session</button>
@@ -60,6 +60,7 @@ async function submitAdd(e, state) {
   const stateEl = document.getElementById("cal-add-state");
   const btn = document.getElementById("cal-add-submit");
   if (!mentee) { stateEl.textContent = "Pick a mentee."; return; }
+  if (!fd.get("next")) { stateEl.textContent = "Pick a next session date. Tentative is fine."; return; }
   btn.disabled = true;
   stateEl.textContent = "Logging…";
   try {

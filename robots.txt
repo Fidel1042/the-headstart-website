@@ -5,6 +5,7 @@
 User-agent: *
 Allow: /
 Disallow: /blog/post-template
+Disallow: /guides/
 
 # AI search and assistants (explicitly allowed)
 User-agent: GPTBot

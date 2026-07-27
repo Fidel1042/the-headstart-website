@@ -211,6 +211,9 @@
 
         if (!menteeRecordId) { errorEl.textContent = "Please select a mentee."; return; }
         if (!sessionDate)    { errorEl.textContent = "Please pick a session date."; return; }
+        // Required: a booked next session is what stops the reach-out nudge and
+        // drives the reminder emails. A tentative date is fine and can change.
+        if (!nextDateInput.value) { errorEl.textContent = "Please pick a next session date. Tentative is fine."; return; }
 
         submitBtn.disabled    = true;
         submitBtn.textContent = "Logging…";
@@ -850,8 +853,8 @@
           </div>
           <div class="form-row-2">
             <div class="form-field">
-              <label for="next-session-date">Next session <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--accent);opacity:0.6">- tentative is fine</span></label>
-              <input type="date" id="next-session-date" />
+              <label for="next-session-date">Next session <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--accent);opacity:0.6">- required, tentative is fine</span></label>
+              <input type="date" id="next-session-date" required />
             </div>
           </div>
           <div class="form-field">
