@@ -280,20 +280,24 @@
     color: #f7d37d;
   }
   h2 .num { margin-right: 0.5rem; }
+  /* Sub-headings carry most of the navigation in this doc, so they sit closer
+     to h2 than to body text. Each step is roughly a 1.2x jump, which keeps the
+     levels tellable apart at a glance. */
   h3 {
-    font-size: 1.18rem;
+    font-size: 1.4rem;
     font-weight: 700;
-    margin: 1.6rem 0 0.6rem 0;
+    margin: 2rem 0 0.7rem 0;
     color: var(--gold);
     letter-spacing: -0.005em;
     line-height: 1.3;
   }
   h4 {
-    font-size: 1.02rem;
+    font-size: 1.15rem;
     font-weight: 700;
-    margin: 1.1rem 0 0.45rem 0;
+    margin: 1.3rem 0 0.5rem 0;
     color: var(--text);
     letter-spacing: -0.005em;
+    line-height: 1.35;
   }
   p {
     margin: 0 0 0.75rem 0;
@@ -1155,7 +1159,72 @@ Now go and build the list.</div>
     <section id="resume">
       <h2><span class="num">4.</span>Resume</h2>
       <p>The annotated resume below is the teaching tool. Each highlighted section links to a comment with the advice attached.</p>
+      <p class="resume-actions">
+        <button type="button" id="resume-export" class="copy-section-btn">Save resume as PDF</button>
+        <a href="resume-annotated.html" target="_blank" rel="noopener" class="copy-section-btn">Open in new tab</a>
+      </p>
       <iframe id="resume-iframe" class="resume-frame" src="resume-annotated.html" title="Annotated Resume Guide" scrolling="no"></iframe>
+
+      <!-- Copy source: the same annotations as plain headings and bullets.
+           Hidden on the page (the iframe above is the teaching view) but this is
+           what "Copy section" puts on the clipboard, because an iframe's content
+           cannot be selected or copied from the parent page. -->
+      <div class="copy-source" hidden>
+        <h3>Professional Profile Creation</h3>
+        <ul>
+          <li>Copy job description</li>
+          <li>Copy your whole resume</li>
+          <li>Paste it in your AI to your choice</li>
+          <li>Insert the following prompt:</li>
+        </ul>
+        <p>I want you to rewrite my professional profile based on the attached job description. Make sure to include all the key words that are aligned from my resume and the job description and bold most of the aligned keywords. Don't include skillsets that I totally don't have.</p>
+        <p>I also want 1 line of reasons why I want to join the company in the job description, with a max word count of 15 words. If the company is a middleman (recruiting agency, recruiting platform), don't include the company name. This line would be in the same paragraph.</p>
+        <p>Keep the professional profile to 4 lines, never add any em-dash. While this profile serves a goal of passing the ATS screening, make sure to not sound robotic, make it sound human by using first person words like 'I' but also be concise.</p>
+        <p>I am going to attach both things now:</p>
+
+        <h3>Education</h3>
+        <ul>
+          <li>Only keep University Education. Only add grades if 75+.</li>
+          <li>Unless your High School grades are considered top 1% in the country, (ie full marks in the public exam).</li>
+        </ul>
+
+        <h3>How to perfect your work experiences</h3>
+        <p>Key: Before you start making changes, KNOW that recruiters only use max 15 seconds to scan your resume. Only keep whats relevant and important is the key to a good resume.</p>
+        <h4>General Guidance for each job description:</h4>
+        <ul>
+          <li>Max 4 bullet point.</li>
+          <li>Start thinking based on your achievements, not your job responsibilities.</li>
+          <li>If there's little impact in your role, talk about the impact your team makes.</li>
+          <li>At least 2 points has to be quantifiable.</li>
+        </ul>
+        <h4>Exact structure of each bullet point:</h4>
+        <ul>
+          <li>Ideal scenerio: 1 line of how you contribute to your role + 1 line of quantifiable impacts that you (or your team) made (bold them)</li>
+          <li>Less Ideal: If impacts are hardly quantifiable, insert numbers to improve context of what you are doing. (See example)</li>
+          <li>Last resort: Showcase the technical skills in your role that you learn</li>
+        </ul>
+
+        <h3>Other Exp</h3>
+        <p>Put 1-2 other work experiences, only if they fullfill 1 of the criteria:</p>
+        <ul>
+          <li>Has company brand name prestige</li>
+          <li>You have an impact that is genuinely impressive</li>
+        </ul>
+
+        <h3>Extra-Curricular</h3>
+        <ul>
+          <li>Society experiences ( At least at a subcom level)</li>
+          <li>Hobbies</li>
+        </ul>
+        <p>Max 1 line each. Max 4 items.</p>
+
+        <h3>Skills</h3>
+        <ul>
+          <li>Never put basic skills like Microsoft word.</li>
+          <li>Put a skill level next to each skill (Either Advanced / Intermediate)</li>
+        </ul>
+      </div>
+
       <script>
         // Auto-size the resume iframe to its content so the resume always
         // renders at original height (no vertical squeeze, no inner scroll).
@@ -1166,7 +1235,6 @@ Now go and build the list.</div>
             try {
               var doc = frame.contentDocument || frame.contentWindow.document;
               if (!doc || !doc.body) return;
-              // Use the larger of body and documentElement to cover both modes
               var h = Math.max(
                 doc.body.scrollHeight,
                 doc.documentElement ? doc.documentElement.scrollHeight : 0
@@ -1176,15 +1244,30 @@ Now go and build the list.</div>
               /* Cross-origin or not loaded yet — leave fallback height */
             }
           }
+          // Export: print the annotated resume on its own. It already carries an
+          // A4 landscape print stylesheet with every comment expanded, so this
+          // gives a proper document rather than a lossy screen grab. The browser
+          // print dialog offers "Save as PDF".
+          var exportBtn = document.getElementById('resume-export');
+          if (exportBtn) {
+            exportBtn.addEventListener('click', function () {
+              try {
+                frame.contentWindow.focus();
+                frame.contentWindow.print();
+              } catch (e) {
+                // Blocked (rare, e.g. opened straight off disk): fall back to
+                // the standalone page, which prints the same way.
+                window.open('resume-annotated.html', '_blank', 'noopener');
+              }
+            });
+          }
+
           frame.addEventListener('load', function () {
             resize();
-            // Resume layout reflows on window resize (3-col vs 1-col).
-            // Re-measure after layout has had a chance to settle.
             window.addEventListener('resize', function () {
               clearTimeout(window.__resumeResizeT);
               window.__resumeResizeT = setTimeout(resize, 150);
             });
-            // Also re-measure once shortly after load in case fonts/images shift layout.
             setTimeout(resize, 300);
             setTimeout(resize, 1000);
           });
@@ -1193,7 +1276,7 @@ Now go and build the list.</div>
     </section>
 
     <!-- 5. LINKEDIN -->
-    <section id="linkedin">
+    <section id="linkedin" data-copy-images>
       <h2><span class="num">5.</span>LinkedIn</h2>
       <p>The key to a LinkedIn profile is to show recruiters in the mentee's desired industry that they are a good candidate.</p>
       <p>The mentee has to:</p>
@@ -1311,7 +1394,7 @@ No em dashes, and the letter cannot be more than 200 words. Make sure the paragr
     </section>
 
     <!-- 7. NETWORKING PLAYBOOK -->
-    <section id="networking-playbook">
+    <section id="networking-playbook" data-copy-images>
       <h2><span class="num">7.</span>Networking Playbook</h2>
       <p>Who to connect with proactively (continuation after mentees have gathered a list of companies they are interested in).</p>
       <p class="note">Connection and DMing is always going to be a numbers game. Depending on your credentials, you may get a 15% to 60% connection rate, and then another 10% to 30% response rate even if you do everything right.</p>
@@ -2019,7 +2102,7 @@ Name</div>
     </section>
 
     <!-- 11. PSYCHOMETRIC TEST -->
-    <section id="psychometric-test">
+    <section id="psychometric-test" data-copy-images>
       <h2><span class="num">11.</span>Psychometric Test</h2>
 
       <h3>What a psychometric test is</h3>
@@ -2229,5 +2312,9 @@ Name</div>
   })();
 </script>
 
+  <!-- "Copy section" buttons. Relative paths so the page works served from
+       the site, from a subfolder, or opened straight off disk. -->
+  <link rel="stylesheet" href="../css/components/copy-section.css" />
+  <script defer src="../js/copy-section.js"></script>
 </body>
 </html>

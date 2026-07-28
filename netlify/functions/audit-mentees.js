@@ -7,6 +7,8 @@
 //   - nocard   : no Stripe customer and not a Package mentee (can't be charged)
 // Also returns a per-mentor count so you can see "Raunaq: 1 matched" at a glance.
 
+const { isPrepaid } = require("../shared/charge-engine");
+
 const headers = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -92,7 +94,7 @@ exports.handler = async (event) => {
     for (const r of mentees) {
       const name        = r.fields["Name"] || "Unnamed mentee";
       const mentorPlain = r.fields["Mentor Email Plain"] || "";
-      const isPackage   = (r.fields["Billing type"] || "Per Session") === "Package";
+      const isPackage   = isPrepaid(r.fields["Billing type"]);
       const hasCard     = Boolean(r.fields["Stripe Customer ID"]);
       const key         = norm(mentorPlain);
 

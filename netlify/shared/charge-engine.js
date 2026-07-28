@@ -11,6 +11,16 @@
 
 const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com", "dev@localhost"];
 
+// Billing types that mean "already paid up front, do not charge per session".
+// Both spellings are accepted so the Airtable option can be renamed from
+// "Package" to "Prepayment" without a window where prepaid mentees get billed
+// twice. Every comparison goes through isPrepaid(), never a bare === "Package".
+const PREPAID_TYPES = ["Package", "Prepayment"];
+const isPrepaid = (billingType) => PREPAID_TYPES.includes(String(billingType || "").trim());
+
+// Airtable formula fragment for "this mentee is prepaid".
+const PREPAID_FORMULA = `OR(${PREPAID_TYPES.map((t) => `{Billing type}="${t}"`).join(",")})`;
+
 const SESSION_FIELDS = ["Mentee Name", "Mentee Record ID", "Date", "Amount Due", "Failure Reason"];
 
 /** Owner allowlist plus the billing passphrase. Returns an error string, or null. */
@@ -198,5 +208,6 @@ const summarise = (results) => {
 
 module.exports = {
   OWNERS, authorise, airtableHeaders, menteeRecord, normalizePhone,
+  PREPAID_TYPES, isPrepaid, PREPAID_FORMULA,
   fetchByStatus, groupByMentee, chargeGroups, writeResults, summarise,
 };

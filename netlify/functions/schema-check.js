@@ -115,7 +115,7 @@ exports.handler = async (event) => {
       findTable(core, AIRTABLE_MENTEE_TABLE_ID),
       "Mentees",
       ["Name", "Billing type", "Session Price", "Stripe Customer ID", "Mentor Email Plain", "Gmail"],
-      [{ field: "Billing type", options: ["Per Session", "Package"] }]
+      [{ field: "Billing type", options: ["Per Session", "Package", "Prepayment"] }]
     ));
 
     groups.push(checkTable(

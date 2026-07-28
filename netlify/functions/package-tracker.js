@@ -2,12 +2,14 @@
 // Owner-only. For every Package (pre-paid) mentee, counts how many sessions
 // they've used vs. how many they bought, so you can see who's running out.
 //
-//   used      = number of "Package" sessions logged for that mentee
-//   total     = the mentee's "Package Sessions" field (how many they paid for)
+//   used      = number of delivered "Package" sessions logged for that mentee
+//   total     = sessions bought, summed from their package PURCHASE rows
 //   remaining = total - used   (negative = they've gone over)
 //
-// Requires a "Package Sessions" (number) field on the Mentee table.
-// If it's blank, total shows as null and remaining can't be computed.
+// Buying a second package extends the allowance rather than replacing it. A
+// purchase row with no "Package Sessions" value counts as one standard pack.
+
+const { PREPAID_FORMULA } = require("../shared/charge-engine");
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -54,7 +56,7 @@ exports.handler = async (event) => {
     const packageMentees = [];
     let offset = null;
     do {
-      const formula = encodeURIComponent(`{Billing type}="Package"`);
+      const formula = encodeURIComponent(PREPAID_FORMULA);
       const url = `https://api.airtable.com/v0/${AIRTABLE_CORE_BASE_ID}/${AIRTABLE_MENTEE_TABLE_ID}` +
         `?filterByFormula=${formula}` +
         (offset ? `&offset=${offset}` : "");
@@ -69,6 +71,9 @@ exports.handler = async (event) => {
     // sessions is counted correctly, with no double-count and no undercount. ──
     const byId       = {};
     const byNameNoId = {};
+    const boughtById       = {};   // sessions purchased, from the purchase rows
+    const boughtByNameNoId = {};
+    const DEFAULT_PACKAGE_SESSIONS = 5;
     offset = null;
     do {
       const formula = encodeURIComponent(`{Payment Status}="Package"`);
@@ -83,28 +88,36 @@ exports.handler = async (event) => {
         // doesn't eat into the allowance. Delivered sessions carry their value
         // in Amount Due, and have Amount Charged of 0/blank.
         const charged = parseFloat(s.fields["Amount Charged"]) || 0;
-        if (charged > 0) continue;
-
         const rid  = s.fields["Mentee Record ID"] || "";
         const name = norm(s.fields["Mentee Name"]);
+
+        // A purchase row is where the allowance comes from. Each one adds the
+        // sessions it bought, so a mentee who buys a second package gets both
+        // counted rather than being stuck at one package's worth.
+        if (charged > 0) {
+          const bought = parseInt(s.fields["Package Sessions"], 10) || DEFAULT_PACKAGE_SESSIONS;
+          if (rid)       boughtById[rid]        = (boughtById[rid]        || 0) + bought;
+          else if (name) boughtByNameNoId[name] = (boughtByNameNoId[name] || 0) + bought;
+          continue;
+        }
+
         if (rid)       byId[rid]        = (byId[rid]        || 0) + 1;
         else if (name) byNameNoId[name] = (byNameNoId[name] || 0) + 1;
       }
       offset = data.offset || null;
     } while (offset);
 
-    // ── 3. Merge: used count per package mentee (prefer record-ID match) ──
-    // Packages are 5 sessions by default. If you ever sell a non-standard
-    // package, add a "Package Sessions" number field on that mentee and it
-    // overrides the default; otherwise 5 is assumed and there's nothing to set.
-    const DEFAULT_PACKAGE_SESSIONS = 5;
-
+    // ── 3. Merge: bought vs used per package mentee (prefer record-ID match) ──
+    // The allowance is the sum of what their purchase rows actually bought, so
+    // buying a second package extends it. A mentee marked Package with no
+    // purchase row logged yet falls back to one standard package.
     const num = (v) => (v === undefined || v === "" || v === null) ? null : (parseInt(v, 10) || 0);
 
     const mentees = packageMentees.map((m) => {
       const id    = m.id;
       const name  = m.fields["Name"] || "Unnamed mentee";
-      const total = num(m.fields["Package Sessions"]) ?? DEFAULT_PACKAGE_SESSIONS;
+      const bought = (boughtById[id] || 0) + (boughtByNameNoId[norm(name)] || 0);
+      const total = bought || DEFAULT_PACKAGE_SESSIONS;
 
       // Sessions used before logging existed (set per mentee mid-package).
       const prior  = num(m.fields["Sessions Already Used"]) || 0;

@@ -1,0 +1,49 @@
+/* copy-section.css — the "Copy section" button on the mentor resource hub.
+   Sits inside each section's h2 so it reads as belonging to that heading. */
+
+.copy-section-btn {
+  margin-left: 0.9rem;
+  vertical-align: middle;
+  padding: 0.28rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(199,155,59,0.5);
+  background: transparent;
+  color: #c79b3b;
+  font-family: inherit;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.copy-section-btn:hover { background: rgba(199,155,59,0.14); color: #f0c75c; }
+.copy-section-btn:focus-visible { outline: 2px solid #f0c75c; outline-offset: 2px; }
+.copy-section-btn.is-copied { border-color: rgba(76,175,129,0.6); color: #4caf81; }
+
+/* The button is a working control, not part of the document being taught,
+   so it never appears in a print or PDF of the hub. */
+@media print { .copy-section-btn { display: none; } }
+
+@media (max-width: 700px) {
+  .copy-section-btn { margin-left: 0.6rem; font-size: 0.58rem; padding: 0.24rem 0.6rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .copy-section-btn { transition: none; }
+}
+
+/* A section can carry a copy-ready version of itself that never renders: used
+   where the on-page view cannot be copied, such as the resume iframe. */
+.copy-source { display: none !important; }
+
+/* Resume export controls. Reuse the copy-button look so the section's actions
+   read as one set rather than three different kinds of control. */
+.resume-actions {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin: 0 0 1rem 0;
+}
+.resume-actions .copy-section-btn { margin-left: 0; text-decoration: none; }

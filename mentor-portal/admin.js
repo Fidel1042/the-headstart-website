@@ -67,10 +67,9 @@ async function load(ownerEmail) {
     mentees: data.mentees,
     onAdded: () => load(ownerEmail), // refresh everything after a manual add
   });
-  // Reveal whichever tab is marked active in the markup, so the default view is
-  // changed by moving is-active in admin.html and nothing here needs touching.
-  const active = document.querySelector(".admin-tab.is-active")?.dataset.view;
-  if (active) document.getElementById("view-" + active).hidden = false;
+  // Which view is showing is decided once, by showView() at startup and by the
+  // tab clicks after that. Re-deciding it here would snap the page back to the
+  // starting tab every time data reloads.
 }
 
 function aggregate({ mentors = [], mentees = [], sessions = [] }) {
@@ -167,14 +166,31 @@ function renderOverview({ rows, totalMentees }) {
   renderPerformance(rows);
 }
 
-// Tab switching between the three views.
+const VIEWS = ["overview", "calendar", "mentees", "performance"];
+
+// This page hosts four views that live in two different nav areas, so the nav
+// highlight follows the view rather than the page.
+const NAV_KEY = {
+  mentees: "mentee-status",
+  overview: "big-picture",
+  performance: "performance",
+  calendar: "calendar",
+};
+
+function showView(view) {
+  if (!VIEWS.includes(view)) return;
+  document.querySelectorAll(".admin-tab").forEach((t) => t.classList.toggle("is-active", t.dataset.view === view));
+  VIEWS.forEach((v) => { document.getElementById("view-" + v).hidden = v !== view; });
+}
+
 document.getElementById("admin-tabs").addEventListener("click", (e) => {
   const tab = e.target.closest(".admin-tab");
   if (!tab) return;
-  document.querySelectorAll(".admin-tab").forEach((t) => t.classList.toggle("is-active", t === tab));
-  ["overview", "calendar", "mentees", "performance"].forEach((v) => {
-    document.getElementById("view-" + v).hidden = v !== tab.dataset.view;
-  });
+  showView(tab.dataset.view);
+  // Keep the URL in step so a refresh, or a copied link, lands in the same place.
+  const url = new URL(location.href);
+  url.searchParams.set("view", tab.dataset.view);
+  history.replaceState({}, "", url);
 });
 
 // Runs last: on localhost requireAuth fires the callback synchronously,
@@ -186,6 +202,9 @@ requireAuth((session) => {
     return;
   }
   OWNER_EMAIL = email;
-  mountPortalNav({ email, isOwner: true, active: "admin" });
+  const wanted = new URLSearchParams(location.search).get("view");
+  const view = VIEWS.includes(wanted) ? wanted : "mentees";
+  showView(view);
+  mountPortalNav({ email, isOwner: true, active: NAV_KEY[view] });
   load(email);
 });

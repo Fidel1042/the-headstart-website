@@ -3,6 +3,7 @@
 // Keeps every portal page's header identical: edit here, updates everywhere.
 
 import { signOut, ownerCanSee } from "./auth.js";
+import { NAV_AREAS } from "./portal-nav-links.js";
 
 const THEME_KEY = "headstart_theme";
 
@@ -20,21 +21,12 @@ export function initTheme() {
   applyTheme(saved);
 }
 
-const OWNER_LINKS = [
-  { href: "/consultation-tool/index.html", label: "Consultation", page: "consultation" },
-  { href: "/mentor-portal/contacts.html", label: "Contacts", page: "contacts" },
-  { href: "/mentor-portal/billing.html", label: "Billing", page: "billing" },
-  { href: "/mentor-portal/pl.html", label: "P&amp;L", page: "pl" },
-  { href: "/mentor-portal/payslips.html", label: "Payslips", page: "payslips" },
-  { href: "/mentor-portal/admin.html", label: "Admin", page: "admin" },
-];
-
 /**
- * Render the shared nav.
+ * Render the shared nav: five areas on top, the active area's pages below.
  * @param {object} opts
  * @param {string}  opts.email      text for the user chip (email or "viewing as …")
  * @param {boolean} opts.isOwner    show owner-only links
- * @param {string}  opts.active     page key to highlight: home|billing|pl|payslips|admin
+ * @param {string}  opts.active     page key, e.g. billing | financials | pl
  * @param {string}  opts.loginEmail the real signed-in owner, for link filtering
  *                                  (defaults to email; matters when email is a
  *                                  "viewing as …" label)
@@ -44,11 +36,28 @@ export function mountPortalNav({ email = "", isOwner = false, active = "", login
   if (!mount) return;
 
   const roleEmail = loginEmail || email;
+  // Hide pages this owner cannot see, then drop any area left with nothing.
+  const areas = NAV_AREAS
+    .map((a) => ({ ...a, links: a.links.filter((l) => ownerCanSee(roleEmail, l.page)) }))
+    .filter((a) => a.links.length);
+
+  const current = areas.find((a) => a.links.some((l) => l.page === active)) || null;
+
   const ownerLinks = isOwner
-    ? OWNER_LINKS.filter((l) => ownerCanSee(roleEmail, l.page))
-        .map((l) =>
-          `<a href="${l.href}" class="nav-pill${l.page === active ? " is-active" : ""}">${l.label}</a>`
+    ? areas.map((a) => {
+        const on = current && a.key === current.key;
+        // An area with one page links straight to it; no second row needed.
+        return `<a href="${a.links[0].href}" class="nav-pill${on ? " is-active" : ""}">${a.label}</a>`;
+      }).join("")
+    : "";
+
+  // Second row only earns its place when the area has somewhere else to go.
+  const subLinks = (isOwner && current && current.links.length > 1)
+    ? `<div class="nav-sub"><div class="nav-sub-inner">${
+        current.links.map((l) =>
+          `<a href="${l.href}" class="nav-sub-link${l.page === active ? " is-active" : ""}">${l.label}</a>`
         ).join("")
+      }</div></div>`
     : "";
 
   mount.innerHTML = `
@@ -72,6 +81,7 @@ export function mountPortalNav({ email = "", isOwner = false, active = "", login
           <button class="nav-pill" id="signout-btn" type="button" title="Sign out">Sign out</button>
         </div>
       </div>
+      ${subLinks}
     </header>`;
 
   const chip = document.getElementById("user-chip");

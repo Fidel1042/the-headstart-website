@@ -1,3 +1,5 @@
+const { isPrepaid } = require("../shared/charge-engine");
+
 const Stripe = require("stripe");
 
 const headers = {
@@ -67,7 +69,7 @@ exports.handler = async (event) => {
     stripeCustomerId = menteeRecord.fields["Stripe Customer ID"];
     menteeName       = menteeRecord.fields["Name"] || "Unknown";
     menteeEmail      = menteeRecord.fields["Gmail"] || "";
-    isPackage        = (menteeRecord.fields["Billing type"] || "Per Session") === "Package";
+    isPackage        = isPrepaid(menteeRecord.fields["Billing type"]);
     const sessionPriceAUD = isPackage ? 0 : (parseFloat(menteeRecord.fields["Session Price"]) || 30);
     amountCents = Math.round(sessionPriceAUD * 100);
     mentorName  = mentorData.records?.[0]?.fields?.["Name"] || mentorEmail;

@@ -16,6 +16,8 @@
 //   Payment Status     (single select: Pending / Charged / Failed / Package)
 //   Mentor Paid        (checkbox / text)
 
+const { isPrepaid } = require("../shared/charge-engine");
+
 const headers = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -83,7 +85,7 @@ exports.handler = async (event) => {
     }
 
     menteeName      = menteeRecord.fields["Name"] || "Unknown";
-    isPackage       = (menteeRecord.fields["Billing type"] || "Per Session") === "Package";
+    isPackage       = isPrepaid(menteeRecord.fields["Billing type"]);
     // Per-session value. For package mentees this is the recognised value of a
     // delivered session (e.g. $150 package / 5 = $30) — it is NOT charged (the
     // weekly run only charges "Pending" rows), it just lets the P&L value each

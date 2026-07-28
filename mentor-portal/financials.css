@@ -1,0 +1,103 @@
+/* financials.css — Mentee Financials screen. Builds on billing.css, which
+   supplies .card-block, .btn, .total-box, .passcode-input and the modal. */
+
+.fin-search { margin-bottom: 1rem; }
+.fin-search .passcode-input { width: 100%; }
+
+.fin-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.8rem;
+  margin: 1rem 0;
+}
+
+.fin-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+
+.fin-ok { color: var(--ok); }
+.fin-bad { color: var(--bad); }
+.fin-warn { color: var(--warn); }
+.fin-none { font-size: 0.85rem; color: var(--text-muted); }
+
+/* ── Charge form ── */
+.fin-charge {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+.fin-field { display: flex; flex-direction: column; gap: 0.3rem; }
+.fin-field--wide { grid-column: 1 / -1; }
+.fin-field > span {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+.fin-field select,
+.fin-field input {
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: var(--text);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.55rem 0.7rem;
+  color-scheme: dark;
+}
+[data-theme="light"] .fin-field select,
+[data-theme="light"] .fin-field input { background: rgba(0,0,0,0.03); color-scheme: light; }
+.fin-field select:focus,
+.fin-field input:focus {
+  outline: none;
+  border-color: var(--accent-line);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+/* ── History ── */
+.fin-history { margin-top: 1rem; }
+.fin-history summary {
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent);
+  padding: 0.4rem 0;
+}
+.table-scroll { overflow-x: auto; }
+.fin-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; min-width: 380px; }
+.fin-table th {
+  text-align: left;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  padding: 0.5rem 0.8rem 0.5rem 0;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+.fin-table td {
+  padding: 0.5rem 0.8rem 0.5rem 0;
+  border-bottom: 1px solid var(--line-soft);
+  color: var(--text);
+}
+.fin-table .num { text-align: right; font-variant-numeric: tabular-nums; padding-right: 0; }
+.fin-table th.num { text-align: right; }
+
+/* ── Confirm dialog ── */
+.confirm-amount {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--accent-bright);
+  letter-spacing: -0.02em;
+  margin: 0.4rem 0 0.2rem;
+}
+.confirm-line { font-size: 0.9rem; color: var(--text); }
+.confirm-line--muted { color: var(--text-muted); font-size: 0.82rem; margin-top: 0.15rem; }
+.confirm-note {
+  margin: 0.9rem 0;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+#confirm-pass { width: 100%; margin-bottom: 0.8rem; }
+
+@media (max-width: 700px) {
+  .fin-charge { grid-template-columns: 1fr; }
+}

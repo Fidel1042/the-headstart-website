@@ -15,7 +15,7 @@
 //   { adminEmail, recordId, kind, ... , passcode, expectedAmount } → charges
 
 const Stripe = require("stripe");
-const { OWNERS, authorise, airtableHeaders, menteeRecord } = require("../shared/charge-engine");
+const { OWNERS, authorise, airtableHeaders, menteeRecord, PREPAID_TYPES } = require("../shared/charge-engine");
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -102,6 +102,23 @@ async function logCharge({ recordId, name, kind, q, paymentIntentId }) {
     { method: "POST", headers: airtableHeaders(), body: JSON.stringify({ records: [{ fields }] }) });
 }
 
+// Marks the mentee as prepaid, trying each accepted spelling of the Airtable
+// option so it works before or after the "Package" to "Prepayment" rename.
+async function setPrepaid(recordId) {
+  const { AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTEE_TABLE_ID } = process.env;
+  const url = `https://api.airtable.com/v0/${AIRTABLE_CORE_BASE_ID}/${AIRTABLE_MENTEE_TABLE_ID}/${recordId}`;
+  for (const value of PREPAID_TYPES) {
+    try {
+      const res = await fetch(url, {
+        method: "PATCH", headers: airtableHeaders(),
+        body: JSON.stringify({ fields: { "Billing type": value } }),
+      });
+      if (res.ok) return value;
+    } catch { /* try the next spelling */ }
+  }
+  return null;   // the charge already succeeded; billing type just needs a look
+}
+
 exports.handler = async (event) => {
   if (event.httpMethod === "OPTIONS") return { statusCode: 204, headers, body: "" };
   if (event.httpMethod !== "POST") return json(405, { error: "Method not allowed" });
@@ -176,11 +193,13 @@ exports.handler = async (event) => {
 
   await logCharge({ recordId: payload.recordId, name, kind: payload.kind, q, paymentIntentId: pi.id });
 
-  // A prepay purchase changes how future sessions are billed.
+  // A prepay purchase changes how future sessions are billed. The Airtable
+  // option may be called "Package" or "Prepayment" depending on whether it has
+  // been renamed yet, and writing one that does not exist is rejected, so both
+  // are tried. This makes the rename safe to do at any time, in any order,
+  // without a window where a purchase fails to switch the mentee over.
   if (payload.kind === "package") {
-    const { AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTEE_TABLE_ID } = process.env;
-    await fetch(`https://api.airtable.com/v0/${AIRTABLE_CORE_BASE_ID}/${AIRTABLE_MENTEE_TABLE_ID}/${payload.recordId}`,
-      { method: "PATCH", headers: airtableHeaders(), body: JSON.stringify({ fields: { "Billing type": "Package" } }) }).catch(() => {});
+    await setPrepaid(payload.recordId);
   }
 
   return json(200, { charged: true, name, amount: q.amount, summary: q.summary, paymentIntentId: pi.id });
