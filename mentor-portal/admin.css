@@ -194,26 +194,11 @@ html { font-size: 110%; }
 .t30-delta--flat { color: var(--text-muted); }
 .t30-prev { color: var(--text-muted); }
 
-/* ── Performance view: retention bar ── */
-.perf-ret { display: flex; align-items: center; gap: 0.6rem; min-width: 150px; }
-.perf-ret__bar {
-  flex: 1;
-  height: 7px;
-  border-radius: 999px;
-  background: var(--line-soft);
-  overflow: hidden;
-}
-.perf-ret__fill { display: block; height: 100%; border-radius: 999px; }
-.perf-ret__fill--ok { background: var(--ok); }
-.perf-ret__fill--warn { background: var(--warn); }
-.perf-ret__fill--bad { background: var(--bad); }
-.perf-ret__val { font-size: 0.82rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.perf-ret__sub { color: var(--text-muted); font-size: 0.72rem; }
-.perf-none { color: var(--text-muted); font-size: 0.82rem; }
-
 /* Mentee status layout (incl. follow-up row) lives in admin-status.css. */
 
 @media (max-width: 900px) {
   .admin-page { padding: 2rem 1rem 4rem; }
   .stat-row { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* Performance view and its retention popup live in admin-performance.css. */

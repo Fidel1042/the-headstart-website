@@ -4,6 +4,7 @@
 // frequency, and how many are still active this month.
 
 import { avgGapDays, fmtFrequency } from "./admin-utils.js";
+import { openRetention } from "./admin-retention-modal.js";
 
 const DAY_MS = 86400000;
 const RETENTION_THRESHOLD = 3;   // sessions needed to count as "retained"
@@ -23,11 +24,13 @@ function perf(m) {
   const back30 = (() => { const x = new Date(); x.setDate(x.getDate() - 30); return x.toISOString().slice(0, 10); })();
 
   const byMentee = new Map(); // mentee key -> sorted array of session dates
+  const nameFor = new Map();  // key -> the name as it was actually written
   m.delivered.forEach((s) => {
     const k = menteeKey(s);
     if (!k || !s.date) return;
     if (!byMentee.has(k)) byMentee.set(k, []);
     byMentee.get(k).push(s.date);
+    if (!nameFor.has(k)) nameFor.set(k, (s.mentee || "").trim() || k);
   });
   byMentee.forEach((dates) => dates.sort());
 
@@ -43,15 +46,35 @@ function perf(m) {
   // only possible once they have had a 2nd session. Averaged across such
   // mentees to give one "how often do they actually meet" number per mentor.
   const menteeGaps = [];
-  byMentee.forEach((dates) => {
+  // Per-mentee working, so the number can be opened up and questioned rather
+  // than taken on trust. This is what the retention popup lists.
+  const detail = [];
+  byMentee.forEach((dates, key) => {
     const first = dates[0];
-    if (daysBetween(first, today) >= GRACE_DAYS) {
+    const age = daysBetween(first, today);
+    const isEligible = age >= GRACE_DAYS;
+    const isRetained = dates.length >= RETENTION_THRESHOLD;
+    if (isEligible) {
       eligible += 1;
-      if (dates.length >= RETENTION_THRESHOLD) retained += 1;
+      if (isRetained) retained += 1;
     }
     const gap = avgGapDays(dates);
     if (gap !== null) menteeGaps.push(gap);
+    detail.push({
+      name: nameFor.get(key) || key,
+      sessions: dates.length,
+      first,
+      last: dates[dates.length - 1],
+      age,
+      eligible: isEligible,
+      retained: isEligible && isRetained,
+      frequency: gap,
+    });
   });
+  // Worst first: the ones dragging the number down are the ones worth reading.
+  detail.sort((a, b) => (a.eligible === b.eligible)
+    ? a.sessions - b.sessions
+    : (a.eligible ? -1 : 1));
 
   return {
     name: m.name,
@@ -64,6 +87,7 @@ function perf(m) {
     eligible,
     frequency: menteeGaps.length ? menteeGaps.reduce((a, g) => a + g, 0) / menteeGaps.length : null,
     active: recent,
+    detail,
   };
 }
 
@@ -77,17 +101,25 @@ const SORT_VALUE = {
   active:    (p) => p.active,
 };
 
-function retentionCell(p) {
+function retentionCell(p, i) {
   if (!p.mentees) return '<span class="perf-none">No mentees</span>';
-  // Every mentee is inside their first month: nothing eligible to judge yet.
-  if (p.retention === null) return '<span class="perf-none">Too new to tell</span>';
+  // Every mentee is inside their first month: nothing eligible to judge yet,
+  // but the working is still worth opening to see who is pending.
+  if (p.retention === null) {
+    return `<button type="button" class="perf-ret-btn perf-none" data-ret="${i}">Too new to tell</button>`;
+  }
   const w = Math.round(p.retention * 100);
   const tone = w >= 60 ? "ok" : w >= 35 ? "warn" : "bad";
+  // Thin samples are flagged in the cell itself, so a 100% off one mentee is
+  // not read as a strong result at a glance.
+  const thin = p.eligible < 3 ? ' <span class="perf-thin" title="Too few mentees to be reliable">thin</span>' : "";
   return `
-    <div class="perf-ret">
-      <div class="perf-ret__bar"><span class="perf-ret__fill perf-ret__fill--${tone}" style="width:${w}%"></span></div>
-      <span class="perf-ret__val">${w}% <span class="perf-ret__sub">${p.retained}/${p.eligible}</span></span>
-    </div>`;
+    <button type="button" class="perf-ret-btn" data-ret="${i}" title="See how this is worked out">
+      <div class="perf-ret">
+        <div class="perf-ret__bar"><span class="perf-ret__fill perf-ret__fill--${tone}" style="width:${w}%"></span></div>
+        <span class="perf-ret__val">${w}% <span class="perf-ret__sub">${p.retained}/${p.eligible}</span>${thin}</span>
+      </div>
+    </button>`;
 }
 
 function frequencyCell(p) {
@@ -111,16 +143,22 @@ function paint() {
   // block of zero-rows that say nothing about performance.
   const data = rows.map(perf).filter((p) => p.sessions > 0 || p.mentees > 0);
   const body = document.getElementById("perf-body");
-  body.innerHTML = sorted(data).map((p) => `
+  const view = sorted(data);
+  body.innerHTML = view.map((p, i) => `
     <tr>
       <td><div class="mentor-name">${p.name}</div><div class="mentor-email">${p.email || "no email"}</div></td>
       <td class="num">${p.mentees}</td>
       <td class="num">${p.sessions}</td>
       <td class="num">${p.avg ? p.avg.toFixed(1) : "—"}</td>
-      <td>${retentionCell(p)}</td>
+      <td>${retentionCell(p, i)}</td>
       <td>${frequencyCell(p)}</td>
       <td class="num">${p.active}</td>
     </tr>`).join("") || '<tr><td colspan="7" class="perf-none">No mentor activity yet.</td></tr>';
+
+  body.onclick = (e) => {
+    const hit = e.target.closest("[data-ret]");
+    if (hit) openRetention(view[Number(hit.dataset.ret)], RETENTION_THRESHOLD, GRACE_DAYS);
+  };
 
   document.querySelectorAll("#perf-table th[data-sort]").forEach((th) => {
     const active = th.dataset.sort === sort.key;

@@ -43,12 +43,14 @@
   </script>
   <link rel="stylesheet" href="portal.css" />
   <link rel="stylesheet" href="portal-nav.css" />
+  <link rel="stylesheet" href="billing.css" />
   <link rel="stylesheet" href="admin.css" />
   <link rel="stylesheet" href="admin-calendar.css" />
   <link rel="stylesheet" href="admin-calendar-modal.css" />
   <link rel="stylesheet" href="admin-status.css" />
   <link rel="stylesheet" href="admin-status-controls.css" />
   <link rel="stylesheet" href="admin-chart.css" />
+  <link rel="stylesheet" href="admin-performance.css" />
   <link rel="stylesheet" href="/mentor-portal/polish.css" />
 </head>
 <body>
@@ -145,6 +147,14 @@
     <section id="view-mentees" hidden>
       <div class="status-grid" id="status-grid"></div>
     </section>
+
+    <!-- Retention working -->
+    <div class="chase-modal" id="retention-modal" hidden>
+      <div class="chase-modal__box chase-modal__box--wide">
+        <button type="button" class="chase-modal__close" id="retention-close" aria-label="Close">&times;</button>
+        <div id="retention-body"></div>
+      </div>
+    </div>
 
     <!-- PERFORMANCE -->
     <section id="view-performance" hidden>
