@@ -735,16 +735,16 @@
     }
     .pricing-meet-mentors a:hover { border-color: #f5d591; }
 
-    /* Pricing two-box grid */
+    /* Pricing grid */
     .pricing-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 1.2rem;
-      max-width: 900px;
+      max-width: 1120px;
       margin: 0 auto;
     }
-    @media (max-width: 760px) {
-      .pricing-grid { grid-template-columns: 1fr; }
+    @media (max-width: 980px) {
+      .pricing-grid { grid-template-columns: 1fr; max-width: 440px; }
     }
     .pricing-box {
       background: rgba(10,10,10,0.75);
@@ -794,11 +794,28 @@
     .pricing-box__price {
       display: flex;
       align-items: baseline;
+      flex-wrap: wrap;
       gap: 0.3rem;
       margin-top: auto;
       margin-bottom: 1.2rem;
       padding-top: 1.4rem;
       border-top: 1px solid rgba(255,255,255,0.07);
+    }
+    .pricing-box--featured { border-color: rgba(199,155,59,0.5); }
+    .pricing-box__original {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #888;
+      text-decoration: line-through;
+      text-decoration-color: rgba(199,155,59,0.7);
+    }
+    .pricing-box__promo {
+      flex-basis: 100%;
+      margin-top: 0.45rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #f7d37d;
     }
     .pricing-box__amount {
       font-size: 2.2rem;
@@ -1494,7 +1511,23 @@
             <p class="mentoring-eyebrow">Pricing</p>
           </div>
           <div class="pricing-grid">
-            <div class="pricing-box reveal" style="--reveal-delay:0s">
+            <div class="pricing-box pricing-box--featured reveal" style="--reveal-delay:0s">
+              <span class="pricing-box__eyebrow">Free This Week</span>
+              <h3 class="pricing-box__title">Personalised Roadmap</h3>
+              <p class="pricing-box__sub">Your offer roadmap, based on your exact scenario.</p>
+              <ul class="pricing-box__list">
+                <li>Tailored to your exact scenario</li>
+                <li>Answer four quick questions</li>
+                <li>In your inbox within 30 minutes</li>
+              </ul>
+              <div class="pricing-box__price">
+                <span class="pricing-box__original">$250</span><span class="pricing-box__amount">Free</span>
+                <span class="pricing-box__promo">Free until 4th Aug, 5pm</span>
+              </div>
+              <a class="pricing-box__cta" href="/job-search-audit">Get my roadmap &rarr;</a>
+            </div>
+
+            <div class="pricing-box reveal" style="--reveal-delay:0.1s">
               <span class="pricing-box__eyebrow">Step 1</span>
               <h3 class="pricing-box__title">Initial Consultation</h3>
               <p class="pricing-box__sub">A free call to understand where you're stuck and match you with a mentor.</p>
@@ -1509,7 +1542,7 @@
               <a class="pricing-box__cta" href="/discovery-call">Book a free call &rarr;</a>
             </div>
 
-            <div class="pricing-box reveal reveal--right" style="--reveal-delay:0.1s">
+            <div class="pricing-box reveal" style="--reveal-delay:0.2s">
               <span class="pricing-box__eyebrow">Step 2</span>
               <h3 class="pricing-box__title">Ongoing Mentoring</h3>
               <p class="pricing-box__sub"> 1-on-1 sessions with your matched mentor.</p>
