@@ -246,7 +246,7 @@
         </form>
 
         <div class="audit-success" id="auditSuccess">
-          <p><strong>Thanks, we've got your answers.</strong><br>We'll put together your personalised offer roadmap and be in touch shortly.</p>
+          <p><strong>Congratulations on taking the first step towards your Grad Offer.</strong><br>Your roadmap will be ready and sent to your email within 30 minutes!</p>
         </div>
 
         <a href="/" class="audit-back-link">Back to Headstart Mentoring</a>
@@ -265,6 +265,12 @@
       e.preventDefault();
       var form = this;
       var data = new FormData(form);
+      // Normalize phone so it never starts with "+": a leading "+" breaks
+      // spreadsheet/CSV exports (read as a formula) and some SMS/automation tools.
+      var phoneEl = document.getElementById("auditPhone");
+      if (phoneEl) {
+        data.set("phone", phoneEl.value.replace(/[\s\-()]/g, "").replace(/^\+/, "00"));
+      }
       fetch("/", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },

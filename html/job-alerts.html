@@ -1481,6 +1481,9 @@ document.getElementById("consultForm").addEventListener("submit", function(e) {
   // Save lead to Netlify with keepalive so POST survives navigation
   try {
     var data = new FormData(form);
+    // Normalize phone so it never starts with "+" (breaks CSV/spreadsheet + some tools).
+    var pn = document.getElementById("consultPhone");
+    if (pn) data.set("phone", pn.value.replace(/[\s\-()]/g, "").replace(/^\+/, "00"));
     fetch("/", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
