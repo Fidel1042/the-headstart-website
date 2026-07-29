@@ -169,16 +169,19 @@
       }
     })();
 
+    var bookingTracked = false;
     window.addEventListener('message', function (e) {
-      if (e.data && e.data.event === 'calendly.event_scheduled') {
-        if (typeof window.gtag === 'function') {
-          var payload = e.data.payload || {};
-          var eventType = payload.event_type || {};
-          window.gtag('event', 'invitee_meeting_scheduled', {
-            service_name: eventType.name || 'Free Career Call',
-            event_category: 'Calendly'
-          });
-        }
+      if (String(e.origin || '').indexOf('calendly.com') === -1) return;
+      if (!e.data || e.data.event !== 'calendly.event_scheduled') return;
+      if (bookingTracked) return;
+      bookingTracked = true;
+      if (typeof window.gtag === 'function') {
+        var payload = e.data.payload || {};
+        var eventType = payload.event_type || {};
+        window.gtag('event', 'invitee_meeting_scheduled', {
+          service_name: eventType.name || 'Free Career Call',
+          event_category: 'Calendly'
+        });
       }
     });
   </script>

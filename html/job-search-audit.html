@@ -32,7 +32,7 @@
       justify-content: center;
       padding: 3rem 1.25rem 5rem;
     }
-    .audit-inner { width: 100%; max-width: 560px; }
+    .audit-inner { width: 100%; max-width: 640px; }
 
     /* ── HERO COPY ── */
     .audit-eyebrow {
@@ -161,6 +161,13 @@
       transition: color 0.15s;
     }
     .audit-back-link:hover { color: rgba(255,255,255,0.75); }
+
+    @media (max-width: 560px) {
+      .audit-page-wrap { padding-left: 1rem; padding-right: 1rem; }
+      .audit-proof li { font-size: 0.85rem; line-height: 1.35; gap: 0.5rem; }
+      .audit-proof li::before { font-size: 0.9rem; }
+      .audit-proof { gap: 0.55rem; }
+    }
   </style>
 </head>
 <body>
