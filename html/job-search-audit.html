@@ -57,6 +57,35 @@
       line-height: 1.65;
       margin: 0 0 2rem;
     }
+    .audit-winners {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #f7d37d;
+      margin: -0.6rem 0 1.4rem;
+    }
+    .audit-course-img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+      margin: 0.4rem 0 1.5rem;
+    }
+    .audit-deadline {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #f7d37d;
+      margin: 0 0 1.5rem;
+    }
+    .audit-deadline span {
+      font-weight: 600;
+      color: rgba(255,255,255,0.6);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.72rem;
+      display: block;
+      margin-bottom: 0.2rem;
+    }
     .audit-proof-label {
       font-size: 0.9rem;
       color: rgba(255,255,255,0.72);
@@ -203,8 +232,11 @@
     <div class="audit-page-wrap">
       <div class="audit-inner">
 
-        <p class="audit-eyebrow">Free Offer Roadmap</p>
-        <h1 class="audit-headline">Based on your exact scenario</h1>
+        <p class="audit-eyebrow">Enter the Giftaway</p>
+        <h1 class="audit-headline">Original Price - $450</h1>
+        <p class="audit-winners">(3x winners)</p>
+        <img class="audit-course-img" src="../images/Course.png" alt="Road to your first grad offer, the five-stage roadmap" />
+        <p class="audit-deadline"><span>Deadline</span>6th August (Thurs) 5:00pm</p>
         <p class="audit-proof-label">Advice is based on:</p>
         <ul class="audit-proof">
           <li>Conversations with 500+ students/grads/recruiters</li>
@@ -242,7 +274,7 @@
             <input type="number" id="q-final" name="final_round_interviews" min="0" step="1" inputmode="numeric" placeholder="0" required />
           </div>
 
-          <button type="submit" class="audit-submit">Get my own roadmap</button>
+          <button type="submit" class="audit-submit">Enter Giveaway</button>
         </form>
 
         <div class="audit-success" id="auditSuccess">
