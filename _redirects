@@ -10,8 +10,8 @@
 /mentee-agreement /html/mentee-agreement.html 200
 /mentee-agreement-popup /html/mentee-agreement-popup.html 200
 /mentee-agreement-submitted /html/mentee-agreement-submitted.html 200
-/growth-intern-role /html/growth-intern-role.html 200
-/growth-intern-application /html/growth-intern-application.html 200
+/growth-intern-role /marketing-intern-role 301
+/growth-intern-application /marketing-intern-application 301
 /marketing-intern-role /html/marketing-intern-role.html 200
 /marketing-intern-application /html/marketing-intern-application.html 200
 /thank-you /thank-you.html 200
