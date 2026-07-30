@@ -6,7 +6,7 @@ const isLocal = location.hostname === "localhost" || location.hostname === "127.
 
 // Set by billing.js once the owner is known.
 let ADMIN_EMAIL = "";
-export function setToolsAdmin(email) { ADMIN_EMAIL = email; }
+export function setToolsAdmin(email) { ADMIN_EMAIL = email; loadCardMentees(); }
 
 // ── Schema check ──
 window.runSchemaCheck = async function (btn) {
@@ -72,10 +72,54 @@ window.runSchemaCheck = async function (btn) {
 };
 
 // ── Card link ──
+// The picker offers "Name — email" so a mentee can be found by name, but the
+// backend needs the address on its own, so whatever is typed is resolved back
+// to a real mentee first. Typing a bare email still works.
+let CARD_MENTEES = [];
+
+async function loadCardMentees() {
+  const list = document.getElementById("card-mentees");
+  if (!list) return;
+  if (isLocal) {
+    CARD_MENTEES = [{ name: "Mary Chen", email: "mary@mock.com" }];
+  } else {
+    try {
+      const res = await fetch("/.netlify/functions/mentee-financials", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ adminEmail: ADMIN_EMAIL }),
+      });
+      const data = await res.json();
+      if (!res.ok) return;                       // picker is a convenience, not a blocker
+      CARD_MENTEES = (data.mentees || []).filter((m) => m.email);
+    } catch { return; }
+  }
+  list.innerHTML = CARD_MENTEES
+    .map((m) => `<option value="${m.name} — ${m.email}"></option>`).join("");
+}
+
+// Accepts "Name — email", a bare email, or a name typed without picking from
+// the list. Returns "" when the text matches nobody and is not an email.
+function resolveCardEmail(text) {
+  const q = text.trim();
+  if (!q) return "";
+  const dashed = q.split("—").pop().trim();      // picked straight from the list
+  if (dashed.includes("@")) return dashed;
+  const lower = q.toLowerCase();
+  const hit = CARD_MENTEES.find((m) => m.name.toLowerCase() === lower)
+    || CARD_MENTEES.find((m) => m.name.toLowerCase().includes(lower));
+  return hit ? hit.email : (q.includes("@") ? q : "");
+}
+
 window.makeCardLink = async function (btn) {
-  const email = document.getElementById("card-email").value.trim();
+  const typed = document.getElementById("card-email").value;
+  const email = resolveCardEmail(typed);
   const out = document.getElementById("card-out");
-  if (!email) { out.innerHTML = '<span style="color:#e0a030;">Enter the mentee\'s email first.</span>'; return; }
+  if (!email) {
+    out.innerHTML = typed.trim()
+      ? '<span style="color:#e0a030;">No mentee matches that. Pick one from the list, or type their email.</span>'
+      : '<span style="color:#e0a030;">Pick a mentee first.</span>';
+    return;
+  }
   const original = btn.textContent; btn.disabled = true; btn.textContent = "Generating…";
   out.textContent = "";
 

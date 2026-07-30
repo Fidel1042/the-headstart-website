@@ -109,7 +109,9 @@
       <p class="block-title">Send Card Link</p>
       <p class="block-sub">Generate a Stripe card-save link for a mentee (separate from the agreement). Send it, they add their card, it's ready for the weekly charge.</p>
       <div class="charge-row">
-        <input type="email" class="passcode-input" id="card-email" placeholder="Mentee's email (their Gmail on file)" autocomplete="off" />
+        <input type="text" class="passcode-input" id="card-email" list="card-mentees"
+               placeholder="Search mentee by name or email" autocomplete="off" />
+        <datalist id="card-mentees"></datalist>
         <button class="btn ghost" onclick="makeCardLink(this)">Generate link</button>
       </div>
       <div class="result" id="card-out"></div>

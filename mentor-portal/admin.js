@@ -178,21 +178,20 @@ const NAV_KEY = {
   calendar: "calendar",
 };
 
+// The heading has to say what you are looking at, since the four views share
+// one page and the nav is what switches them.
+const VIEW_TITLE = {
+  mentees: "Mentee Status",
+  overview: "Big Picture",
+  performance: "Detailed Performance",
+  calendar: "Calendar",
+};
+
 function showView(view) {
   if (!VIEWS.includes(view)) return;
-  document.querySelectorAll(".admin-tab").forEach((t) => t.classList.toggle("is-active", t.dataset.view === view));
+  document.getElementById("admin-title").textContent = VIEW_TITLE[view];
   VIEWS.forEach((v) => { document.getElementById("view-" + v).hidden = v !== view; });
 }
-
-document.getElementById("admin-tabs").addEventListener("click", (e) => {
-  const tab = e.target.closest(".admin-tab");
-  if (!tab) return;
-  showView(tab.dataset.view);
-  // Keep the URL in step so a refresh, or a copied link, lands in the same place.
-  const url = new URL(location.href);
-  url.searchParams.set("view", tab.dataset.view);
-  history.replaceState({}, "", url);
-});
 
 // Runs last: on localhost requireAuth fires the callback synchronously,
 // so everything the callback touches must already be defined above.

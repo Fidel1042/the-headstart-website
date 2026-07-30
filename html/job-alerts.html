@@ -1451,8 +1451,6 @@ document.getElementById("emailForm").addEventListener("submit", function(e) {
   document.getElementById("consultName").value = document.getElementById("signupName").value || "";
   document.getElementById("consultEmail").value = document.getElementById("signupEmail").value || "";
   document.getElementById("consultIntStudent").value = document.getElementById("hiddenIntStudent").value || "";
-  // Slight delay so the success message renders first, then the modal pops
-  setTimeout(openConsultModal, 350);
 });
 
 // Consult form → same hierarchy as discovery-call page

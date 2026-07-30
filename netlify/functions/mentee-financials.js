@@ -65,11 +65,14 @@ exports.handler = async (event) => {
     // ── List mode: just enough to populate the picker ──
     if (!payload.recordId) {
       const recs = await fetchAll(AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTEE_TABLE_ID,
-        ["Name", "Client Pipeline", "Billing type"], `{Client Pipeline}="Acquired"`);
+        ["Name", "Client Pipeline", "Billing type", "Gmail"], `{Client Pipeline}="Acquired"`);
       return json(200, {
         mentees: recs.map((r) => ({
           id: r.id,
           name: r.fields["Name"] || "Unnamed",
+          // Carried so pickers elsewhere (the card-link box) can offer
+          // "Name — email" instead of making Fidel recall the address.
+          email: r.fields["Gmail"] || "",
           billingType: r.fields["Billing type"] || "Per Session",
         })).sort((a, b) => a.name.localeCompare(b.name)),
       });

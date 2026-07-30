@@ -59,14 +59,10 @@
 
   <main class="admin-page">
 
+    <!-- One page, four views. The nav is the only place they are switched from,
+         so the heading just names whichever view is showing. -->
     <div class="admin-head">
-      <h1 class="admin-title">Mentor Overview</h1>
-      <div class="admin-tabs" id="admin-tabs">
-        <button type="button" class="admin-tab is-active" data-view="mentees">Mentee status</button>
-        <button type="button" class="admin-tab" data-view="overview">Big picture</button>
-        <button type="button" class="admin-tab" data-view="performance">Detailed performance</button>
-        <button type="button" class="admin-tab" data-view="calendar">Calendar</button>
-      </div>
+      <h1 class="admin-title" id="admin-title">Mentee Status</h1>
     </div>
 
     <p class="state-loading" id="loading">Loading</p>
