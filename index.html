@@ -738,13 +738,13 @@
     /* Pricing grid */
     .pricing-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 1.2rem;
-      max-width: 1120px;
+      max-width: 900px;
       margin: 0 auto;
     }
-    @media (max-width: 980px) {
-      .pricing-grid { grid-template-columns: 1fr; max-width: 440px; }
+    @media (max-width: 760px) {
+      .pricing-grid { grid-template-columns: 1fr; }
     }
     .pricing-box {
       background: rgba(10,10,10,0.75);
@@ -1511,22 +1511,7 @@
             <p class="mentoring-eyebrow">Pricing</p>
           </div>
           <div class="pricing-grid">
-            <div class="pricing-box pricing-box--featured reveal" style="--reveal-delay:0s">
-              <span class="pricing-box__eyebrow">One-Off</span>
-              <h3 class="pricing-box__title">Personalised Roadmap</h3>
-              <p class="pricing-box__sub">Your offer roadmap, based on your exact scenario.</p>
-              <ul class="pricing-box__list">
-                <li>Tailored to your exact scenario</li>
-                <li>Answer four quick questions</li>
-                <li>In your inbox within 30 minutes</li>
-              </ul>
-              <div class="pricing-box__price">
-                <span class="pricing-box__amount">$450</span>
-              </div>
-              <a class="pricing-box__cta" href="/job-search-audit">Get my roadmap &rarr;</a>
-            </div>
-
-            <div class="pricing-box reveal" style="--reveal-delay:0.1s">
+            <div class="pricing-box reveal" style="--reveal-delay:0s">
               <span class="pricing-box__eyebrow">Step 1</span>
               <h3 class="pricing-box__title">Initial Consultation</h3>
               <p class="pricing-box__sub">A free call to understand where you're stuck and match you with a mentor.</p>
@@ -1541,7 +1526,7 @@
               <a class="pricing-box__cta" href="/discovery-call">Book a free call &rarr;</a>
             </div>
 
-            <div class="pricing-box reveal" style="--reveal-delay:0.2s">
+            <div class="pricing-box reveal" style="--reveal-delay:0.1s">
               <span class="pricing-box__eyebrow">Step 2</span>
               <h3 class="pricing-box__title">Ongoing Mentoring</h3>
               <p class="pricing-box__sub"> 1-on-1 sessions with your matched mentor.</p>
