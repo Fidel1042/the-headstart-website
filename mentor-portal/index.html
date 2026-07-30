@@ -242,7 +242,11 @@
 
           logCard.hidden = true;
           successCard.hidden = false;
-          successDetail.textContent = `Logged for ${result.menteeName}.`;
+          // A duplicate is not an error: the session is already on record, so the
+          // mentor is told that plainly instead of being shown a second "Logged".
+          successDetail.textContent = result.duplicate
+            ? result.message
+            : `Logged for ${result.menteeName}.`;
           loadHistory();
 
           clearTimeout(window._successTimer);

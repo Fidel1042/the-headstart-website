@@ -113,9 +113,16 @@ window.chargeAll = async function (btn) {
     let msg = `Charged ${data.chargedCount} mentee(s) — $${data.chargedTotal.toFixed(2)}.`;
     if (data.failedCount) {
       const names = data.results.filter(r => r.status === "Failed").map(r => `${r.name} (${r.reason})`).join(", ");
-      msg += ` <span style="color:#e0a030;">${data.failedCount} declined — charge manually in Stripe: ${names}</span>`;
+      msg += ` <span style="color:#e0a030;">${data.failedCount} declined. Chase them below.</span>`;
     }
     resultEl.innerHTML = msg;
+    if (data.failedCount) {
+      // The Retry Failed panel is built once on page load, so a fresh decline
+      // would not appear there until a manual refresh. Rebuild it and take him
+      // straight to it, since chasing is the next thing he has to do.
+      await loadFailed();
+      document.getElementById("retry-block").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   } catch (e) {
     btn.textContent = "Failed — try again"; btn.disabled = false;
     resultEl.innerHTML = `<span style="color:#e05050;">${e.message}</span>`;

@@ -45,6 +45,10 @@ export function showAddForm(state) {
       <label>Session date<input type="date" name="date" value="${today}" required /></label>
       <label>Next session date (tentative is fine)<input type="date" name="next" required /></label>
       <label>Notes (optional)<textarea name="notes" rows="2"></textarea></label>
+      <label class="cal-check">
+        <input type="checkbox" name="hold" checked />
+        <span>Hold the mentor's payout until they log it themselves</span>
+      </label>
       <div class="cal-form__row">
         <button type="submit" class="cal-btn cal-btn--today" id="cal-add-submit">Log session</button>
         <span class="cal-form__state" id="cal-add-state"></span>
@@ -74,10 +78,17 @@ async function submitAdd(e, state) {
           sessionDate: fd.get("date"),
           nextSessionDate: fd.get("next") || "",
           notes: (fd.get("notes") || "").trim(),
+          // Logged for the mentor, so the payout is recorded but withheld from
+          // the next payslip until they engage. Unticking pays them as normal.
+          payoutHeld: fd.get("hold") === "on",
+          loggedBy: state.ownerEmail || "admin",
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
+      // Already on record. Say so and stay open, rather than closing as if a
+      // new session had just been added.
+      if (data.duplicate) { stateEl.textContent = data.message; btn.disabled = false; return; }
     }
     closeModal();
     if (state.onAdded) state.onAdded();

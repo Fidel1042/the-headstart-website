@@ -10,6 +10,9 @@ exports.handler = async (event) => {
   if (event.httpMethod === "OPTIONS") return { statusCode: 204, headers, body: "" };
   if (event.httpMethod !== "POST")    return { statusCode: 405, headers, body: JSON.stringify({ error: "Method not allowed" }) };
 
+  let payload = {};
+  try { payload = JSON.parse(event.body || "{}"); } catch { payload = {}; }
+
   const {
     AIRTABLE_API_TOKEN,
     AIRTABLE_BASE_ID,
@@ -35,7 +38,16 @@ exports.handler = async (event) => {
   // Every UNPAID session, regardless of age. "Mentor Paid" (set to "Yes" after
   // payment) is the source of truth, so no date window — a window would silently
   // orphan any session that missed its 7-day slot (how Koda's $20 got skipped).
-  const formula = encodeURIComponent(`NOT({Mentor Paid}="Yes")`);
+  // The page sends the exact record ids it displayed. Re-querying here is what
+  // broke pay runs before: money was transferred against the figures on screen,
+  // then anything logged in the minutes that followed silently joined the run
+  // and got marked paid without ever being transferred.
+  const runIds = Array.isArray(payload.recordIds) ? payload.recordIds.filter(Boolean) : null;
+  const idFilter = runIds && runIds.length
+    ? `OR(${runIds.map((id) => `RECORD_ID()="${id}"`).join(",")})`
+    : null;
+  const baseFilter = `AND(NOT({Mentor Paid}="Yes"),NOT({Payout Held}))`;
+  const formula = encodeURIComponent(idFilter ? `AND(${baseFilter},${idFilter})` : baseFilter);
 
   const res  = await fetch(
     `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_SESSION_TABLE_ID}` +
@@ -61,6 +73,7 @@ exports.handler = async (event) => {
     if (!byMentor[email]) byMentor[email] = { name, sessions: [], recordIds: [], total: 0 };
     byMentor[email].recordIds.push(s.id);
     byMentor[email].sessions.push({
+      id:     s.id, // lets the preview hold one row back without holding the mentor
       date:   s.fields["Date"] || "",
       mentee: s.fields["Mentee Name"] || "—",
       payout,
@@ -136,11 +149,27 @@ exports.handler = async (event) => {
       }),
     });
 
-    results.push({ email, success: brevoRes.ok, recordIds: byMentor[email].recordIds });
+    // Keep Brevo's own words on a failure. Without this a blocked account
+    // (new sending IP needing verification, expired key, unverified sender)
+    // is indistinguishable from any other error, which is how a whole pay run
+    // silently failed to send.
+    let reason = "";
+    if (!brevoRes.ok) {
+      try {
+        const err = await brevoRes.json();
+        reason = err.message || err.code || `HTTP ${brevoRes.status}`;
+      } catch {
+        reason = `HTTP ${brevoRes.status}`;
+      }
+    }
+    results.push({ email, success: brevoRes.ok, reason, recordIds: byMentor[email].recordIds });
   }
 
   // Only mark sessions as Mentor Paid for mentors whose email actually succeeded
   const paidIds = results.filter((r) => r.success).flatMap((r) => r.recordIds);
+  // Stamping the run date makes a pay run reconcilable against a bank transfer
+  // afterwards, instead of only knowing that something was paid at some point.
+  const paidOn = new Date().toISOString().slice(0, 10);
   const chunks  = [];
   for (let i = 0; i < paidIds.length; i += 10) chunks.push(paidIds.slice(i, i + 10));
 
@@ -151,11 +180,22 @@ exports.handler = async (event) => {
         method: "PATCH",
         headers: airtableHeaders,
         body: JSON.stringify({
-          records: chunk.map((id) => ({ id, fields: { "Mentor Paid": "Yes" } })),
+          records: chunk.map((id) => ({
+            id,
+            fields: { "Mentor Paid": "Yes", "Paid On": paidOn },
+          })),
         }),
       }
     );
   }
+
+  // What to actually transfer, per mentor, matching what was just marked paid.
+  const transfer = results.filter((r) => r.success).map((r) => ({
+    name: byMentor[r.email].name,
+    email: r.email,
+    amount: parseFloat(byMentor[r.email].total.toFixed(2)),
+    sessions: byMentor[r.email].recordIds.length,
+  }));
 
   // Send audit summary to Fidel
   const grandTotal = Object.values(byMentor).reduce((sum, m) => sum + m.total, 0);
@@ -228,6 +268,11 @@ exports.handler = async (event) => {
   return {
     statusCode: 200,
     headers,
-    body: JSON.stringify({ sent: results }),
+    body: JSON.stringify({
+      sent: results,
+      paidOn,
+      transfer,
+      transferTotal: parseFloat(transfer.reduce((a, t) => a + t.amount, 0).toFixed(2)),
+    }),
   };
 };

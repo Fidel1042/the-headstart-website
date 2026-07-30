@@ -90,3 +90,16 @@
 }
 .cal-form__row { display: flex; align-items: center; gap: 0.8rem; margin-top: 0.2rem; }
 .cal-form__state { font-size: 0.8rem; color: var(--accent); }
+
+/* Payout hold toggle on the manual add form. */
+.cal-check {
+  flex-direction: row !important;
+  align-items: flex-start;
+  gap: 0.5rem !important;
+  font-size: 0.72rem !important;
+  font-weight: 500 !important;
+  color: var(--text) !important;
+  line-height: 1.45;
+  cursor: pointer;
+}
+.cal-check input { width: auto; margin-top: 0.15rem; flex-shrink: 0; }

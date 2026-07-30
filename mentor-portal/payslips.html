@@ -47,6 +47,11 @@
 
     initTheme();
 
+    let ADMIN_EMAIL = "";
+    // The pay run currently on screen. Sending uses these exact ids, so what
+    // gets marked paid is always what was displayed when you transferred.
+    let RUN_IDS = [];
+
     requireAuth((session) => {
       const email = session?.user?.email || "";
       const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com"];
@@ -54,6 +59,7 @@
         window.location.replace("/mentor-portal/index.html");
         return;
       }
+      ADMIN_EMAIL = email;
       mountPortalNav({ email, isOwner: true, active: "payslips" });
       loadPayslips();
     });
@@ -129,6 +135,8 @@
 
       loading.hidden = true;
 
+      renderHeld(data);
+
       if (!data.mentors || data.mentors.length === 0) {
         empty.hidden = false;
         return;
@@ -137,6 +145,7 @@
       weekEl.textContent = data.weekLabel;
 
       let grandTotal = 0;
+      RUN_IDS = data.mentors.flatMap((m) => m.recordIds || []);
       list.innerHTML = data.mentors.map((m) => {
         grandTotal += m.total;
         const rows = m.sessions.map((s) => `
@@ -144,6 +153,7 @@
             <span class="session-date">${formatDate(s.date)}</span>
             <span class="session-mentee">${s.mentee}</span>
             <span class="session-amount">$${s.payout.toFixed(2)}</span>
+            <button type="button" class="held-release row-hold" data-id="${s.id}">Hold</button>
           </div>`).join("");
 
         return `
@@ -162,8 +172,73 @@
       sendBtn.hidden = false;
     }
 
+    // Sessions logged on a mentor's behalf with their payout held back. This is
+    // money owed but deliberately not paid yet, so it is shown separately
+    // rather than just being absent from the payslip run.
+    function renderHeld(data) {
+      const box = document.getElementById("held-block");
+      const rows = (data.held || []);
+      if (!box) return;
+      if (!rows.length) { box.hidden = true; return; }
+      box.hidden = false;
+      document.getElementById("held-total").textContent = `$${(data.heldTotal || 0).toFixed(2)} AUD`;
+      document.getElementById("held-list").innerHTML = rows.map((r) => `
+        <div class="session-row${r.caughtUp ? " session-row--caught" : ""}">
+          <span class="session-date">${formatDate(r.date)}</span>
+          <span class="session-mentee">${r.mentor} &middot; ${r.mentee}${
+            r.caughtUp ? `<span class="caught-tag">Logged it himself ${formatDate(r.caughtUp)} &middot; pay him</span>` : ""
+          }</span>
+          <span class="session-amount">$${r.payout.toFixed(2)}</span>
+          <button type="button" class="held-release" data-id="${r.id}">Release</button>
+        </div>`).join("");
+    }
+
+    // One function both ways: holding and releasing are the same write with the
+    // flag flipped, and both end by reloading so the row moves between the two
+    // lists and the frozen RUN_IDS snapshot is rebuilt with it.
+    window.setHold = async function (id, btn, hold) {
+      const was = btn.textContent;
+      btn.disabled = true; btn.textContent = hold ? "Holding…" : "Releasing…";
+      try {
+        const res = await fetch("/.netlify/functions/admin-update", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ kind: hold ? "hold-payout" : "release-payout", recordId: id, ownerEmail: ADMIN_EMAIL }),
+        });
+        const d = await res.json();
+        if (!res.ok) throw new Error(d.error);
+        loadPayslips();   // the row moves between the payable and held lists
+      } catch (e) {
+        btn.disabled = false; btn.textContent = was;
+        alert(e.message || "Could not save — try again.");
+      }
+    };
+
+    document.addEventListener("click", (e) => {
+      const b = e.target.closest(".held-release");
+      if (b) window.setHold(b.dataset.id, b, b.classList.contains("row-hold"));
+    });
+
+    // After a run, this is the bank-transfer checklist. It mirrors exactly what
+    // was marked paid, which is the whole point: the figure you transfer and the
+    // figure the system recorded can no longer drift apart.
+    function renderTransfer(data) {
+      const box = document.getElementById("transfer-block");
+      if (!box || !data.transfer || !data.transfer.length) return;
+      box.hidden = false;
+      document.getElementById("transfer-date").textContent = formatDate(data.paidOn);
+      document.getElementById("transfer-total").textContent = `$${data.transferTotal.toFixed(2)} AUD`;
+      document.getElementById("transfer-list").innerHTML = data.transfer.map((t) => `
+        <div class="session-row">
+          <span class="session-mentee">${t.name}</span>
+          <span class="session-date">${t.sessions} session${t.sessions !== 1 ? "s" : ""}</span>
+          <span class="session-amount">$${t.amount.toFixed(2)}</span>
+        </div>`).join("");
+      box.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
     window.sendAll = async function(btn) {
-      if (!confirm("Send payslip emails to all mentors listed?")) return;
+      if (!RUN_IDS.length) { alert("Nothing in this run. Refresh the page."); return; }
+      if (!confirm(`Mark these ${RUN_IDS.length} session(s) as paid and email the payslips?\n\nOnly what is on screen right now is included. Anything logged after this rolls to the next run.`)) return;
       const original = btn.textContent;
       btn.disabled = true;
       btn.textContent = "Sending…";
@@ -171,13 +246,28 @@
         const res  = await fetch("/.netlify/functions/send-payslips", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({}),
+          body: JSON.stringify({ recordIds: RUN_IDS }),
         });
         const data = await res.json();
+        if (data.transfer) renderTransfer(data);
         if (data.sent) {
-          const count = data.sent.filter((r) => r.success).length;
-          btn.textContent = `Sent to ${count} mentor${count !== 1 ? "s" : ""} ✓`;
-          btn.classList.add("sent");
+          const ok = data.sent.filter((r) => r.success);
+          const failed = data.sent.filter((r) => !r.success);
+          // "Sent to 0 mentors" used to render with a success tick, so a run
+          // where every email bounced looked like it had worked.
+          if (failed.length) {
+            btn.textContent = `${failed.length} failed`;
+            btn.disabled = false;
+            const why = failed[0].reason ? ` Reason: ${failed[0].reason}` : "";
+            alert(
+              `${ok.length} payslip(s) sent, ${failed.length} FAILED.\n\n` +
+              failed.map((f) => `${f.email}`).join("\n") +
+              `\n\nFailed ones were NOT marked paid, so they stay in the next run.${why}`
+            );
+          } else {
+            btn.textContent = `Sent to ${ok.length} mentor${ok.length !== 1 ? "s" : ""} ✓`;
+            btn.classList.add("sent");
+          }
         } else {
           btn.textContent = data.message || "Nothing to send";
         }
@@ -283,7 +373,8 @@
     .sessions { display: flex; flex-direction: column; gap: 2px; }
     .session-row {
       display: grid;
-      grid-template-columns: 110px 1fr auto;
+      grid-template-columns: 110px 1fr auto 76px;
+      align-items: center;
       gap: 12px;
       padding: 6px 0;
       border-top: 1px solid var(--line);
@@ -332,6 +423,55 @@
       font-size: 0.9rem;
       padding: 60px 0;
     }
+
+    /* ── Payouts on hold ── */
+    .held-block {
+      border: 1px solid var(--warn, #e0a030);
+      border-radius: 14px;
+      background: rgba(224,160,48,0.06);
+      padding: 1.1rem 1.3rem;
+      margin-bottom: 1.6rem;
+    }
+    .held-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+    .held-title { font-size: 0.95rem; font-weight: 700; color: var(--warn, #e0a030); }
+    .held-total { font-size: 0.95rem; font-weight: 700; color: var(--warn, #e0a030); font-variant-numeric: tabular-nums; }
+    .held-note { margin: 0.4rem 0 0.9rem; font-size: 0.78rem; line-height: 1.5; color: var(--text-muted); max-width: 60ch; }
+    .held-release {
+      background: transparent;
+      border: 1px solid var(--accent, #c79b3b);
+      color: var(--accent, #c79b3b);
+      border-radius: 999px;
+      padding: 0.2rem 0.7rem;
+      margin-left: 0.8rem;
+      font-family: inherit;
+      font-size: 0.66rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .held-release:hover { background: rgba(199,155,59,0.14); }
+    /* Caught up: the mentor has since logged this himself, so it is ready to
+       release. Called out on the row rather than left for Fidel to remember. */
+    .caught-tag {
+      display: block;
+      margin-top: 2px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #4caf81;
+    }
+    .session-row--caught { align-items: flex-start; }
+    .held-release:disabled { opacity: 0.55; cursor: default; }
+    .transfer-block {
+      border: 1px solid var(--ok, #4caf81);
+      border-radius: 14px;
+      background: rgba(76,175,129,0.07);
+      padding: 1.1rem 1.3rem;
+      margin-bottom: 1.6rem;
+    }
+    .transfer-block .held-title,
+    .transfer-block .held-total { color: var(--ok, #4caf81); }
   </style>
   <link rel="stylesheet" href="portal.css" />
   <link rel="stylesheet" href="portal-nav.css" />
@@ -349,6 +489,28 @@
     </div>
 
     <p class="loading" id="loading" hidden>Loading…</p>
+    <!-- Money owed but deliberately not being paid yet: sessions logged for a
+         mentor who did not log them. Shown above the payable list so it is never
+         quietly missing from a pay run. -->
+    <div class="held-block" id="held-block" hidden>
+      <div class="held-head">
+        <span class="held-title">Payouts on hold</span>
+        <span class="held-total" id="held-total"></span>
+      </div>
+      <p class="held-note">Logged on the mentor's behalf. They are not paid for these until you release them, so they feel the cost of not logging. Release once they catch up.</p>
+      <div class="sessions" id="held-list"></div>
+    </div>
+
+    <!-- Produced by a completed pay run: transfer exactly these amounts. -->
+    <div class="transfer-block" id="transfer-block" hidden>
+      <div class="held-head">
+        <span class="held-title">Transfer these amounts</span>
+        <span class="held-total" id="transfer-total"></span>
+      </div>
+      <p class="held-note">Pay run <strong id="transfer-date"></strong>. These sessions are now marked paid and the payslips have gone out. Transfer exactly these amounts, then you are square.</p>
+      <div class="sessions" id="transfer-list"></div>
+    </div>
+
     <p class="empty" id="empty" hidden>No unpaid sessions outstanding.</p>
 
     <div id="content" hidden>

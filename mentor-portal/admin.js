@@ -66,6 +66,7 @@ async function load(ownerEmail) {
     mentors: data.mentors,
     mentees: data.mentees,
     onAdded: () => load(ownerEmail), // refresh everything after a manual add
+    ownerEmail,
   });
   // Which view is showing is decided once, by showView() at startup and by the
   // tab clicks after that. Re-deciding it here would snap the page back to the

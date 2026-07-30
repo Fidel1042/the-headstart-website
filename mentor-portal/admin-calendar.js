@@ -89,7 +89,7 @@ const fmtDate = (d) => d ? new Date(d.slice(0, 10) + "T00:00:00").toLocaleDateSt
 const fmtMoney = (n) => "$" + (n || 0).toLocaleString("en-AU", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const esc = (s) => String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-export function initCalendar({ sessions = [], mentors = [], mentees = [], onAdded = null } = {}) {
+export function initCalendar({ sessions = [], mentors = [], mentees = [], onAdded = null, ownerEmail = "" } = {}) {
   const colors = new Map();
   const names = new Map();
   mentors.forEach((m, i) => { colors.set(m.email, PALETTE[i % PALETTE.length]); names.set(m.email, m.name); });
@@ -125,7 +125,7 @@ export function initCalendar({ sessions = [], mentors = [], mentees = [], onAdde
     registry.push({ type: "booked", s });
   });
 
-  state = { byDate, upcoming, colors, names, mentees, registry, onAdded };
+  state = { byDate, upcoming, colors, names, mentees, registry, onAdded, ownerEmail };
   if (!month) { month = new Date(); month.setDate(1); }
   // A mentor filtered before a refresh may no longer have data; fall back to all.
   if (filterEmail && !colors.has(filterEmail)) filterEmail = "";

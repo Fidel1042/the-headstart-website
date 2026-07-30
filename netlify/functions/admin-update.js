@@ -37,7 +37,7 @@ exports.handler = async (event) => {
     AIRTABLE_MENTOR_TABLE_ID,
   } = process.env;
 
-  let tableId, fields;
+  let tableId, fields, baseId;
   if (kind === "mentee-followup") {
     tableId = AIRTABLE_MENTEE_TABLE_ID;
     fields = { "Last Followed Up": payload.date || null };
@@ -48,6 +48,12 @@ exports.handler = async (event) => {
     // readers merge the two sources.
     tableId = AIRTABLE_MENTEE_TABLE_ID;
     fields = { "Next Session": payload.date || null };
+  } else if (kind === "hold-payout" || kind === "release-payout") {
+    // Holds a session back from the next payslip, or frees it again. The session
+    // row lives in the session log base, not the core directory.
+    tableId = process.env.AIRTABLE_SESSION_TABLE_ID;
+    baseId  = process.env.AIRTABLE_BASE_ID;
+    fields = { "Payout Held": kind === "hold-payout" };
   } else if (kind === "mentor-notes") {
     tableId = AIRTABLE_MENTOR_TABLE_ID;
     fields = { "Admin Notes": typeof payload.notes === "string" ? payload.notes : "" };
@@ -66,7 +72,9 @@ exports.handler = async (event) => {
 
   try {
     const res = await fetch(
-      `https://api.airtable.com/v0/${AIRTABLE_CORE_BASE_ID}/${tableId}/${recordId}`,
+      // Most kinds live in the core directory; a release targets the session
+      // log base instead, so the base is overridable per kind.
+      `https://api.airtable.com/v0/${baseId || AIRTABLE_CORE_BASE_ID}/${tableId}/${recordId}`,
       {
         method: "PATCH",
         headers: { Authorization: `Bearer ${AIRTABLE_API_TOKEN}`, "Content-Type": "application/json" },

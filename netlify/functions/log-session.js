@@ -40,7 +40,7 @@ exports.handler = async (event) => {
     return { statusCode: 400, headers, body: JSON.stringify({ error: "Invalid JSON" }) };
   }
 
-  const { menteeRecordId, mentorEmail, sessionDate, nextSessionDate, notes } = payload;
+  const { menteeRecordId, mentorEmail, sessionDate, nextSessionDate, notes, payoutHeld, loggedBy } = payload;
 
   if (!menteeRecordId || !mentorEmail || !sessionDate) {
     return {
@@ -63,6 +63,47 @@ exports.handler = async (event) => {
     Authorization: `Bearer ${AIRTABLE_API_TOKEN}`,
     "Content-Type": "application/json",
   };
+
+  // ── Step 0: has this session already been logged? ──
+  // Fidel logs sessions on behalf of mentors who have not got round to it. When
+  // the mentor eventually logs the same session himself, a second row would mean
+  // paying the same session twice. Same mentee + same date = the same session, so
+  // no duplicate row is written. A held payout stays held: releasing it is
+  // Fidel's decision alone, never something a mentor can trigger by logging.
+  try {
+    const dupeFormula =
+      `AND({Mentee Record ID}="${menteeRecordId}",{Date}="${sessionDate}")`;
+    const dupeRes = await fetch(
+      `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_SESSION_TABLE_ID}` +
+      `?filterByFormula=${encodeURIComponent(dupeFormula)}&maxRecords=1` +
+      `&fields[]=Mentee Name&fields[]=Payout Held`,
+      { headers: airtableHeaders }
+    );
+    const dupe = (await dupeRes.json()).records?.[0];
+    if (dupe) {
+      // The mentor has caught up on a session Fidel logged for him. Stamp the
+      // date so the held panel can say "he has logged this, pay him". The
+      // payout itself stays held; only Fidel's click releases it.
+      if (dupe.fields["Payout Held"] && !loggedBy) {
+        await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_SESSION_TABLE_ID}/${dupe.id}`, {
+          method: "PATCH",
+          headers: airtableHeaders,
+          body: JSON.stringify({ fields: { "Mentor Logged At": new Date().toISOString().slice(0, 10) } }),
+        }).catch(() => {});
+      }
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({
+          duplicate: true,
+          message: "This session is already logged, so nothing was added.",
+        }),
+      };
+    }
+  } catch {
+    // A failed duplicate check must never block a mentor from logging. Worst
+    // case is the old behaviour: a possible double row, which Fidel can see.
+  }
 
   // ── Step 1: pull mentee + mentor details in parallel ──
   let menteeName, isPackage, sessionPriceAUD, mentorName, mentorRate;
@@ -116,6 +157,12 @@ exports.handler = async (event) => {
     "Mentor Payout":    mentorRate,
     "Payment Status":   isPackage ? "Package" : "Pending",
   };
+
+  // Logged by an owner on a mentor's behalf. The payout is recorded in full but
+  // held back from the next payslip, so the mentor sees the money is there and
+  // waiting rather than losing it. Untick "Payout Held" in Airtable to release.
+  if (payoutHeld) fields["Payout Held"] = true;
+  if (loggedBy) fields["Logged By"] = loggedBy;
 
   // "Next Session" is an optional DATE field. Airtable rejects an empty string
   // on a date field ('Cannot parse date value ""'), which would fail the whole
