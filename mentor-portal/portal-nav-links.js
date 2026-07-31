@@ -37,14 +37,16 @@ export const NAV_AREAS = [
       { href: "/mentor-portal/admin.html?view=overview", label: "Big picture", page: "big-picture" },
       { href: "/mentor-portal/admin.html?view=performance", label: "Detailed performance", page: "performance" },
       { href: "/mentor-portal/admin.html?view=calendar", label: "Calendar", page: "calendar" },
-      { href: "/mentor-portal/billing.html", label: "Billing", page: "billing" },
-      { href: "/mentor-portal/payslips.html", label: "Payslips", page: "payslips" },
     ],
   },
   {
+    // Money in and money out. Billing and payslips sit here rather than under
+    // Mentors: they are the finance run, not mentor management.
     key: "admin",
     label: "Admin",
     links: [
+      { href: "/mentor-portal/billing.html", label: "Billing", page: "billing" },
+      { href: "/mentor-portal/payslips.html", label: "Payslips", page: "payslips" },
       { href: "/mentor-portal/pl.html", label: "P&amp;L", page: "pl" },
     ],
   },

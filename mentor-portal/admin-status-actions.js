@@ -86,6 +86,42 @@ export async function saveNextSession(id, grid) {
   btn.disabled = false;
 }
 
+// Saves the working notes and the park-until date together. Putting a mentee on
+// hold moves them between groups, so a hold change triggers a full reload; a
+// notes-only edit does not, since nothing about the list changes.
+export async function saveNotes(id, grid) {
+  const box = grid.querySelector(`.status-notes__box[data-id="${id}"]`);
+  const date = grid.querySelector(`.hold-date[data-id="${id}"]`);
+  const stateEl = document.getElementById(`notes-state-${id}`);
+  const btn = grid.querySelector(`.notes-save[data-id="${id}"]`);
+  if (!box) return;
+  const m = menteeIndex.get(id);
+  const holdChanged = (m?.holdUntil || "") !== (date?.value || "");
+  btn.disabled = true;
+  stateEl.textContent = "Saving…";
+  try {
+    if (!isLocal) {
+      const res = await fetch("/.netlify/functions/admin-update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          kind: "mentee-notes", recordId: id, ownerEmail,
+          notes: box.value, holdUntil: date?.value || "",
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+    }
+    if (m) { m.adminNotes = box.value; m.holdUntil = date?.value || ""; }
+    if (holdChanged && onChangedCb) { onChangedCb(); return; }
+    stateEl.textContent = "Saved";
+    setTimeout(() => { stateEl.textContent = ""; }, 3000);
+  } catch (err) {
+    stateEl.textContent = err.message || "Could not save";
+  }
+  btn.disabled = false;
+}
+
 // Re-homes a mentee at the end of their group. Moving the wrapper keeps the row
 // and its history panel together, and the header stays first because it is a
 // sibling that is never moved.

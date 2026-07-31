@@ -172,6 +172,55 @@
 }
 .status-history__list li { white-space: nowrap; }
 
+/* ── Notes + hold, inside the expand panel ── */
+.status-notes { margin-bottom: 0.8rem; max-width: 640px; }
+.status-notes__box {
+  width: 100%;
+  font-family: inherit;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--text);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.5rem 0.65rem;
+  resize: vertical;
+}
+[data-theme="light"] .status-notes__box { background: rgba(0,0,0,0.03); }
+.status-notes__box:focus {
+  outline: none;
+  border-color: var(--accent-line);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+.status-notes__row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.45rem;
+  flex-wrap: wrap;
+}
+.status-notes__hold {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+.status-notes__hold input {
+  font-family: inherit;
+  font-size: 0.76rem;
+  color: var(--text);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 0.3rem 0.45rem;
+  color-scheme: dark;
+}
+[data-theme="light"] .status-notes__hold input { background: rgba(0,0,0,0.03); color-scheme: light; }
+/* Marks a parked mentee wherever they appear, so the state is never invisible. */
+.status-row__hold { color: var(--accent); font-weight: 700; }
+
 @media (prefers-reduced-motion: reduce) {
   .status-row__caret { transition: none; }
 }

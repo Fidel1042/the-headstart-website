@@ -3,9 +3,19 @@
 // The writes behind Set and Drop live in admin-status-actions.js.
 
 import { avgGapDays, fmtFrequency } from "./admin-utils.js";
-import { configureActions, nextLabel, dropMentee, saveNextSession } from "./admin-status-actions.js";
+import { configureActions, nextLabel, dropMentee, saveNextSession, saveNotes } from "./admin-status-actions.js";
 
 const DAY_MS = 86400000;
+
+// A hold parks someone for three weeks unless a different date is picked. Long
+// enough that the mentee has actually had time, short enough that nobody goes
+// quiet for a month without Fidel seeing them again.
+const HOLD_DEFAULT_DAYS = 21;
+const addDays = (n) => {
+  const d = new Date();
+  d.setDate(d.getDate() + n);
+  return d.toISOString().slice(0, 10);
+};
 
 let bound = false;
 
@@ -32,7 +42,10 @@ function item(m, tone) {
             <span class="status-row__caret" aria-hidden="true"></span>
             <span class="status-row__name">${m.name}</span>
           </button>
-          <span class="status-row__mentor">${m.mentor}</span>
+          <span class="status-row__mentor">${m.mentor}${
+            m.holdUntil && m.holdUntil >= new Date().toISOString().slice(0, 10)
+              ? ` <span class="status-row__hold">on hold to ${fmtDate(m.holdUntil)}</span>` : ""
+          }</span>
         </div>
         <div class="status-row__lastcol">
           <span class="status-row__last">${m.last ? `${fmtDate(m.last)} <span class="status-row__ago">· ${m.days}d</span>` : "No sessions yet"}</span>
@@ -46,9 +59,35 @@ function item(m, tone) {
           <span class="fu-state" id="fu-state-${m.id}"></span>
         </div>
       </div>
-      <div class="status-history" id="${histId}" hidden>${historyList(m)}</div>
+      <div class="status-history" id="${histId}" hidden>${notesPanel(m)}${historyList(m)}</div>
     </div>`;
 }
+
+// Notes and the park-until date, tucked inside the expand so the row itself
+// stays one line. Both save together on one button.
+function notesPanel(m) {
+  return `
+    <div class="status-notes">
+      <textarea class="status-notes__box" data-id="${m.id}" rows="2"
+        placeholder="Notes: what you've tried, what they said…"
+        aria-label="Notes for ${m.name}">${escapeText(m.adminNotes || "")}</textarea>
+      <div class="status-notes__row">
+        <label class="status-notes__hold">
+          <span>Hold until</span>
+          <!-- Empty means not on hold. The 3-week button fills it in one click. -->
+          <input type="date" class="hold-date" data-id="${m.id}" value="${m.holdUntil || ""}" aria-label="Hold ${m.name} until" />
+        </label>
+        <button type="button" class="fu-save hold-quick" data-id="${m.id}">Hold 3 weeks</button>
+        <button type="button" class="fu-save notes-save" data-id="${m.id}">Save</button>
+        <span class="fu-state" id="notes-state-${m.id}"></span>
+      </div>
+    </div>`;
+}
+
+// Notes are free text going straight into a textarea, so a stray "</textarea>"
+// would break out of the element and eat the rest of the row.
+const escapeText = (s) => String(s || "")
+  .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 // Column labels, so the row values are not four unlabelled pieces of text.
 // The third column is the mentee's FIRST session in the "no sessions yet"
@@ -106,7 +145,8 @@ export function renderStatus({ mentees = [], allDelivered = [], rows = [], owner
     menteeIndex: new Map(mentees.map((m) => [m.id, m])),
   });
 
-  const buckets = { active: [], nudge: [], dropped: [], none: [] };
+  const buckets = { active: [], nudge: [], dropped: [], none: [], hold: [] };
+  const todayHold = new Date().toISOString().slice(0, 10);
   mentees.forEach((m) => {
     const mine = allDelivered.filter((s) => sameMentee(s, m)).sort((a, b) => b.date.localeCompare(a.date));
     const last = mine[0]?.date || "";
@@ -129,7 +169,11 @@ export function renderStatus({ mentees = [], allDelivered = [], rows = [], owner
       // most-recent-first for the history list.
       frequency: avgGapDays([...sessionDates].sort()),
     };
-    if (days === null) buckets.none.push(it);
+    // On hold wins over everything except being dropped: it means "I have
+    // chased this one and they asked for time", so it must leave the work pile.
+    // The moment the date passes they fall back into their normal group.
+    if (it.holdUntil && it.holdUntil >= todayHold) buckets.hold.push(it);
+    else if (days === null) buckets.none.push(it);
     else if (days <= 14) buckets.active.push(it);
     else if (days <= 28) buckets.nudge.push(it);
     else buckets.dropped.push(it);
@@ -154,15 +198,33 @@ export function renderStatus({ mentees = [], allDelivered = [], rows = [], owner
       }</div>
     </details>`;
 
+  // On hold sorts by when the hold runs out, soonest first, so the top of that
+  // list is who comes back to you next.
+  buckets.hold.sort((a, b) => (a.holdUntil || "").localeCompare(b.holdUntil || ""));
+
   grid.innerHTML =
     col("Nudge", "warn", buckets.nudge, true) +
     (buckets.none.length ? col("No sessions yet", "muted", buckets.none, true, true) : "") +
+    (buckets.hold.length ? col("On hold", "muted", buckets.hold, false) : "") +
     col("Dropped", "bad", buckets.dropped, false) +
     col("Active", "ok", buckets.active, false);
 
   if (!bound) {
     bound = true;
     grid.addEventListener("click", (e) => {
+      // Checked before .fu-save: the notes button carries both classes so it
+      // picks up the same styling, and would otherwise book a session instead.
+      // Three weeks is the standing default for a hold, so the common case is
+      // one click. The date picker beside it is the override.
+      const quick = e.target.closest(".hold-quick");
+      if (quick) {
+        const box = grid.querySelector(`.hold-date[data-id="${quick.dataset.id}"]`);
+        if (box) box.value = addDays(HOLD_DEFAULT_DAYS);
+        saveNotes(quick.dataset.id, grid);
+        return;
+      }
+      const notes = e.target.closest(".notes-save");
+      if (notes) { saveNotes(notes.dataset.id, grid); return; }
       const fu = e.target.closest(".fu-save");
       if (fu) { saveNextSession(fu.dataset.id, grid); return; }
       const drop = e.target.closest(".drop-btn");

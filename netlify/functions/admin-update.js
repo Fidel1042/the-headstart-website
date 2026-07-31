@@ -54,6 +54,14 @@ exports.handler = async (event) => {
     tableId = process.env.AIRTABLE_SESSION_TABLE_ID;
     baseId  = process.env.AIRTABLE_BASE_ID;
     fields = { "Payout Held": kind === "hold-payout" };
+  } else if (kind === "mentee-notes") {
+    // Working notes plus an optional park-until date, saved together so one
+    // Save button covers both. A cleared date takes them off hold immediately.
+    tableId = AIRTABLE_MENTEE_TABLE_ID;
+    fields = {
+      "Admin Notes": typeof payload.notes === "string" ? payload.notes : "",
+      "On Hold Until": payload.holdUntil || null,
+    };
   } else if (kind === "mentor-notes") {
     tableId = AIRTABLE_MENTOR_TABLE_ID;
     fields = { "Admin Notes": typeof payload.notes === "string" ? payload.notes : "" };
