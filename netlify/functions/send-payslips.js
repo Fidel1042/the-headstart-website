@@ -73,7 +73,7 @@ exports.handler = async (event) => {
     if (!byMentor[email]) byMentor[email] = { name, sessions: [], recordIds: [], total: 0 };
     byMentor[email].recordIds.push(s.id);
     byMentor[email].sessions.push({
-      id:     s.id, // lets the preview hold one row back without holding the mentor
+      id:     s.id, // kept in step with get-payslips, which the preview reads
       date:   s.fields["Date"] || "",
       mentee: s.fields["Mentee Name"] || "—",
       payout,

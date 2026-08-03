@@ -98,6 +98,30 @@
 }
 #confirm-pass { width: 100%; margin-bottom: 0.8rem; }
 
+/* ── Record a payment: the outstanding sessions to tick off ── */
+.fin-rec { margin-bottom: 0.9rem; }
+.fin-rec__row {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.45rem 0.2rem;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.84rem;
+  cursor: pointer;
+}
+.fin-rec__row:last-child { border-bottom: none; }
+.fin-rec__row input { width: auto; cursor: pointer; }
+.fin-rec__date { color: var(--text); }
+.fin-rec__status {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+.fin-rec__due { font-variant-numeric: tabular-nums; font-weight: 700; }
+
 @media (max-width: 700px) {
   .fin-charge { grid-template-columns: 1fr; }
 }

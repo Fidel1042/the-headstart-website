@@ -139,6 +139,16 @@ exports.handler = async (event) => {
         charged: byStatus("Charged").length,
       },
       outstanding: money(sum(pending, "Amount Due") + sum(failed, "Amount Due")),
+      // Every session still owed for, itemised, so a payment that arrived
+      // outside Stripe can be recorded against the exact rows it settled.
+      outstandingRows: pending.concat(failed)
+        .sort((a, b) => String(a.fields["Date"] || "").localeCompare(String(b.fields["Date"] || "")))
+        .map((r) => ({
+          id: r.id,
+          date: String(r.fields["Date"] || "").slice(0, 10),
+          due: money(r.fields["Amount Due"]),
+          status: r.fields["Payment Status"] || "",
+        })),
       failedTotal: money(sum(failed, "Amount Due")),
       lifetimeCharged: money(sum(delivered.concat(purchases), "Amount Charged")),
       packageBought,

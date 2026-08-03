@@ -245,6 +245,23 @@ export const mentors = [
     why: "He knows what a long job search feels like from the inside. 107 days of applications, interviews, and doubt before the offer came. He wants to help international students stay in the fight when it starts to feel stuck.",
     different: "Shriyansh has worked in Big 4 on both sides of the ocean and can speak specifically to Deloitte's process, including the 3-stage interview.",
   },
+  {
+    id: "shifat", name: "Shifat", intl: "International",
+    role: "AI Engineer", company: "PwC",
+    uni: "Swinburne University of Technology", degree: "Computer Science",
+    major: "Computer Science", industry: "Technology", rate: "$20",
+    visa: "485 - Temporary Graduate Visa", gradYear: "2023",
+    specialiseIn: ["Software Engineering", "AI", "Data Engineering"],
+    photo: IMG + "Shifat.png",
+    detailPhoto: DIMG + "Shifat.png",
+    logos: [{ src: LOGO + "PWC real.png", alt: "PwC" }],
+    tags: ["software engineer", "software engineering", "ai", "artificial intelligence", "machine learning", "data engineering", "data", "computer science", "cs", "backend", "microservices", "tech", "technology", "pwc", "graduate", "internship", "international"],
+    bestFor: "Computer science, software engineering, AI and data students at any year level, especially anyone who has landed an internship or grad role and wants to convert it into a return offer.",
+    detailed: true,
+    lead: "Shifat works in PwC's AI team, building their internal gen-AI platform and rolling custom AI tools out to teams across the firm. Before that he spent two years on payments back-end microservices at Quest Payments, a role he landed as a second-year intern and converted into full-time.",
+    why: "He watches students at Melbourne meetups ask strangers for referrals with no GitHub, no LinkedIn and no projects behind them. He does not think they are lazy, he thinks nobody ever told them what the game actually is.",
+    different: "Shifat builds your project pathway around the free time you actually have, then checks your progress every session and probes what you learned rather than taking your word for it. By the interview stage he runs mock rounds against you himself.",
+  },
 ];
 
 export function getMentor(id) {

@@ -8,6 +8,7 @@
 import { requireAuth } from "./auth.js";
 import { mountPortalNav, initTheme } from "./portal-ui.js";
 import { openConfirm } from "./financials-charge.js";
+import { configureRecord, renderRecord } from "./financials-record.js";
 
 initTheme();
 
@@ -32,6 +33,7 @@ requireAuth((session) => {
   }
   ADMIN_EMAIL = email;
   mountPortalNav({ email, isOwner: true, active: "financials" });
+  configureRecord({ api, adminEmail: email, onDone: () => loadMentee(CURRENT.id) });
   loadList();
 });
 
@@ -109,6 +111,8 @@ function render(d) {
   const wa = document.getElementById("fin-wa");
   wa.hidden = !d.phone;
   if (d.phone) wa.href = `https://wa.me/${d.phone}`;
+
+  renderRecord(d);
 }
 
 function historyHtml(history) {

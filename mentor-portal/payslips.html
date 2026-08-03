@@ -197,6 +197,13 @@
     // flag flipped, and both end by reloading so the row moves between the two
     // lists and the frozen RUN_IDS snapshot is rebuilt with it.
     window.setHold = async function (id, btn, hold) {
+      // A row rendered without its Airtable id would PATCH the literal string
+      // "undefined" and come back as a generic save failure, so say what is
+      // actually wrong instead.
+      if (!id || id === "undefined") {
+        alert("This row is missing its Airtable id, so it cannot be held. Refresh the page and try again.");
+        return;
+      }
       const was = btn.textContent;
       btn.disabled = true; btn.textContent = hold ? "Holding…" : "Releasing…";
       try {

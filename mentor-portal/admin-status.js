@@ -169,9 +169,10 @@ export function renderStatus({ mentees = [], allDelivered = [], rows = [], owner
       // most-recent-first for the history list.
       frequency: avgGapDays([...sessionDates].sort()),
     };
-    // On hold wins over everything except being dropped: it means "I have
-    // chased this one and they asked for time", so it must leave the work pile.
-    // The moment the date passes they fall back into their normal group.
+    // On hold is checked first, so it wins over every group including Dropped:
+    // it means "I have chased this one and they asked for time", so it must
+    // leave the work pile regardless of how long since their last session. The
+    // moment the date passes they fall back into whichever group they belong to.
     if (it.holdUntil && it.holdUntil >= todayHold) buckets.hold.push(it);
     else if (days === null) buckets.none.push(it);
     else if (days <= 14) buckets.active.push(it);

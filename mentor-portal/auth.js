@@ -27,6 +27,7 @@ export const ALLOWED_MENTOR_EMAILS = [
   "brendonvo@outlook.com",
   "luischua18@gmail.com",
   "shriyanssh@gmail.com",
+  "shifatrahman@gmail.com",
 ];
 
 // Owners who see a reduced portal. Koko runs mentee support, not money, so the

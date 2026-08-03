@@ -121,6 +121,35 @@
         </div>
         <p class="result" id="ch-out"></p>
       </div>
+
+      <!-- Money that arrived outside Stripe -->
+      <div class="card-block" id="rec-block" hidden>
+        <p class="block-title">Record a payment</p>
+        <p class="block-sub">For money that came in outside Stripe. Tick what it covered, and those sessions stop showing as owed. Nothing is charged.</p>
+
+        <div class="fin-rec" id="rec-list"></div>
+
+        <div class="fin-charge">
+          <label class="fin-field">
+            <span>How they paid</span>
+            <select id="rec-method">
+              <option>Bank transfer</option>
+              <option>Cash</option>
+              <option>Card (manual)</option>
+              <option>Other</option>
+            </select>
+          </label>
+          <label class="fin-field fin-field--wide">
+            <span>Note (optional)</span>
+            <input type="text" id="rec-note" placeholder="e.g. paid on the spot after session" />
+          </label>
+        </div>
+
+        <div class="charge-row">
+          <button class="btn ghost" id="rec-save">Record payment</button>
+        </div>
+        <p class="result" id="rec-out"></p>
+      </div>
     </div>
 
     <!-- Safe-haven confirm -->

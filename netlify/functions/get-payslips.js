@@ -68,6 +68,9 @@ exports.handler = async (event) => {
     if (!byMentor[email]) byMentor[email] = { email, name, sessions: [], recordIds: [], total: 0 };
     byMentor[email].recordIds.push(s.id);
     byMentor[email].sessions.push({
+      // Needed by the per-row Hold button. This is the endpoint the preview
+      // actually reads, so without it every row renders data-id="undefined".
+      id:     s.id,
       date:   s.fields["Date"] || "",
       mentee: s.fields["Mentee Name"] || "—",
       payout,
