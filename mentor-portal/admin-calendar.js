@@ -201,14 +201,15 @@ function draw() {
   const dow = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => `<div class="cal-dow">${d}</div>`).join("");
   document.getElementById("cal-grid").innerHTML = dow + cells;
 
-  // Legend follows the colour mode: mentors when showing everyone, this
-  // mentor's mentees when one is selected.
-  const legendPairs = filterEmail
+  // The legend only earns its place when one mentor is selected, where the
+  // colours mean something specific: which mentee is which. Across all mentors
+  // it was a wall of names nobody reads, so it is not drawn at all.
+  const legend = document.getElementById("cal-legend");
+  legend.innerHTML = filterEmail
     ? nameForMentees()
-    : [...state.colors.entries()].map(([email, c]) => [state.names.get(email) || email, c]);
-  document.getElementById("cal-legend").innerHTML = legendPairs
-    .map(([label, c]) => `<span class="cal-legend__item"><span class="cal-swatch" style="--c:${c}"></span>${esc(label)}</span>`)
-    .join("") +
-    `<span class="cal-legend__item"><span class="cal-swatch cal-swatch--next"></span>Booked (not logged yet)</span>`;
+        .map(([label, c]) => `<span class="cal-legend__item"><span class="cal-swatch" style="--c:${c}"></span>${esc(label)}</span>`)
+        .join("") +
+      `<span class="cal-legend__item"><span class="cal-swatch cal-swatch--next"></span>Booked (not logged yet)</span>`
+    : "";
 }
 

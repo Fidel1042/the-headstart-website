@@ -140,6 +140,8 @@
   gap: 0.9rem;
   margin-top: 1rem;
 }
+/* Empty across all mentors, so it must not leave a gap under the grid. */
+.cal-legend:empty { display: none; }
 .cal-legend__item {
   display: inline-flex;
   align-items: center;
