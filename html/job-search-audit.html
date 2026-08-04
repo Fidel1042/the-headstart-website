@@ -232,14 +232,17 @@
     <div class="audit-page-wrap">
       <div class="audit-inner">
 
-        <p class="audit-eyebrow">Free Offer Roadmap</p>
-        <h1 class="audit-headline">Based on your exact scenario</h1>
-        <img class="audit-course-img" src="../images/Course.png" alt="Road to your first grad offer, the five-stage roadmap" />
-        <p class="audit-proof-label">Advice is based on:</p>
-        <ul class="audit-proof">
-          <li>Conversations with 500+ students/grads/recruiters</li>
-          <li>30+ offers secured across Tech/Business/Engineering</li>
-        </ul>
+        <div id="auditIntro">
+          <p class="audit-eyebrow">Free Offer Roadmap</p>
+          <h1 class="audit-headline">Based on your exact scenario</h1>
+          <p class="audit-desc">We'll send you the one stage closest to where your job search is right now.</p>
+          <img class="audit-course-img" src="../images/Course.png" alt="Road to your first grad offer, the five-stage roadmap" />
+          <p class="audit-proof-label">Advice is based on:</p>
+          <ul class="audit-proof">
+            <li>Conversations with 500+ students/grads/recruiters</li>
+            <li>30+ offers secured across Tech/Business/Engineering</li>
+          </ul>
+        </div>
 
         <form name="job-search-audit" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="audit-form" id="auditForm">
           <input type="hidden" name="form-name" value="job-search-audit" />
@@ -311,6 +314,8 @@
         gtag("event", "generate_lead", { form_id: "job_search_audit" });
       }
 
+      var intro = document.getElementById("auditIntro");
+      if (intro) intro.style.display = "none";
       form.style.display = "none";
       document.getElementById("auditSuccess").style.display = "block";
     });
