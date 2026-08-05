@@ -1,10 +1,18 @@
-// record-payment.js — marks sessions as paid when the money arrived outside
-// Stripe (bank transfer, cash, a card the mentee ran themselves).
+// record-payment.js — marks sessions as paid for money that did not come from
+// the automatic weekly run.
 //
-// No money moves here. This only records something that already happened, so
-// it deliberately does NOT write a Stripe Payment ID: the P&L reads that field
-// to decide whether to deduct Stripe's fee, and inventing one would invent a
-// cost that was never charged.
+// Two cases, and the difference between them is real money:
+//
+//   "Stripe (charged by hand)" — Fidel opened the Stripe dashboard and took the
+//   payment himself. Stripe DID take its cut, so a payment ID is recorded and
+//   the P&L deducts 3.25% + 30c.
+//
+//   Bank transfer / Cash / Other — the money never went through Stripe, so no
+//   payment ID is written and no fee is deducted.
+//
+// monthly-pl.js decides whether to charge that fee purely on whether "Stripe
+// Payment ID" is set, so this field is the whole job. Writing one when Stripe
+// was not used invents a cost; omitting one when it was hides a real one.
 
 const { OWNERS, airtableHeaders } = require("../shared/charge-engine");
 
@@ -18,7 +26,8 @@ const headers = {
 const json = (statusCode, body) => ({ statusCode, headers, body: JSON.stringify(body) });
 const money = (n) => Math.round((parseFloat(n) || 0) * 100) / 100;
 
-const METHODS = ["Bank transfer", "Cash", "Card (manual)", "Other"];
+const STRIPE_METHOD = "Stripe (charged by hand)";
+const METHODS = [STRIPE_METHOD, "Bank transfer", "Cash", "Other"];
 
 exports.handler = async (event) => {
   if (event.httpMethod === "OPTIONS") return { statusCode: 204, headers, body: "" };
@@ -41,6 +50,14 @@ exports.handler = async (event) => {
   const method = METHODS.includes(payload.method) ? payload.method : "Other";
   const note = String(payload.note || "").trim();
   const when = new Date().toISOString().slice(0, 10);
+  const viaStripe = method === STRIPE_METHOD;
+  // Stripe's own id when it was pasted in, otherwise a marker. Either way the
+  // field is non-empty, which is what makes the P&L charge the fee. A marker is
+  // used rather than leaving it blank because the fee was genuinely paid, and
+  // hunting down the real id later is not worth blocking the record over.
+  const paymentId = viaStripe
+    ? (String(payload.stripeId || "").trim() || `manual-stripe-${when}`)
+    : "";
 
   const { AIRTABLE_BASE_ID, AIRTABLE_SESSION_TABLE_ID } = process.env;
   const base = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_SESSION_TABLE_ID}`;
@@ -81,6 +98,9 @@ exports.handler = async (event) => {
       count: todo.length,
       skipped: already.length,
       total,
+      viaStripe,
+      // Shown back so the fee consequence is visible before confirming.
+      fee: viaStripe ? money(total * 0.0325 + 0.30) : 0,
       rows: todo.map((r) => ({
         date: String(r.fields["Date"] || "").slice(0, 10),
         due: money(r.fields["Amount Due"]),
@@ -103,6 +123,8 @@ exports.handler = async (event) => {
             "Payment Status": "Charged",
             "Amount Charged": money(r.fields["Amount Due"]),
             "Failure Reason": trail,
+            // Only set when Stripe really took the money. See the header note.
+            ...(viaStripe ? { "Stripe Payment ID": paymentId } : {}),
           },
         })),
       }),

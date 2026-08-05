@@ -6,7 +6,7 @@
 import { requireAuth, ALLOWED_MENTOR_EMAILS } from "./auth.js";
 import { mountPortalNav, initTheme } from "./portal-ui.js";
 import { setToolsAdmin } from "./billing-tools.js";
-import { setFailed } from "./chase-modal.js";
+import { setFailed, configurePaid } from "./chase-modal.js";
 
 initTheme();
 
@@ -21,6 +21,7 @@ requireAuth((session) => {
   }
   ADMIN_EMAIL = email;
   setToolsAdmin(email);   // the tools module needs the same owner identity
+  configurePaid({ api: billingApi, adminEmail: email, onDone: loadFailed });
   mountPortalNav({ email, isOwner: true, active: "billing" });
   loadPreview();
   loadFailed();
@@ -28,6 +29,17 @@ requireAuth((session) => {
 });
 
 const BASE_TITLE = "Weekly Billing – The Headstart";
+
+/** POST to a Netlify function, throwing the server's own message on failure. */
+async function billingApi(fn, body) {
+  const res = await fetch(`/.netlify/functions/${fn}`, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Something went wrong");
+  return data;
+}
 
 const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1";
 
@@ -166,6 +178,7 @@ async function loadFailed() {
       </div>
       <span class="row-amount">$${m.total.toFixed(2)}</span>
       <button class="btn ghost chase-btn" onclick="openChase(${i})">Chase</button>
+      <button class="btn ghost chase-btn" onclick="markPaid(${i}, this)">Mark charged</button>
     </div>`).join("");
   document.getElementById("retry-total").textContent = `$${data.total.toFixed(2)} AUD`;
   content.hidden = false;

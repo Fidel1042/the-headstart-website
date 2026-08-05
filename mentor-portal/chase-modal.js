@@ -7,6 +7,62 @@ let failed = [];
 
 export function setFailed(list) { failed = list || []; }
 
+// Some declines can never be retried: Nikhil's Indian-issued card needs a
+// mandate Stripe cannot create off-session, so the money can only ever arrive
+// another way. This records that it did, without touching a card.
+export function configurePaid({ api, adminEmail, onDone }) { paidDeps = { api, adminEmail, onDone }; }
+let paidDeps = { api: null, adminEmail: "", onDone: null };
+
+window.markPaid = async function (index, btn) {
+  const m = failed[index];
+  if (!m || !paidDeps.api) return;
+  const ids = m.sessionIds || [];
+  if (!ids.length) { window.alert("No session rows found for this mentee. Reload and try again."); return; }
+
+  // Charging by hand in the Stripe dashboard is the usual reason a row gets
+  // settled outside the weekly run, so it is the default. The choice is not
+  // cosmetic: it decides whether the P&L deducts Stripe's fee.
+  const method = window.prompt(
+    `How was ${m.name}'s $${m.total.toFixed(2)} paid?\n\n` +
+    `1 = Stripe (charged by hand)\n2 = Bank transfer\n3 = Cash\n4 = Other`,
+    "1"
+  );
+  if (method === null) return;
+  const chosen = { 1: "Stripe (charged by hand)", 2: "Bank transfer", 3: "Cash", 4: "Other" }[method.trim()];
+  if (!chosen) { window.alert("Type 1, 2, 3 or 4."); return; }
+
+  // Optional: pasting the real Stripe id makes the row traceable back to the
+  // dashboard. Skipping it still records the fee, just without the link.
+  let stripeId = "";
+  if (chosen === "Stripe (charged by hand)") {
+    stripeId = window.prompt("Stripe payment ID (optional, starts pi_). Leave blank to skip.", "") || "";
+  }
+
+  const original = btn.textContent;
+  btn.disabled = true; btn.textContent = "Recording…";
+  try {
+    // The server totals the rows from Airtable, so the figure confirmed is
+    // Airtable's rather than whatever this page happens to be showing.
+    const p = await paidDeps.api("record-payment", {
+      recordIds: ids, method: chosen, stripeId, adminEmail: paidDeps.adminEmail, preview: true,
+    });
+    const feeLine = p.viaStripe
+      ? `\n\nStripe's fee of $${p.fee.toFixed(2)} will be counted as a cost.`
+      : `\n\nNo Stripe fee will be counted, since the money did not go through Stripe.`;
+    if (!window.confirm(
+      `Mark ${m.name} as charged, $${p.total.toFixed(2)} via ${chosen}?\n\n` +
+      `${p.count} session(s) will be marked Charged in Airtable.${feeLine}`
+    )) {
+      btn.disabled = false; btn.textContent = original; return;
+    }
+    await paidDeps.api("record-payment", { recordIds: ids, method: chosen, stripeId, adminEmail: paidDeps.adminEmail });
+    if (paidDeps.onDone) paidDeps.onDone();
+  } catch (e) {
+    btn.disabled = false; btn.textContent = original;
+    window.alert(e.message || "Could not record — try again.");
+  }
+};
+
 const esc = (s) => String(s == null ? "" : s)
   .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 

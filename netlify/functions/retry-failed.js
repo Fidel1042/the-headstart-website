@@ -60,6 +60,9 @@ exports.handler = async (event) => {
         reason: g.reason || "",
         phone: normalizePhone(rec?.fields?.["Phone Number"] || "", rec?.fields?.["Aussie Number"] || ""),
         message: chaseMessage(g.name, g.total, g.reason),
+        // The exact session rows behind this decline, so the page can record a
+        // payment that arrived some other way without a round trip.
+        sessionIds: g.sessionIds,
       });
     }
     return json(200, {

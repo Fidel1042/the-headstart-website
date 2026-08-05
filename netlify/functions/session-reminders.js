@@ -197,17 +197,28 @@ exports.handler = async (event) => {
     const summary = [];
     let sent = 0;
     for (const [email, b] of byMentor) {
-      if (!b.tomorrow.length && !b.reachout.length) continue;
-      const subject = b.tomorrow.length ? "Reminder: you have a session tomorrow" : "A mentee to reach out to";
-      summary.push({ mentor: email, tomorrow: b.tomorrow, reachout: b.reachout.map((r) => r.name) });
+      // Mentors are only emailed about a session tomorrow. The reach-out nudge
+      // was dropped from their inbox on purpose: chasing a quiet mentee is
+      // Koko's job, and a mentor who gets nagged weekly stops reading the
+      // emails that actually matter. The reach-out tracking below still runs,
+      // it just no longer lands in a mentor's Gmail.
+      if (!b.tomorrow.length) continue;
+      summary.push({ mentor: email, tomorrow: b.tomorrow });
       if (!dryRun && BREVO_API_KEY) {
-        await sendEmail(BREVO_API_KEY, email, b.name, subject, buildEmail(b));
+        await sendEmail(BREVO_API_KEY, email, b.name, "Reminder: you have a session tomorrow",
+          buildEmail({ name: b.name, tomorrow: b.tomorrow, reachout: [] }));
         sent++;
-        // Stamp each nudged mentee so it waits 7 days before the next nudge.
-        // "First Reminded" is written once and never overwritten: it is the
-        // clock Koko's check-in counts from.
+      }
+    }
+
+    // Stamped whether or not the mentor was emailed, because these are the
+    // clocks Koko's weekly digest counts from. Skipping them would mean nobody
+    // ever escalates.
+    if (!dryRun) {
+      for (const [, b] of byMentor) {
         for (const r of b.reachout) {
           const fields = { "Last Reminded": today };
+          // Written once and never overwritten: it is the start of the clock.
           if (r.first) fields["First Reminded"] = today;
           await patchMentee(AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTEE_TABLE_ID, r.id, fields, AIRTABLE_API_TOKEN);
         }

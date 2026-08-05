@@ -68,10 +68,19 @@ function card(c, kind) {
       </div>
       <div class="contact-card__actions">
         <button type="button" class="c-btn c-btn--save" data-act="save" data-id="${c.id}" ${hasPhone ? "" : "disabled"}>Save contact</button>
-        ${c.message ? `<button type="button" class="c-btn" data-act="copymsg" data-id="${c.id}">Copy message</button>` : ""}
+        ${(c.messages || []).map((m, i) =>
+          `<button type="button" class="c-btn" data-act="copymsg" data-id="${c.id}" data-msg="${i}"
+             title="${esc(m.when || "")}">Copy ${esc(m.label)}</button>`).join("")}
         <a class="c-btn c-btn--msg${hasPhone ? "" : " is-disabled"}" ${hasPhone ? `href="https://wa.me/${c.phone}" target="_blank" rel="noopener"` : 'aria-disabled="true"'}>Message</a>
         <button type="button" class="c-btn c-btn--done" data-act="done" data-id="${c.id}" data-kind="${kind}">Mark done</button>
       </div>
+      ${(c.messages || []).length ? `
+      <details class="contact-msg">
+        <summary>Read the ${c.messages.length} message${c.messages.length === 1 ? "" : "s"}</summary>
+        ${c.messages.map((m) => `
+          <p class="contact-msg__label">${esc(m.label)}${m.when ? ` &middot; ${esc(m.when)}` : ""}</p>
+          <p class="contact-msg__body">${esc(m.text)}</p>`).join("")}
+      </details>` : ""}
     </article>`;
 }
 
@@ -170,7 +179,10 @@ document.querySelector(".contacts-page").addEventListener("click", (e) => {
   if (!btn) return;
   const c = byId.get(btn.dataset.id);
   if (btn.dataset.act === "save" && c) saveContact(c);
-  if (btn.dataset.act === "copymsg" && c) copyToClipboard(btn, c.message);
+  if (btn.dataset.act === "copymsg" && c) {
+    const m = (c.messages || [])[Number(btn.dataset.msg)];
+    if (m) copyToClipboard(btn, m.text);
+  }
   if (btn.dataset.act === "done") markDone(btn.dataset.id, btn.dataset.kind, btn);
 });
 

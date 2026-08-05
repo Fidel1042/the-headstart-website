@@ -57,6 +57,11 @@ function updateTotal() {
 
 document.addEventListener("change", (e) => {
   if (e.target.classList?.contains("rec-tick")) updateTotal();
+  // The Stripe id field only means anything for a Stripe charge.
+  if (e.target.id === "rec-method") {
+    const wrap = document.getElementById("rec-stripe-wrap");
+    if (wrap) wrap.hidden = e.target.value !== "Stripe (charged by hand)";
+  }
 });
 
 document.addEventListener("click", async (e) => {
@@ -68,6 +73,7 @@ document.addEventListener("click", async (e) => {
 
   const method = document.getElementById("rec-method").value;
   const note = document.getElementById("rec-note").value;
+  const stripeId = document.getElementById("rec-stripe").value;
   btn.disabled = true;
   out.textContent = "Checking…";
 
@@ -75,16 +81,21 @@ document.addEventListener("click", async (e) => {
     // The server re-reads the rows and totals them from Airtable, so the figure
     // confirmed here is Airtable's, not this page's.
     const p = await deps.api("record-payment", {
-      recordIds, method, note, adminEmail: deps.adminEmail, preview: true,
+      recordIds, method, note, stripeId, adminEmail: deps.adminEmail, preview: true,
     });
     const skipNote = p.skipped ? `\n\n${p.skipped} already marked charged and will be left alone.` : "";
+    // The fee consequence is stated up front, because picking the wrong method
+    // is the one mistake here that quietly corrupts the P&L.
+    const feeLine = p.viaStripe
+      ? `\n\nStripe's fee of ${money(p.fee)} will be counted as a cost.`
+      : `\n\nNo Stripe fee will be counted, since the money did not go through Stripe.`;
     if (!confirm(
-      `Record ${money(p.total)} received from ${CURRENT.name} by ${method}?\n\n` +
-      `${p.count} session(s) will be marked as charged. No card is touched.${skipNote}`
+      `Mark ${CURRENT.name} as charged, ${money(p.total)} via ${method}?\n\n` +
+      `${p.count} session(s) will be marked Charged in Airtable.${feeLine}${skipNote}`
     )) {
       out.textContent = ""; updateTotal(); return;
     }
-    const done = await deps.api("record-payment", { recordIds, method, note, adminEmail: deps.adminEmail });
+    const done = await deps.api("record-payment", { recordIds, method, note, stripeId, adminEmail: deps.adminEmail });
     out.innerHTML = `<span class="fin-ok">Recorded ${money(done.total)} across ${done.recorded} session(s).</span>`;
     document.getElementById("rec-note").value = "";
     if (deps.onDone) deps.onDone();

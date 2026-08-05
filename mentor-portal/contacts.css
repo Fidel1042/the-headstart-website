@@ -123,3 +123,40 @@ html { font-size: 110%; }
   .contact-card__actions { width: 100%; }
   .c-btn { flex: 1 1 auto; min-height: 44px; }
 }
+
+/* ── The consultation follow-up, readable before it is sent ── */
+/* Full width on its own line: the card is a flex row, so the message must
+   claim the whole basis rather than squeezing in beside the buttons. */
+.contact-msg {
+  flex: 1 1 100%;
+  border-top: 1px solid var(--line);
+  padding-top: 0.7rem;
+  margin-top: 0.2rem;
+}
+.contact-msg summary {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--accent);
+  cursor: pointer;
+}
+.contact-msg summary:hover { color: var(--accent-bright); }
+.contact-msg__label {
+  margin-top: 0.9rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.contact-msg__body {
+  margin-top: 0.35rem;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--text);
+  /* Preserves the blank lines the message was written with, so what is read
+     here is exactly what lands in WhatsApp. */
+  white-space: pre-wrap;
+  max-width: 62ch;
+}

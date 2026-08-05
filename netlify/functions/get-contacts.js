@@ -56,14 +56,52 @@ async function fetchAll(baseId, tableId, fields, token) {
 // with or without them and everything up to the next heading is taken.
 const HEADING = /^\s*#*\s*(whatsapp|gmail|email)\s+(follow-?up|nudge)\s*:?\s*$/i;
 
-function whatsappFollowUp(drafts) {
-  if (!drafts) return "";
+// The current Make.com prompt writes three blocks separated by banner lines:
+//   === FOLLOW-UP (send now) ===   === NUDGE 1 ... ===   === NUDGE 2 ... ===
+// Each is a separate message sent on a different day, so they are split apart
+// and returned as a list rather than one blob. Older records used
+// "WhatsApp follow-up:" style headings, so both shapes are handled.
+const BANNER = /^\s*=+\s*(.+?)\s*=+\s*$/;
+
+// "FOLLOW-UP (send now)" → { label: "Follow-up", when: "send now" }, so the
+// buttons can be short and the timing still shown.
+function splitLabel(raw) {
+  const m = String(raw).match(/^(.*?)\s*\((.+)\)\s*$/);
+  const title = (m ? m[1] : raw).trim();
+  const nice = title.charAt(0).toUpperCase() + title.slice(1).toLowerCase();
+  return { label: nice, when: m ? m[2].trim() : "" };
+}
+
+/** Every draft message in the field, in order, each with its own label. */
+function draftMessages(drafts) {
+  if (!drafts) return [];
   const lines = drafts.split(/\r?\n/);
-  const start = lines.findIndex((l) => HEADING.test(l) && /whatsapp/i.test(l) && !/nudge/i.test(l));
-  if (start === -1) return drafts.trim();
-  const rest = lines.slice(start + 1);
-  const end = rest.findIndex((l) => HEADING.test(l));
-  return (end === -1 ? rest : rest.slice(0, end)).join("\n").trim();
+
+  const out = [];
+  let current = null;
+  const push = () => {
+    if (!current) return;
+    const text = current.lines.join("\n").trim();
+    if (text) out.push({ label: current.label, when: current.when, text });
+    current = null;
+  };
+
+  lines.forEach((l) => {
+    const banner = l.match(BANNER);
+    if (banner) { push(); current = { ...splitLabel(banner[1]), lines: [] }; return; }
+    if (HEADING.test(l)) {
+      push();
+      const nudge = /nudge/i.test(l);
+      current = { label: nudge ? "Nudge" : "Follow-up", when: "", lines: [] };
+      return;
+    }
+    if (current) current.lines.push(l);
+    // Text before any heading is a message with no label of its own. This is
+    // how the oldest records look, so it must not be dropped.
+    else current = { label: "Follow-up", when: "", lines: [l] };
+  });
+  push();
+  return out;
 }
 
 exports.handler = async (event) => {
@@ -111,7 +149,7 @@ exports.handler = async (event) => {
         stage:    f["Client Pipeline"] || "",
         mentor:   mentorEmail ? (mentorName.get(mentorEmail) || mentorEmail) : "Not matched yet",
         modified: f["Last Modified"] || "",
-        message:  whatsappFollowUp(f["Drafts"] || ""),
+        messages: draftMessages(f["Drafts"] || ""),
       };
     };
     const newestFirst = (a, b) => (b.modified || "").localeCompare(a.modified || "");
