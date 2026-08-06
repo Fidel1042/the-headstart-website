@@ -71,8 +71,12 @@ exports.handler = async (event) => {
   // no duplicate row is written. A held payout stays held: releasing it is
   // Fidel's decision alone, never something a mentor can trigger by logging.
   try {
+    // "Date" is a dateTime field holding 2026-07-18T00:00:00.000Z, so comparing
+    // it to the plain "2026-07-18" the form sends matches nothing at all. It has
+    // to be compared as a day, or this check silently never fires.
     const dupeFormula =
-      `AND({Mentee Record ID}="${menteeRecordId}",{Date}="${sessionDate}")`;
+      `AND({Mentee Record ID}="${menteeRecordId}",` +
+      `IS_SAME({Date},DATETIME_PARSE("${sessionDate}","YYYY-MM-DD"),"day"))`;
     const dupeRes = await fetch(
       `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_SESSION_TABLE_ID}` +
       `?filterByFormula=${encodeURIComponent(dupeFormula)}&maxRecords=1` +

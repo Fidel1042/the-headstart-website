@@ -178,6 +178,50 @@
         </div>
         <p class="result" id="rec-out"></p>
       </div>
+
+      <!-- A package paid for outside the weekly run. Creates the purchase row
+           rather than updating existing sessions, because none exist yet. -->
+      <div class="card-block">
+        <p class="block-title">Record a prepayment</p>
+        <p class="block-sub">A package you took payment for yourself, for example charging an overseas card by hand in Stripe. This creates the purchase record and switches them to prepaid, so the weekly run stops billing them per session.</p>
+
+        <div class="fin-charge">
+          <label class="fin-field">
+            <span>Amount charged</span>
+            <input type="number" id="pre-amount" min="1" max="5000" step="0.01" placeholder="e.g. 250" />
+          </label>
+          <label class="fin-field">
+            <span>Sessions covered</span>
+            <input type="number" id="pre-sessions" value="5" min="1" max="50" />
+          </label>
+          <label class="fin-field">
+            <span>How they paid</span>
+            <select id="pre-method">
+              <option>Stripe (charged by hand)</option>
+              <option>Bank transfer</option>
+              <option>Cash</option>
+              <option>Other</option>
+            </select>
+          </label>
+          <label class="fin-field">
+            <span>Date paid</span>
+            <input type="date" id="pre-date" />
+          </label>
+          <label class="fin-field" id="pre-stripe-wrap">
+            <span>Stripe payment ID (optional)</span>
+            <input type="text" id="pre-stripe" placeholder="pi_..." />
+          </label>
+          <label class="fin-field fin-field--wide">
+            <span>Note (optional)</span>
+            <input type="text" id="pre-note" placeholder="e.g. Indian card, charged in the dashboard" />
+          </label>
+        </div>
+
+        <div class="charge-row">
+          <button class="btn ghost" id="pre-save">Record prepayment</button>
+        </div>
+        <p class="result" id="pre-out"></p>
+      </div>
     </div>
 
     <!-- Safe-haven confirm -->

@@ -26,6 +26,10 @@ export function renderRecord(d) {
   if (!block) return;
   out.textContent = "";
 
+  // Default the prepayment date to today, so the common case needs no typing.
+  const dateEl = document.getElementById("pre-date");
+  if (dateEl && !dateEl.value) dateEl.value = new Date().toISOString().slice(0, 10);
+
   const rows = d.outstandingRows || [];
   if (!rows.length) { block.hidden = true; return; }
   block.hidden = false;
@@ -55,13 +59,62 @@ function updateTotal() {
   btn.disabled = !rows.length;
 }
 
+const STRIPE_METHOD = "Stripe (charged by hand)";
+
 document.addEventListener("change", (e) => {
   if (e.target.classList?.contains("rec-tick")) updateTotal();
   // The Stripe id field only means anything for a Stripe charge.
-  if (e.target.id === "rec-method") {
-    const wrap = document.getElementById("rec-stripe-wrap");
-    if (wrap) wrap.hidden = e.target.value !== "Stripe (charged by hand)";
+  const wraps = { "rec-method": "rec-stripe-wrap", "pre-method": "pre-stripe-wrap" };
+  if (wraps[e.target.id]) {
+    const wrap = document.getElementById(wraps[e.target.id]);
+    if (wrap) wrap.hidden = e.target.value !== STRIPE_METHOD;
   }
+});
+
+// ── Recording a prepayment taken outside the weekly run ──
+document.addEventListener("click", async (e) => {
+  const btn = e.target.closest("#pre-save");
+  if (!btn || !CURRENT) {
+    if (btn) window.alert("Search for a mentee first.");
+    return;
+  }
+  const out = document.getElementById("pre-out");
+  const amount = document.getElementById("pre-amount").value;
+  const sessions = document.getElementById("pre-sessions").value;
+  const method = document.getElementById("pre-method").value;
+  const body = {
+    kind: "prepay",
+    recordId: CURRENT.id,
+    amount, sessions, method,
+    date: document.getElementById("pre-date").value,
+    stripeId: document.getElementById("pre-stripe").value,
+    note: document.getElementById("pre-note").value,
+    adminEmail: deps.adminEmail,
+  };
+
+  btn.disabled = true;
+  out.textContent = "Checking…";
+  try {
+    const p = await deps.api("record-payment", { ...body, preview: true });
+    const feeLine = p.viaStripe
+      ? `\n\nStripe's fee of ${money(p.fee)} will be counted as a cost.`
+      : `\n\nNo Stripe fee will be counted, since the money did not go through Stripe.`;
+    if (!confirm(
+      `Record a ${money(p.amount)} prepayment for ${p.name}?\n\n` +
+      `${p.sessions} sessions at ${money(p.each)} each.\n` +
+      `They will be switched to prepaid, so the weekly run stops charging them per session.${feeLine}`
+    )) {
+      out.textContent = ""; btn.disabled = false; return;
+    }
+    const done = await deps.api("record-payment", body);
+    out.innerHTML = `<span class="fin-ok">Recorded ${money(done.amount)} for ${done.sessions} sessions.` +
+      (done.billingType ? ` Billing type set to ${done.billingType}.` : " Set their billing type by hand, it could not be updated.") +
+      `</span>`;
+    if (deps.onDone) deps.onDone();
+  } catch (err) {
+    out.innerHTML = `<span class="fin-bad">${String(err.message || "Could not record")}</span>`;
+  }
+  btn.disabled = false;
 });
 
 document.addEventListener("click", async (e) => {

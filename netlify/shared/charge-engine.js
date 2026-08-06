@@ -15,7 +15,10 @@ const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com", "dev@localho
 // Both spellings are accepted so the Airtable option can be renamed from
 // "Package" to "Prepayment" without a window where prepaid mentees get billed
 // twice. Every comparison goes through isPrepaid(), never a bare === "Package".
-const PREPAID_TYPES = ["Package", "Prepayment"];
+// "Prepayment" first: the Airtable option has been renamed, so writing
+// "Package" now fails. The old spelling stays in the list so reads of any
+// historic value still register as prepaid.
+const PREPAID_TYPES = ["Prepayment", "Package"];
 const isPrepaid = (billingType) => PREPAID_TYPES.includes(String(billingType || "").trim());
 
 // Airtable formula fragment for "this mentee is prepaid".

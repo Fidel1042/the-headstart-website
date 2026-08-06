@@ -89,10 +89,15 @@ function draftMessages(drafts) {
   lines.forEach((l) => {
     const banner = l.match(BANNER);
     if (banner) { push(); current = { ...splitLabel(banner[1]), lines: [] }; return; }
-    if (HEADING.test(l)) {
+    const heading = l.match(HEADING);
+    if (heading) {
       push();
-      const nudge = /nudge/i.test(l);
-      current = { label: nudge ? "Nudge" : "Follow-up", when: "", lines: [] };
+      // Older records carry a WhatsApp AND a Gmail version of each message, so
+      // the channel has to be in the label. Without it you get two buttons both
+      // saying "Follow-up" and no way to tell which is which.
+      const channel = /whatsapp/i.test(heading[1]) ? "WhatsApp" : "Email";
+      const type = /nudge/i.test(heading[2]) ? "nudge" : "follow-up";
+      current = { label: `${channel} ${type}`, when: "", lines: [] };
       return;
     }
     if (current) current.lines.push(l);
