@@ -27,7 +27,6 @@ export const NAV_AREAS = [
     label: "Current Mentees",
     links: [
       { href: "/mentor-portal/admin.html?view=mentees", label: "Mentee status", page: "mentee-status" },
-      { href: "/mentor-portal/financials.html", label: "Financials", page: "financials" },
     ],
   },
   {

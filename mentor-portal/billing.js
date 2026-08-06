@@ -7,6 +7,7 @@ import { requireAuth, ALLOWED_MENTOR_EMAILS } from "./auth.js";
 import { mountPortalNav, initTheme } from "./portal-ui.js";
 import { setToolsAdmin } from "./billing-tools.js";
 import { setFailed, configurePaid } from "./chase-modal.js";
+import { initFinancials } from "./financials.js";
 
 initTheme();
 
@@ -22,6 +23,7 @@ requireAuth((session) => {
   ADMIN_EMAIL = email;
   setToolsAdmin(email);   // the tools module needs the same owner identity
   configurePaid({ api: billingApi, adminEmail: email, onDone: loadFailed });
+  initFinancials(email);   // the mentee financials block now lives on this page
   mountPortalNav({ email, isOwner: true, active: "billing" });
   loadPreview();
   loadFailed();

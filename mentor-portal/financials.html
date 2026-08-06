@@ -1,170 +1,18 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>Mentee Financials – The Headstart</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#000000" />
-  <link rel="manifest" href="/mentor-portal/manifest.webmanifest" />
-  <link rel="apple-touch-icon" href="/mentor-portal/icons/icon-180.png" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-  <meta name="apple-mobile-web-app-title" content="Headstart" />
-  <meta name="format-detection" content="telephone=no" />
-  <script defer src="/mentor-portal/pwa.js"></script>
-  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
-  <style id="auth-gate">
-    html:not(.auth-ok) body { visibility: hidden; }
-    html:not(.auth-ok) { background: #000; }
-    html:not(.auth-ok)::after {
-      content: ""; position: fixed; top: 50%; left: 50%;
-      width: 30px; height: 30px; margin: -15px 0 0 -15px;
-      border-radius: 50%; border: 3px solid rgba(255,255,255,0.18);
-      border-top-color: #c79b3b; animation: auth-spin 0.7s linear infinite;
-    }
-    @keyframes auth-spin { to { transform: rotate(360deg); } }
-  </style>
-  <script>
-    /* Failsafe: if the login check has not finished in 12s, swap the blank
-       screen for a reload prompt so nobody is stuck on a black screen. */
-    setTimeout(function () {
-      var r = document.documentElement;
-      if (!r.classList.contains("auth-ok")) {
-        r.classList.add("auth-ok");
-        if (document.body) document.body.innerHTML =
-          '<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;text-align:center;background:#000;color:#fff;font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif">' +
-          '<p style="font-size:1.05rem;max-width:340px;line-height:1.5">This page is taking too long to load. Check your internet, then reload.</p>' +
-          '<button onclick="location.reload()" style="padding:12px 26px;border-radius:999px;border:1px solid #c79b3b;background:transparent;color:#f0c75c;font-weight:700;font-size:0.9rem;cursor:pointer">Reload</button>' +
-          '</div>';
-      }
-    }, 12000);
-  </script>
-  <script type="module" src="financials.js"></script>
-  <link rel="stylesheet" href="portal.css" />
-  <link rel="stylesheet" href="portal-nav.css" />
-  <link rel="stylesheet" href="billing.css" />
-  <link rel="stylesheet" href="financials.css" />
-  <link rel="stylesheet" href="/mentor-portal/polish.css" />
+  <meta name="robots" content="noindex, nofollow" />
+  <!-- Mentee Financials now lives on the billing page, so charging one mentee
+       and running the weekly charge are the same screen. Kept as a redirect so
+       old bookmarks and the PWA shortcut still land somewhere useful. -->
+  <meta http-equiv="refresh" content="0; url=/mentor-portal/billing.html#fin-search" />
+  <script>location.replace("/mentor-portal/billing.html#fin-search");</script>
 </head>
 <body>
-
-  <div id="portal-nav"></div>
-
-  <main class="page">
-
-    <div class="card-block">
-      <p class="block-title">Mentee Financials</p>
-      <p class="block-sub">Pick a mentee to see what they owe, what they've paid, and their package balance. Every charge shows you the exact amount before anything happens.</p>
-
-      <div class="fin-search">
-        <input type="text" class="passcode-input" id="fin-search" list="fin-names"
-               placeholder="Search mentee by name…" autocomplete="off" aria-label="Search mentee" />
-        <datalist id="fin-names"></datalist>
-      </div>
-
-      <p class="loading" id="fin-loading" hidden>Loading…</p>
-      <p class="empty" id="fin-empty">Search for a mentee above.</p>
-    </div>
-
-    <div id="fin-detail" hidden>
-      <!-- Snapshot -->
-      <div class="card-block">
-        <p class="block-title" id="fin-name"></p>
-        <p class="block-sub" id="fin-sub"></p>
-        <div class="fin-tiles" id="fin-tiles"></div>
-        <div class="fin-actions">
-          <a class="btn ghost" id="fin-wa" target="_blank" rel="noopener" hidden>WhatsApp</a>
-          <button class="btn ghost" id="fin-invoice">Send invoice</button>
-        </div>
-        <p class="result" id="fin-invoice-out"></p>
-      </div>
-
-      <!-- Charge -->
-      <div class="card-block">
-        <p class="block-title">Charge this mentee</p>
-        <p class="block-sub">The amount is worked out from Airtable, not from this page. You'll see it, and confirm it, before the card is touched.</p>
-
-        <div class="fin-charge">
-          <label class="fin-field">
-            <span>What for</span>
-            <select id="ch-kind">
-              <option value="session">Single lesson (uses their session price)</option>
-              <option value="package">Prepay package</option>
-              <option value="custom">Other amount</option>
-            </select>
-          </label>
-
-          <label class="fin-field" id="ch-sessions-wrap">
-            <span>Sessions</span>
-            <input type="number" id="ch-sessions" value="1" min="1" max="50" />
-          </label>
-
-          <label class="fin-field" id="ch-rate-wrap" hidden>
-            <span>Rate each</span>
-            <input type="number" id="ch-rate" value="49" min="1" max="1000" step="0.01" />
-          </label>
-
-          <label class="fin-field" id="ch-amount-wrap" hidden>
-            <span>Amount</span>
-            <input type="number" id="ch-amount" min="1" max="5000" step="0.01" />
-          </label>
-
-          <label class="fin-field fin-field--wide" id="ch-reason-wrap" hidden>
-            <span>Reason</span>
-            <input type="text" id="ch-reason" placeholder="e.g. missed session fee" />
-          </label>
-        </div>
-
-        <div class="charge-row">
-          <button class="btn ghost" id="ch-check">Check amount</button>
-        </div>
-        <p class="result" id="ch-out"></p>
-      </div>
-
-      <!-- Money that arrived outside Stripe -->
-      <div class="card-block" id="rec-block" hidden>
-        <p class="block-title">Record a payment</p>
-        <p class="block-sub">For money collected outside the weekly run, including a charge you made by hand in the Stripe dashboard. Tick what it covered and those sessions stop showing as owed. No card is touched from here.</p>
-
-        <div class="fin-rec" id="rec-list"></div>
-
-        <div class="fin-charge">
-          <label class="fin-field">
-            <span>How they paid</span>
-            <select id="rec-method">
-              <option>Stripe (charged by hand)</option>
-              <option>Bank transfer</option>
-              <option>Cash</option>
-              <option>Other</option>
-            </select>
-          </label>
-          <label class="fin-field" id="rec-stripe-wrap">
-            <span>Stripe payment ID (optional)</span>
-            <input type="text" id="rec-stripe" placeholder="pi_..." />
-          </label>
-          <label class="fin-field fin-field--wide">
-            <span>Note (optional)</span>
-            <input type="text" id="rec-note" placeholder="e.g. charged in the dashboard after the card failed" />
-          </label>
-        </div>
-
-        <div class="charge-row">
-          <button class="btn ghost" id="rec-save">Record payment</button>
-        </div>
-        <p class="result" id="rec-out"></p>
-      </div>
-    </div>
-
-    <!-- Safe-haven confirm -->
-    <div class="chase-modal" id="confirm-modal" hidden>
-      <div class="chase-modal__box">
-        <button type="button" class="chase-modal__close" id="confirm-close" aria-label="Close">&times;</button>
-        <div id="confirm-body"></div>
-      </div>
-    </div>
-
-  </main>
-
+  <p style="font-family:system-ui,sans-serif;padding:24px">
+    Mentee Financials has moved to <a href="/mentor-portal/billing.html#fin-search">Billing</a>.
+  </p>
 </body>
 </html>

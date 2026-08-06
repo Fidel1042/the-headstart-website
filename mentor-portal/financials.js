@@ -5,12 +5,11 @@
 // come to, shows that back, and sends the same figure to be checked again on
 // the way in. See charge-custom.js for the reasoning.
 
-import { requireAuth } from "./auth.js";
-import { mountPortalNav, initTheme } from "./portal-ui.js";
+// Driven by billing.js, which owns the page. This module no longer signs the
+// user in or mounts the nav: doing that from two modules on one page mounted
+// the nav twice.
 import { openConfirm } from "./financials-charge.js";
 import { configureRecord, renderRecord } from "./financials-record.js";
-
-initTheme();
 
 const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1";
 let ADMIN_EMAIL = "";
@@ -24,18 +23,13 @@ const fmtDate = (d) => d
   ? new Date(String(d).slice(0, 10) + "T00:00:00").toLocaleDateString("en-AU", { day: "numeric", month: "short", year: "numeric" })
   : "—";
 
-requireAuth((session) => {
-  const email = session?.user?.email || "";
-  const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com"];
-  if (!OWNERS.includes(email) && email !== "dev@localhost") {
-    window.location.replace("/mentor-portal/index.html");
-    return;
-  }
+/** Called once by billing.js after the owner is known. */
+export function initFinancials(email) {
+  if (!document.getElementById("fin-search")) return;
   ADMIN_EMAIL = email;
-  mountPortalNav({ email, isOwner: true, active: "financials" });
   configureRecord({ api, adminEmail: email, onDone: () => loadMentee(CURRENT.id) });
   loadList();
-});
+}
 
 async function api(fn, body) {
   const res = await fetch(`/.netlify/functions/${fn}`, {
@@ -58,10 +52,19 @@ async function loadList() {
     MENTEES.map((m) => `<option value="${esc(m.name)}"></option>`).join("");
 }
 
+// Names in Airtable are typed by hand and carry stray whitespace ("Utkarsh
+// Kumar " has a trailing space), so both sides are normalised before comparing.
+// An exact match wins; failing that a single partial match is accepted, so a
+// half-typed name still lands rather than silently doing nothing.
+const norm = (s) => String(s || "").trim().toLowerCase().replace(/\s+/g, " ");
+
 document.getElementById("fin-search").addEventListener("input", (e) => {
-  const q = e.target.value.trim().toLowerCase();
-  const hit = MENTEES.find((m) => m.name.toLowerCase() === q);
-  if (hit) loadMentee(hit.id);
+  const q = norm(e.target.value);
+  if (!q) return;
+  const hit = MENTEES.find((m) => norm(m.name) === q);
+  if (hit) { loadMentee(hit.id); return; }
+  const partial = MENTEES.filter((m) => norm(m.name).includes(q));
+  if (partial.length === 1) loadMentee(partial[0].id);
 });
 
 async function loadMentee(id) {

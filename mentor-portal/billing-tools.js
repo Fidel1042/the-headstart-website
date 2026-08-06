@@ -104,9 +104,11 @@ function resolveCardEmail(text) {
   if (!q) return "";
   const dashed = q.split("—").pop().trim();      // picked straight from the list
   if (dashed.includes("@")) return dashed;
-  const lower = q.toLowerCase();
-  const hit = CARD_MENTEES.find((m) => m.name.toLowerCase() === lower)
-    || CARD_MENTEES.find((m) => m.name.toLowerCase().includes(lower));
+  // Airtable names carry stray whitespace, so both sides are normalised.
+  const norm = (s) => String(s || "").trim().toLowerCase().replace(/\s+/g, " ");
+  const lower = norm(q);
+  const hit = CARD_MENTEES.find((m) => norm(m.name) === lower)
+    || CARD_MENTEES.find((m) => norm(m.name).includes(lower));
   return hit ? hit.email : (q.includes("@") ? q : "");
 }
 
