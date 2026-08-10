@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<title>Headstart Mentoring: Session Schedule</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<style>
+  :root {
+    --bg: #000000;
+    --bg-card: rgba(255,255,255,0.04);
+    --text: #ffffff;
+    --line: rgba(255,255,255,0.1);
+    --line-soft: rgba(255,255,255,0.07);
+    --muted: rgba(255,255,255,0.62);
+    --gold: #d6a93e;
+    --gold-bright: #f0c75c;
+    --accent: #c79b3b;
+    --accent-soft: rgba(199,155,59,0.22);
+    --accent-line: rgba(199,155,59,0.4);
+  }
+  [data-theme="light"] {
+    --bg: #ffffff;
+    --bg-card: rgba(0,0,0,0.025);
+    --text: #14110c;
+    --line: rgba(0,0,0,0.12);
+    --line-soft: rgba(0,0,0,0.07);
+    --muted: rgba(0,0,0,0.58);
+    --gold: #9b6f16;
+    --gold-bright: #7d5a10;
+    --accent: #9b6f16;
+    --accent-soft: rgba(155,111,22,0.12);
+    --accent-line: rgba(155,111,22,0.32);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .site-header {
+    position: sticky; top: 0; z-index: 50;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+    padding: 0.9rem 1.6rem;
+    display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+  }
+  .logo { height: 30px; width: auto; display: block; }
+  .header-text h1 { font-size: 1.05rem; margin: 0; font-weight: 800; letter-spacing: -0.01em; }
+  .header-text .sub { font-size: 0.72rem; color: var(--muted); }
+  .header-actions { margin-left: auto; display: flex; align-items: center; gap: 0.6rem; }
+  .back-link, .theme-toggle {
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+    color: var(--accent); text-decoration: none;
+    border: 1px solid var(--line); border-radius: 999px;
+    padding: 0.45rem 0.9rem; background: transparent; cursor: pointer; font-family: inherit;
+  }
+  .back-link:hover, .theme-toggle:hover { border-color: var(--accent-line); color: var(--gold-bright); }
+
+  .layout { display: flex; gap: 2.4rem; max-width: 1180px; margin: 0 auto; padding: 2rem 1.6rem 5rem; }
+
+  .sidebar { flex: 0 0 220px; position: sticky; top: 84px; align-self: flex-start; }
+  .sidebar-title {
+    font-size: 0.66rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--accent); margin: 0 0 0.7rem;
+  }
+  .sidebar ol { list-style: none; margin: 0; padding: 0; }
+  .sidebar li { margin-bottom: 0.15rem; }
+  .sidebar a {
+    display: block; padding: 0.3rem 0.5rem; border-radius: 7px;
+    font-size: 0.8rem; color: var(--muted); text-decoration: none;
+  }
+  .sidebar a:hover { color: var(--gold-bright); background: var(--accent-soft); }
+  .sidebar .block-label {
+    font-size: 0.62rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted); margin: 1rem 0 0.35rem; padding-left: 0.5rem;
+  }
+
+  main { flex: 1; min-width: 0; max-width: 760px; }
+
+  .intro { border: 1px solid var(--line); border-radius: 14px; padding: 1.2rem 1.4rem; margin-bottom: 2rem; background: var(--bg-card); }
+  .intro p { margin: 0 0 0.7rem; }
+  .intro p:last-child { margin-bottom: 0; }
+  .intro strong { color: var(--gold-bright); }
+
+  h2.block {
+    font-size: 0.72rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--accent); margin: 2.6rem 0 1rem; padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  /* One session, one card. The number is the anchor a mentor scans for. */
+  .session {
+    border: 1px solid var(--line); border-radius: 14px;
+    padding: 1.3rem 1.5rem; margin-bottom: 1rem; background: var(--bg-card);
+  }
+  .session__head { display: flex; align-items: baseline; gap: 0.8rem; flex-wrap: wrap; margin-bottom: 0.15rem; }
+  .session__num {
+    font-size: 0.68rem; font-weight: 800; letter-spacing: 0.08em;
+    color: var(--accent); background: var(--accent-soft);
+    border-radius: 6px; padding: 0.2rem 0.5rem; white-space: nowrap;
+  }
+  .session__title { font-size: 1.05rem; font-weight: 800; margin: 0; letter-spacing: -0.01em; }
+  .session__goal { color: var(--muted); font-size: 0.9rem; margin: 0.35rem 0 0.9rem; }
+  .session ul { margin: 0 0 0.9rem; padding-left: 1.15rem; }
+  .session li { margin-bottom: 0.35rem; font-size: 0.92rem; }
+  .session li:last-child { margin-bottom: 0; }
+
+  .meta { display: flex; flex-direction: column; gap: 0.3rem; border-top: 1px solid var(--line-soft); padding-top: 0.75rem; }
+  .meta div { font-size: 0.85rem; }
+  .meta .k {
+    font-size: 0.64rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--accent); margin-right: 0.5rem;
+  }
+
+  .feat {
+    font-weight: 800; font-size: 0.95rem; margin: 1.1rem 0 0.4rem;
+    color: var(--gold-bright);
+  }
+  .prompt {
+    background: rgba(0,0,0,0.35); border: 1px solid var(--line);
+    border-radius: 10px; padding: 0.9rem 1rem; margin: 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.78rem; line-height: 1.55; color: var(--text);
+    white-space: pre-wrap; overflow-x: auto;
+  }
+  [data-theme="light"] .prompt { background: rgba(0,0,0,0.04); }
+
+  .breather {
+    border: 1px dashed var(--accent-line); border-radius: 12px;
+    padding: 0.9rem 1.2rem; margin-bottom: 1rem;
+    font-size: 0.88rem; color: var(--muted);
+  }
+  .breather strong { color: var(--gold-bright); }
+
+  .rules { border: 1px solid var(--line); border-radius: 14px; padding: 1.2rem 1.4rem; margin-top: 2rem; }
+  .rules h3 { margin: 0 0 0.7rem; font-size: 0.95rem; }
+  .rules ul { margin: 0; padding-left: 1.15rem; }
+  .rules li { margin-bottom: 0.45rem; font-size: 0.92rem; }
+
+  @media (max-width: 900px) {
+    .layout { flex-direction: column; gap: 1.4rem; padding: 1.4rem 1.1rem 4rem; }
+    .sidebar { position: static; flex: 1 1 auto; }
+    .sidebar ol { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+    .sidebar .block-label { display: none; }
+    .sidebar a { border: 1px solid var(--line); border-radius: 999px; font-size: 0.74rem; }
+    .site-header { padding: 0.8rem 1.1rem; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="../mentor-portal/" class="logo-home" aria-label="Mentor portal home">
+    <img class="logo" src="../images/headstart-italic-logo.png" alt="The Headstart logo" />
+  </a>
+  <div class="header-text">
+    <h1>Session Schedule</h1>
+    <span class="sub">Internal &middot; Suggested path, not a script</span>
+  </div>
+  <div class="header-actions">
+    <a class="back-link" href="../mentor-portal/">&larr; Mentor Portal</a>
+    <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle light/dark mode" title="Toggle light/dark mode">
+      <span id="theme-icon">&#9788;</span>
+    </button>
+  </div>
+</header>
+
+<div class="layout">
+
+  <nav class="sidebar">
+    <p class="sidebar-title">Sessions</p>
+    <p class="block-label">Goals and materials</p>
+    <ol>
+      <li><a href="#s1">1. Goal alignment and plan</a></li>
+      <li><a href="#s2">2. Resume, LinkedIn, cover letter</a></li>
+      <li><a href="#s3">3. Materials sign-off and story</a></li>
+    </ol>
+    <p class="block-label">Outreach</p>
+    <ol>
+      <li><a href="#s4">4. Target list and templates</a></li>
+      <li><a href="#s5">5. Coffee chats and review</a></li>
+    </ol>
+    <p class="block-label">Screening calls</p>
+    <ol>
+      <li><a href="#s6">6. Practice and intro structure</a></li>
+      <li><a href="#s7">7. Prep, round two</a></li>
+    </ol>
+    <p class="block-label">Interviews</p>
+    <ol>
+      <li><a href="#s8">8 to 11. Story bank and mocks</a></li>
+      <li><a href="#s12">12. Real interviews and technical</a></li>
+      <li><a href="#s13">13+. Ad hoc practice</a></li>
+    </ol>
+    <p class="block-label">Handouts</p>
+    <ol>
+      <li><a href="#candidacy">6 features check</a></li>
+      <li><a href="#unique-story">Unique personal story</a></li>
+      <li><a href="#passion-project">Relevant passion project</a></li>
+      <li><a href="#aus-experience">Australia job experience</a></li>
+    </ol>
+  </nav>
+
+  <main>
+
+    <div class="intro">
+      <p><strong>Who this is for:</strong> the mentee we see most, a final year student or recent grad who wants a job, has no serious materials, no outreach habit and no interview practice.</p>
+      <p><strong>Shape:</strong> 13 sessions, weekly, over about 3 months. 13 to 15 is the recommended range. Add one session for a side project if they have nothing to talk about. Optional 1 week break after session 5. After session 12 it goes ad hoc.</p>
+      <p><strong>Continuity target:</strong> 5 or more sessions, at 2 per fortnight while the schedule is live. A mentee who drops below that has usually lost the thread, not the interest. Flag it rather than waiting for them to disappear.</p>
+      <p><strong>This is a suggestion, not a script.</strong> Diagnose first. If they are already getting interviews and failing them, start at session 8. If they land an interview at session 4, drop everything and prep them for it. The schedule waits.</p>
+    </div>
+
+    <h2 class="block">Goals and materials</h2>
+
+    <section class="session" id="s1">
+      <div class="session__head">
+        <span class="session__num">01</span>
+        <h3 class="session__title">Goal alignment and plan</h3>
+      </div>
+      <p class="session__goal">Objectives:</p>
+      <ul>
+        <li>Align on the goal of the mentee</li>
+        <li>Build rapport, try finding something in common</li>
+        <li>First resume review</li>
+        <li><strong>Candidacy check:</strong> do they have 3 out of 6 of the <a href="#candidacy">features of a strong candidate</a>? If they already have a local relevant internship and one other feature, skip this and move on. If you are not 100% sure they can land a job, run the quick audit.</li>
+      </ul>
+      <div class="meta">
+        <div><span class="k">Homework</span>Rewrite resume. If not yet confirmed on the goal, brainstorm a goal.</div>
+        <div><span class="k">Next session</span>LinkedIn optimisation, resume feedback, cover letter introduction.</div>
+      </div>
+    </section>
+
+    <section class="session" id="s2">
+      <div class="session__head">
+        <span class="session__num">02</span>
+        <h3 class="session__title">Resume, LinkedIn and cover letter</h3>
+      </div>
+      <p class="session__goal">Objectives:</p>
+      <ul>
+        <li>Provide further feedback on resume</li>
+        <li>First feedback round of LinkedIn</li>
+        <li>Introduce cover letter template</li>
+        <li><em>Optional:</em> if the mentee needs projects to improve their resume, give them some starters to build a project. See <a href="#passion-project">Relevant Passion Project</a>.</li>
+      </ul>
+      <div class="meta">
+        <div><span class="k">Homework</span>Resume and LinkedIn feedback, plus <a href="#unique-story">story preparation</a>.</div>
+      </div>
+    </section>
+
+    <section class="session" id="s3">
+      <div class="session__head">
+        <span class="session__num">03</span>
+        <h3 class="session__title">Materials sign-off and story</h3>
+      </div>
+      <p class="session__goal">Materials closed, and one story that is theirs.</p>
+      <ul>
+        <li>Final LinkedIn and resume sign-off. No more edits after this.</li>
+        <li>Dig out the unique story: the fun fact, the odd job, the side project, the thing relevant to the role that nobody else will say. Most mentees have one and do not realise it counts.</li>
+        <li>Confirm the plan for the remaining sessions</li>
+        <li>Ask for feedback on how the sessions are going and how they like to work</li>
+      </ul>
+      <div class="meta">
+        <div><span class="k">Done when</span>They have one story they can tell in 60 seconds that is theirs alone.</div>
+      </div>
+    </section>
+
+    <h2 class="block">Outreach</h2>
+
+    <section class="session" id="s4">
+      <div class="session__head">
+        <span class="session__num">04</span>
+        <h3 class="session__title">Target list and outreach templates</h3>
+      </div>
+      <p class="session__goal">They know who to contact and have seen it done.</p>
+      <ul>
+        <li>Run the pre-set prompt to generate the target company list</li>
+        <li><strong>Who to approach</strong> at each company: job title, seniority, how close to the team they would join. This is the part mentees get wrong.</li>
+        <li>Hand over the outreach templates</li>
+        <li><strong>Live demo one.</strong> Write and send a real message together, in the session.</li>
+      </ul>
+      <div class="meta">
+        <div><span class="k">Homework</span>Send the first batch.</div>
+        <div><span class="k">Done when</span>At least one real message has gone out during the session.</div>
+      </div>
+    </section>
+
+    <section class="session" id="s5">
+      <div class="session__head">
+        <span class="session__num">05</span>
+        <h3 class="session__title">Coffee chats and outreach review</h3>
+      </div>
+      <p class="session__goal">They can run the conversation their outreach earns them.</p>
+      <ul>
+        <li>What to actually ask in a coffee chat. The questions that get useful answers, and the ones that waste the meeting.</li>
+        <li>How to open, how to close, how to follow up, how to ask for the next thing</li>
+        <li>Review the outreach so far: what went out, what came back, what to change</li>
+      </ul>
+      <div class="meta">
+        <div><span class="k">Homework</span>Second outreach batch, act on the review.</div>
+        <div><span class="k">Done when</span>They have a question list they would be comfortable using tomorrow.</div>
+      </div>
+    </section>
+
+    <div class="breather">
+      <strong>Optional 1 week break here.</strong> Outreach needs time to produce replies. Meeting with nothing to review wastes their money and your time.
+    </div>
+
+    <h2 class="block">Screening calls</h2>
+
+    <section class="session" id="s6">
+      <div class="session__head">
+        <span class="session__num">06</span>
+        <h3 class="session__title">Screening call practice and intro structure</h3>
+      </div>
+      <p class="session__goal">First attempt at the call, and a self introduction that holds up.</p>
+      <ul>
+        <li>Brainstorm the intro structure. Build it with them, do not hand them a script.</li>
+        <li>Start practising screening calls. Expect the first attempt to be rough, that is the point of doing it here rather than with a recruiter.</li>
+        <li>Motivational questions: why this role, why this company, why you</li>
+      </ul>
+      <div class="meta">
+        <div><span class="k">Homework</span>Rehearse the intro out loud until it stops sounding rehearsed.</div>
+        <div><span class="k">Done when</span>They can get through an intro without reading.</div>
+      </div>
+    </section>
+
+    <section class="session" id="s7">
+      <div class="session__head">
+        <span class="session__num">07</span>
+        <h3 class="session__title">Screening call prep, round two</h3>
+      </div>
+      <p class="session__goal">They understand what the screener is actually assessing.</p>
+      <ul>
+        <li>Second round of practice, with the intro from session 6 tightened</li>
+        <li>What the call is really testing: communication, motivation, basic fit, and whether they are worth 45 minutes of a hiring manager's time</li>
+        <li>How to prepare in the 20 minutes before a screening call</li>
+        <li>Common failure points and how to recover mid-call</li>
+      </ul>
+      <div class="meta">
+        <div><span class="k">Done when</span>They can explain what a screener is listening for.</div>
+      </div>
+    </section>
+
+    <h2 class="block">Interviews</h2>
+
+    <section class="session" id="s8">
+      <div class="session__head">
+        <span class="session__num">08 to 11</span>
+        <h3 class="session__title">Story bank and mocks</h3>
+      </div>
+      <p class="session__goal">Enough material to answer anything, tested under mock conditions.</p>
+      <p class="session__goal">Each session runs the same shape: add stories to the bank, mock the questions those stories cover, give feedback, rework the weak ones.</p>
+      <ul>
+        <li>The 4 to 8 core interview questions first</li>
+        <li>Behavioural questions in depth, since this is where most mentees lose</li>
+        <li>How one story can answer three different questions</li>
+        <li>Full question bank so nothing comes up cold</li>
+      </ul>
+      <div class="meta">
+        <div><span class="k">Done when</span>They can answer an unseen question without freezing.</div>
+      </div>
+    </section>
+
+    <section class="session" id="s12">
+      <div class="session__head">
+        <span class="session__num">12</span>
+        <h3 class="session__title">Real interviews and technical questions</h3>
+      </div>
+      <p class="session__goal">Ready for the interviews actually in front of them.</p>
+      <ul>
+        <li>Work on the real interviews they have coming up, by name</li>
+        <li>Any technical or discipline specific questions</li>
+        <li>Assessment centres, case studies, panels, whatever their process involves</li>
+      </ul>
+    </section>
+
+    <section class="session" id="s13">
+      <div class="session__head">
+        <span class="session__num">13+</span>
+        <h3 class="session__title">Ad hoc practice</h3>
+      </div>
+      <p class="session__goal">Driven entirely by what is in their calendar. Whatever interview is next, prep for that. No fixed content.</p>
+    </section>
+
+    <h2 class="block">Handouts</h2>
+
+    <p style="color:var(--muted);font-size:0.92rem;margin:0 0 1.2rem;">The candidacy check for session 1, and the three things a mentee can start today if they fall short of 3 out of 6.</p>
+
+    <section class="session" id="candidacy">
+      <div class="session__head">
+        <span class="session__num">Check</span>
+        <h3 class="session__title">The 6 features of a strong candidate</h3>
+      </div>
+      <p class="session__goal">To build the foundation, a mentee must have <strong>at least 3 out of 6</strong>. Based on conversations with 500+ students and grads, and 30+ offers secured across tech, business and engineering.</p>
+
+      <p class="feat">1. Relevant internship experience</p>
+      <ul>
+        <li>Local internship preferred. One from their home country also works, as it builds employer confidence they can do the job.</li>
+        <li>This is the "juice" to a resume or LinkedIn</li>
+        <li>Virtual internships (Forage and similar) do not count as valid internship experience to most hirers</li>
+      </ul>
+
+      <p class="feat">2. Society executive role</p>
+      <ul>
+        <li>Executive means leading a function of the society, sometimes managing sub-committees</li>
+        <li>Gives them real world experience distinct from internships</li>
+      </ul>
+
+      <p class="feat">3. 85+ WAM, relevant professional certificates, or wins in case competitions</p>
+      <ul>
+        <li>Grades matter only above 85+</li>
+        <li>A relevant, widely recognised certificate makes a difference. CFA for finance, CISSP for cyber security.</li>
+        <li>Case competition wins count if top 3 or similarly notable</li>
+      </ul>
+
+      <p class="feat">4. Relevant passion project</p>
+      <ul>
+        <li>Showcases proactivity and interest in the field</li>
+        <li>Must have <strong>direct impact</strong> on their daily life or social circle, preferably quantifiable</li>
+        <li>AI can help execute the project, but direct impact is non-negotiable</li>
+      </ul>
+
+      <p class="feat">5. Unique personal story / fun facts</p>
+      <ul>
+        <li>Everyone has unique stories</li>
+        <li>Unique stories make them memorable among hundreds of applicants</li>
+        <li>1 to 2 relevant fun facts can help them stand out immediately</li>
+      </ul>
+
+      <p class="feat">6. Australia job experience, including casual roles and volunteering</p>
+      <ul>
+        <li>Local experience is <strong>king</strong>, it shows they can communicate with people in Australia</li>
+        <li>Casual or part-time work reassures employers on communication skills</li>
+        <li>No job? Volunteering works too, if done consistently, for example once every 2 weeks</li>
+      </ul>
+
+      <div class="meta">
+        <div><span class="k">If short of 3</span>Start with <a href="#unique-story">unique personal story</a>, <a href="#passion-project">passion project</a>, or <a href="#aus-experience">Australia job experience</a>. Those three can start today.</div>
+      </div>
+    </section>
+
+    <section class="session" id="unique-story">
+      <div class="session__head">
+        <span class="session__num">Handout</span>
+        <h3 class="session__title">Unique personal story / fun facts</h3>
+      </div>
+      <p class="session__goal"><strong>Fun fact: they already have them.</strong> They just need a third opinion to validate and point out these unique stories. Here is the step by step to extract them.</p>
+      <ol>
+        <li>Write down every single memorable activity you have done since high school to today</li>
+        <li>Write down your target field (marketing, accounting, software engineer)</li>
+        <li>List out 2 memorable incidents per activity that relate to your target field</li>
+        <li>Find a person already inside the industry, or who has had an internship at least</li>
+        <li>Present your timeline to them and ask them to highlight what is interesting about you. If you cannot find that person, we can help you.</li>
+      </ol>
+      <div class="meta">
+        <div><span class="k">Time required</span>2 to 4 hours</div>
+        <div><span class="k">Use it in</span>LinkedIn About section, resume professional profile, interview answers</div>
+      </div>
+    </section>
+
+    <section class="session" id="passion-project">
+      <div class="session__head">
+        <span class="session__num">Handout</span>
+        <h3 class="session__title">Relevant passion project</h3>
+      </div>
+      <p class="session__goal">A passion project should not be generic AI slop. These avenues work across every field:</p>
+      <ul>
+        <li>Non-assignment related academic research</li>
+        <li>Technical tools that improve your life or the life of your social circle, for example a finance tracker</li>
+        <li>Blogs or articles posted regularly</li>
+        <li>Business ideas to make money. It has to relate to your field, or to a part of business that uses your particular skills.</li>
+      </ul>
+      <p style="font-weight:700;margin:0 0 0.5rem;">Key to a successful passion project</p>
+      <ol>
+        <li><strong>It must generate an impact or result.</strong> For example: saved $x, got x users, got x likes on a social media post, made $x, got recognition from a professor.</li>
+        <li><strong>You must have put in 20+ hours combined.</strong> When you work hard towards a project you gain genuine confidence in your own work, and that confidence is the difference maker during interviews. We have talked to 600+ mentees, recruiters and managers, and everyone can tell whether a passion project is AI slop or the real deal.</li>
+      </ol>
+      <div class="meta">
+        <div><span class="k">Time required</span>3 to 4 weeks</div>
+        <div><span class="k">Use it in</span>LinkedIn and resume experience, interview answers</div>
+      </div>
+    </section>
+
+    <section class="session" id="aus-experience">
+      <div class="session__head">
+        <span class="session__num">Handout</span>
+        <h3 class="session__title">Australia job experience</h3>
+      </div>
+
+      <p class="feat">Casual and part time roles</p>
+      <p class="session__goal">Three ways to get one, easiest to hardest:</p>
+      <ol>
+        <li>Text every single friend of yours in Australia and ask if their part time workplace has any vacancies</li>
+        <li>Online applications</li>
+        <li>Print a resume of your past casual job history, go to the suburbs near you, walk into every shop, introduce yourself and ask if you can hand a resume to the manager</li>
+      </ol>
+      <div class="meta">
+        <div><span class="k">Time required</span>4 to 8 weeks</div>
+        <div><span class="k">Use it in</span>LinkedIn and resume experience, interview answers</div>
+      </div>
+
+      <p class="feat" style="margin-top:1.3rem;">Volunteering</p>
+      <p class="session__goal">To find volunteering activities that are available, give this prompt to your LLM of choice:</p>
+      <pre class="prompt">Context: I live in [insert suburb and state]. I'm building a candidacy for [insert field].
+
+Task: Find 5 volunteer opportunities that could strengthen this candidacy.
+
+Criteria (all must apply):
+- In or related to [insert field]
+- Involves teamwork: regular interaction and collaboration with other volunteers, not solo work
+- Easy to get accepted (minimal vetting or interview process)
+- Can start within 1 month from today
+- Ongoing, regular commitment (not a one-off event)
+
+Output format per option:
+- Name + hyperlink
+- 1 to 2 sentence description
+- Acceptance difficulty rating (Easy / Medium / Hard, with a one-line reason why)</pre>
+    </section>
+
+    <div class="rules">
+      <h3>Running it well</h3>
+      <ul>
+        <li><strong>Do not run this on rails.</strong> If a mentee lands an interview at session 4, drop everything and prepare them for it.</li>
+        <li><strong>Two tasks maximum per session.</strong> Overwhelmed mentees stop showing up.</li>
+        <li><strong>A skipped homework is a diagnosis, not a failure.</strong> Find out why before reassigning it.</li>
+        <li>Sessions 1 to 3 feel slow to mentors and fast to mentees. Do not rush them.</li>
+      </ul>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  (function () {
+    var root = document.documentElement;
+    var THEME_KEY = 'headstart_theme';
+    var btn = document.getElementById('theme-toggle');
+    var icon = document.getElementById('theme-icon');
+    function applyTheme(theme) {
+      root.setAttribute('data-theme', theme);
+      icon.innerHTML = theme === 'dark' ? '&#9788;' : '&#9790;';
+      btn.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+      try { localStorage.setItem(THEME_KEY, theme); } catch (e) {}
+    }
+    var saved = 'dark';
+    try { saved = localStorage.getItem(THEME_KEY) || 'dark'; } catch (e) {}
+    applyTheme(saved);
+    btn.addEventListener('click', function () {
+      var current = root.getAttribute('data-theme') || 'dark';
+      applyTheme(current === 'dark' ? 'light' : 'dark');
+    });
+  })();
+</script>
+
+<link rel="stylesheet" href="../css/components/copy-section.css" />
+<script defer src="../js/copy-section.js"></script>
+</body>
+</html>
