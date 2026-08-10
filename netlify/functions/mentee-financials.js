@@ -6,7 +6,8 @@
 //
 // Read-only. Nothing here moves money; charge-custom.js does that.
 
-const { OWNERS, airtableHeaders, menteeRecord, normalizePhone } = require("../shared/charge-engine");
+const Stripe = require("stripe");
+const { OWNERS, airtableHeaders, menteeRecord, normalizePhone, cardSummary } = require("../shared/charge-engine");
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -132,6 +133,13 @@ exports.handler = async (event) => {
       sessionPriceRaw: f["Session Price"] === undefined ? "" : String(f["Session Price"]),
       sessionPrice: parseFloat(f["Session Price"]),
       hasCard: Boolean(f["Stripe Customer ID"]),
+      // Read from Stripe, not from Airtable. The Airtable field only says a
+      // customer exists, so a mentee swapping their card changed nothing on
+      // screen and there was no way to confirm the new card had landed.
+      card: await cardSummary(
+        new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2024-06-20" }),
+        f["Stripe Customer ID"] || ""
+      ),
       counts: {
         total: delivered.length,
         pending: pending.length,

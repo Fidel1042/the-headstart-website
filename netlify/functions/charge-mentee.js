@@ -1,4 +1,4 @@
-const { isPrepaid } = require("../shared/charge-engine");
+const { isPrepaid, activeCard } = require("../shared/charge-engine");
 
 const Stripe = require("stripe");
 
@@ -102,13 +102,14 @@ exports.handler = async (event) => {
       await stripe.customers.update(stripeCustomerId, { email: menteeEmail }).catch(() => {});
     }
 
-    let paymentMethodId = customer?.invoice_settings?.default_payment_method;
-    if (customer && !paymentMethodId) {
+    // Newest card wins, and it is written back as the customer default. See
+    // activeCard() for why the stored default cannot be trusted on its own.
+    let paymentMethodId = null;
+    if (customer) {
       try {
-        const methods = await stripe.paymentMethods.list({ customer: stripeCustomerId, type: "card" });
-        if (methods.data.length) paymentMethodId = methods.data[0].id;
+        paymentMethodId = await activeCard(stripe, stripeCustomerId);
       } catch {
-        // leave paymentMethodId null — will fall through to "no saved card" failure reason
+        // leave null — falls through to the "no saved card" failure reason
       }
     }
 

@@ -83,6 +83,22 @@ async function loadMentee(id) {
   detail.hidden = false;
 }
 
+// The real card, read live from Stripe. Shows the actual brand and last 4 so a
+// replaced card is visible, and flags a card that has already expired.
+function cardLabel(d) {
+  if (!d.hasCard) return '<span class="fin-bad">no card on file</span>';
+  const c = d.card;
+  if (!c) return '<span class="fin-bad">customer exists but no card saved</span>';
+  const exp = c.expMonth && c.expYear ? ` exp ${String(c.expMonth).padStart(2, "0")}/${String(c.expYear).slice(-2)}` : "";
+  const now = new Date();
+  const dead = c.expYear && (c.expYear < now.getFullYear() ||
+    (c.expYear === now.getFullYear() && c.expMonth < now.getMonth() + 1));
+  const label = `${c.brand} &middot;&middot;&middot;&middot;${c.last4}${exp}`;
+  const added = c.addedAt ? ` <span class="fin-dim">added ${fmtDate(c.addedAt)}</span>` : "";
+  const extra = c.total > 1 ? ` <span class="fin-dim">(${c.total} cards on file, newest is charged)</span>` : "";
+  return dead ? `<span class="fin-bad">${label} EXPIRED</span>${added}` : `${label}${added}${extra}`;
+}
+
 function render(d) {
   document.getElementById("fin-name").textContent = d.name;
 
@@ -92,7 +108,7 @@ function render(d) {
   const bits = [
     d.billingType,
     priceOk ? `${money(d.sessionPrice)} a session` : `<span class="fin-bad">price unreadable ("${esc(d.sessionPriceRaw)}")</span>`,
-    d.hasCard ? "card on file" : '<span class="fin-bad">no card on file</span>',
+    cardLabel(d),
   ];
   document.getElementById("fin-sub").innerHTML = bits.join(" &middot; ");
 

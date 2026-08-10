@@ -116,6 +116,63 @@ function normalizePhone(raw, aussie) {
 }
 
 /**
+ * The card to charge: the most recently added one.
+ *
+ * Nothing in this codebase ever sets invoice_settings.default_payment_method.
+ * The agreement flow creates a SetupIntent and the card link uses a Checkout
+ * setup session, and neither writes a default. So the old code fell through to
+ * paymentMethods.list()[0] and trusted Stripe's list ordering, which is not a
+ * documented guarantee. When a mentee replaces a dead card, that is exactly the
+ * case where guessing wrong means charging the card that already failed.
+ *
+ * Newest-first is chosen deliberately: Fidel only ever sends a card link when
+ * the card on file has stopped working, so the newest card is always the one
+ * the mentee intends to be charged.
+ *
+ * The winner is written back as the customer's default, so Stripe agrees with
+ * us from then on and the next run does no extra work.
+ */
+async function activeCard(stripe, customerId) {
+  const methods = await stripe.paymentMethods.list({ customer: customerId, type: "card", limit: 100 });
+  if (!methods.data.length) return null;
+
+  const newest = methods.data.slice().sort((a, b) => (b.created || 0) - (a.created || 0))[0];
+
+  const customer = await stripe.customers.retrieve(customerId);
+  if (customer?.invoice_settings?.default_payment_method !== newest.id) {
+    // Best effort. A failure here must not stop the charge going through.
+    await stripe.customers.update(customerId, {
+      invoice_settings: { default_payment_method: newest.id },
+    }).catch(() => {});
+  }
+  return newest.id;
+}
+
+/** Card details for display: brand, last 4, expiry, when it was added. */
+async function cardSummary(stripe, customerId) {
+  if (!customerId) return null;
+  try {
+    const methods = await stripe.paymentMethods.list({ customer: customerId, type: "card", limit: 100 });
+    if (!methods.data.length) return null;
+    const sorted = methods.data.slice().sort((a, b) => (b.created || 0) - (a.created || 0));
+    const c = sorted[0];
+    return {
+      brand: c.card?.brand || "card",
+      last4: c.card?.last4 || "",
+      expMonth: c.card?.exp_month || null,
+      expYear: c.card?.exp_year || null,
+      country: c.card?.country || "",
+      addedAt: c.created ? new Date(c.created * 1000).toISOString().slice(0, 10) : "",
+      // More than one means older cards are still attached. Harmless, but worth
+      // showing so a replaced card is visibly a replacement.
+      total: sorted.length,
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Charge each group once. `label` appears on the Stripe description so a retry
  * is distinguishable from the original weekly run in the Stripe dashboard.
  */
@@ -139,12 +196,7 @@ async function chargeGroups(groups, stripe, label = "weekly") {
 
     let paymentMethodId = null;
     try {
-      const customer = await stripe.customers.retrieve(customerId);
-      paymentMethodId = customer?.invoice_settings?.default_payment_method || null;
-      if (!paymentMethodId) {
-        const methods = await stripe.paymentMethods.list({ customer: customerId, type: "card" });
-        if (methods.data.length) paymentMethodId = methods.data[0].id;
-      }
+      paymentMethodId = await activeCard(stripe, customerId);
     } catch {
       results.push({ ...m, status: "Failed", reason: "Stripe customer not found", paymentIntentId: "" });
       continue;
@@ -213,4 +265,5 @@ module.exports = {
   OWNERS, authorise, airtableHeaders, menteeRecord, normalizePhone,
   PREPAID_TYPES, isPrepaid, PREPAID_FORMULA,
   fetchByStatus, groupByMentee, chargeGroups, writeResults, summarise,
+  activeCard, cardSummary,
 };

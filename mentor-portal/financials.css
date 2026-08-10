@@ -125,3 +125,6 @@
 @media (max-width: 700px) {
   .fin-charge { grid-template-columns: 1fr; }
 }
+
+/* Secondary detail inside the mentee subtitle (when a card was added, etc). */
+.fin-dim { color: var(--text-muted); font-size: 0.82em; }

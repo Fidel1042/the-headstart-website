@@ -15,7 +15,7 @@
 //   { adminEmail, recordId, kind, ... , passcode, expectedAmount } → charges
 
 const Stripe = require("stripe");
-const { OWNERS, authorise, airtableHeaders, menteeRecord, PREPAID_TYPES } = require("../shared/charge-engine");
+const { OWNERS, authorise, airtableHeaders, menteeRecord, PREPAID_TYPES, activeCard } = require("../shared/charge-engine");
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -165,12 +165,9 @@ exports.handler = async (event) => {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2024-06-20" });
   let paymentMethodId = null;
   try {
-    const customer = await stripe.customers.retrieve(customerId);
-    paymentMethodId = customer?.invoice_settings?.default_payment_method || null;
-    if (!paymentMethodId) {
-      const methods = await stripe.paymentMethods.list({ customer: customerId, type: "card" });
-      if (methods.data.length) paymentMethodId = methods.data[0].id;
-    }
+    // Newest card wins. See activeCard() for why the stored default is not
+    // trusted: nothing in this codebase ever sets it.
+    paymentMethodId = await activeCard(stripe, customerId);
   } catch {
     return json(502, { error: "Could not reach Stripe. Nothing was charged." });
   }
