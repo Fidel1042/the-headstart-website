@@ -1,25 +1,13 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8" />
-<title>Headstart Mentoring: Session Schedule</title>
+<title>Headstart Mentoring: Weekly Session Structure</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#ffffff" />
 <meta name="robots" content="noindex, nofollow" />
 <style>
   :root {
-    --bg: #000000;
-    --bg-card: rgba(255,255,255,0.04);
-    --text: #ffffff;
-    --line: rgba(255,255,255,0.1);
-    --line-soft: rgba(255,255,255,0.07);
-    --muted: rgba(255,255,255,0.62);
-    --gold: #d6a93e;
-    --gold-bright: #f0c75c;
-    --accent: #c79b3b;
-    --accent-soft: rgba(199,155,59,0.22);
-    --accent-line: rgba(199,155,59,0.4);
-  }
-  [data-theme="light"] {
     --bg: #ffffff;
     --bg-card: rgba(0,0,0,0.025);
     --text: #14110c;
@@ -32,21 +20,29 @@
     --accent-soft: rgba(155,111,22,0.12);
     --accent-line: rgba(155,111,22,0.32);
   }
+  [data-theme="dark"] {
+    --bg: #000000;
+    --bg-card: rgba(255,255,255,0.04);
+    --text: #ffffff;
+    --line: rgba(255,255,255,0.1);
+    --line-soft: rgba(255,255,255,0.07);
+    --muted: rgba(255,255,255,0.62);
+    --gold: #d6a93e;
+    --gold-bright: #f0c75c;
+    --accent: #c79b3b;
+    --accent-soft: rgba(199,155,59,0.22);
+    --accent-line: rgba(199,155,59,0.4);
+  }
   * { box-sizing: border-box; }
   body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--text);
+    margin: 0; background: var(--bg); color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
+    line-height: 1.6; -webkit-font-smoothing: antialiased;
   }
 
   .site-header {
-    position: sticky; top: 0; z-index: 50;
-    background: var(--bg);
-    border-bottom: 1px solid var(--line);
-    padding: 0.9rem 1.6rem;
+    position: sticky; top: 0; z-index: 50; background: var(--bg);
+    border-bottom: 1px solid var(--line); padding: 0.9rem 1.6rem;
     display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
   }
   .logo { height: 30px; width: auto; display: block; }
@@ -55,32 +51,14 @@
   .header-actions { margin-left: auto; display: flex; align-items: center; gap: 0.6rem; }
   .back-link, .theme-toggle {
     font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
-    color: var(--accent); text-decoration: none;
-    border: 1px solid var(--line); border-radius: 999px;
-    padding: 0.45rem 0.9rem; background: transparent; cursor: pointer; font-family: inherit;
+    color: var(--accent); text-decoration: none; border: 1px solid var(--line);
+    border-radius: 999px; padding: 0.45rem 0.9rem; background: transparent;
+    cursor: pointer; font-family: inherit;
   }
   .back-link:hover, .theme-toggle:hover { border-color: var(--accent-line); color: var(--gold-bright); }
 
-  .layout { display: flex; gap: 2.4rem; max-width: 1180px; margin: 0 auto; padding: 2rem 1.6rem 5rem; }
-
-  .sidebar { flex: 0 0 220px; position: sticky; top: 84px; align-self: flex-start; }
-  .sidebar-title {
-    font-size: 0.66rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--accent); margin: 0 0 0.7rem;
-  }
-  .sidebar ol { list-style: none; margin: 0; padding: 0; }
-  .sidebar li { margin-bottom: 0.15rem; }
-  .sidebar a {
-    display: block; padding: 0.3rem 0.5rem; border-radius: 7px;
-    font-size: 0.8rem; color: var(--muted); text-decoration: none;
-  }
-  .sidebar a:hover { color: var(--gold-bright); background: var(--accent-soft); }
-  .sidebar .block-label {
-    font-size: 0.62rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
-    color: var(--muted); margin: 1rem 0 0.35rem; padding-left: 0.5rem;
-  }
-
-  main { flex: 1; min-width: 0; max-width: 760px; }
+  /* No sidebar: the flowchart is the navigation. */
+  main { max-width: 1060px; margin: 0 auto; padding: 2rem 1.6rem 5rem; }
 
   .intro { border: 1px solid var(--line); border-radius: 14px; padding: 1.2rem 1.4rem; margin-bottom: 2rem; background: var(--bg-card); }
   .intro p { margin: 0 0 0.7rem; }
@@ -93,10 +71,69 @@
     border-bottom: 1px solid var(--line);
   }
 
-  /* One session, one card. The number is the anchor a mentor scans for. */
+  /* ── Flowchart ───────────────────────────────────────────────────────────
+     One row per phase. Nodes sit in a row joined by arrows; the phase itself
+     is joined to the next by a down arrow. Everything is a link into the
+     matching session, so this doubles as the page navigation. */
+  .flow { margin-bottom: 2.6rem; }
+  .flow__title {
+    font-size: 0.66rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--accent); margin: 0 0 1rem;
+  }
+  .phase {
+    border: 1px solid var(--line); border-radius: 14px;
+    padding: 0.9rem 1.1rem; background: var(--bg-card);
+  }
+  .phase__name {
+    font-size: 0.62rem; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 0.7rem;
+  }
+  .phase__row { display: flex; align-items: stretch; gap: 0; flex-wrap: wrap; }
+
+  .node {
+    flex: 1 1 0; min-width: 150px;
+    display: flex; flex-direction: column; gap: 0.15rem;
+    border: 1px solid var(--line); border-radius: 10px;
+    padding: 0.6rem 0.8rem; background: var(--bg);
+    color: var(--text); text-decoration: none;
+    font-family: inherit; text-align: left; cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .node__more {
+    margin-top: 0.35rem; font-size: 0.66rem; font-weight: 800;
+    letter-spacing: 0.05em; color: var(--accent);
+  }
+  .node:hover .node__more { color: var(--gold-bright); }
+  .node:hover { border-color: var(--accent-line); background: var(--accent-soft); }
+  .node b { font-size: 0.62rem; font-weight: 800; letter-spacing: 0.07em; color: var(--accent); }
+  .node span { font-size: 0.84rem; font-weight: 700; }
+  .node em { font-style: normal; font-size: 0.68rem; color: var(--muted); }
+  .node--pause { border-style: dashed; border-color: var(--accent-line); background: transparent; }
+  .node--open { border-style: dashed; }
+
+  /* Horizontal arrow between two nodes in the same phase. */
+  .arrow {
+    flex: 0 0 34px; display: flex; align-items: center; justify-content: center;
+    color: var(--accent-line); font-size: 1.1rem; line-height: 1;
+  }
+  /* Vertical arrow between phases. */
+  .arrow--down {
+    display: flex; align-items: center; justify-content: center;
+    color: var(--accent-line); font-size: 1.2rem; line-height: 1;
+    padding: 0.35rem 0;
+  }
+
+  @media (max-width: 760px) {
+    .phase__row { flex-direction: column; }
+    .node { min-width: 0; }
+    .arrow { flex: 0 0 auto; height: 26px; transform: rotate(90deg); }
+  }
+
+  /* ── Session cards ── */
   .session {
     border: 1px solid var(--line); border-radius: 14px;
     padding: 1.3rem 1.5rem; margin-bottom: 1rem; background: var(--bg-card);
+    scroll-margin-top: 84px;
   }
   .session__head { display: flex; align-items: baseline; gap: 0.8rem; flex-wrap: wrap; margin-bottom: 0.15rem; }
   .session__num {
@@ -106,7 +143,7 @@
   }
   .session__title { font-size: 1.05rem; font-weight: 800; margin: 0; letter-spacing: -0.01em; }
   .session__goal { color: var(--muted); font-size: 0.9rem; margin: 0.35rem 0 0.9rem; }
-  .session ul { margin: 0 0 0.9rem; padding-left: 1.15rem; }
+  .session ul, .session ol { margin: 0 0 0.9rem; padding-left: 1.15rem; }
   .session li { margin-bottom: 0.35rem; font-size: 0.92rem; }
   .session li:last-child { margin-bottom: 0; }
 
@@ -117,39 +154,86 @@
     color: var(--accent); margin-right: 0.5rem;
   }
 
-  .feat {
-    font-weight: 800; font-size: 0.95rem; margin: 1.1rem 0 0.4rem;
-    color: var(--gold-bright);
-  }
+  .feat { font-weight: 800; font-size: 0.95rem; margin: 1.1rem 0 0.4rem; color: var(--gold-bright); }
   .prompt {
-    background: rgba(0,0,0,0.35); border: 1px solid var(--line);
-    border-radius: 10px; padding: 0.9rem 1rem; margin: 0;
+    background: rgba(0,0,0,0.04); border: 1px solid var(--line); border-radius: 10px;
+    padding: 0.9rem 1rem; margin: 0;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 0.78rem; line-height: 1.55; color: var(--text);
     white-space: pre-wrap; overflow-x: auto;
   }
-  [data-theme="light"] .prompt { background: rgba(0,0,0,0.04); }
+  [data-theme="dark"] .prompt { background: rgba(0,0,0,0.35); }
 
   .breather {
     border: 1px dashed var(--accent-line); border-radius: 12px;
-    padding: 0.9rem 1.2rem; margin-bottom: 1rem;
-    font-size: 0.88rem; color: var(--muted);
+    padding: 0.9rem 1.2rem; margin-bottom: 1rem; font-size: 0.88rem; color: var(--muted);
   }
   .breather strong { color: var(--gold-bright); }
 
   .rules { border: 1px solid var(--line); border-radius: 14px; padding: 1.2rem 1.4rem; margin-top: 2rem; }
   .rules h3 { margin: 0 0 0.7rem; font-size: 0.95rem; }
-  .rules ul { margin: 0; padding-left: 1.15rem; }
+  .rules ul, .rules ol { margin: 0; padding-left: 1.15rem; }
+  /* The three-point close is the part that must not be skimmed, so it reads as
+     a checklist rather than more prose. */
+  .rules__check { margin: 0 0 1rem !important; }
+  .rules__check li { font-weight: 700; }
+  .rules a { color: var(--accent); font-weight: 700; }
+  .rules a:hover { color: var(--gold-bright); }
   .rules li { margin-bottom: 0.45rem; font-size: 0.92rem; }
 
-  @media (max-width: 900px) {
-    .layout { flex-direction: column; gap: 1.4rem; padding: 1.4rem 1.1rem 4rem; }
-    .sidebar { position: static; flex: 1 1 auto; }
-    .sidebar ol { display: flex; flex-wrap: wrap; gap: 0.3rem; }
-    .sidebar .block-label { display: none; }
-    .sidebar a { border: 1px solid var(--line); border-radius: 999px; font-size: 0.74rem; }
-    .site-header { padding: 0.8rem 1.1rem; }
+  /* ── Resource chips + popup ── */
+  /* Resources are linked from the words that mention them, so a mentor never
+     has to work out which chip matched which line. */
+  .res-link {
+    font: inherit; font-weight: 700; color: var(--accent);
+    background: none; border: none; padding: 0; cursor: pointer;
+    text-decoration: underline; text-underline-offset: 2px;
+    text-decoration-color: var(--accent-line);
   }
+  .res-link:hover { color: var(--gold-bright); text-decoration-color: currentColor; }
+
+  .res-modal {
+    position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.5);
+    display: flex; align-items: center; justify-content: center; padding: 1.2rem;
+  }
+  .res-modal[hidden] { display: none; }
+  .res-modal__box {
+    width: 100%; max-width: 800px; max-height: 86vh;
+    display: flex; flex-direction: column;
+    background: var(--bg); border: 1px solid var(--accent-line);
+    border-radius: 16px; overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.25);
+  }
+  .res-modal__bar {
+    display: flex; align-items: center; gap: 0.8rem;
+    padding: 0.9rem 1.2rem; border-bottom: 1px solid var(--line); background: var(--bg-card);
+  }
+  .res-modal__title { font-weight: 800; font-size: 0.95rem; flex: 1; min-width: 0; }
+  .res-modal__open {
+    font-size: 0.66rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--accent); text-decoration: none; white-space: nowrap;
+    border: 1px solid var(--line); border-radius: 999px; padding: 0.3rem 0.7rem;
+  }
+  .res-modal__open[hidden] { display: none; }
+  .res-modal__close {
+    background: none; border: none; color: var(--muted);
+    font-size: 1.5rem; line-height: 1; cursor: pointer; padding: 0 0.2rem;
+  }
+  .res-modal__close:hover { color: var(--gold-bright); }
+  .res-modal__body { padding: 1.2rem 1.4rem 1.6rem; overflow-y: auto; }
+  .res-modal__body .session { border: none; padding: 0; margin: 0; background: none; }
+  .res-modal__body .session__head { margin-bottom: 0.6rem; }
+  .res-modal__body .num { display: none; }
+  .res-modal__body h2 { font-size: 1.05rem; margin: 0 0 0.8rem; }
+  .res-modal__body h3 { font-size: 0.95rem; margin: 1.2rem 0 0.4rem; color: var(--gold-bright); }
+  .res-modal__body h4 { font-size: 0.88rem; margin: 0.9rem 0 0.3rem; }
+  .res-modal__body img { max-width: 100%; height: auto; border-radius: 10px; }
+  .res-modal__body table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  .res-modal__body td, .res-modal__body th { border: 1px solid var(--line); padding: 0.4rem 0.6rem; text-align: left; }
+  .res-modal__body ul, .res-modal__body ol { padding-left: 1.15rem; }
+  .res-modal__body li { margin-bottom: 0.35rem; font-size: 0.92rem; }
+  .res-note { color: var(--muted); font-size: 0.9rem; }
+  #res-store { display: none; }
 </style>
 </head>
 <body>
@@ -159,63 +243,95 @@
     <img class="logo" src="../images/headstart-italic-logo.png" alt="The Headstart logo" />
   </a>
   <div class="header-text">
-    <h1>Session Schedule</h1>
+    <h1>Recommended Structure Flow</h1>
     <span class="sub">Internal &middot; Suggested path, not a script</span>
   </div>
   <div class="header-actions">
     <a class="back-link" href="../mentor-portal/">&larr; Mentor Portal</a>
     <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle light/dark mode" title="Toggle light/dark mode">
-      <span id="theme-icon">&#9788;</span>
+      <span id="theme-icon">&#9790;</span>
     </button>
   </div>
 </header>
 
-<div class="layout">
+<main>
+  <div class="intro">
+    <p>We'd love if you could do <strong>weekly sessions</strong> with the mentee to maintain consistency and momentum, which have resulted in the highest possibility of a job offer.</p>
+    <p>Here's a <strong>12 to 15 session roadmap</strong>, covering what to teach and do in each session, so you never run out of ideas on how to help mentees improve. You don't need to strictly follow these, we are more than happy if you run your own weekly structure.</p>
+    <p>Also, if mentees have any ad hoc requests that we can help with, this would be the priority for that!</p>
+  </div>
+  <div class="flow">
+    <p class="flow__title">The whole path</p>
 
-  <nav class="sidebar">
-    <p class="sidebar-title">Sessions</p>
-    <p class="block-label">Goals and materials</p>
-    <ol>
-      <li><a href="#s1">1. Goal alignment and plan</a></li>
-      <li><a href="#s2">2. Resume, LinkedIn, cover letter</a></li>
-      <li><a href="#s3">3. Materials sign-off and story</a></li>
-    </ol>
-    <p class="block-label">Outreach</p>
-    <ol>
-      <li><a href="#s4">4. Target list and templates</a></li>
-      <li><a href="#s5">5. Coffee chats and review</a></li>
-    </ol>
-    <p class="block-label">Screening calls</p>
-    <ol>
-      <li><a href="#s6">6. Practice and intro structure</a></li>
-      <li><a href="#s7">7. Prep, round two</a></li>
-    </ol>
-    <p class="block-label">Interviews</p>
-    <ol>
-      <li><a href="#s8">8 to 11. Story bank and mocks</a></li>
-      <li><a href="#s12">12. Real interviews and technical</a></li>
-      <li><a href="#s13">13+. Ad hoc practice</a></li>
-    </ol>
-    <p class="block-label">Handouts</p>
-    <ol>
-      <li><a href="#candidacy">6 features check</a></li>
-      <li><a href="#unique-story">Unique personal story</a></li>
-      <li><a href="#passion-project">Relevant passion project</a></li>
-      <li><a href="#aus-experience">Australia job experience</a></li>
-    </ol>
-  </nav>
+    <div class="phase">
+      <p class="phase__name">Goals and materials</p>
+      <div class="phase__row">
+        <button type="button" class="node" data-session="s1"><b>01</b><span>Goal + plan</span><em>candidacy check</em><span class="node__more">View more &rarr;</span></button>
+        <span class="arrow">&rarr;</span>
+        <button type="button" class="node" data-session="s2"><b>02</b><span>Resume, LinkedIn, cover letter</span><span class="node__more">View more &rarr;</span></button>
+        <span class="arrow">&rarr;</span>
+        <button type="button" class="node" data-session="s3"><b>03</b><span>Sign-off + story</span><span class="node__more">View more &rarr;</span></button>
+      </div>
+    </div>
+    <div class="arrow--down">&darr;</div>
 
-  <main>
+    <div class="phase">
+      <p class="phase__name">Outreach</p>
+      <div class="phase__row">
+        <button type="button" class="node" data-session="s4"><b>04</b><span>Target list + templates</span><em>live demo one</em><span class="node__more">View more &rarr;</span></button>
+        <span class="arrow">&rarr;</span>
+        <button type="button" class="node" data-session="s5"><b>05</b><span>Coffee chats + review</span><span class="node__more">View more &rarr;</span></button>
+        <span class="arrow">&rarr;</span>
+        <span class="node node--pause"><b>Pause</b><span>1 week break</span><em>let replies land</em></span>
+      </div>
+    </div>
+    <div class="arrow--down">&darr;</div>
 
-    <div class="intro">
-      <p><strong>Who this is for:</strong> the mentee we see most, a final year student or recent grad who wants a job, has no serious materials, no outreach habit and no interview practice.</p>
-      <p><strong>Shape:</strong> 13 sessions, weekly, over about 3 months. 13 to 15 is the recommended range. Add one session for a side project if they have nothing to talk about. Optional 1 week break after session 5. After session 12 it goes ad hoc.</p>
-      <p><strong>Continuity target:</strong> 5 or more sessions, at 2 per fortnight while the schedule is live. A mentee who drops below that has usually lost the thread, not the interest. Flag it rather than waiting for them to disappear.</p>
-      <p><strong>This is a suggestion, not a script.</strong> Diagnose first. If they are already getting interviews and failing them, start at session 8. If they land an interview at session 4, drop everything and prep them for it. The schedule waits.</p>
+    <div class="phase">
+      <p class="phase__name">Screening calls</p>
+      <div class="phase__row">
+        <button type="button" class="node" data-session="s6"><b>06</b><span>Practice + intro structure</span><span class="node__more">View more &rarr;</span></button>
+        <span class="arrow">&rarr;</span>
+        <button type="button" class="node" data-session="s7"><b>07</b><span>Prep round two</span><span class="node__more">View more &rarr;</span></button>
+      </div>
+    </div>
+    <div class="arrow--down">&darr;</div>
+
+    <div class="phase">
+      <p class="phase__name">Interviews</p>
+      <div class="phase__row">
+        <button type="button" class="node" data-session="s8"><b>08 to 11</b><span>Story bank + mocks</span><em>repeat each session: add stories, mock, rework</em><span class="node__more">View more &rarr;</span></button>
+      </div>
+    </div>
+    <div class="arrow--down">&darr;</div>
+
+    <div class="phase">
+      <p class="phase__name">Live interviews</p>
+      <div class="phase__row">
+        <button type="button" class="node" data-session="s12"><b>12</b><span>Real interviews + technical</span><span class="node__more">View more &rarr;</span></button>
+        <span class="arrow">&rarr;</span>
+        <button type="button" class="node node--open" data-session="s13"><b>13+</b><span>Ad hoc</span><em>whatever is next</em><span class="node__more">View more &rarr;</span></button>
+      </div>
     </div>
 
-    <h2 class="block">Goals and materials</h2>
+    <p class="res-note" style="margin-top:0.9rem;">An interview at any point overrides the order. Prep for it, then come back.</p>
+  </div>
+    <div class="rules">
+    <h3>At the end of each session, please tick all of the following</h3>
+    <ol class="rules__check">
+      <li>Set at least 1 take home task</li>
+      <li>Mention what will be in the next session</li>
+      <li>Confirm a next session date in the call</li>
+    </ol>
+    <ul>
+      <li>If the mentee has more important requests, always listen and be flexible on the plan.</li>
+      <li>If a mentee consistently fails to do their tasks, <a href="mentee-types.html" target="_blank" rel="noopener">check Difficult Mentees</a> for how to deal with it.</li>
+    </ul>
+  </div>
 
+</main>
+
+<div id="res-store">
     <section class="session" id="s1">
       <div class="session__head">
         <span class="session__num">01</span>
@@ -225,15 +341,14 @@
       <ul>
         <li>Align on the goal of the mentee</li>
         <li>Build rapport, try finding something in common</li>
-        <li>First resume review</li>
-        <li><strong>Candidacy check:</strong> do they have 3 out of 6 of the <a href="#candidacy">features of a strong candidate</a>? If they already have a local relevant internship and one other feature, skip this and move on. If you are not 100% sure they can land a job, run the quick audit.</li>
+        <li>First <button type="button" class="res-link" data-res="resume">resume</button> review</li>
+        <li><strong>Candidacy check:</strong> do they have 3 out of 6 of the <button type="button" class="res-link" data-res="candidacy">features of a strong candidate</button>? If they already have a local relevant internship and one other feature, skip this and move on. If you are not 100% sure they can land a job, run the quick audit.</li>
       </ul>
       <div class="meta">
         <div><span class="k">Homework</span>Rewrite resume. If not yet confirmed on the goal, brainstorm a goal.</div>
         <div><span class="k">Next session</span>LinkedIn optimisation, resume feedback, cover letter introduction.</div>
       </div>
     </section>
-
     <section class="session" id="s2">
       <div class="session__head">
         <span class="session__num">02</span>
@@ -241,35 +356,33 @@
       </div>
       <p class="session__goal">Objectives:</p>
       <ul>
-        <li>Provide further feedback on resume</li>
-        <li>First feedback round of LinkedIn</li>
-        <li>Introduce cover letter template</li>
-        <li><em>Optional:</em> if the mentee needs projects to improve their resume, give them some starters to build a project. See <a href="#passion-project">Relevant Passion Project</a>.</li>
+        <li>Provide further feedback on <button type="button" class="res-link" data-res="resume">resume</button></li>
+        <li>First feedback round of <button type="button" class="res-link" data-res="linkedin">LinkedIn</button></li>
+        <li>Introduce <button type="button" class="res-link" data-res="cover-letter">cover letter</button> template</li>
+        <li><em>Optional:</em> if the mentee needs projects to improve their resume, give them some starters to build a project. See <button type="button" class="res-link" data-res="passion-project">Relevant Passion Project</button>.</li>
       </ul>
       <div class="meta">
-        <div><span class="k">Homework</span>Resume and LinkedIn feedback, plus <a href="#unique-story">story preparation</a>.</div>
+        <div><span class="k">Homework</span>Resume and LinkedIn feedback, plus story preparation.</div>
       </div>
     </section>
-
     <section class="session" id="s3">
       <div class="session__head">
         <span class="session__num">03</span>
         <h3 class="session__title">Materials sign-off and story</h3>
       </div>
-      <p class="session__goal">Materials closed, and one story that is theirs.</p>
+      <p class="session__goal">Objectives:</p>
       <ul>
-        <li>Final LinkedIn and resume sign-off. No more edits after this.</li>
-        <li>Dig out the unique story: the fun fact, the odd job, the side project, the thing relevant to the role that nobody else will say. Most mentees have one and do not realise it counts.</li>
+        <li>Final <button type="button" class="res-link" data-res="linkedin">LinkedIn</button> and <button type="button" class="res-link" data-res="resume">resume</button> sign-off. No more edits after this.</li>
+        <li>Dig out the <button type="button" class="res-link" data-res="unique-story">unique story</button>: the fun fact, the odd job, the side project, the thing relevant to the role that nobody else will say. Most mentees have one and do not realise it counts.</li>
         <li>Confirm the plan for the remaining sessions</li>
         <li>Ask for feedback on how the sessions are going and how they like to work</li>
+        <li>If they are not doing the work properly, ask if they want to do it together during the sessions instead. Some mentees need the handholding.</li>
       </ul>
       <div class="meta">
-        <div><span class="k">Done when</span>They have one story they can tell in 60 seconds that is theirs alone.</div>
+        <div><span class="k">Homework</span>Run the <button type="button" class="res-link" data-res="where-to-find-roles">pre-set prompt</button> to build their target company list.</div>
+        <div><span class="k">Done when</span>Resume and LinkedIn are at a satisfactory level.</div>
       </div>
     </section>
-
-    <h2 class="block">Outreach</h2>
-
     <section class="session" id="s4">
       <div class="session__head">
         <span class="session__num">04</span>
@@ -277,9 +390,9 @@
       </div>
       <p class="session__goal">They know who to contact and have seen it done.</p>
       <ul>
-        <li>Run the pre-set prompt to generate the target company list</li>
+        <li>Run the pre-set prompt to generate the <button type="button" class="res-link" data-res="where-to-find-roles">target company list</button></li>
         <li><strong>Who to approach</strong> at each company: job title, seniority, how close to the team they would join. This is the part mentees get wrong.</li>
-        <li>Hand over the outreach templates</li>
+        <li>Hand over the <button type="button" class="res-link" data-res="networking-playbook">outreach templates</button></li>
         <li><strong>Live demo one.</strong> Write and send a real message together, in the session.</li>
       </ul>
       <div class="meta">
@@ -287,7 +400,6 @@
         <div><span class="k">Done when</span>At least one real message has gone out during the session.</div>
       </div>
     </section>
-
     <section class="session" id="s5">
       <div class="session__head">
         <span class="session__num">05</span>
@@ -295,7 +407,7 @@
       </div>
       <p class="session__goal">They can run the conversation their outreach earns them.</p>
       <ul>
-        <li>What to actually ask in a coffee chat. The questions that get useful answers, and the ones that waste the meeting.</li>
+        <li>What to actually ask in a <button type="button" class="res-link" data-res="coffee-chat">coffee chat</button>. The questions that get useful answers, and the ones that waste the meeting.</li>
         <li>How to open, how to close, how to follow up, how to ask for the next thing</li>
         <li>Review the outreach so far: what went out, what came back, what to change</li>
       </ul>
@@ -304,13 +416,6 @@
         <div><span class="k">Done when</span>They have a question list they would be comfortable using tomorrow.</div>
       </div>
     </section>
-
-    <div class="breather">
-      <strong>Optional 1 week break here.</strong> Outreach needs time to produce replies. Meeting with nothing to review wastes their money and your time.
-    </div>
-
-    <h2 class="block">Screening calls</h2>
-
     <section class="session" id="s6">
       <div class="session__head">
         <span class="session__num">06</span>
@@ -319,15 +424,14 @@
       <p class="session__goal">First attempt at the call, and a self introduction that holds up.</p>
       <ul>
         <li>Brainstorm the intro structure. Build it with them, do not hand them a script.</li>
-        <li>Start practising screening calls. Expect the first attempt to be rough, that is the point of doing it here rather than with a recruiter.</li>
-        <li>Motivational questions: why this role, why this company, why you</li>
+        <li>Start practising <button type="button" class="res-link" data-res="screening-calls">screening calls</button>. Expect the first attempt to be rough, that is the point of doing it here rather than with a recruiter.</li>
+        <li><button type="button" class="res-link" data-res="interview-resource">Motivational questions</button>: why this role, why this company, why you</li>
       </ul>
       <div class="meta">
         <div><span class="k">Homework</span>Rehearse the intro out loud until it stops sounding rehearsed.</div>
         <div><span class="k">Done when</span>They can get through an intro without reading.</div>
       </div>
     </section>
-
     <section class="session" id="s7">
       <div class="session__head">
         <span class="session__num">07</span>
@@ -337,25 +441,22 @@
       <ul>
         <li>Second round of practice, with the intro from session 6 tightened</li>
         <li>What the call is really testing: communication, motivation, basic fit, and whether they are worth 45 minutes of a hiring manager's time</li>
-        <li>How to prepare in the 20 minutes before a screening call</li>
-        <li>Common failure points and how to recover mid-call</li>
+        <li>How to prepare in the 20 minutes before a <button type="button" class="res-link" data-res="screening-calls">screening call</button></li>
+        <li><button type="button" class="res-link" data-res="psychometric-test">Common failure points and how to recover mid-call</button></li>
       </ul>
       <div class="meta">
         <div><span class="k">Done when</span>They can explain what a screener is listening for.</div>
       </div>
     </section>
-
-    <h2 class="block">Interviews</h2>
-
     <section class="session" id="s8">
       <div class="session__head">
         <span class="session__num">08 to 11</span>
         <h3 class="session__title">Story bank and mocks</h3>
       </div>
       <p class="session__goal">Enough material to answer anything, tested under mock conditions.</p>
-      <p class="session__goal">Each session runs the same shape: add stories to the bank, mock the questions those stories cover, give feedback, rework the weak ones.</p>
+      <p class="session__goal">Each session runs the same shape: add stories to the bank, <button type="button" class="res-link" data-res="recorded-interviews">mock the questions</button> those stories cover, give feedback, rework the weak ones.</p>
       <ul>
-        <li>The 4 to 8 core interview questions first</li>
+        <li>The 4 to 8 core <button type="button" class="res-link" data-res="interview-resource">interview questions</button> first</li>
         <li>Behavioural questions in depth, since this is where most mentees lose</li>
         <li>How one story can answer three different questions</li>
         <li>Full question bank so nothing comes up cold</li>
@@ -364,7 +465,6 @@
         <div><span class="k">Done when</span>They can answer an unseen question without freezing.</div>
       </div>
     </section>
-
     <section class="session" id="s12">
       <div class="session__head">
         <span class="session__num">12</span>
@@ -373,11 +473,10 @@
       <p class="session__goal">Ready for the interviews actually in front of them.</p>
       <ul>
         <li>Work on the real interviews they have coming up, by name</li>
-        <li>Any technical or discipline specific questions</li>
-        <li>Assessment centres, case studies, panels, whatever their process involves</li>
+        <li>Any <button type="button" class="res-link" data-res="interview-resource">technical or discipline specific questions</button></li>
+        <li><button type="button" class="res-link" data-res="assessment-centres">Assessment centres</button>, <button type="button" class="res-link" data-res="individual-case-study">case studies</button>, panels, whatever their process involves</li>
       </ul>
     </section>
-
     <section class="session" id="s13">
       <div class="session__head">
         <span class="session__num">13+</span>
@@ -385,11 +484,6 @@
       </div>
       <p class="session__goal">Driven entirely by what is in their calendar. Whatever interview is next, prep for that. No fixed content.</p>
     </section>
-
-    <h2 class="block">Handouts</h2>
-
-    <p style="color:var(--muted);font-size:0.92rem;margin:0 0 1.2rem;">The candidacy check for session 1, and the three things a mentee can start today if they fall short of 3 out of 6.</p>
-
     <section class="session" id="candidacy">
       <div class="session__head">
         <span class="session__num">Check</span>
@@ -439,10 +533,9 @@
       </ul>
 
       <div class="meta">
-        <div><span class="k">If short of 3</span>Start with <a href="#unique-story">unique personal story</a>, <a href="#passion-project">passion project</a>, or <a href="#aus-experience">Australia job experience</a>. Those three can start today.</div>
+        <div><span class="k">If short of 3</span>Start with <button type="button" class="res-link" data-res="unique-story">unique personal story</button>, <button type="button" class="res-link" data-res="passion-project">passion project</button>, or <button type="button" class="res-link" data-res="aus-experience">Australia job experience</button>. Those three can start today.</div>
       </div>
     </section>
-
     <section class="session" id="unique-story">
       <div class="session__head">
         <span class="session__num">Handout</span>
@@ -461,7 +554,6 @@
         <div><span class="k">Use it in</span>LinkedIn About section, resume professional profile, interview answers</div>
       </div>
     </section>
-
     <section class="session" id="passion-project">
       <div class="session__head">
         <span class="session__num">Handout</span>
@@ -484,7 +576,6 @@
         <div><span class="k">Use it in</span>LinkedIn and resume experience, interview answers</div>
       </div>
     </section>
-
     <section class="session" id="aus-experience">
       <div class="session__head">
         <span class="session__num">Handout</span>
@@ -521,43 +612,143 @@ Output format per option:
 - 1 to 2 sentence description
 - Acceptance difficulty rating (Easy / Medium / Hard, with a one-line reason why)</pre>
     </section>
+</div>
 
-    <div class="rules">
-      <h3>Running it well</h3>
-      <ul>
-        <li><strong>Do not run this on rails.</strong> If a mentee lands an interview at session 4, drop everything and prepare them for it.</li>
-        <li><strong>Two tasks maximum per session.</strong> Overwhelmed mentees stop showing up.</li>
-        <li><strong>A skipped homework is a diagnosis, not a failure.</strong> Find out why before reassigning it.</li>
-        <li>Sessions 1 to 3 feel slow to mentors and fast to mentees. Do not rush them.</li>
-      </ul>
+<div class="res-modal" id="res-modal" hidden>
+  <div class="res-modal__box" role="dialog" aria-modal="true" aria-labelledby="res-modal-title">
+    <div class="res-modal__bar">
+      <span class="res-modal__title" id="res-modal-title"></span>
+      <a class="res-modal__open" id="res-modal-open" target="_blank" rel="noopener" hidden>Open full page</a>
+      <button type="button" class="res-modal__close" id="res-modal-close" aria-label="Close">&times;</button>
     </div>
-
-  </main>
+    <div class="res-modal__body" id="res-modal-body"></div>
+  </div>
 </div>
 
 <script>
+  /* Theme. Light is the default here, matching the rest of the portal. */
   (function () {
     var root = document.documentElement;
-    var THEME_KEY = 'headstart_theme';
+    var KEY = 'headstart_theme';
     var btn = document.getElementById('theme-toggle');
     var icon = document.getElementById('theme-icon');
-    function applyTheme(theme) {
-      root.setAttribute('data-theme', theme);
-      icon.innerHTML = theme === 'dark' ? '&#9788;' : '&#9790;';
-      btn.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
-      try { localStorage.setItem(THEME_KEY, theme); } catch (e) {}
+    function apply(t) {
+      root.setAttribute('data-theme', t);
+      icon.innerHTML = t === 'dark' ? '&#9788;' : '&#9790;';
+      try { localStorage.setItem(KEY, t); } catch (e) {}
     }
-    var saved = 'dark';
-    try { saved = localStorage.getItem(THEME_KEY) || 'dark'; } catch (e) {}
-    applyTheme(saved);
+    var saved = 'light';
+    try { saved = localStorage.getItem(KEY) || 'light'; } catch (e) {}
+    apply(saved);
     btn.addEventListener('click', function () {
-      var current = root.getAttribute('data-theme') || 'dark';
-      applyTheme(current === 'dark' ? 'light' : 'dark');
+      apply((root.getAttribute('data-theme') || 'light') === 'dark' ? 'light' : 'dark');
     });
   })();
 </script>
 
-<link rel="stylesheet" href="../css/components/copy-section.css" />
-<script defer src="../js/copy-section.js"></script>
+<script>
+  /* Resource popups.
+     Mentors were being sent to a different page mid-session to find out what a
+     line referred to, which in practice meant they did not look. Everything
+     opens in place instead.
+
+     Two sources:
+       local  the handouts stored on this page
+       hub    a section of tutor-resources.html, fetched once and cached
+
+     Every path ends in visible content or a visible explanation. An earlier
+     version could leave an empty box when a fetch half-worked, which is worse
+     than no popup at all: it looks broken and tells you nothing. */
+  (function () {
+    var HUB = 'tutor-resources.html';
+    var TITLES = {
+      'candidacy': 'The 6 features of a strong candidate',
+      'unique-story': 'Unique personal story / fun facts',
+      'passion-project': 'Relevant passion project',
+      'aus-experience': 'Australia job experience'
+    };
+
+    var modal = document.getElementById('res-modal');
+    var bodyEl = document.getElementById('res-modal-body');
+    var titleEl = document.getElementById('res-modal-title');
+    var openFull = document.getElementById('res-modal-open');
+    var store = document.getElementById('res-store');
+    var hubDoc = null;
+
+    function open(title, html, href) {
+      titleEl.textContent = title || 'Resource';
+      bodyEl.innerHTML = html || '<p class="res-note">This resource is empty.</p>';
+      bodyEl.scrollTop = 0;
+      if (href) { openFull.href = href; openFull.hidden = false; } else { openFull.hidden = true; }
+      modal.hidden = false;
+    }
+    function close() { modal.hidden = true; bodyEl.innerHTML = ''; }
+
+    function fallback(key, label, why) {
+      open(label, '<p class="res-note">' + why + '</p>' +
+        '<p class="res-note"><a href="' + HUB + '#' + key + '" target="_blank" rel="noopener">Open it in the resource hub instead</a></p>');
+    }
+
+    async function fromHub(key) {
+      if (!hubDoc) {
+        var res = await fetch(HUB, { cache: 'no-cache' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        hubDoc = new DOMParser().parseFromString(await res.text(), 'text/html');
+      }
+      return hubDoc.getElementById(key);
+    }
+
+    document.addEventListener('click', function (e) {
+      if (e.target.closest('#res-modal-close') || e.target === modal) { close(); return; }
+
+      /* A flowchart node opens that session in the popup. Jumping the page to
+         the bottom made the flowchart useless as an overview: you lost your
+         place the moment you looked anything up. */
+      var node = e.target.closest('[data-session]');
+      if (node) {
+        var sec = document.getElementById(node.dataset.session);
+        if (!sec) return;
+        var head = sec.querySelector('.session__title');
+        var num = sec.querySelector('.session__num');
+        var clone = sec.cloneNode(true);
+        var h = clone.querySelector('.session__head');
+        if (h) h.remove();   // the popup bar already carries the title
+        open((num ? num.textContent.trim() + ' \u00b7 ' : '') + (head ? head.textContent.trim() : 'Session'),
+             clone.innerHTML);
+        return;
+      }
+
+      var chip = e.target.closest('.res-link');
+      if (!chip) return;
+      e.preventDefault();
+
+      var key = chip.dataset.res;
+      var label = TITLES[key] || chip.textContent.trim();
+      if (!key) { fallback('', label, 'This resource is not wired up yet.'); return; }
+
+      /* Local handouts render straight away, no network involved. */
+      var local = store ? store.querySelector('[id="' + key + '"]') : null;
+      if (local && local.innerHTML.trim()) { open(label, local.innerHTML); return; }
+
+      open(label, '<p class="res-note">Loading&hellip;</p>');
+      fromHub(key).then(function (section) {
+        if (!section || !section.innerHTML.trim()) {
+          fallback(key, label, 'That section could not be found in the resource hub.');
+          return;
+        }
+        var h2 = section.querySelector('h2');
+        var name = h2 ? h2.textContent.replace(/^\s*\d+\.\s*/, '').trim() : label;
+        open(name, section.innerHTML, HUB + '#' + key);
+      }).catch(function (err) {
+        fallback(key, label, 'Could not load this resource (' + (err.message || 'network error') + ').');
+      });
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !modal.hidden) close();
+    });
+  })();
+</script>
+
 </body>
 </html>

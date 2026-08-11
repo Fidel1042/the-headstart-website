@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<title>Headstart Mentoring: Difficult Mentees</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<style>
+  :root {
+    --bg: #000000;
+    --bg-card: rgba(255,255,255,0.04);
+    --text: #ffffff;
+    --line: rgba(255,255,255,0.1);
+    --line-soft: rgba(255,255,255,0.07);
+    --muted: rgba(255,255,255,0.62);
+    --gold-bright: #f0c75c;
+    --accent: #c79b3b;
+    --accent-soft: rgba(199,155,59,0.22);
+    --accent-line: rgba(199,155,59,0.4);
+  }
+  [data-theme="light"] {
+    --bg: #ffffff;
+    --bg-card: rgba(0,0,0,0.025);
+    --text: #14110c;
+    --line: rgba(0,0,0,0.12);
+    --line-soft: rgba(0,0,0,0.07);
+    --muted: rgba(0,0,0,0.58);
+    --gold-bright: #7d5a10;
+    --accent: #9b6f16;
+    --accent-soft: rgba(155,111,22,0.12);
+    --accent-line: rgba(155,111,22,0.32);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .site-header {
+    position: sticky; top: 0; z-index: 50;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+    padding: 0.9rem 1.6rem;
+    display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+  }
+  .logo { height: 30px; width: auto; display: block; }
+  .header-text h1 { font-size: 1.05rem; margin: 0; font-weight: 800; letter-spacing: -0.01em; }
+  .header-text .sub { font-size: 0.72rem; color: var(--muted); }
+  .header-actions { margin-left: auto; display: flex; align-items: center; gap: 0.6rem; }
+  .back-link, .theme-toggle {
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+    color: var(--accent); text-decoration: none;
+    border: 1px solid var(--line); border-radius: 999px;
+    padding: 0.45rem 0.9rem; background: transparent; cursor: pointer; font-family: inherit;
+  }
+  .back-link:hover, .theme-toggle:hover { border-color: var(--accent-line); color: var(--gold-bright); }
+
+  main { max-width: 760px; margin: 0 auto; padding: 2rem 1.6rem 5rem; }
+
+  h2.block {
+    font-size: 0.72rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--accent); margin: 2.6rem 0 1rem; padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--line);
+  }
+  h2.block.first { margin-top: 0.4rem; }
+
+  /* One type, one card. The number is the anchor a mentor scans for. */
+  .type {
+    border: 1px solid var(--line); border-radius: 14px;
+    padding: 1.3rem 1.5rem; margin-bottom: 1rem; background: var(--bg-card);
+  }
+  .type__head { display: flex; align-items: baseline; gap: 0.8rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
+  .type__num {
+    font-size: 0.68rem; font-weight: 800; letter-spacing: 0.08em;
+    color: var(--accent); background: var(--accent-soft);
+    border-radius: 6px; padding: 0.2rem 0.5rem; white-space: nowrap;
+  }
+  .type__title { font-size: 1.05rem; font-weight: 800; margin: 0; letter-spacing: -0.01em; }
+  /* Fixed height, auto width: the two figures read as the same size despite
+     slightly different source aspect ratios. Pixelated keeps the art crisp. */
+  .type--figure { display: flex; gap: 1.3rem; align-items: flex-start; }
+  .type__fig { flex: 0 0 auto; height: 140px; width: auto; image-rendering: pixelated; }
+  .type__body { flex: 1; min-width: 0; }
+  .type ul { margin: 0.6rem 0 0; padding-left: 1.15rem; }
+  .type li { margin-bottom: 0.35rem; font-size: 0.92rem; }
+  .type li:last-child { margin-bottom: 0; }
+
+  .row { margin-bottom: 0.8rem; }
+  .row:last-child { margin-bottom: 0; }
+  .row .k {
+    display: block; margin-bottom: 0.1rem;
+    font-size: 0.62rem; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase;
+    color: var(--accent);
+  }
+  .row .v { display: block; font-size: 0.92rem; }
+  .row .v a { color: var(--gold-bright); text-decoration: underline; text-underline-offset: 2px; }
+
+  .note {
+    border-top: 1px solid var(--line-soft); margin-top: 0.85rem; padding-top: 0.75rem;
+    font-size: 0.87rem; color: var(--muted);
+  }
+  .note strong { color: var(--gold-bright); }
+
+  .rules { border: 1px solid var(--line); border-radius: 14px; padding: 1.2rem 1.4rem; margin-top: 1rem; }
+  .rules h3 { margin: 0 0 0.7rem; font-size: 0.95rem; }
+  .rules ul { margin: 0; padding-left: 1.15rem; }
+  .rules li { margin-bottom: 0.45rem; font-size: 0.92rem; }
+  .rules p { font-size: 0.9rem; color: var(--muted); margin: 0.9rem 0 0; }
+
+  @media (max-width: 700px) {
+    main { padding: 1.4rem 1.1rem 4rem; }
+    .site-header { padding: 0.8rem 1.1rem; }
+    .type--figure { gap: 0.9rem; }
+    .type__fig { height: 104px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="../mentor-portal/" class="logo-home" aria-label="Mentor portal home">
+    <img class="logo" src="../images/headstart-italic-logo.png" alt="The Headstart logo" />
+  </a>
+  <div class="header-text">
+    <h1>Difficult Mentees?</h1>
+    <span class="sub">Internal &middot; Reading the person in front of you</span>
+  </div>
+  <div class="header-actions">
+    <a class="back-link" href="../mentor-portal/">&larr; Mentor Portal</a>
+    <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle light/dark mode" title="Toggle light/dark mode">
+      <span id="theme-icon">&#9788;</span>
+    </button>
+  </div>
+</header>
+
+<main>
+
+  <h2 class="block first">Two types of mentees, high level</h2>
+
+  <div class="type type--figure">
+    <img class="type__fig" src="../images/textures/Happy.png" alt="" />
+    <div class="type__body">
+      <div class="type__head"><span class="type__num">01</span><h3 class="type__title">Motivated student</h3></div>
+      <div class="row"><span class="k">Their behaviour</span><span class="v">Attempts everything you ask them to.</span></div>
+      <div class="row"><span class="k">What a good mentor would do</span><span class="v">Give them tasks every week, so the progress runs at their pace.</span></div>
+    </div>
+  </div>
+
+  <div class="type type--figure">
+    <img class="type__fig" src="../images/textures/Sad.png" alt="" />
+    <div class="type__body">
+      <div class="type__head"><span class="type__num">02</span><h3 class="type__title">Looks ambitious but does not attempt the work</h3></div>
+      <div class="row"><span class="k">Their behaviour</span><span class="v">Agrees to everything on the call, then usually does not get much work done.</span></div>
+      <div class="row"><span class="k">Why they behave that way</span><span class="v">The task feels too difficult, so they procrastinate.</span></div>
+      <div class="row"><span class="k">What a good mentor would do</span><span class="v">Complete the first few steps with them in the session. If they prefer it, do more handholding and finish the task with them during the session.</span></div>
+      <div class="note">Some mentees would rather pay to be walked through the work than do it alone. Give them that without making them feel judged for it.</div>
+    </div>
+  </div>
+
+  <h2 class="block">Specific mentee personalities and how to deal with them</h2>
+
+  <div class="rules">
+    <h3>Check these two things before you decide a mentee is difficult</h3>
+    <ul>
+      <li><strong>The match.</strong> Are you actually in the seat they want? If their target is narrow and outside your lane, say so and tell Fidel.</li>
+      <li><strong>The promise.</strong> Ask what they were told at the consultation. And if it is completely different from what you can offer, raise it to Fidel.</li>
+    </ul>
+  </div>
+
+  <div class="type">
+    <div class="type__head"><span class="type__num">01</span><h3 class="type__title">Rather yap than work</h3></div>
+    <div class="row"><span class="k">Their behaviour</span><span class="v">Enjoys conversations with mentors, but offers little progress in terms of work done.</span></div>
+    <div class="row"><span class="k">Why they behave that way</span><span class="v">Enjoys the feeling of being productive if they do a session.</span></div>
+    <div class="row"><span class="k">What a good mentor would do</span><span class="v">Go along with the conversations, and still handhold them to at least finish one task.</span></div>
+  </div>
+
+  <div class="type">
+    <div class="type__head"><span class="type__num">02</span><h3 class="type__title">Defensive and unwilling to listen to advice</h3></div>
+    <div class="row"><span class="k">Their behaviour</span><span class="v">Very fixated on a certain path or job, and cannot afford to be that specific, because as a candidate they are not the best of the best.</span></div>
+    <div class="row"><span class="k">Why they behave that way</span><span class="v">There is a reason underneath their strong preference.</span></div>
+    <div class="row"><span class="k">What a good mentor would do</span><span class="v">Have an honest chat to understand their motivations, what they like, and why the preference is so strong. Use their past experience to explain why focusing on one niche is not enough in the Australian market.</span></div>
+    <div class="note">Keep the session frequency up. These usually go wrong when the sessions quietly stop.</div>
+  </div>
+
+  <div class="type">
+    <div class="type__head"><span class="type__num">03</span><h3 class="type__title">Wants a direct roadmap, with no fluff</h3></div>
+    <div class="row"><span class="k">Their behaviour</span><span class="v">Wants specific tricks and tips to follow.</span></div>
+    <div class="row"><span class="k">Why they behave that way</span><span class="v">Prefers being transactional and does not like fluff.</span></div>
+    <div class="row"><span class="k">What a good mentor would do</span><span class="v">Give them more practical strategies through our <a href="tutor-resources.html">Mentor Resource Hub</a>.</span></div>
+  </div>
+
+  <div class="type">
+    <div class="type__head"><span class="type__num">04</span><h3 class="type__title">Good candidate but unconfident</h3></div>
+    <div class="row"><span class="k">Their behaviour</span><span class="v">Has good, relevant experience but did not know it was relevant.</span></div>
+    <div class="row"><span class="k">Why they behave that way</span><span class="v">Previous job searching failures.</span></div>
+    <div class="row"><span class="k">What a good mentor would do</span><span class="v">Tell them they are actually good enough, from someone like yourself who already has the credibility.</span></div>
+  </div>
+
+  <h2 class="block">Flag it to Fidel when</h2>
+
+  <div class="rules">
+    <ul>
+      <li>Three sessions in a row produce nothing, even when you built it with them on the call.</li>
+      <li>They want something outside your lane.</li>
+      <li>A mentee has become a drain on you.</li>
+      <li>Someone is heading for a bad outcome and is likely to blame the service.</li>
+    </ul>
+    <p>Flag early. Nobody is judged on a mentee who did not do the work.</p>
+  </div>
+
+</main>
+
+<script>
+  const root = document.documentElement;
+  const btn = document.getElementById('theme-toggle');
+  const icon = document.getElementById('theme-icon');
+  const saved = localStorage.getItem('hs-theme');
+  if (saved) { root.setAttribute('data-theme', saved); }
+  const sync = () => {
+    icon.innerHTML = root.getAttribute('data-theme') === 'light' ? '&#9789;' : '&#9788;';
+  };
+  sync();
+  btn.addEventListener('click', () => {
+    const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('hs-theme', next);
+    sync();
+  });
+</script>
+
+</body>
+</html>

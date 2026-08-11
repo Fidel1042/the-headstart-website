@@ -17,12 +17,12 @@
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <style>
     :root {
-      --bg: #000000;
-      --text: #f5f5f5;
-      --muted: rgba(255, 255, 255, 0.72);
-      --line: rgba(255, 255, 255, 0.07);
+      --bg: #ffffff;
+      --text: #14110c;
+      --muted: rgba(0, 0, 0, 0.62);
+      --line: rgba(0, 0, 0, 0.10);
       --gold-gradient: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
-      --accent-soft: rgba(199,155,59,0.22);
+      --accent-soft: rgba(155,111,22,0.12);
     }
 
     /* Root font-size: bigger on desktop, smaller on mobile so big text doesn't overflow */
@@ -50,12 +50,12 @@
       inset: 0;
       pointer-events: none;
       background-image:
-        radial-gradient(rgba(255,255,255,0.055) 1px, transparent 0),
-        radial-gradient(rgba(255,255,255,0.03) 1px, transparent 0);
+        radial-gradient(rgba(0,0,0,0.047) 1px, transparent 0),
+        radial-gradient(rgba(0,0,0,0.025) 1px, transparent 0);
       background-size: 3px 3px, 5px 5px;
       background-position: 0 0, 1px 1px;
       opacity: 0.42;
-      mix-blend-mode: screen;
+      mix-blend-mode: multiply;
       z-index: 0;
     }
 
@@ -97,11 +97,11 @@
     .logo-bar__title {
       font-size: 0.9rem;
       font-weight: 600;
-      color: rgba(255,255,255,0.6);
+      color: rgba(0,0,0,0.51);
     }
 
     .logo-bar__title span {
-      color: rgba(255,255,255,0.3);
+      color: rgba(0,0,0,0.55);
       margin: 0 0.4em;
     }
 
@@ -110,13 +110,13 @@
       font-size: 0.78rem;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.35);
+      color: rgba(0,0,0,0.55);
       margin-bottom: 0.5rem;
     }
 
     h1 {
       font-size: clamp(1.6rem, 3.3vw, 2.1rem);
-      color: #f7d37d;
+      color: #9b6f16;
       font-weight: 700;
       line-height: 1.2;
       margin-bottom: 2rem;
@@ -124,7 +124,7 @@
 
     h2 {
       font-size: clamp(1.1rem, 2.2vw, 1.3rem);
-      color: #f7d37d;
+      color: #9b6f16;
       font-weight: 700;
       line-height: 1.2;
       margin-bottom: 1rem;
@@ -133,7 +133,7 @@
     h3 {
       font-size: 1.05rem;
       font-weight: 700;
-      color: rgba(255,255,255,0.75);
+      color: rgba(0,0,0,0.637);
       margin-bottom: 0.6rem;
       letter-spacing: 0.01em;
     }
@@ -150,9 +150,9 @@
     .card-box {
       border-radius: 20px;
       border: 1px solid var(--line);
-      background: radial-gradient(circle at top left, var(--accent-soft), #050505);
+      background: radial-gradient(circle at top left, var(--accent-soft), var(--bg));
       padding: 1.6rem 1.8rem 1.8rem;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.7);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.06);
       margin-bottom: 1.4rem;
     }
 
@@ -161,7 +161,7 @@
       width: 100%;
       border-radius: 12px;
       display: block;
-      border: 1px solid rgba(255,255,255,0.06);
+      border: 1px solid rgba(0,0,0,0.051);
     }
 
     /* List inside card */
@@ -187,9 +187,9 @@
       gap: 0.4rem;
       padding: 0.65rem 1.3rem;
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.2);
+      border: 1px solid rgba(0,0,0,0.22);
       text-decoration: none;
-      color: #f5f5f5;
+      color: var(--text);
       font-weight: 700;
       letter-spacing: 0.06em;
       text-transform: uppercase;
@@ -198,7 +198,7 @@
       transition: background 0.2s, border-color 0.2s;
     }
 
-    .btn:hover { border-color: rgba(255,255,255,0.45); }
+    .btn:hover { border-color: rgba(0,0,0,0.55); }
 
     .btn-gold {
       border-color: rgba(199,155,59,0.6);
@@ -226,8 +226,8 @@
       cursor: pointer;
       padding: 0.65rem 0.85rem;
       border-radius: 10px;
-      border: 1px solid rgba(255,255,255,0.06);
-      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(0,0,0,0.051);
+      background: rgba(0,0,0,0.017);
       transition: background 0.15s, border-color 0.15s;
       font-size: 1.02rem;
       line-height: 1.55;
@@ -235,7 +235,7 @@
       user-select: none;
     }
 
-    .checklist li:hover { background: rgba(255,255,255,0.04); }
+    .checklist li:hover { background: rgba(0,0,0,0.034); }
 
     .checklist li.checked {
       background: rgba(100,220,100,0.06);
@@ -247,7 +247,7 @@
       height: 20px;
       min-width: 20px;
       border-radius: 6px;
-      border: 1.5px solid rgba(255,255,255,0.22);
+      border: 1.5px solid rgba(0,0,0,0.187);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -271,7 +271,7 @@
       padding: 1.1rem 1.4rem;
       border-radius: 14px;
       border: 1px solid rgba(199,155,59,0.45);
-      background: radial-gradient(circle at top left, rgba(199,155,59,0.16), rgba(0,0,0,0));
+      background: radial-gradient(circle at top left, rgba(155,111,22,0.10), rgba(0,0,0,0));
     }
 
     .congrats.visible { display: flex; flex-wrap: wrap; }
@@ -281,13 +281,13 @@
     .congrats__title {
       font-size: 1rem;
       font-weight: 700;
-      color: #f7d37d;
+      color: #9b6f16;
       margin-bottom: 0.15rem;
     }
 
     .congrats__sub {
       font-size: 0.85rem;
-      color: rgba(255,255,255,0.45);
+      color: rgba(0,0,0,0.55);
       line-height: 1.4;
     }
 
@@ -299,7 +299,7 @@
       border-radius: 999px;
       border: 1px solid rgba(199,155,59,0.7);
       text-decoration: none;
-      color: #f5f5f5;
+      color: var(--text);
       font-weight: 700;
       letter-spacing: 0.06em;
       text-transform: uppercase;
@@ -310,7 +310,7 @@
     }
 
     .btn-congrats:hover {
-      background: rgba(199,155,59,0.22);
+      background: rgba(155,111,22,0.12);
       border-color: rgba(199,155,59,1);
     }
 
@@ -344,16 +344,60 @@
       padding-bottom: 0.4rem;
     }
 
+    /* The three-point close is the part that must not be skimmed, so it reads
+       as a checklist rather than more prose. */
+    .end-check { margin: 0.9rem 0 1.2rem 1.15rem; }
+    .end-check li { font-weight: 700; margin-bottom: 0.35rem; }
+
+    .docs-status {
+      margin-top: 1.2rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--accent, #9b6f16);
+    }
+    .res-out.opened::after { content: " \2713"; }
+    /* Locked until all three documents have been opened. Pointer-events stays
+       on so the click can be caught and explained, rather than the link just
+       feeling broken. */
+    .next-gate.locked { opacity: 0.4; }
+    .next-gate.locked:hover { cursor: not-allowed; }
+
+    /* Each resource is its own block: a rule between them and a bigger title,
+       so four items read as four things rather than one wall. */
+    .res-item {
+      padding-top: 1.4rem;
+      margin-top: 1.4rem;
+      border-top: 1px solid var(--line);
+    }
+    .res-item h3 {
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      margin: 0 0 0.5rem !important;
+      color: var(--text);
+    }
+    .res-item p { margin-bottom: 0.6rem; }
+    .res-item p:last-child { margin-bottom: 0; }
+
+    .res-out {
+      display: inline-block;
+      font-weight: 700;
+      color: var(--accent, #9b6f16);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(155,111,22,0.35);
+    }
+    .res-out:hover { border-bottom-color: currentColor; }
+
     .journey-title {
       font-weight: 700;
       font-size: 1rem;
-      color: #ffffff;
+      color: var(--text);
       margin-bottom: 0.3rem;
     }
 
     .journey-desc {
       font-size: 0.9rem;
-      color: rgba(255,255,255,0.6);
+      color: rgba(0,0,0,0.51);
       line-height: 1.6;
     }
 
@@ -385,12 +429,12 @@
   </style>
   <style id="auth-gate">
     html:not(.auth-ok) body { visibility: hidden; }
-    html:not(.auth-ok) { background: #000; }
+    html:not(.auth-ok) { background: #fff; }
     html:not(.auth-ok)::after {
       content: ""; position: fixed; top: 50%; left: 50%;
       width: 30px; height: 30px; margin: -15px 0 0 -15px;
-      border-radius: 50%; border: 3px solid rgba(255,255,255,0.18);
-      border-top-color: #c79b3b; animation: auth-spin 0.7s linear infinite;
+      border-radius: 50%; border: 3px solid rgba(0,0,0,0.153);
+      border-top-color: #9b6f16; animation: auth-spin 0.7s linear infinite;
     }
     @keyframes auth-spin { to { transform: rotate(360deg); } }
   </style>
@@ -403,9 +447,9 @@
       if (!r.classList.contains("auth-ok")) {
         r.classList.add("auth-ok");
         if (document.body) document.body.innerHTML =
-          '<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;text-align:center;background:#000;color:#fff;font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif">' +
+          '<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;text-align:center;background:#fff;color:#14110c;font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif">' +
           '<p style="font-size:1.05rem;max-width:340px;line-height:1.5">This page is taking too long to load. Check your internet, then reload.</p>' +
-          '<button onclick="location.reload()" style="padding:12px 26px;border-radius:999px;border:1px solid #c79b3b;background:transparent;color:#f0c75c;font-weight:700;font-size:0.9rem;cursor:pointer">Reload</button>' +
+          '<button onclick="location.reload()" style="padding:12px 26px;border-radius:999px;border:1px solid #c79b3b;background:transparent;color:#9b6f16;font-weight:700;font-size:0.9rem;cursor:pointer">Reload</button>' +
           '</div>';
       }
     }, 12000);
@@ -425,86 +469,74 @@
     <h1>How The Headstart Works</h1>
 
     <div class="card-box">
-      <h2>Customer Journey</h2>
-      <p style="color: rgba(255,255,255,0.6); font-size: 0.95rem; margin-bottom: 1.6rem;">How a typical mentee's journey would look like:</p>
-      <div class="journey">
-        <div class="journey-step">
-          <div class="journey-num">1</div>
-          <div class="journey-content">
-            <div class="journey-title">Initial Consultation</div>
-            <div class="journey-desc">Mentee discovers Headstart Mentoring via LinkedIn, Instagram, or word of mouth. They book a free initial consultation. Koko runs the call to understand their current situation and needs.</div>
-          </div>
-        </div>
-        <div class="journey-connector"></div>
-        <div class="journey-step">
-          <div class="journey-num">2</div>
-          <div class="journey-content">
-            <div class="journey-title">Mentee Signs Up</div>
-            <div class="journey-desc">If the mentee is ready to commit, they sign up on a pay-as-you-go basis.</div>
-          </div>
-        </div>
-        <div class="journey-connector"></div>
-        <div class="journey-step">
-          <div class="journey-num">3</div>
-          <div class="journey-content">
-            <div class="journey-title">Mentor Match</div>
-            <div class="journey-desc">We match the mentee with a mentor within the same or similar industry.</div>
-          </div>
-        </div>
-        <div class="journey-connector"></div>
-        <div class="journey-step">
-          <div class="journey-num">4</div>
-          <div class="journey-content">
-            <div class="journey-title">WhatsApp Group Opened</div>
-            <div class="journey-desc">A WhatsApp group is created between the mentee, their mentor, and Fidel. This is the main communication channel for scheduling, updates, and support throughout the mentoring relationship.</div>
-          </div>
-        </div>
-        <div class="journey-connector"></div>
-        <div class="journey-step">
-          <div class="journey-num">5</div>
-          <div class="journey-content">
-            <div class="journey-title">Sessions Begin</div>
-            <div class="journey-desc">1-on-1 mentoring sessions run on an agreed schedule. The mentor logs each session via the Airtable form (covered in Module 3) within 24 hours of it occurring.</div>
-          </div>
-        </div>
-        <div class="journey-connector"></div>
-        <div class="journey-step">
-          <div class="journey-num">6</div>
-          <div class="journey-content">
-            <div class="journey-title">Progress & Ongoing Support</div>
-            <div class="journey-desc">The mentee progresses through their goals. Additional sessions are booked as needed. If any issues arise, message Fidel directly on WhatsApp.</div>
-          </div>
-        </div>
-        <div class="journey-connector"></div>
-        <div class="journey-step">
-          <div class="journey-num">7</div>
-          <div class="journey-content">
-            <div class="journey-title">Outcome</div>
-            <div class="journey-desc">Mentee lands their internship or graduate role. The ideal outcome is a mentee who is confident, well-prepared, and refers friends to Headstart.</div>
-          </div>
-        </div>
+      <h2>Your resources</h2>
+      <p>Everything you need sits in the mentor portal under <strong>Resources</strong>. Have a read of all three before your first session.</p>
+
+      <div class="res-item">
+      <h3>01 &middot; Mentor Resource Hub</h3>
+      <p>The reference library. Resume and LinkedIn feedback, cover letters, where to find roles, the networking playbook, coffee chat etiquette, interview questions, screening calls, psychometric tests, assessment centres and case studies.</p>
+      <p>Use it when you are not sure how to advise on a specific part of the job search. Pull the section you need and adapt it, it is a reference and not a script.</p>
+      <p><a class="res-out" data-doc="hub" href="tutor-resources.html" target="_blank" rel="noopener">Open the Resource Hub &rarr;</a></p>
       </div>
+
+      <div class="res-item">
+      <h3>02 &middot; Accountability shared document</h3>
+      <p>A shared tracker you copy once per mentee. Use it to keep you and the mentee's progress on the same page, so nobody is guessing what was agreed last session or what is still outstanding.</p>
+      <p><a class="res-out" data-doc="tracker" href="https://docs.google.com/document/d/1D_OHsA1uESXiiDrlh8nydSpFhxg8RlTP17M97_UWejM/edit?usp=sharing" target="_blank" rel="noopener">Open the tracker &rarr;</a></p>
+      </div>
+
+      <div class="res-item">
+      <h3>03 &middot; Recommended Structure Flow for Weekly Sessions</h3>
+      <p>A recommended <strong>12 to 15 session structure</strong>, so you never run out of ideas on what to cover next. It runs from goal setting and materials, through outreach and coffee chats, into screening calls, story banks and mock interviews, and finishes on live interview prep.</p>
+      <p>You do not have to follow it strictly. We are more than happy if you run your own weekly structure, and if a mentee has an ad hoc request that takes priority.</p>
+      <p><a class="res-out" data-doc="schedule" href="session-schedule.html" target="_blank" rel="noopener">Open the structure flow &rarr;</a></p>
+      </div>
+
+      <div class="res-item">
+      <h3>04 &middot; Difficult Mentees?</h3>
+      <p>How to deal with mentees, at a high level. The two broad types you will meet, the specific personalities that need a different approach, and when to flag something to Fidel.</p>
+      <p>Worth reading early. Most of the difficulty in mentoring is not the job search advice, it is working out what this particular person actually needs from you.</p>
+      <p><a class="res-out" data-doc="types" href="mentee-types.html" target="_blank" rel="noopener">Open Difficult Mentees &rarr;</a></p>
+      </div>
+
+      <p id="docs-status" class="docs-status"></p>
+    </div>
+
+    <div class="card-box">
+      <h2>At the end of each session, please tick all of the following</h2>
+      <ol class="end-check">
+        <li>Set at least 1 take home task</li>
+        <li>Mention what will be in the next session</li>
+        <li>Confirm a next session date in the call</li>
+      </ol>
+      <ul>
+        <li>If the mentee has more important requests, always listen and be flexible on the plan.</li>
+        <li>If a mentee consistently fails to do their tasks, <a class="res-out" data-doc="types" href="mentee-types.html" target="_blank" rel="noopener">check Difficult Mentees</a> for how to deal with it.</li>
+      </ul>
     </div>
 
     <div class="card-box">
       <h2>Module Checklist</h2>
       <ul class="checklist" id="checklist">
-        <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I understand the 7-step mentee journey from discovery through to outcome</li>
+        <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I have read the Mentor Resource Hub and know what is in it</li>
+        <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I have read the recommended structure flow and understand the 12 to 15 session shape</li>
+        <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I have read Difficult Mentees and know how to handle the different personalities</li>
         <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I understand how mentees are matched with their mentor</li>
         <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I know that Fidel manages the WhatsApp group and is the main point of contact</li>
+        <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I will set a task, flag what is next, and confirm the next session date at the end of every session</li>
       </ul>
       <div class="congrats" id="congrats">
         <div class="congrats__text">
           <div class="congrats__title">Module 2 complete</div>
           <div class="congrats__sub">Nice work. Move on to Session Logs &amp; Payment when ready.</div>
         </div>
-        <a class="btn-congrats" href="mentor-onboarding-teachworks-payment.html">Next Module &rarr;</a>
+        <a class="btn-congrats next-gate" href="mentor-onboarding-teachworks-payment.html">Next Module &rarr;</a>
       </div>
     </div>
 
     <div class="controls">
       <a class="btn" href="mentor-onboarding-professional-standards.html">&larr; Previous Module</a>
-      <a class="btn btn-gold" href="mentor-onboarding-teachworks-payment.html">Next Module &rarr;</a>
+      <a class="btn btn-gold next-gate" href="mentor-onboarding-teachworks-payment.html">Next Module &rarr;</a>
     </div>
 
     <script>
@@ -521,5 +553,55 @@
     </script>
 
   </main>
+    <script>
+      /* Module 2 is a reading module, so "next" has to mean the reading was
+         actually opened. Progress is kept in localStorage: a mentor who reads
+         the hub today and comes back tomorrow does not start again. */
+      (function () {
+        var KEY = 'headstart_m2_docs';
+        var DOCS = ['hub', 'schedule', 'types'];
+
+        function read() {
+          try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { return []; }
+        }
+        function save(list) {
+          try { localStorage.setItem(KEY, JSON.stringify(list)); } catch (e) {}
+        }
+
+        function paint() {
+          var done = read();
+          document.querySelectorAll('.res-out[data-doc]').forEach(function (a) {
+            a.classList.toggle('opened', done.indexOf(a.dataset.doc) !== -1);
+          });
+          var all = done.length >= DOCS.length;
+          document.querySelectorAll('.next-gate').forEach(function (b) {
+            b.classList.toggle('locked', !all);
+          });
+          var status = document.getElementById('docs-status');
+          if (status) {
+            status.textContent = all
+              ? 'All three opened. You can move on.'
+              : 'Opened ' + done.length + ' of 3. Open all three to continue.';
+          }
+        }
+
+        document.addEventListener('click', function (e) {
+          var link = e.target.closest('.res-out[data-doc]');
+          if (link) {
+            var done = read();
+            if (done.indexOf(link.dataset.doc) === -1) { done.push(link.dataset.doc); save(done); }
+            paint();
+            return;
+          }
+          var gate = e.target.closest('.next-gate');
+          if (gate && gate.classList.contains('locked')) {
+            e.preventDefault();
+            alert('Please open all three resources first. They are the ones you will lean on every session.');
+          }
+        });
+
+        paint();
+      })();
+    </script>
 </body>
 </html>

@@ -17,12 +17,12 @@
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <style>
     :root {
-      --bg: #000000;
-      --text: #f5f5f5;
-      --muted: rgba(255, 255, 255, 0.72);
-      --line: rgba(255, 255, 255, 0.07);
+      --bg: #ffffff;
+      --text: #14110c;
+      --muted: rgba(0, 0, 0, 0.62);
+      --line: rgba(0, 0, 0, 0.10);
       --gold-gradient: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
-      --accent-soft: rgba(199,155,59,0.22);
+      --accent-soft: rgba(155,111,22,0.12);
     }
 
     /* Root font-size: bigger on desktop, smaller on mobile so big text doesn't overflow */
@@ -51,12 +51,12 @@
       inset: 0;
       pointer-events: none;
       background-image:
-        radial-gradient(rgba(255,255,255,0.055) 1px, transparent 0),
-        radial-gradient(rgba(255,255,255,0.03) 1px, transparent 0);
+        radial-gradient(rgba(0,0,0,0.047) 1px, transparent 0),
+        radial-gradient(rgba(0,0,0,0.025) 1px, transparent 0);
       background-size: 3px 3px, 5px 5px;
       background-position: 0 0, 1px 1px;
       opacity: 0.42;
-      mix-blend-mode: screen;
+      mix-blend-mode: multiply;
       z-index: 0;
     }
 
@@ -90,7 +90,7 @@
 
     .logo-bar__text h1 {
       font-size: clamp(1.3rem, 2.8vw, 1.65rem);
-      color: #f7d37d;
+      color: #9b6f16;
       font-weight: 700;
       line-height: 1.2;
     }
@@ -100,7 +100,7 @@
       font-size: 0.78rem;
       letter-spacing: 0.06em;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.35);
+      color: rgba(0,0,0,0.55);
     }
 
     /* Intro text */
@@ -117,7 +117,7 @@
       font-size: 0.78rem;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.35);
+      color: rgba(0,0,0,0.55);
       margin-bottom: 1rem;
     }
 
@@ -125,14 +125,14 @@
     .card-box {
       border-radius: 20px;
       border: 1px solid var(--line);
-      background: radial-gradient(circle at top left, var(--accent-soft), #050505);
+      background: radial-gradient(circle at top left, var(--accent-soft), var(--bg));
       padding: 1.6rem 1.8rem 1.8rem;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.7);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.06);
     }
 
     h2 {
       font-size: clamp(1.1rem, 2.2vw, 1.3rem);
-      color: #f7d37d;
+      color: #9b6f16;
       font-weight: 700;
       line-height: 1.2;
       margin-bottom: 1rem;
@@ -152,8 +152,8 @@
       gap: 0.75rem;
       padding: 0.85rem 1rem;
       border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.07);
-      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(0,0,0,0.06);
+      background: rgba(0,0,0,0.025);
       color: var(--text);
       text-decoration: none;
       font-size: 0.97rem;
@@ -179,7 +179,7 @@
 
     .module-arrow {
       margin-left: auto;
-      color: rgba(255,255,255,0.3);
+      color: rgba(0,0,0,0.55);
       font-size: 0.9rem;
     }
 
@@ -199,7 +199,7 @@
       border-radius: 999px;
       border: 1px solid rgba(199,155,59,0.6);
       text-decoration: none;
-      color: #f5f5f5;
+      color: var(--text);
       font-weight: 700;
       letter-spacing: 0.06em;
       text-transform: uppercase;
@@ -234,12 +234,12 @@
   </style>
   <style id="auth-gate">
     html:not(.auth-ok) body { visibility: hidden; }
-    html:not(.auth-ok) { background: #000; }
+    html:not(.auth-ok) { background: #fff; }
     html:not(.auth-ok)::after {
       content: ""; position: fixed; top: 50%; left: 50%;
       width: 30px; height: 30px; margin: -15px 0 0 -15px;
-      border-radius: 50%; border: 3px solid rgba(255,255,255,0.18);
-      border-top-color: #c79b3b; animation: auth-spin 0.7s linear infinite;
+      border-radius: 50%; border: 3px solid rgba(0,0,0,0.153);
+      border-top-color: #9b6f16; animation: auth-spin 0.7s linear infinite;
     }
     @keyframes auth-spin { to { transform: rotate(360deg); } }
   </style>
@@ -252,9 +252,9 @@
       if (!r.classList.contains("auth-ok")) {
         r.classList.add("auth-ok");
         if (document.body) document.body.innerHTML =
-          '<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;text-align:center;background:#000;color:#fff;font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif">' +
+          '<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;text-align:center;background:#fff;color:#14110c;font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif">' +
           '<p style="font-size:1.05rem;max-width:340px;line-height:1.5">This page is taking too long to load. Check your internet, then reload.</p>' +
-          '<button onclick="location.reload()" style="padding:12px 26px;border-radius:999px;border:1px solid #c79b3b;background:transparent;color:#f0c75c;font-weight:700;font-size:0.9rem;cursor:pointer">Reload</button>' +
+          '<button onclick="location.reload()" style="padding:12px 26px;border-radius:999px;border:1px solid #c79b3b;background:transparent;color:#9b6f16;font-weight:700;font-size:0.9rem;cursor:pointer">Reload</button>' +
           '</div>';
       }
     }, 12000);
@@ -295,7 +295,7 @@
         <li>
           <a href="mentor-onboarding-professional-standards.html">
             <span class="module-num">01</span>
-            Professional Standards &amp; Boundaries
+            Our Mentoring Philosophy
             <span class="module-arrow">&rarr;</span>
           </a>
         </li>

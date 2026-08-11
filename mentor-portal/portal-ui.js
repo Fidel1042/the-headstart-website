@@ -16,8 +16,10 @@ export function applyTheme(theme) {
 }
 
 export function initTheme() {
-  let saved = "dark";
-  try { saved = localStorage.getItem(THEME_KEY) || "dark"; } catch (e) {}
+  // Light is the portal default. Anyone who has already chosen a theme keeps
+  // their choice: only a first visit, with nothing stored, lands on light.
+  let saved = "light";
+  try { saved = localStorage.getItem(THEME_KEY) || "light"; } catch (e) {}
   applyTheme(saved);
 }
 
@@ -90,7 +92,7 @@ export function mountPortalNav({ email = "", isOwner = false, active = "", login
   // Re-apply so the freshly injected icon matches the current theme.
   initTheme();
   document.getElementById("theme-toggle").addEventListener("click", () => {
-    const current = document.documentElement.getAttribute("data-theme") || "dark";
+    const current = document.documentElement.getAttribute("data-theme") || "light";
     applyTheme(current === "dark" ? "light" : "dark");
   });
 

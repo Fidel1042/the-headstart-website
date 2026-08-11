@@ -96,7 +96,10 @@ function cardLabel(d) {
   const label = `${c.brand} &middot;&middot;&middot;&middot;${c.last4}${exp}`;
   const added = c.addedAt ? ` <span class="fin-dim">added ${fmtDate(c.addedAt)}</span>` : "";
   const extra = c.total > 1 ? ` <span class="fin-dim">(${c.total} cards on file, newest is charged)</span>` : "";
-  return dead ? `<span class="fin-bad">${label} EXPIRED</span>${added}` : `${label}${added}${extra}`;
+  // Link can demand the mentee verify at link.com before an off-session charge
+  // goes through, so it is called out before a run rather than after it fails.
+  const link = c.viaLink ? ' <span class="fin-bad">saved via Link, may block auto-charge</span>' : "";
+  return dead ? `<span class="fin-bad">${label} EXPIRED</span>${added}` : `${label}${added}${link}${extra}`;
 }
 
 function render(d) {

@@ -17,12 +17,12 @@
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <style>
     :root {
-      --bg: #000000;
-      --text: #f5f5f5;
-      --muted: rgba(255, 255, 255, 0.72);
-      --line: rgba(255, 255, 255, 0.07);
+      --bg: #ffffff;
+      --text: #14110c;
+      --muted: rgba(0, 0, 0, 0.62);
+      --line: rgba(0, 0, 0, 0.10);
       --gold-gradient: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
-      --accent-soft: rgba(199,155,59,0.22);
+      --accent-soft: rgba(155,111,22,0.12);
     }
 
     /* Root font-size: bigger on desktop, smaller on mobile so big text doesn't overflow */
@@ -50,12 +50,12 @@
       inset: 0;
       pointer-events: none;
       background-image:
-        radial-gradient(rgba(255,255,255,0.055) 1px, transparent 0),
-        radial-gradient(rgba(255,255,255,0.03) 1px, transparent 0);
+        radial-gradient(rgba(0,0,0,0.047) 1px, transparent 0),
+        radial-gradient(rgba(0,0,0,0.025) 1px, transparent 0);
       background-size: 3px 3px, 5px 5px;
       background-position: 0 0, 1px 1px;
       opacity: 0.42;
-      mix-blend-mode: screen;
+      mix-blend-mode: multiply;
       z-index: 0;
     }
 
@@ -80,20 +80,20 @@
 
     .logo-bar a { display: flex; align-items: center; gap: 0.85rem; text-decoration: none; }
 
-    .logo-bar__title { font-size: 0.9rem; font-weight: 600; color: rgba(255,255,255,0.6); }
-    .logo-bar__title span { color: rgba(255,255,255,0.3); margin: 0 0.4em; }
+    .logo-bar__title { font-size: 0.9rem; font-weight: 600; color: rgba(0,0,0,0.51); }
+    .logo-bar__title span { color: rgba(0,0,0,0.55); margin: 0 0.4em; }
 
     .eyebrow {
       font-size: 0.78rem;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.35);
+      color: rgba(0,0,0,0.55);
       margin-bottom: 0.5rem;
     }
 
     h1 {
       font-size: clamp(1.6rem, 3.3vw, 2.1rem);
-      color: #f7d37d;
+      color: #9b6f16;
       font-weight: 700;
       line-height: 1.2;
       margin-bottom: 2rem;
@@ -101,7 +101,7 @@
 
     h2 {
       font-size: clamp(1.1rem, 2.2vw, 1.3rem);
-      color: #f7d37d;
+      color: #9b6f16;
       font-weight: 700;
       line-height: 1.2;
       margin-bottom: 1rem;
@@ -114,9 +114,9 @@
     .card-box {
       border-radius: 20px;
       border: 1px solid var(--line);
-      background: radial-gradient(circle at top left, var(--accent-soft), #050505);
+      background: radial-gradient(circle at top left, var(--accent-soft), var(--bg));
       padding: 1.6rem 1.8rem 1.8rem;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.7);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.06);
       margin-bottom: 1.4rem;
     }
 
@@ -142,7 +142,7 @@
       padding: 1rem 1.2rem;
       margin-top: 1.2rem;
       font-size: 0.95rem;
-      color: rgba(255,255,255,0.85);
+      color: rgba(0,0,0,0.722);
       line-height: 1.7;
     }
 
@@ -162,8 +162,8 @@
       cursor: pointer;
       padding: 0.65rem 0.85rem;
       border-radius: 10px;
-      border: 1px solid rgba(255,255,255,0.06);
-      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(0,0,0,0.051);
+      background: rgba(0,0,0,0.017);
       transition: background 0.15s, border-color 0.15s;
       font-size: 1.02rem;
       line-height: 1.55;
@@ -171,13 +171,13 @@
       user-select: none;
     }
 
-    .checklist li:hover { background: rgba(255,255,255,0.04); }
+    .checklist li:hover { background: rgba(0,0,0,0.034); }
     .checklist li.checked { background: rgba(100,220,100,0.06); border-color: rgba(100,220,100,0.2); }
 
     .check-box {
       width: 20px; height: 20px; min-width: 20px;
       border-radius: 6px;
-      border: 1.5px solid rgba(255,255,255,0.22);
+      border: 1.5px solid rgba(0,0,0,0.187);
       display: flex; align-items: center; justify-content: center;
       margin-top: 0.1rem;
       transition: background 0.15s, border-color 0.15s;
@@ -198,7 +198,7 @@
       padding: 1.1rem 1.4rem;
       border-radius: 14px;
       border: 1px solid rgba(199,155,59,0.45);
-      background: radial-gradient(circle at top left, rgba(199,155,59,0.16), rgba(0,0,0,0));
+      background: radial-gradient(circle at top left, rgba(155,111,22,0.10), rgba(0,0,0,0));
     }
 
     .congrats.visible { display: flex; flex-wrap: wrap; }
@@ -206,23 +206,23 @@
 
     .congrats__title {
       font-size: 1rem; font-weight: 700;
-      color: #f7d37d;
+      color: #9b6f16;
       margin-bottom: 0.15rem;
     }
 
-    .congrats__sub { font-size: 0.85rem; color: rgba(255,255,255,0.45); line-height: 1.4; }
+    .congrats__sub { font-size: 0.85rem; color: rgba(0,0,0,0.55); line-height: 1.4; }
 
     .btn-congrats {
       display: inline-flex; align-items: center; gap: 0.4rem;
       padding: 0.65rem 1.3rem; border-radius: 999px;
       border: 1px solid rgba(199,155,59,0.7);
-      text-decoration: none; color: #f5f5f5;
+      text-decoration: none; color: var(--text);
       font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; font-size: 0.72rem;
       background: rgba(199,155,59,0.12); white-space: nowrap;
       transition: background 0.2s, border-color 0.2s;
     }
 
-    .btn-congrats:hover { background: rgba(199,155,59,0.22); border-color: rgba(199,155,59,1); }
+    .btn-congrats:hover { background: rgba(155,111,22,0.12); border-color: rgba(199,155,59,1); }
 
     .controls {
       margin-top: 2rem; display: flex; justify-content: space-between; gap: 0.7rem; flex-wrap: wrap;
@@ -231,20 +231,20 @@
     .btn {
       display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
       padding: 0.65rem 1.3rem; border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.2);
-      text-decoration: none; color: #f5f5f5;
+      border: 1px solid rgba(0,0,0,0.22);
+      text-decoration: none; color: var(--text);
       font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; font-size: 0.72rem;
       background: transparent; transition: background 0.2s, border-color 0.2s;
     }
 
-    .btn:hover { border-color: rgba(255,255,255,0.45); }
+    .btn:hover { border-color: rgba(0,0,0,0.55); }
     .btn-gold { border-color: rgba(199,155,59,0.6); }
     .btn-gold:hover { background: rgba(199,155,59,0.1); border-color: rgba(199,155,59,0.9); }
 
     h3 {
       font-size: 1.05rem;
       font-weight: 700;
-      color: rgba(255,255,255,0.75);
+      color: rgba(0,0,0,0.637);
       margin-bottom: 0.6rem;
       margin-top: 0.1rem;
       letter-spacing: 0.01em;
@@ -262,9 +262,9 @@
     .part-2-card {
       border-radius: 20px;
       border: 1px solid rgba(199,155,59,0.5);
-      background: radial-gradient(circle at top left, rgba(199,155,59,0.22), #050505);
+      background: radial-gradient(circle at top left, rgba(155,111,22,0.12), var(--bg));
       padding: 1.8rem 2rem 2rem;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.7);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.06);
       margin-bottom: 1.4rem;
     }
     .part-2-eyebrow {
@@ -285,8 +285,8 @@
       margin-top: 1.2rem;
       padding: 1rem 1.2rem;
       border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.1);
-      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(0,0,0,0.085);
+      background: rgba(0,0,0,0.034);
       flex-wrap: wrap;
     }
     .contact-meta { display: flex; flex-direction: column; gap: 0.2rem; }
@@ -294,13 +294,13 @@
       font-size: 0.72rem;
       letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.55);
+      color: rgba(0,0,0,0.468);
       font-weight: 700;
     }
     .contact-number {
       font-size: 1.25rem;
       font-weight: 600;
-      color: #f5f5f5;
+      color: var(--text);
       letter-spacing: 0.02em;
       font-family: ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace;
       user-select: all;
@@ -309,9 +309,9 @@
       margin-left: auto;
       padding: 0.55rem 1.1rem;
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.22);
+      border: 1px solid rgba(0,0,0,0.187);
       background: transparent;
-      color: #f5f5f5;
+      color: var(--text);
       font-family: inherit;
       font-size: 0.74rem;
       font-weight: 700;
@@ -347,7 +347,7 @@
       border-radius: 999px;
       border: 1px solid rgba(199,155,59,0.7);
       background: linear-gradient(135deg, rgba(199,155,59,0.4), rgba(199,155,59,0.15));
-      color: #f5f5f5;
+      color: var(--text);
       font-size: 0.85rem;
       font-weight: 700;
       letter-spacing: 0.08em;
@@ -358,14 +358,14 @@
     .part-2-cta:hover {
       transform: translateY(-2px);
       border-color: rgba(199,155,59,1);
-      background: linear-gradient(135deg, rgba(199,155,59,0.55), rgba(199,155,59,0.22));
+      background: linear-gradient(135deg, rgba(199,155,59,0.55), rgba(155,111,22,0.12));
       box-shadow: 0 0 28px rgba(199,155,59,0.32);
     }
     .part-2-cta .arrow { transition: transform 0.18s; }
     .part-2-cta:hover .arrow { transform: translateX(3px); }
     .part-2-cta-hint {
       font-size: 0.8rem;
-      color: rgba(255,255,255,0.55);
+      color: rgba(0,0,0,0.468);
     }
   
     .logo-home {
@@ -389,12 +389,12 @@
   </style>
   <style id="auth-gate">
     html:not(.auth-ok) body { visibility: hidden; }
-    html:not(.auth-ok) { background: #000; }
+    html:not(.auth-ok) { background: #fff; }
     html:not(.auth-ok)::after {
       content: ""; position: fixed; top: 50%; left: 50%;
       width: 30px; height: 30px; margin: -15px 0 0 -15px;
-      border-radius: 50%; border: 3px solid rgba(255,255,255,0.18);
-      border-top-color: #c79b3b; animation: auth-spin 0.7s linear infinite;
+      border-radius: 50%; border: 3px solid rgba(0,0,0,0.153);
+      border-top-color: #9b6f16; animation: auth-spin 0.7s linear infinite;
     }
     @keyframes auth-spin { to { transform: rotate(360deg); } }
   </style>
@@ -407,9 +407,9 @@
       if (!r.classList.contains("auth-ok")) {
         r.classList.add("auth-ok");
         if (document.body) document.body.innerHTML =
-          '<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;text-align:center;background:#000;color:#fff;font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif">' +
+          '<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;text-align:center;background:#fff;color:#14110c;font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif">' +
           '<p style="font-size:1.05rem;max-width:340px;line-height:1.5">This page is taking too long to load. Check your internet, then reload.</p>' +
-          '<button onclick="location.reload()" style="padding:12px 26px;border-radius:999px;border:1px solid #c79b3b;background:transparent;color:#f0c75c;font-weight:700;font-size:0.9rem;cursor:pointer">Reload</button>' +
+          '<button onclick="location.reload()" style="padding:12px 26px;border-radius:999px;border:1px solid #c79b3b;background:transparent;color:#9b6f16;font-weight:700;font-size:0.9rem;cursor:pointer">Reload</button>' +
           '</div>';
       }
     }, 12000);
@@ -461,7 +461,7 @@
 
       <div class="sub-section">
         <h3>2.1 &nbsp;How You Get Paid</h3>
-        <p>Payments are managed manually by Fidel on a bi-weekly basis. He uses the Airtable form submissions to confirm which sessions have been logged, then calculates and sends each mentor's payment directly.</p>
+        <p>You are paid weekly, every Monday, for the sessions you have logged.</p>
         <p>If you have any questions about a payment, message Fidel on WhatsApp.</p>
       </div>
 
@@ -486,24 +486,13 @@
       </div>
     </div>
 
-    <!-- SECTION 3: MENTOR RESOURCE HUB INTRO -->
-    <div class="card-box">
-      <h2>3. Mentor Resource Hub</h2>
-      <p>Before our Part 2 call, please skim the Mentor Resource Hub. It's the master reference you'll pull from during sessions: resume, LinkedIn, cover letter, networking, coffee chats, and the full interview question bank.</p>
-      <p>You don't need to memorise it. Just know what's in there so you can find the right section quickly when a mentee asks.</p>
-      <p style="margin-top: 1.2rem;">
-        <a class="btn btn-gold" href="tutor-resources.html" target="_blank" rel="noopener">Open the Mentor Resource Hub &rarr;</a>
-      </p>
-    </div>
-
     <div class="card-box">
       <h2>Module Checklist</h2>
       <ul class="checklist" id="checklist">
         <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I know how to log sessions in the Mentor Portal</li>
         <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I will log every session within 24 hours of it ending</li>
-        <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I understand payments are managed manually by Fidel on a bi-weekly basis</li>
+        <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I understand I am paid weekly, every Monday, for the sessions I have logged</li>
         <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I have or will register my ABN before my first session</li>
-        <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I have skimmed the <a href="tutor-resources.html" target="_blank" rel="noopener" style="color: inherit; text-decoration: underline;">Mentor Resource Hub</a></li>
       </ul>
       <div class="congrats" id="congrats">
         <div class="congrats__text">

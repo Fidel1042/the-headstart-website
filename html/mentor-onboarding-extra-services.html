@@ -17,12 +17,12 @@
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <style>
     :root {
-      --bg: #000000;
-      --text: #f5f5f5;
-      --muted: rgba(255, 255, 255, 0.72);
-      --line: rgba(255, 255, 255, 0.07);
+      --bg: #ffffff;
+      --text: #14110c;
+      --muted: rgba(0, 0, 0, 0.62);
+      --line: rgba(0, 0, 0, 0.10);
       --gold-gradient: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
-      --accent-soft: rgba(199,155,59,0.22);
+      --accent-soft: rgba(155,111,22,0.12);
     }
 
     /* Root font-size: bigger on desktop, smaller on mobile so big text doesn't overflow */
@@ -50,12 +50,12 @@
       inset: 0;
       pointer-events: none;
       background-image:
-        radial-gradient(rgba(255,255,255,0.055) 1px, transparent 0),
-        radial-gradient(rgba(255,255,255,0.03) 1px, transparent 0);
+        radial-gradient(rgba(0,0,0,0.047) 1px, transparent 0),
+        radial-gradient(rgba(0,0,0,0.025) 1px, transparent 0);
       background-size: 3px 3px, 5px 5px;
       background-position: 0 0, 1px 1px;
       opacity: 0.42;
-      mix-blend-mode: screen;
+      mix-blend-mode: multiply;
       z-index: 0;
     }
 
@@ -97,11 +97,11 @@
     .logo-bar__title {
       font-size: 0.9rem;
       font-weight: 600;
-      color: rgba(255,255,255,0.6);
+      color: rgba(0,0,0,0.51);
     }
 
     .logo-bar__title span {
-      color: rgba(255,255,255,0.3);
+      color: rgba(0,0,0,0.55);
       margin: 0 0.4em;
     }
 
@@ -110,13 +110,13 @@
       font-size: 0.78rem;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.35);
+      color: rgba(0,0,0,0.55);
       margin-bottom: 0.5rem;
     }
 
     h1 {
       font-size: clamp(1.6rem, 3.3vw, 2.1rem);
-      color: #f7d37d;
+      color: #9b6f16;
       font-weight: 700;
       line-height: 1.2;
       margin-bottom: 2rem;
@@ -124,7 +124,7 @@
 
     h2 {
       font-size: clamp(1.1rem, 2.2vw, 1.3rem);
-      color: #f7d37d;
+      color: #9b6f16;
       font-weight: 700;
       line-height: 1.2;
       margin-bottom: 1rem;
@@ -133,7 +133,7 @@
     h3 {
       font-size: 1.05rem;
       font-weight: 700;
-      color: rgba(255,255,255,0.75);
+      color: rgba(0,0,0,0.637);
       margin-bottom: 0.6rem;
       letter-spacing: 0.01em;
     }
@@ -150,9 +150,9 @@
     .card-box {
       border-radius: 20px;
       border: 1px solid var(--line);
-      background: radial-gradient(circle at top left, var(--accent-soft), #050505);
+      background: radial-gradient(circle at top left, var(--accent-soft), var(--bg));
       padding: 1.6rem 1.8rem 1.8rem;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.7);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.06);
       margin-bottom: 1.4rem;
     }
 
@@ -188,12 +188,12 @@
     .service-placeholder__title {
       font-size: 1rem;
       font-weight: 700;
-      color: rgba(255,255,255,0.45);
+      color: rgba(0,0,0,0.55);
     }
 
     .service-placeholder__note {
       font-size: 0.8rem;
-      color: rgba(255,255,255,0.22);
+      color: rgba(0,0,0,0.55);
     }
 
     /* Complete card */
@@ -232,9 +232,9 @@
       gap: 0.4rem;
       padding: 0.65rem 1.3rem;
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.2);
+      border: 1px solid rgba(0,0,0,0.22);
       text-decoration: none;
-      color: #f5f5f5;
+      color: var(--text);
       font-weight: 700;
       letter-spacing: 0.06em;
       text-transform: uppercase;
@@ -243,7 +243,7 @@
       transition: background 0.2s, border-color 0.2s;
     }
 
-    .btn:hover { border-color: rgba(255,255,255,0.45); }
+    .btn:hover { border-color: rgba(0,0,0,0.55); }
 
     .btn-gold {
       border-color: rgba(199,155,59,0.6);
@@ -271,8 +271,8 @@
       cursor: pointer;
       padding: 0.65rem 0.85rem;
       border-radius: 10px;
-      border: 1px solid rgba(255,255,255,0.06);
-      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(0,0,0,0.051);
+      background: rgba(0,0,0,0.017);
       transition: background 0.15s, border-color 0.15s;
       font-size: 1.02rem;
       line-height: 1.55;
@@ -280,7 +280,7 @@
       user-select: none;
     }
 
-    .checklist li:hover { background: rgba(255,255,255,0.04); }
+    .checklist li:hover { background: rgba(0,0,0,0.034); }
 
     .checklist li.checked {
       background: rgba(100,220,100,0.06);
@@ -292,7 +292,7 @@
       height: 20px;
       min-width: 20px;
       border-radius: 6px;
-      border: 1.5px solid rgba(255,255,255,0.22);
+      border: 1.5px solid rgba(0,0,0,0.187);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -316,7 +316,7 @@
       padding: 1.1rem 1.4rem;
       border-radius: 14px;
       border: 1px solid rgba(199,155,59,0.45);
-      background: radial-gradient(circle at top left, rgba(199,155,59,0.16), rgba(0,0,0,0));
+      background: radial-gradient(circle at top left, rgba(155,111,22,0.10), rgba(0,0,0,0));
     }
 
     .congrats.visible { display: flex; flex-wrap: wrap; }
@@ -326,13 +326,13 @@
     .congrats__title {
       font-size: 1rem;
       font-weight: 700;
-      color: #f7d37d;
+      color: #9b6f16;
       margin-bottom: 0.15rem;
     }
 
     .congrats__sub {
       font-size: 0.85rem;
-      color: rgba(255,255,255,0.45);
+      color: rgba(0,0,0,0.55);
       line-height: 1.4;
     }
 
@@ -344,7 +344,7 @@
       border-radius: 999px;
       border: 1px solid rgba(199,155,59,0.7);
       text-decoration: none;
-      color: #f5f5f5;
+      color: var(--text);
       font-weight: 700;
       letter-spacing: 0.06em;
       text-transform: uppercase;
@@ -355,7 +355,7 @@
     }
 
     .btn-congrats:hover {
-      background: rgba(199,155,59,0.22);
+      background: rgba(155,111,22,0.12);
       border-color: rgba(199,155,59,1);
     }
 
@@ -384,12 +384,12 @@
   </style>
   <style id="auth-gate">
     html:not(.auth-ok) body { visibility: hidden; }
-    html:not(.auth-ok) { background: #000; }
+    html:not(.auth-ok) { background: #fff; }
     html:not(.auth-ok)::after {
       content: ""; position: fixed; top: 50%; left: 50%;
       width: 30px; height: 30px; margin: -15px 0 0 -15px;
-      border-radius: 50%; border: 3px solid rgba(255,255,255,0.18);
-      border-top-color: #c79b3b; animation: auth-spin 0.7s linear infinite;
+      border-radius: 50%; border: 3px solid rgba(0,0,0,0.153);
+      border-top-color: #9b6f16; animation: auth-spin 0.7s linear infinite;
     }
     @keyframes auth-spin { to { transform: rotate(360deg); } }
   </style>
@@ -402,9 +402,9 @@
       if (!r.classList.contains("auth-ok")) {
         r.classList.add("auth-ok");
         if (document.body) document.body.innerHTML =
-          '<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;text-align:center;background:#000;color:#fff;font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif">' +
+          '<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;text-align:center;background:#fff;color:#14110c;font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif">' +
           '<p style="font-size:1.05rem;max-width:340px;line-height:1.5">This page is taking too long to load. Check your internet, then reload.</p>' +
-          '<button onclick="location.reload()" style="padding:12px 26px;border-radius:999px;border:1px solid #c79b3b;background:transparent;color:#f0c75c;font-weight:700;font-size:0.9rem;cursor:pointer">Reload</button>' +
+          '<button onclick="location.reload()" style="padding:12px 26px;border-radius:999px;border:1px solid #c79b3b;background:transparent;color:#9b6f16;font-weight:700;font-size:0.9rem;cursor:pointer">Reload</button>' +
           '</div>';
       }
     }, 12000);
@@ -425,7 +425,7 @@
 
     <div class="card-box">
       <h2>One $55 session, every milestone</h2>
-      <p style="color: rgba(255,255,255,0.7); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.4rem;">Under the flat $55/session model, resume and LinkedIn work is no longer a separate paid service. It sits inside regular mentoring. Mentees can use a session for any of the milestones below.</p>
+      <p style="color: rgba(0,0,0,0.595); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.4rem;">Under the flat $55/session model, resume and LinkedIn work is no longer a separate paid service. It sits inside regular mentoring. Mentees can use a session for any of the milestones below.</p>
       <div class="service-grid">
         <div class="service-placeholder">
           <span class="service-placeholder__title">Career direction</span>

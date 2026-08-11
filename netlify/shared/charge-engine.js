@@ -132,11 +132,21 @@ function normalizePhone(raw, aussie) {
  * The winner is written back as the customer's default, so Stripe agrees with
  * us from then on and the next run does no extra work.
  */
+// A card saved through Stripe Link is wrapped in a wallet. Link can refuse an
+// off-session charge and demand the customer verify at link.com, which is not
+// something a weekly batch run can do anything about. A directly entered card
+// has no such gate, so those are always preferred. Link is used only when it is
+// the only thing on file, where a Link charge that might work still beats a
+// guaranteed "no card".
+const isLinkBacked = (pm) => pm?.card?.wallet?.type === "link";
+
 async function activeCard(stripe, customerId) {
   const methods = await stripe.paymentMethods.list({ customer: customerId, type: "card", limit: 100 });
   if (!methods.data.length) return null;
 
-  const newest = methods.data.slice().sort((a, b) => (b.created || 0) - (a.created || 0))[0];
+  const byNewest = (a, b) => (b.created || 0) - (a.created || 0);
+  const plain = methods.data.filter((pm) => !isLinkBacked(pm)).sort(byNewest);
+  const newest = (plain.length ? plain : methods.data.slice().sort(byNewest))[0];
 
   const customer = await stripe.customers.retrieve(customerId);
   if (customer?.invoice_settings?.default_payment_method !== newest.id) {
@@ -154,10 +164,17 @@ async function cardSummary(stripe, customerId) {
   try {
     const methods = await stripe.paymentMethods.list({ customer: customerId, type: "card", limit: 100 });
     if (!methods.data.length) return null;
-    const sorted = methods.data.slice().sort((a, b) => (b.created || 0) - (a.created || 0));
+    // Mirror activeCard's choice exactly, so the portal shows the card that
+    // will actually be charged rather than merely the newest one.
+    const byNewest = (a, b) => (b.created || 0) - (a.created || 0);
+    const plain = methods.data.filter((pm) => !isLinkBacked(pm)).sort(byNewest);
+    const sorted = plain.length ? plain : methods.data.slice().sort(byNewest);
     const c = sorted[0];
     return {
       brand: c.card?.brand || "card",
+      // Link cards can block an off-session charge, so this has to be visible
+      // before a run rather than discovered in the failure reason afterwards.
+      viaLink: isLinkBacked(c),
       last4: c.card?.last4 || "",
       expMonth: c.card?.exp_month || null,
       expYear: c.card?.exp_year || null,
