@@ -65,4 +65,34 @@ function buildKokoEmail(list, checkDays) {
     `<p>Worth checking whether the mentor actually messaged them.</p>`;
 }
 
-module.exports = { buildEmail, buildKokoEmail, firstName, esc };
+
+/**
+ * Fidel's Monday list: acquired mentees who have gone quiet, longest first.
+ *
+ * A mentee with a booking that came and went shows that date, because "booked
+ * for 1 Aug, never happened" is a different conversation from "no contact at
+ * all". Anyone on hold, or with a next session Koko has already confirmed, is
+ * excluded upstream.
+ */
+function buildNudgeEmail(list, reachOutDays) {
+  const cell = (v, last) =>
+    `<td style="padding:8px ${last ? 0 : 14}px 8px 0;border-bottom:1px solid #e6e1d5">${v}</td>`;
+
+  const rows = list.map((n) =>
+    `<tr>${cell(esc(n.name))}${cell(esc(n.mentor))}` +
+    `${cell("<strong>" + n.gap + " days</strong>")}` +
+    `${cell(esc(n.lastDate || "never"))}` +
+    `${cell(n.missed ? "missed " + esc(n.missed) : "&mdash;", true)}</tr>`).join("");
+
+  const head = ["Mentee", "Mentor", "Quiet for", "Last session", "Booking"]
+    .map((c, i, arr) => `<th align="left" style="padding:0 ${i === arr.length - 1 ? 0 : 14}px 8px 0;border-bottom:2px solid #d9d3c4">${c}</th>`).join("");
+
+  return `<p>Morning Fidel,</p>` +
+    `<p>${list.length} mentee${list.length === 1 ? " has" : "s have"} gone quiet: ` +
+    `${reachOutDays}+ days since their last session, nothing coming up.</p>` +
+    `<table style="border-collapse:collapse;font-size:14px"><tr>${head}</tr>${rows}</table>` +
+    `<p style="margin-top:16px">A mentee drops off this list as soon as you set their next session date, ` +
+    `or park them with Hold, on the mentee status page.</p>`;
+}
+
+module.exports = { buildEmail, buildKokoEmail, buildNudgeEmail, firstName, esc };

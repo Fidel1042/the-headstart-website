@@ -32,9 +32,16 @@ function fmtShort(dateStr) {
   return d.toLocaleDateString("en-AU", { day: "numeric", month: "short" });
 }
 
-// Green within 1 week, yellow 1–2 weeks, red past 2 weeks.
-function cadence(days) {
+// Matches what the Monday nudge email does, so a mentor and the admin list
+// never disagree about who needs chasing:
+//   on hold          parked deliberately, nobody should be chasing
+//   something booked not overdue, whatever the gap since the last session
+//   15+ days         the same threshold as REACH_OUT_DAYS in session-reminders
+function cadence(days, next, holdUntil) {
+  const today = new Date().toISOString().slice(0, 10);
+  if (holdUntil && holdUntil >= today) return { tone: "", label: "On hold" };
   if (days === null) return { tone: "", label: "No sessions yet" };
+  if (next && next >= today) return { tone: "ok", label: "Booked" };
   if (days <= 7)  return { tone: "ok",   label: "On track" };
   if (days <= 14) return { tone: "warn", label: "Follow up" };
   return { tone: "bad", label: "Overdue" };
@@ -48,21 +55,28 @@ function statsFor(mentee, sessions) {
   );
   const last = mine.reduce((acc, s) => (s.date > acc ? s.date : acc), "");
   const today = new Date().toISOString().slice(0, 10);
-  const next = mine.reduce((acc, s) => {
+  // A date Koko set on the mentee record counts the same as one a mentor
+  // logged, so both are folded together before picking the soonest upcoming.
+  let next = mine.reduce((acc, s) => {
     const n = (s.next || "").slice(0, 10);
     return n >= today && (n < acc || !acc) ? n : acc;
   }, "");
-  return { count: mine.length, last, next, days: daysSince(last) };
+  const admin = mentee.nextSession || "";
+  if (admin >= today && (!next || admin < next)) next = admin;
+  return { count: mine.length, last, next, days: daysSince(last), holdUntil: mentee.holdUntil || "" };
 }
 
 const esc = (s) => String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 function card(mentee, s) {
-  const pill = cadence(s.days);
+  const pill = cadence(s.days, s.next, s.holdUntil);
   const isPackage = mentee.billingType === "Package";
   const sessions = isPackage ? `${s.count}/${PACKAGE_TOTAL} sessions` : `${s.count} session${s.count === 1 ? "" : "s"}`;
   const daysTxt = s.days === null ? "no sessions" : `${s.days}d since`;
-  const nextTxt = s.next ? `next ${fmtShort(s.next)}` : "no next date";
+  // On hold says when it lifts, since "no next date" would read as neglect.
+  const nextTxt = s.holdUntil && s.holdUntil >= new Date().toISOString().slice(0, 10)
+    ? `on hold to ${fmtShort(s.holdUntil)}`
+    : (s.next ? `next ${fmtShort(s.next)}` : "no next date");
   return `
     <article class="mentee-card">
       <div class="mentee-card__head">

@@ -44,8 +44,14 @@ exports.handler = async (event) => {
     const allMenteeRecords = [];
     let offset = null;
     do {
-      const formula = encodeURIComponent(`LOWER(TRIM({Mentor Email Plain}))="${wanted}"`);
-      const extraFields = ["Target Industry", "Major", "University Year", "Suggested Plan", "Mentor Notes"]
+      // Only Acquired mentees, matching admin-overview, get-contacts,
+      // mentee-financials and session-reminders. Without the pipeline check a
+      // dropped mentee stayed attached to their mentor forever and kept showing
+      // as "Overdue", so mentors were chased about people who had left.
+      const formula = encodeURIComponent(
+        `AND(LOWER(TRIM({Mentor Email Plain}))="${wanted}",{Client Pipeline}="Acquired")`);
+      const extraFields = ["Target Industry", "Major", "University Year", "Suggested Plan", "Mentor Notes",
+        "Next Session", "On Hold Until"]
         .map((f) => `&fields[]=${encodeURIComponent(f)}`).join("");
       const url = `https://api.airtable.com/v0/${AIRTABLE_CORE_BASE_ID}/${AIRTABLE_MENTEE_TABLE_ID}` +
         `?filterByFormula=${formula}&fields[]=Name&fields[]=Billing%20type&fields[]=Stripe%20Customer%20ID` +
@@ -68,6 +74,11 @@ exports.handler = async (event) => {
         year:        r.fields["University Year"] || "",
         plan:        r.fields["Suggested Plan"] || "",
         notes:       r.fields["Mentor Notes"] || "",
+        // Set by Koko from the mentee status view. Without these the mentor's
+        // portal showed a mentee as Overdue while a session was already booked,
+        // and had no idea a mentee had been put on hold.
+        nextSession: (r.fields["Next Session"]  || "").slice(0, 10),
+        holdUntil:   (r.fields["On Hold Until"] || "").slice(0, 10),
       }));
 
     return {

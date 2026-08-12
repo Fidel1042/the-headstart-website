@@ -10,7 +10,7 @@
 
 const SENDER = { name: "The Headstart", email: "fidel@theheadstartmentoring.com" };
 const TZ = "Australia/Sydney";
-const REACH_OUT_DAYS = 10;
+const REACH_OUT_DAYS = 15;
 // A mentee qualifies for Koko's check 10 days after their mentor's FIRST nudge
 // about them. It has to key off the first nudge, not "Last Reminded": that one
 // is re-stamped every 7 days while the nudge cycle runs, so a 10 day gap from
@@ -23,8 +23,12 @@ const REACH_OUT_DAYS = 10;
 const KOKO_CHECK_DAYS = 10;
 const KOKO_DIGEST_DAY = "Mon";
 const KOKO = { email: "kokoro.araki1015@gmail.com", name: "Koko" };
+// Mentors are no longer emailed about quiet mentees, so the nudging has to
+// land somewhere. This is that somewhere: one list, once a week.
+const FIDEL = { email: "fidelhon@gmail.com", name: "Fidel" };
+const NUDGE_DIGEST_DAY = "Mon";
 
-const { buildEmail, buildKokoEmail } = require("../shared/reminder-emails");
+const { buildEmail, buildKokoEmail, buildNudgeEmail } = require("../shared/reminder-emails");
 
 const ymd = (date) =>
   new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" }).format(date);
@@ -95,7 +99,8 @@ exports.handler = async (event) => {
     // Active, acquired mentees with a mentor assigned.
     const menteeRecs = await fetchAll(AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTEE_TABLE_ID,
       ["Name", "Client Pipeline", "Mentor Email Plain", "Mentor Name",
-       "Last Reminded", "First Reminded", "Koko Checked At", "Next Session"], AIRTABLE_API_TOKEN);
+       "Last Reminded", "First Reminded", "Koko Checked At", "Next Session",
+       "On Hold Until"], AIRTABLE_API_TOKEN);
     const active = new Map();
     const byName = new Map(); // lowercased mentee name -> record id (for older
                               // session rows whose Mentee Record ID is blank)
@@ -112,6 +117,7 @@ exports.handler = async (event) => {
           lastReminded:  (f["Last Reminded"]   || "").slice(0, 10),
           firstReminded: (f["First Reminded"]  || "").slice(0, 10),
           kokoChecked:   (f["Koko Checked At"] || "").slice(0, 10),
+          holdUntil:     (f["On Hold Until"]    || "").slice(0, 10),
           // Booked by Koko from the admin view rather than by the mentor on a
           // session row. Counts exactly the same for reminders below.
           adminNext:     (f["Next Session"]    || "").slice(0, 10),
@@ -133,8 +139,9 @@ exports.handler = async (event) => {
       const purchase = f["Payment Status"] === "Package" && (parseFloat(f["Amount Charged"]) || 0) > 0;
       const date = (f["Date"] || "").slice(0, 10);
       const next = (f["Next Session"] || "").slice(0, 10);
-      const a = agg.get(id) || { lastDate: "", hasFuture: false, tomorrow: false };
+      const a = agg.get(id) || { lastDate: "", hasFuture: false, tomorrow: false, lastBooked: "" };
       if (date && !purchase && date > a.lastDate) a.lastDate = date;
+      if (next && next > a.lastBooked) a.lastBooked = next;
       if (next && next >= today) a.hasFuture = true;
       if (next === tomorrow) a.tomorrow = true;
       agg.set(id, a);
@@ -158,6 +165,7 @@ exports.handler = async (event) => {
       return byMentor.get(email);
     };
     const kokoList = [];  // mentees to escalate to Koko
+    const nudgeList = []; // quiet mentees for Fidel's Monday list
     const toReset  = [];  // booked again: clear the stamps so the cycle restarts
     active.forEach((m, id) => {
       const a = agg.get(id);
@@ -178,6 +186,23 @@ exports.handler = async (event) => {
       const dueForNudge = !m.lastReminded || daysBetween(m.lastReminded, today) >= 7;
       if (gap >= REACH_OUT_DAYS && dueForNudge) {
         bucket(m.mentorEmail, m.mentorName).reachout.push({ id, name: m.name, gap, first: !m.firstReminded });
+      }
+
+      // Fidel's weekly list. A booking that came and went with nothing logged
+      // means the session did not happen, so it belongs here alongside plain
+      // silence. The missed date is carried through as context.
+      //
+      // Two exits: a hold, or a next session Koko has confirmed from the mentee
+      // status page. Both mean somebody has already dealt with this one.
+      const parked = m.holdUntil && m.holdUntil >= today;
+      const booked = m.adminNext && m.adminNext >= today;
+      if (gap >= REACH_OUT_DAYS && !parked && !booked) {
+        nudgeList.push({
+          name: m.name, mentor: m.mentorName, gap,
+          lastDate: a.lastDate,
+          // Only a genuinely missed booking, not one still to come.
+          missed: (a.lastBooked && a.lastBooked < today && a.lastBooked > a.lastDate) ? a.lastBooked : "",
+        });
       }
 
       // Qualifies for Koko's weekly digest once the mentor's first nudge is 10+
@@ -227,6 +252,14 @@ exports.handler = async (event) => {
 
     // Koko's check-in: did the mentors actually chase these mentees? One digest
     // on the fixed day, sorted worst first.
+    nudgeList.sort((a, b) => b.gap - a.gap);
+    const nudgeDay = m.weekday === NUDGE_DIGEST_DAY;
+    if (nudgeList.length && nudgeDay && !dryRun && BREVO_API_KEY) {
+      await sendEmail(BREVO_API_KEY, FIDEL.email, FIDEL.name,
+        `${nudgeList.length} mentee${nudgeList.length === 1 ? "" : "s"} to nudge this week`,
+        buildNudgeEmail(nudgeList, REACH_OUT_DAYS));
+    }
+
     kokoList.sort((a, b) => b.since - a.since);
     const kokoDay = m.weekday === KOKO_DIGEST_DAY;
     if (kokoList.length && kokoDay && !dryRun && BREVO_API_KEY) {
@@ -248,6 +281,7 @@ exports.handler = async (event) => {
     return { statusCode: 200, body: JSON.stringify({
       date: today, dryRun, mentorsEmailed: sent, summary,
       kokoDigestDay: KOKO_DIGEST_DAY, kokoSendsToday: kokoDay,
+      nudgeSendsToday: nudgeDay, nudgeList,
       kokoCheck: kokoList, stampsCleared: toReset.length,
     }) };
   } catch (err) {
