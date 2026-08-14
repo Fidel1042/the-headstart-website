@@ -39,6 +39,14 @@ export const NAV_AREAS = [
     ],
   },
   {
+    // Top of the funnel: where leads come from and what they turn into.
+    key: "leads",
+    label: "Leads",
+    links: [
+      { href: "/mentor-portal/leads.html", label: "Attribution", page: "leads" },
+    ],
+  },
+  {
     // Money in and money out. Billing and payslips sit here rather than under
     // Mentors: they are the finance run, not mentor management.
     key: "admin",

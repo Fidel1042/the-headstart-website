@@ -48,6 +48,7 @@
     import { mountPortalNav, initTheme } from "./portal-ui.js";
     import { renderMenteeDashboard } from "./mentee-dashboard.js";
     import { renderSessionHistory } from "./session-history.js";
+    import { renderMentorStats } from "./mentor-stats-panel.js";
 
     initTheme();
 
@@ -103,6 +104,7 @@
       }
 
       initSessionForm(mentorEmail);
+      renderMentorStats(mentorEmail);   // shown under the log form
     });
 
     async function initSessionForm(mentorEmail) {
@@ -339,9 +341,81 @@
       transition: color 0.15s, border-color 0.15s;
     }
     .tabbar__btn:hover { color: var(--text); }
-    /* Stats is a page, not a panel, so it is a link wearing the tab styling. */
-    .tabbar__btn--link { text-decoration: none; display: inline-flex; align-items: center; }
     .tabbar__btn.is-active { color: var(--accent-bright); border-bottom-color: var(--accent-bright); }
+
+
+    /* ── Your numbers, under the log form ── */
+    .stats-divider {
+      display: flex; align-items: center; gap: 0.8rem;
+      margin: 2.4rem 0 1.2rem; color: var(--accent);
+      font-size: 0.62rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+    }
+    .stats-divider::before, .stats-divider::after {
+      content: ""; flex: 1; height: 1px; background: var(--line);
+    }
+    .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.7rem; margin-bottom: 1.2rem; }
+    .tile {
+      border: 1px solid var(--line); border-radius: 14px;
+      padding: 0.9rem 1rem; background: var(--bg-card);
+      display: flex; flex-direction: column; gap: 0.15rem;
+    }
+    .tile__label {
+      font-size: 0.6rem; font-weight: 800; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--accent);
+    }
+    .tile__val { font-size: 1.55rem; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; }
+    .tile__sub { font-size: 0.72rem; color: var(--text-muted); }
+
+    .chart-card { border: 1px solid var(--line); border-radius: 16px; padding: 1.2rem 1.3rem; background: var(--bg-card); margin-bottom: 1rem; }
+    .chart-tabs { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1.2rem; }
+    .chart-tab {
+      font-family: inherit; font-size: 0.72rem; font-weight: 700;
+      padding: 0.32rem 0.8rem; border-radius: 999px; cursor: pointer;
+      border: 1px solid var(--line); background: transparent; color: var(--text-muted);
+    }
+    .chart-tab.is-on { border-color: var(--accent-line); background: var(--accent-soft); color: var(--accent); }
+
+    .bars { display: flex; align-items: flex-end; gap: 0.5rem; height: 170px; }
+    .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.35rem; height: 100%; justify-content: flex-end; }
+    .bar-val { font-size: 0.7rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .bar {
+      width: 100%; max-width: 50px; border-radius: 8px 8px 3px 3px;
+      background: linear-gradient(180deg, var(--accent) 0%, rgba(155,111,22,0.5) 100%);
+      min-height: 3px; transition: height 0.35s ease;
+    }
+    .bar-col--now .bar { background: linear-gradient(180deg, #d6a93e 0%, var(--accent) 100%); }
+    .bar-label { font-size: 0.64rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+    .bar-col--now .bar-label { color: var(--accent); font-weight: 800; }
+
+    .cadence__row { display: flex; align-items: baseline; gap: 0.55rem; flex-wrap: wrap; margin: 0.5rem 0 0.6rem; }
+    .cadence__big { font-size: 2rem; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+    .cadence__unit { font-size: 0.84rem; color: var(--text-muted); }
+    .track { height: 10px; border-radius: 999px; background: rgba(0,0,0,0.07); overflow: hidden; margin: 0.9rem 0 0.4rem; }
+    .track__fill { height: 100%; border-radius: 999px; background: var(--accent); transition: width 0.5s ease; }
+    .track-ends { display: flex; justify-content: space-between; font-size: 0.66rem; color: var(--text-muted); }
+    .cadence__note { font-size: 0.85rem; margin-top: 0.9rem; line-height: 1.6; }
+    .cadence__note strong { color: var(--accent); }
+
+    .stats-hint { font-size: 0.8rem; color: var(--text-muted); margin: 0.35rem 0 1rem; }
+    .mrow {
+      display: grid; grid-template-columns: 1fr 66px 1fr 84px;
+      align-items: center; gap: 0.7rem;
+      padding: 0.6rem 0; border-top: 1px solid var(--line);
+      font-size: 0.85rem;
+    }
+    .mrow:first-child { border-top: none; }
+    .mrow__name { font-weight: 700; }
+    .mrow__gap { font-weight: 800; font-variant-numeric: tabular-nums; text-align: right; }
+    .mrow__bar { height: 8px; border-radius: 999px; background: rgba(0,0,0,0.07); overflow: hidden; }
+    .mrow__fill { height: 100%; border-radius: 999px; background: var(--accent); }
+    .mrow--good .mrow__fill { background: #4caf81; }
+    .mrow--good .mrow__gap { color: #4caf81; }
+    .mrow__since { font-size: 0.72rem; color: var(--text-muted); text-align: right; }
+    .mrow__since.is-late { color: #e05050; font-weight: 700; }
+    @media (max-width: 620px) {
+      .mrow { grid-template-columns: 1fr auto; }
+      .mrow__bar { display: none; }
+    }
 
     /* Compact onboarding banner (shown on the Log tab until done) */
     .onboarding-incomplete { display: block; margin-bottom: 1.2rem; }
@@ -843,7 +917,6 @@
     <button class="tabbar__btn" type="button" data-tab="mentees">Mentees</button>
     <button class="tabbar__btn" type="button" data-tab="history">History</button>
     <button class="tabbar__btn" type="button" data-tab="resources">Resources</button>
-    <a class="tabbar__btn tabbar__btn--link" href="/mentor-portal/stats.html">My Stats</a>
   </nav>
 
   <main>
@@ -895,6 +968,31 @@
           <div class="success-detail" id="success-detail"></div>
         </div>
         <button class="log-another" id="log-another-btn">Log another &rarr;</button>
+      </div>
+
+      <!-- Your numbers, under the form so they are seen every time a session
+           is logged rather than sitting on a page nobody opens. -->
+      <div id="stats-root" hidden>
+        <div class="stats-divider"><span>Your numbers</span></div>
+
+        <div class="tiles" id="stats-tiles"></div>
+
+        <div class="chart-card">
+          <div class="chart-tabs">
+            <button type="button" class="chart-tab is-on" data-metric="earnings">Earnings</button>
+            <button type="button" class="chart-tab" data-metric="sessions">Sessions</button>
+            <button type="button" class="chart-tab" data-metric="perStudent">Per student</button>
+          </div>
+          <div class="bars" id="stats-bars"></div>
+        </div>
+
+        <div class="chart-card" id="stats-cadence"></div>
+
+        <div class="chart-card" id="stats-mentees-card" hidden>
+          <span class="tile__label">Where your next sessions are</span>
+          <p class="stats-hint">Longest gap first. The one at the top is who to book next.</p>
+          <div id="stats-mentees"></div>
+        </div>
       </div>
     </section>
 

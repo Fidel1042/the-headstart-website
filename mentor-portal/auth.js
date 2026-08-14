@@ -34,7 +34,8 @@ export const ALLOWED_MENTOR_EMAILS = [
 // billing (charging mentees) and payslips (paying mentors) pages are hidden
 // from her nav and blocked if she reaches the URL directly. Keyed by page id.
 export const LIMITED_OWNERS = {
-  "kokoro.araki1015@gmail.com": ["billing", "payslips"],
+  // "leads" is Fidel's attribution dashboard, hidden from Koko by request.
+  "kokoro.araki1015@gmail.com": ["billing", "payslips", "leads"],
 };
 
 /** Whether an owner is allowed to see a given owner page. */

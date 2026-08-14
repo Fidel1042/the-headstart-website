@@ -1,0 +1,132 @@
+/* leads.css — owner-only leads attribution page */
+
+.leads-page {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 4rem;
+}
+
+.leads-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+.leads-title { font-size: 1.5rem; margin: 0; }
+
+.leads-range { display: flex; gap: 0.35rem; }
+.range-btn {
+  min-height: 44px;
+  padding: 0 0.95rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.range-btn:hover { color: var(--text); }
+.range-btn.is-active {
+  color: var(--accent);
+  border-color: var(--accent-line);
+  background: var(--accent-soft);
+}
+
+/* ── KPI tiles ──
+   Repeating layout, so all four alignment rules apply: the grid gives equal
+   row height, the label has a min-height sized to its longest sibling so
+   every value sits on the same baseline, and the value is pushed to the
+   bottom of the tile. */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+.kpi {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--bg-card);
+  padding: 1rem 1.05rem;
+}
+.kpi__label {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  line-height: 1.35;
+  min-height: 2.7em;      /* 1.35 line-height x 2 lines, the longest label */
+  margin-bottom: 0.5rem;
+}
+.kpi__value {
+  margin-top: auto;
+  font-size: 1.65rem;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+.kpi__sub {
+  margin-top: 0.3rem;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  min-height: 1.4em;
+}
+.kpi--accent .kpi__value { color: var(--accent); }
+
+.leads-section { margin-bottom: 2.5rem; }
+.leads-h2 { font-size: 1.02rem; margin: 0 0 0.3rem; }
+.leads-sub {
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  margin: 0 0 0.9rem;
+  line-height: 1.5;
+}
+
+.leads-note {
+  border: 1px solid var(--accent-line);
+  background: var(--accent-soft);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  margin: 0 0 2rem;
+}
+
+.data-table td.num, .data-table th.num { text-align: right; white-space: nowrap; }
+.data-table td.strong { font-weight: 700; }
+.data-table td.dim { color: var(--text-muted); }
+.data-table .src { font-weight: 700; white-space: nowrap; }
+.rate-good { color: var(--ok); font-weight: 700; }
+.rate-mid  { color: var(--warn); font-weight: 700; }
+.rate-bad  { color: var(--bad); font-weight: 700; }
+
+/* ── weekly trend ── */
+.trend { display: flex; flex-direction: column; gap: 0.45rem; }
+.trend-row {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr 3.5rem;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: 0.82rem;
+}
+.trend-week { color: var(--text-muted); white-space: nowrap; }
+.trend-bars { display: flex; height: 20px; border-radius: 5px; overflow: hidden; background: var(--bg-card); }
+.trend-seg { height: 100%; }
+.trend-total { text-align: right; font-weight: 700; }
+
+.trend-key { display: flex; flex-wrap: wrap; gap: 0.9rem; margin-top: 0.9rem; font-size: 0.78rem; color: var(--text-muted); }
+.trend-key span { display: inline-flex; align-items: center; gap: 0.35rem; }
+.trend-key i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+@media (max-width: 560px) {
+  .kpi__value { font-size: 1.4rem; }
+  .range-btn { min-height: 44px; }
+  .trend-row { grid-template-columns: 4.2rem 1fr 2.8rem; font-size: 0.76rem; }
+}

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <title>Leads – The Headstart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffffff" />
+  <link rel="manifest" href="/mentor-portal/manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="/mentor-portal/icons/icon-180.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Headstart" />
+  <meta name="format-detection" content="telephone=no" />
+  <script defer src="/mentor-portal/pwa.js"></script>
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+  <style id="auth-gate">
+    html:not(.auth-ok) body { visibility: hidden; }
+    html:not(.auth-ok) { background: #fff; }
+    html:not(.auth-ok)::after {
+      content: ""; position: fixed; top: 50%; left: 50%;
+      width: 30px; height: 30px; margin: -15px 0 0 -15px;
+      border-radius: 50%; border: 3px solid rgba(0,0,0,0.12);
+      border-top-color: #c79b3b; animation: auth-spin 0.7s linear infinite;
+    }
+    @keyframes auth-spin { to { transform: rotate(360deg); } }
+  </style>
+  <link rel="stylesheet" href="/mentor-portal/portal.css" />
+  <link rel="stylesheet" href="/mentor-portal/portal-nav.css" />
+  <link rel="stylesheet" href="/mentor-portal/polish.css" />
+  <link rel="stylesheet" href="/mentor-portal/leads.css" />
+</head>
+<body>
+
+  <div id="portal-nav"></div>
+
+  <main class="leads-page">
+    <div class="leads-head">
+      <h1 class="leads-title">Leads</h1>
+      <div class="leads-range" id="range">
+        <button type="button" class="range-btn" data-days="7">7d</button>
+        <button type="button" class="range-btn is-active" data-days="28">28d</button>
+        <button type="button" class="range-btn" data-days="90">90d</button>
+        <button type="button" class="range-btn" data-days="365">1y</button>
+      </div>
+    </div>
+
+    <p class="state-loading" id="loading">Loading</p>
+    <p class="state-empty" id="error" hidden></p>
+
+    <div id="content" hidden>
+
+      <section class="kpi-grid" id="kpis"></section>
+
+      <p class="leads-note" id="notice" hidden></p>
+
+      <section class="leads-section">
+        <h2 class="leads-h2">Where leads come from</h2>
+        <p class="leads-sub">Traffic and on-site behaviour, by the channel someone first arrived from.</p>
+        <div class="data-table-wrap">
+          <table class="data-table" id="channel-table"></table>
+        </div>
+      </section>
+
+      <section class="leads-section">
+        <h2 class="leads-h2">What happened after the call</h2>
+        <p class="leads-sub">From Airtable. This is the money view, close rate is signed divided by consulted.</p>
+        <div class="data-table-wrap">
+          <table class="data-table" id="sales-table"></table>
+        </div>
+      </section>
+
+      <section class="leads-section">
+        <h2 class="leads-h2">Traffic by week</h2>
+        <p class="leads-sub">Spot a channel falling off before it costs you a month of calls.</p>
+        <div class="trend" id="trend"></div>
+      </section>
+
+      <section class="leads-section">
+        <h2 class="leads-h2">Per post</h2>
+        <p class="leads-sub">One row per tagged campaign. Only fills in for links built with the link builder.</p>
+        <div class="data-table-wrap">
+          <table class="data-table" id="campaign-table"></table>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script type="module" src="leads.js"></script>
+
+</body>
+</html>
