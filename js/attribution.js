@@ -24,8 +24,24 @@
   var TTL_DAYS = 90;
   var TTL_MS = TTL_DAYS * 24 * 60 * 60 * 1000;
 
-  // Referrer hostname -> [source, medium]. Longest match wins.
+  // Referrer hostname -> [source, medium]. First match wins, so the AI
+  // assistants must sit ABOVE the search engines: gemini.google.com would
+  // otherwise be caught by the 'google.' rule and mislabelled as organic.
   var REFERRER_MAP = [
+    // AI assistants and answer engines. medium 'ai' so they can be grouped
+    // as one channel, which is what GEO performance actually looks like.
+    ['chatgpt.com',           ['chatgpt',    'ai']],
+    ['chat.openai.com',       ['chatgpt',    'ai']],
+    ['perplexity.ai',         ['perplexity', 'ai']],
+    ['claude.ai',             ['claude',     'ai']],
+    ['gemini.google.com',     ['gemini',     'ai']],
+    ['copilot.microsoft.com', ['copilot',    'ai']],
+    ['bing.com/chat',         ['copilot',    'ai']],
+    ['you.com',               ['you',        'ai']],
+    ['poe.com',               ['poe',        'ai']],
+    ['grok.com',              ['grok',       'ai']],
+    ['mistral.ai',            ['mistral',    'ai']],
+
     ['linkedin.com',      ['linkedin',  'referral']],
     ['lnkd.in',           ['linkedin',  'referral']],
     ['instagram.com',     ['instagram', 'referral']],
