@@ -48,15 +48,27 @@ function normalizePrivateKey(raw) {
   key = key.replace(/\\n/g, "\n");
 
   const match = key.match(/-----BEGIN ([A-Z ]+?)-----([\s\S]*?)-----END \1-----/);
-  if (!match) {
-    throw new Error(
-      "GA4_PRIVATE_KEY is not a PEM key. It must include the BEGIN and END " +
-      `lines. Received ${key.length} characters.`
-    );
+
+  let label, body;
+  if (match) {
+    label = match[1];
+    body = match[2].replace(/\s+/g, "");
+  } else {
+    // No header lines. Copying a service-account key out of the JSON without
+    // the BEGIN/END lines is an easy miss, and the body alone is still a
+    // perfectly good PKCS#8 key, so rebuild the envelope around it.
+    const stripped = key.replace(/\s+/g, "");
+    if (!/^[A-Za-z0-9+/=]+$/.test(stripped) || stripped.length < 600) {
+      throw new Error(
+        "GA4_PRIVATE_KEY does not look like a private key. Paste the whole " +
+        "private_key value from the service account JSON. " +
+        `Received ${key.length} characters.`
+      );
+    }
+    label = "PRIVATE KEY";
+    body = stripped;
   }
-  const label = match[1];
-  const body = match[2].replace(/\s+/g, "");
-  if (!body) throw new Error("GA4_PRIVATE_KEY has no key body between BEGIN and END");
+  if (!body) throw new Error("GA4_PRIVATE_KEY has no key body");
 
   return `-----BEGIN ${label}-----\n${(body.match(/.{1,64}/g) || []).join("\n")}\n-----END ${label}-----\n`;
 }
