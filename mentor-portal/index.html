@@ -225,7 +225,7 @@
             const opt = menteeSelect.options[menteeSelect.selectedIndex];
             result = { success: true, menteeName: (opt ? opt.textContent : "mentee").replace(" — no card on file", "") };
           } else {
-            const res = await fetch("/.netlify/functions/log-session", {
+            const post = (confirmDuplicate) => fetch("/.netlify/functions/log-session", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
@@ -234,10 +234,24 @@
                 sessionDate,
                 nextSessionDate: nextDateInput.value || "",
                 notes: notesField.value.trim(),
+                confirmDuplicate,
               }),
             });
+            let res = await post(false);
             result = await res.json();
             if (!res.ok) throw new Error(result.error);
+            // A session close to an existing one is usually the same session
+            // recorded under two dates, so it asks before adding a second row.
+            if (result.possibleDuplicate) {
+              if (!confirm(result.message)) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Log session";
+                return;
+              }
+              res = await post(true);
+              result = await res.json();
+              if (!res.ok) throw new Error(result.error);
+            }
           }
 
           logCard.hidden = true;
@@ -325,6 +339,8 @@
       transition: color 0.15s, border-color 0.15s;
     }
     .tabbar__btn:hover { color: var(--text); }
+    /* Stats is a page, not a panel, so it is a link wearing the tab styling. */
+    .tabbar__btn--link { text-decoration: none; display: inline-flex; align-items: center; }
     .tabbar__btn.is-active { color: var(--accent-bright); border-bottom-color: var(--accent-bright); }
 
     /* Compact onboarding banner (shown on the Log tab until done) */
@@ -827,6 +843,7 @@
     <button class="tabbar__btn" type="button" data-tab="mentees">Mentees</button>
     <button class="tabbar__btn" type="button" data-tab="history">History</button>
     <button class="tabbar__btn" type="button" data-tab="resources">Resources</button>
+    <a class="tabbar__btn tabbar__btn--link" href="/mentor-portal/stats.html">My Stats</a>
   </nav>
 
   <main>
@@ -973,7 +990,7 @@
       }
       tabbar.addEventListener('click', function (e) {
         var b = e.target.closest('.tabbar__btn');
-        if (b) showTab(b.getAttribute('data-tab'));
+        if (b && b.getAttribute('data-tab')) showTab(b.getAttribute('data-tab'));
       });
       var savedTab = 'log';
       try { savedTab = localStorage.getItem(TAB_KEY) || 'log'; } catch (e) {}

@@ -16,12 +16,13 @@
   <meta property="og:type" content="website" />
 
   <!-- Google tag (gtag.js) -->
+  <script src="/js/attribution.js"></script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-SMH2KVMJT2"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag("js", new Date());
-    gtag("config", "G-SMH2KVMJT2");
+    gtag("config", "G-SMH2KVMJT2", window.HS_ATTRIBUTION_CONFIG || {});
   </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 
@@ -480,14 +481,15 @@
       });
     }
 
-    // GA4 link click tracking
+    // GA4 link click tracking. The visitor's real source comes from
+    // attribution.js, so /links works for Instagram bio, stories, WhatsApp,
+    // or anywhere else it gets posted.
     document.querySelectorAll('[data-track]').forEach((btn) => {
       btn.addEventListener('click', () => {
-        if (typeof gtag === 'function') {
-          gtag('event', 'link_click', {
+        if (typeof window.hsTrack === 'function') {
+          window.hsTrack('link_click', {
             link_id: btn.dataset.track,
-            link_url: btn.href,
-            source: 'instagram_bio',
+            link_url: btn.href
           });
         }
       });

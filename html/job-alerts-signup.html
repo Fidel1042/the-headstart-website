@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <!-- Google tag (gtag.js) -->
+  <script src="/js/attribution.js"></script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-SMH2KVMJT2"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag("js", new Date());
-    gtag("config", "G-SMH2KVMJT2");
+    gtag("config", "G-SMH2KVMJT2", window.HS_ATTRIBUTION_CONFIG || {});
   </script>
   <title>Get Weekly Job Alerts | Headstart Mentoring</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -516,18 +517,33 @@
     function openConsultModal() {
       consultModal.classList.add("is-open");
       document.body.style.overflow = "hidden";
-      if (typeof gtag === "function") {
-        gtag("event", "modal_view", { modal_name: "consultation_popup" });
+      if (typeof window.hsTrack === "function") {
+        window.hsTrack("modal_view", { modal_name: "consultation_popup" });
       }
     }
     function closeConsultModal() {
       consultModal.classList.remove("is-open");
-      document.body.style.overflow =    }
+      document.body.style.overflow = "";
+    }
     consultClose.addEventListener("click", closeConsultModal);
     consultBackdrop.addEventListener("click", closeConsultModal);
     document.addEventListener("keydown", function(e) {
       if (e.key === "Escape" && consultModal.classList.contains("is-open")) closeConsultModal();
     });
+
+    // Signup start — fires once on first interaction, gives us a denominator
+    // for the signup completion rate.
+    (function () {
+      var form = document.getElementById("emailForm");
+      var fired = false;
+      form.addEventListener("input", function () {
+        if (fired) return;
+        fired = true;
+        if (typeof window.hsTrack === "function") {
+          window.hsTrack("signup_start", { form_id: "job_alert_signup", signup_type: "job_alerts" });
+        }
+      }, true);
+    })();
 
     // Signup form submit
     document.getElementById("emailForm").addEventListener("submit", function(e) {
@@ -560,9 +576,10 @@
       this.style.display = "none";
       document.getElementById("emailSuccess").style.display = "block";
 
-      if (typeof gtag === "function") {
-        gtag("event", "generate_lead", {
+      if (typeof window.hsTrack === "function") {
+        window.hsTrack("generate_lead", {
           form_id: "job_alert_signup",
+          signup_type: "job_alerts",
           student_status: intStudentVal,
           industries: industriesVal,
           role_type: roleTypeVal
@@ -590,8 +607,8 @@
       phoneVal = phoneVal.replace(/^(0061|61)/, '0');
       var isAus = /^(04|4)\d/.test(phoneVal);
 
-      if (typeof gtag === "function") {
-        gtag("event", "consult_form_submit", { form_id: "job_alerts_consult_modal", is_au: isAus ? "yes" : "no" });
+      if (typeof window.hsTrack === "function") {
+        window.hsTrack("consult_form_submit", { form_id: "job_alerts_consult_modal", is_au: isAus ? "yes" : "no" });
       }
 
       if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = "One moment..."; }

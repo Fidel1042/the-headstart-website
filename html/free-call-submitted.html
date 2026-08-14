@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <!-- Google tag (gtag.js) -->
+  <script src="/js/attribution.js"></script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-SMH2KVMJT2"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag("js", new Date());
-    gtag("config", "G-SMH2KVMJT2");
+    gtag("config", "G-SMH2KVMJT2", window.HS_ATTRIBUTION_CONFIG || {});
   </script>
   <title>Book Your Free Career Call | Headstart Mentoring</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -175,11 +176,15 @@
       if (!e.data || e.data.event !== 'calendly.event_scheduled') return;
       if (bookingTracked) return;
       bookingTracked = true;
-      if (typeof window.gtag === 'function') {
+      if (typeof window.hsTrack === 'function') {
         var payload = e.data.payload || {};
         var eventType = payload.event_type || {};
-        window.gtag('event', 'invitee_meeting_scheduled', {
+        var bookingFrom = 'unknown';
+        try { bookingFrom = sessionStorage.getItem('hs_booking_from') || 'unknown'; } catch (err) {}
+        window.hsTrack('invitee_meeting_scheduled', {
           service_name: eventType.name || 'Free Career Call',
+          signup_type: 'discovery_call',
+          booking_from_page: bookingFrom,
           event_category: 'Calendly'
         });
       }

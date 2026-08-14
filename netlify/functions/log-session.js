@@ -41,6 +41,9 @@ exports.handler = async (event) => {
   }
 
   const { menteeRecordId, mentorEmail, sessionDate, nextSessionDate, notes, payoutHeld, loggedBy } = payload;
+  // Set by the form after the person logging has confirmed a near-miss is a
+  // genuinely separate session.
+  const confirmDuplicate = payload.confirmDuplicate === true;
 
   if (!menteeRecordId || !mentorEmail || !sessionDate) {
     return {
@@ -65,31 +68,44 @@ exports.handler = async (event) => {
   };
 
   // ── Step 0: has this session already been logged? ──
-  // Fidel logs sessions on behalf of mentors who have not got round to it. When
-  // the mentor eventually logs the same session himself, a second row would mean
-  // paying the same session twice. Same mentee + same date = the same session, so
-  // no duplicate row is written. A held payout stays held: releasing it is
-  // Fidel's decision alone, never something a mentor can trigger by logging.
+  // Two different failures, so two different answers.
+  //
+  //   Same day      the same session, logged twice. Silently ignored.
+  //   Within 4 days probably the same session recorded under slightly different
+  //                 dates, which is what happens when Fidel logs on a mentor's
+  //                 behalf to charge the mentee and the mentor later logs it
+  //                 himself. But some mentees genuinely meet twice a week, so
+  //                 this asks rather than blocks.
+  const NEAR_DAYS = 4;
   try {
+    const near = new Date(sessionDate + "T00:00:00Z");
+    const from = new Date(near); from.setUTCDate(from.getUTCDate() - NEAR_DAYS);
+    const to   = new Date(near); to.setUTCDate(to.getUTCDate() + NEAR_DAYS);
+    const iso  = (d) => d.toISOString().slice(0, 10);
+
     // "Date" is a dateTime field holding 2026-07-18T00:00:00.000Z, so comparing
     // it to the plain "2026-07-18" the form sends matches nothing at all. It has
     // to be compared as a day, or this check silently never fires.
-    const dupeFormula =
+    const windowFormula =
       `AND({Mentee Record ID}="${menteeRecordId}",` +
-      `IS_SAME({Date},DATETIME_PARSE("${sessionDate}","YYYY-MM-DD"),"day"))`;
-    const dupeRes = await fetch(
+      `IS_AFTER({Date},DATETIME_PARSE("${iso(from)}","YYYY-MM-DD")),` +
+      `IS_BEFORE({Date},DATETIME_PARSE("${iso(to)}","YYYY-MM-DD")))`;
+
+    const res = await fetch(
       `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_SESSION_TABLE_ID}` +
-      `?filterByFormula=${encodeURIComponent(dupeFormula)}&maxRecords=1` +
-      `&fields[]=Mentee Name&fields[]=Payout Held`,
+      `?filterByFormula=${encodeURIComponent(windowFormula)}&maxRecords=10` +
+      `&fields[]=Mentee Name&fields[]=Payout Held&fields[]=Date&fields[]=Mentor Name`,
       { headers: airtableHeaders }
     );
-    const dupe = (await dupeRes.json()).records?.[0];
-    if (dupe) {
+    const rows = (await res.json()).records || [];
+    const sameDay = rows.find((r) => String(r.fields["Date"] || "").slice(0, 10) === sessionDate);
+
+    if (sameDay) {
       // The mentor has caught up on a session Fidel logged for him. Stamp the
       // date so the held panel can say "he has logged this, pay him". The
       // payout itself stays held; only Fidel's click releases it.
-      if (dupe.fields["Payout Held"] && !loggedBy) {
-        await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_SESSION_TABLE_ID}/${dupe.id}`, {
+      if (sameDay.fields["Payout Held"] && !loggedBy) {
+        await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_SESSION_TABLE_ID}/${sameDay.id}`, {
           method: "PATCH",
           headers: airtableHeaders,
           body: JSON.stringify({ fields: { "Mentor Logged At": new Date().toISOString().slice(0, 10) } }),
@@ -101,6 +117,27 @@ exports.handler = async (event) => {
         body: JSON.stringify({
           duplicate: true,
           message: "This session is already logged, so nothing was added.",
+        }),
+      };
+    }
+
+    if (rows.length && !confirmDuplicate) {
+      const other = rows.sort((a, b) =>
+        String(b.fields["Date"] || "").localeCompare(String(a.fields["Date"] || "")))[0];
+      const otherDate = String(other.fields["Date"] || "").slice(0, 10);
+      const days = Math.abs(Math.round(
+        (new Date(sessionDate + "T00:00:00Z") - new Date(otherDate + "T00:00:00Z")) / 86400000));
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({
+          possibleDuplicate: true,
+          existingDate: otherDate,
+          days,
+          message: `There is already a session for this mentee on ${otherDate}, ` +
+            `${days} day${days === 1 ? "" : "s"} from the date you picked. ` +
+            `If that is the same session, cancel and leave it alone. ` +
+            `If this is a genuinely different session, confirm to log it.`,
         }),
       };
     }

@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <!-- Google tag (gtag.js) -->
+  <script src="/js/attribution.js"></script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-SMH2KVMJT2"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag("js", new Date());
-    gtag("config", "G-SMH2KVMJT2");
+    gtag("config", "G-SMH2KVMJT2", window.HS_ATTRIBUTION_CONFIG || {});
   </script>
   <title>Graduate Job Alerts Australia | Headstart Mentoring</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -1247,8 +1248,8 @@ document.querySelectorAll(".tab:not(.soon)").forEach(btn => {
     document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
     activeCat = btn.dataset.cat;
-    if (typeof gtag === "function") {
-      gtag("event", "industry_tab_click", { tab_name: btn.dataset.cat });
+    if (typeof window.hsTrack === "function") {
+      window.hsTrack("industry_tab_click", { tab_name: btn.dataset.cat });
     }
     // Keep the URL in sync so users can copy/share the current tab view.
     try {
@@ -1320,14 +1321,14 @@ document.getElementById("jobList").addEventListener("click", function(e) {
 
   // Job row click → GA4 click-tracking
   const rowLink = e.target.closest(".job-row");
-  if (rowLink && typeof gtag === "function") {
+  if (rowLink && typeof window.hsTrack === "function") {
     sessionJobClickCount++;
-    gtag("event", "job_click", {
-      company: rowLink.dataset.company,
-      title: rowLink.dataset.title,
-      source: rowLink.dataset.source,
-      category: rowLink.dataset.category,
-      city: rowLink.dataset.city,
+    window.hsTrack("job_click", {
+      job_company: rowLink.dataset.company,
+      job_title: rowLink.dataset.title,
+      job_platform: rowLink.dataset.source,
+      job_category: rowLink.dataset.category,
+      job_city: rowLink.dataset.city,
       click_index: sessionJobClickCount
     });
   }
@@ -1353,8 +1354,8 @@ var consultClose = document.getElementById("consultClose");
 function openConsultModal() {
   consultModal.classList.add("is-open");
   document.body.style.overflow = "hidden";
-  if (typeof gtag === "function") {
-    gtag("event", "modal_view", { modal_name: "consultation_popup" });
+  if (typeof window.hsTrack === "function") {
+    window.hsTrack("modal_view", { modal_name: "consultation_popup" });
   }
 }
 function closeConsultModal() {
@@ -1397,8 +1398,8 @@ document.getElementById("emailForm").addEventListener("submit", function(e) {
   this.style.display = "none";
   document.getElementById("emailSuccess").style.display = "block";
 
-  if (typeof gtag === "function") {
-    gtag("event", "generate_lead", {
+  if (typeof window.hsTrack === "function") {
+    window.hsTrack("generate_lead", {
       form_id: "job_alert_signup",
       student_status: (document.getElementById("hiddenIntStudent").value || "").trim(),
       industries: (document.getElementById("hiddenIndustries").value || "").trim(),
@@ -1429,8 +1430,8 @@ document.getElementById("consultForm").addEventListener("submit", function(e) {
   phoneVal = phoneVal.replace(/^(0061|61)/, '0');
   var isAus = /^(04|4)\d/.test(phoneVal);
 
-  if (typeof gtag === "function") {
-    gtag("event", "consult_form_submit", { form_id: "job_alerts_consult_modal", is_au: isAus ? "yes" : "no" });
+  if (typeof window.hsTrack === "function") {
+    window.hsTrack("consult_form_submit", { form_id: "job_alerts_consult_modal", is_au: isAus ? "yes" : "no" });
   }
 
   if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = "One moment..."; }

@@ -69,7 +69,7 @@ async function submitAdd(e, state) {
   stateEl.textContent = "Logging…";
   try {
     if (!isLocal) {
-      const res = await fetch("/.netlify/functions/log-session", {
+      const post = (confirmDuplicate) => fetch("/.netlify/functions/log-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -82,10 +82,20 @@ async function submitAdd(e, state) {
           // the next payslip until they engage. Unticking pays them as normal.
           payoutHeld: fd.get("hold") === "on",
           loggedBy: state.ownerEmail || "admin",
+          confirmDuplicate,
         }),
       });
-      const data = await res.json();
+      let res = await post(false);
+      let data = await res.json();
       if (!res.ok) throw new Error(data.error);
+      // Logging on a mentor's behalf is exactly how the same session ends up
+      // recorded twice under different dates, so near misses are queried here.
+      if (data.possibleDuplicate) {
+        if (!window.confirm(data.message)) { stateEl.textContent = ""; btn.disabled = false; return; }
+        res = await post(true);
+        data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+      }
       // Already on record. Say so and stay open, rather than closing as if a
       // new session had just been added.
       if (data.duplicate) { stateEl.textContent = data.message; btn.disabled = false; return; }

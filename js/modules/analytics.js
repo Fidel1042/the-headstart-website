@@ -1,4 +1,10 @@
 export function gtagEvent(name, params) {
+  // hsTrack (js/attribution.js) attaches first-touch source to every event.
+  // Fall back to raw gtag if attribution.js failed to load.
+  if (typeof window.hsTrack === 'function') {
+    window.hsTrack(name, params);
+    return;
+  }
   if (typeof window.gtag !== 'function') return;
   window.gtag('event', name, params);
 }
@@ -21,6 +27,24 @@ export const init = () => {
         location: locationLabel(el),
         page: window.location.pathname
       });
+    });
+  });
+
+  // Booking funnel start. Fires when someone on any page clicks through to
+  // the discovery call, giving us the denominator for booking rate.
+  document.querySelectorAll('a[href*="/discovery-call"], a[href*="discovery-call.html"]').forEach(el => {
+    el.addEventListener('click', () => {
+      const fromPage = window.location.pathname;
+      gtagEvent('booking_start', {
+        location: locationLabel(el),
+        from_page: fromPage
+      });
+      // Remembered so the eventual Calendly booking knows which page the
+      // journey actually started on. Without this we can count bookings and
+      // count main-page visits, but never tie one to the other.
+      try {
+        sessionStorage.setItem('hs_booking_from', fromPage);
+      } catch (e) { /* storage blocked, fall back to "unknown" */ }
     });
   });
 

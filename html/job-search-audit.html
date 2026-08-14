@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <!-- Google tag (gtag.js) -->
+  <script src="/js/attribution.js"></script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-SMH2KVMJT2"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag("js", new Date());
-    gtag("config", "G-SMH2KVMJT2");
+    gtag("config", "G-SMH2KVMJT2", window.HS_ATTRIBUTION_CONFIG || {});
   </script>
   <title>Free Personalised Offer Roadmap | Headstart Mentoring</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -310,8 +311,24 @@
         body: new URLSearchParams(data).toString()
       }).catch(function () {});
 
-      if (typeof gtag === "function") {
-        gtag("event", "generate_lead", { form_id: "job_search_audit" });
+
+    // Signup start — fires once on first interaction, gives the denominator
+    // for this signup type's completion rate.
+    (function () {
+      var f = document.getElementById("auditForm");
+      if (!f) return;
+      var fired = false;
+      f.addEventListener("input", function () {
+        if (fired) return;
+        fired = true;
+        if (typeof window.hsTrack === "function") {
+          window.hsTrack("signup_start", { form_id: "job_search_audit", signup_type: "audit_roadmap" });
+        }
+      }, true);
+    })();
+
+      if (typeof window.hsTrack === "function") {
+        window.hsTrack("generate_lead", { form_id: "job_search_audit", signup_type: "audit_roadmap" });
       }
 
       var intro = document.getElementById("auditIntro");

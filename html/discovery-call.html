@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <!-- Google tag (gtag.js) -->
+  <script src="/js/attribution.js"></script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-SMH2KVMJT2"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag("js", new Date());
-    gtag("config", "G-SMH2KVMJT2");
+    gtag("config", "G-SMH2KVMJT2", window.HS_ATTRIBUTION_CONFIG || {});
   </script>
   <title>Book a Free Internship &amp; Career Mentoring Call | Headstart Mentoring</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -404,6 +405,21 @@
     // the default "Thank you" page when form metadata gets out of sync.
     (function () {
       var form = document.querySelector('form.signup-form');
+    // Signup start — fires once on first interaction, gives the denominator
+    // for this signup type's completion rate.
+    (function () {
+      var f = form;
+      if (!f) return;
+      var fired = false;
+      f.addEventListener("input", function () {
+        if (fired) return;
+        fired = true;
+        if (typeof window.hsTrack === "function") {
+          window.hsTrack("signup_start", { form_id: "discovery_call_form", signup_type: "discovery_call" });
+        }
+      }, true);
+    })();
+
       if (!form) return;
       var submitBtn = form.querySelector('.discovery-submit-btn');
       var originalLabel = submitBtn ? submitBtn.innerHTML : '';
@@ -461,8 +477,8 @@
         }, 4000);
 
         try {
-          if (typeof window.gtag === 'function') {
-            window.gtag('event', 'discovery_form_submit', { form_id: 'discovery_call_form' });
+          if (typeof window.hsTrack === 'function') {
+            window.hsTrack('discovery_form_submit', { form_id: 'discovery_call_form', signup_type: 'discovery_call' });
           }
           window.location.href = '/free-call-submitted';
         } catch (err) {
