@@ -73,10 +73,23 @@
     }
   }
 
+  // Short forms people actually type in links, mapped to one canonical name.
+  // Without this, "ig" and "instagram" become two separate channels in every
+  // report, which is the exact fragmentation this whole setup exists to end.
+  var SOURCE_ALIASES = {
+    ig: 'instagram', insta: 'instagram', instagram_bio: 'instagram',
+    li: 'linkedin', 'linked-in': 'linkedin', lnkd: 'linkedin',
+    fb: 'facebook', wa: 'whatsapp', yt: 'youtube', tt: 'tiktok',
+    email: 'brevo', newsletter: 'brevo',
+  };
+
   function param(name) {
     try {
       var v = new URLSearchParams(window.location.search).get(name);
-      return v ? v.trim().toLowerCase().slice(0, 100) : '';
+      if (!v) return '';
+      v = v.trim().toLowerCase().slice(0, 100);
+      if (name === 'utm_source' && SOURCE_ALIASES[v]) return SOURCE_ALIASES[v];
+      return v;
     } catch (e) {
       return '';
     }
