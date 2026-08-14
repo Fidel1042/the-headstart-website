@@ -38,6 +38,14 @@
 [functions."monthly-pl"]
   schedule = "0 0 1 * *"
 
+# Monday morning leads report, 06:15 Sydney all year round.
+# Netlify crons run in UTC, and Sydney shifts between UTC+10 and UTC+11 with
+# daylight saving. Firing at both 19:15 and 20:15 UTC on Sunday means one of
+# them always lands on 06:15 in Sydney; the function checks the local hour and
+# exits quietly on the other. Do not "tidy" this into a single time.
+[functions."weekly-report"]
+  schedule = "15 19,20 * * 0"
+
 # Mentor reminders. Runs hourly at :00 and :15; the function only sends at the
 # right Melbourne local time (weekdays 5:15pm, weekends 10am) and exits fast
 # otherwise. Hourly is needed so it stays correct across daylight saving.

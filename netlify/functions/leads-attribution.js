@@ -28,6 +28,39 @@ function b64url(input) {
     .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
+/**
+ * Rebuild a usable PEM from however the key survived being pasted.
+ *
+ * Environment variable UIs mangle multi-line secrets in several ways: escaping
+ * newlines as \n, replacing them with spaces, or stripping them entirely. All
+ * three produce "DECODER routines::unsupported" from OpenSSL. Since the body
+ * is just base64, throw away all whitespace and re-wrap it at 64 characters.
+ */
+function normalizePrivateKey(raw) {
+  let key = String(raw || "").trim();
+  if (!key) throw new Error("GA4_PRIVATE_KEY is empty");
+
+  // A pasted JSON value can arrive still wrapped in quotes.
+  if ((key.startsWith('"') && key.endsWith('"')) ||
+      (key.startsWith("'") && key.endsWith("'"))) {
+    key = key.slice(1, -1);
+  }
+  key = key.replace(/\\n/g, "\n");
+
+  const match = key.match(/-----BEGIN ([A-Z ]+?)-----([\s\S]*?)-----END \1-----/);
+  if (!match) {
+    throw new Error(
+      "GA4_PRIVATE_KEY is not a PEM key. It must include the BEGIN and END " +
+      `lines. Received ${key.length} characters.`
+    );
+  }
+  const label = match[1];
+  const body = match[2].replace(/\s+/g, "");
+  if (!body) throw new Error("GA4_PRIVATE_KEY has no key body between BEGIN and END");
+
+  return `-----BEGIN ${label}-----\n${(body.match(/.{1,64}/g) || []).join("\n")}\n-----END ${label}-----\n`;
+}
+
 async function ga4Token(clientEmail, privateKey) {
   const now = Math.floor(Date.now() / 1000);
   const header = b64url(JSON.stringify({ alg: "RS256", typ: "JWT" }));
@@ -40,8 +73,7 @@ async function ga4Token(clientEmail, privateKey) {
   }));
   const signer = crypto.createSign("RSA-SHA256");
   signer.update(`${header}.${claim}`);
-  // Netlify stores the key with literal \n, turn those back into newlines.
-  const sig = b64url(signer.sign(privateKey.replace(/\\n/g, "\n")));
+  const sig = b64url(signer.sign(normalizePrivateKey(privateKey)));
 
   const res = await fetch("https://oauth2.googleapis.com/token", {
     method: "POST",
@@ -73,7 +105,10 @@ async function runReport(token, propertyId, body) {
   }));
 }
 
-const dateRange = (days) => [{ startDate: `${days}daysAgo`, endDate: "today" }];
+const dateRange = (days, offset = 0) => [{
+  startDate: `${days + offset}daysAgo`,
+  endDate: offset ? `${offset}daysAgo` : "today",
+}];
 
 const eventFilter = (names) => ({
   filter: { fieldName: "eventName", inListFilter: { values: names } },
@@ -96,40 +131,53 @@ async function fetchAll(baseId, tableId, token) {
   return records;
 }
 
-// Collapse the free-text Lead Source field into stable buckets.
+// The five options on the Airtable Lead Source dropdown. Every historical
+// free-text value is folded into one of these so old and new records can be
+// compared. Records with no source at all are dropped from the breakdown
+// entirely: they are pre-dropdown history, not a channel worth a row.
+const LEAD_SOURCES = ["LinkedIn", "Instagram", "Referral", "SEO", "Others"];
+
 function bucketSource(raw) {
   const s = String(raw || "").trim().toLowerCase();
   if (!s) return "Unattributed";
   if (s.includes("linkedin")) return "LinkedIn";
   if (s.includes("insta") || s === "ig") return "Instagram";
   if (s.includes("refer") || s.includes("friend") || s.includes("recommend")) return "Referral";
-  if (s.includes("google") || s.includes("seo") || s.includes("search")) return "Search";
-  if (s.includes("career fair") || s.includes("event") || s.includes("society")) return "Events";
-  if (s.includes("outreach") || s.includes("direct")) return "Outreach";
-  return "Other";
+  if (s.includes("seo") || s.includes("google") || s.includes("search") || s.includes("bing")) return "SEO";
+  return "Others";
+}
+
+/**
+ * GA4's own sessionSource is fragmented: LinkedIn arrives as "linkedin.com",
+ * "LinkedIn" and "lnkd.in"; Instagram as "ig", "instagram.com",
+ * "l.instagram.com" and "instagram_bio". Collapse them so the historical view
+ * uses the same channel names as the first-touch view.
+ */
+function normaliseSessionSource(raw) {
+  const s = String(raw || "").trim().toLowerCase();
+  if (!s || s === "(direct)" || s === "(none)") return "direct";
+  if (s.includes("linkedin") || s.includes("lnkd")) return "linkedin";
+  if (s === "ig" || s.includes("instagram")) return "instagram";
+  if (s.includes("facebook")) return "facebook";
+  if (s.includes("google")) return "google";
+  if (s.includes("bing")) return "bing";
+  if (s.includes("chatgpt") || s.includes("openai")) return "chatgpt";
+  if (s.includes("perplexity")) return "perplexity";
+  if (s.includes("brevo") || s.includes("sendib")) return "brevo";
+  return s;
 }
 
 const truthy = (v) => v === 1 || v === true || v === "Yes" || v === "yes";
 
 /* ------------------------------------------------------------ handler --- */
 
-exports.handler = async (event) => {
-  if (event.httpMethod === "OPTIONS") return { statusCode: 204, headers, body: "" };
-  if (event.httpMethod !== "POST") {
-    return { statusCode: 405, headers, body: JSON.stringify({ error: "Method not allowed" }) };
-  }
-
-  let payload;
-  try { payload = JSON.parse(event.body || "{}"); }
-  catch { return { statusCode: 400, headers, body: JSON.stringify({ error: "Invalid JSON" }) }; }
-
-  const ownerEmail = (payload.ownerEmail || "").toLowerCase().trim();
-  if (!OWNERS.includes(ownerEmail)) {
-    return { statusCode: 403, headers, body: JSON.stringify({ error: "Owners only" }) };
-  }
-
-  const days = Math.min(Math.max(parseInt(payload.days, 10) || 28, 1), 365);
-
+/**
+ * Pull everything for a window. `offset` shifts the window back, so
+ * gather(7) is the last 7 days and gather(7, 7) is the 7 days before that.
+ * Both the portal page and the Monday email call this, so they can never
+ * show different numbers.
+ */
+async function gather(days, offset = 0) {
   const {
     GA4_PROPERTY_ID, GA4_CLIENT_EMAIL, GA4_PRIVATE_KEY,
     AIRTABLE_API_TOKEN, AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTEE_TABLE_ID,
@@ -145,10 +193,10 @@ exports.handler = async (event) => {
     const token = await ga4Token(GA4_CLIENT_EMAIL, GA4_PRIVATE_KEY);
     const P = GA4_PROPERTY_ID;
 
-    const [visitors, conversions, campaigns, weekly] = await Promise.all([
+    const [visitors, conversions, campaigns, weekly, sessionRows, sessionWeekly, linkClicks] = await Promise.all([
       // People arriving, by original source
       runReport(token, P, {
-        dateRanges: dateRange(days),
+        dateRanges: dateRange(days, offset),
         dimensions: [{ name: "customEvent:first_source" }, { name: "customEvent:first_medium" }],
         metrics: [{ name: "totalUsers" }],
         dimensionFilter: eventFilter(["page_view"]),
@@ -156,7 +204,7 @@ exports.handler = async (event) => {
       }),
       // Conversions, by source and by which of the three things they signed up for
       runReport(token, P, {
-        dateRanges: dateRange(days),
+        dateRanges: dateRange(days, offset),
         dimensions: [
           { name: "customEvent:first_source" },
           { name: "eventName" },
@@ -168,7 +216,7 @@ exports.handler = async (event) => {
       }),
       // Per-post performance
       runReport(token, P, {
-        dateRanges: dateRange(days),
+        dateRanges: dateRange(days, offset),
         dimensions: [{ name: "customEvent:first_campaign" }, { name: "eventName" }],
         metrics: [{ name: "totalUsers" }],
         dimensionFilter: eventFilter(["page_view", ...CONVERSION_EVENTS]),
@@ -176,11 +224,37 @@ exports.handler = async (event) => {
       }),
       // Weekly trend by source
       runReport(token, P, {
-        dateRanges: dateRange(days),
+        dateRanges: dateRange(days, offset),
         dimensions: [{ name: "week" }, { name: "customEvent:first_source" }],
         metrics: [{ name: "totalUsers" }],
         dimensionFilter: eventFilter(["page_view"]),
         limit: 500,
+      }),
+      // GA4's own session attribution. Rougher than first-touch, but it goes
+      // back a year, so the page has something to show before the new
+      // dimensions have accumulated.
+      runReport(token, P, {
+        dateRanges: dateRange(days, offset),
+        dimensions: [{ name: "sessionSource" }, { name: "eventName" }],
+        metrics: [{ name: "totalUsers" }],
+        dimensionFilter: eventFilter(["page_view", ...CONVERSION_EVENTS]),
+        limit: 600,
+      }),
+      runReport(token, P, {
+        dateRanges: dateRange(days, offset),
+        dimensions: [{ name: "week" }, { name: "sessionSource" }],
+        metrics: [{ name: "totalUsers" }],
+        dimensionFilter: eventFilter(["page_view"]),
+        limit: 900,
+      }),
+      // The /links page: which of the three options people choose, and who
+      // sent them. This is the Instagram bio-link question.
+      runReport(token, P, {
+        dateRanges: dateRange(days, offset),
+        dimensions: [{ name: "customEvent:link_id" }, { name: "customEvent:first_source" }],
+        metrics: [{ name: "totalUsers" }],
+        dimensionFilter: eventFilter(["link_click"]),
+        limit: 200,
       }),
     ]);
 
@@ -221,6 +295,57 @@ exports.handler = async (event) => {
     });
     out.campaigns = Object.values(camp).sort((a, b) => b.visitors - a.visitors).slice(0, 25);
 
+    // Which of the three /links options gets picked, split by who sent them.
+    const LINK_LABELS = {
+      offer_roadmap: "Offer roadmap",
+      mentoring_landing: "Mentoring (main site)",
+      job_alerts: "Job alerts",
+    };
+    // Seed all three so an option nobody picked shows as 0 rather than
+    // vanishing, which would read as "there are only two options".
+    const links = {};
+    Object.entries(LINK_LABELS).forEach(([id, label]) => {
+      links[id] = { linkId: id, label, total: 0, bySource: {} };
+    });
+    linkClicks.forEach(({ dims, mets }) => {
+      const [linkId, src] = dims;
+      if (!linkId || linkId === "(not set)") return;
+      const l = (links[linkId] = links[linkId] || {
+        linkId, label: LINK_LABELS[linkId] || linkId, total: 0, bySource: {},
+      });
+      l.total += mets[0];
+      l.bySource[src || "(unknown)"] = (l.bySource[src || "(unknown)"] || 0) + mets[0];
+    });
+    out.linksPage = Object.values(links).sort((a, b) => b.total - a.total);
+
+    // Same shape as out.channels, so the page can swap between them.
+    const sess = {};
+    sessionRows.forEach(({ dims, mets }) => {
+      const [rawSrc, evName] = dims;
+      const key = normaliseSessionSource(rawSrc);
+      const c = (sess[key] = sess[key] || {
+        source: key, medium: "", visitors: 0,
+        signups: { job_alerts: 0, audit_roadmap: 0, discovery_call: 0 },
+        callForms: 0, booked: 0,
+      });
+      if (evName === "page_view") c.visitors += mets[0];
+      if (evName === "discovery_form_submit") { c.callForms += mets[0]; c.signups.discovery_call += mets[0]; }
+      if (evName === "invitee_meeting_scheduled") c.booked += mets[0];
+      if (evName === "generate_lead") c.signups.job_alerts += mets[0];
+    });
+    out.channelsSession = Object.values(sess)
+      .filter((c) => c.visitors || c.booked)
+      .sort((a, b) => b.visitors - a.visitors);
+
+    const swk = {};
+    sessionWeekly.forEach(({ dims, mets }) => {
+      const [week, rawSrc] = dims;
+      const key = normaliseSessionSource(rawSrc);
+      swk[week] = swk[week] || { week, sources: {} };
+      swk[week].sources[key] = (swk[week].sources[key] || 0) + mets[0];
+    });
+    out.weeklySession = Object.values(swk).sort((a, b) => a.week.localeCompare(b.week));
+
     const wk = {};
     weekly.forEach(({ dims, mets }) => {
       const [week, src] = dims;
@@ -233,12 +358,16 @@ exports.handler = async (event) => {
     out.channels = [];
     out.campaigns = [];
     out.weekly = [];
+    out.linksPage = [];
+    out.channelsSession = [];
+    out.weeklySession = [];
   }
 
   /* ---- Airtable side: what happened after the call ---- */
   try {
     const recs = await fetchAll(AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTEE_TABLE_ID, AIRTABLE_API_TOKEN);
-    const since = new Date(Date.now() - days * 86400000);
+    const until = new Date(Date.now() - offset * 86400000);
+    const since = new Date(Date.now() - (days + offset) * 86400000);
 
     const bySource = {};
     let totals = { leads: 0, consulted: 0, signed: 0 };
@@ -247,7 +376,7 @@ exports.handler = async (event) => {
       const f = r.fields || {};
       // Date the call happened; fall back to record creation for pure leads.
       const when = new Date(f["Meeting Time"] || f["Created"] || 0);
-      if (!when || isNaN(when) || when < since) return;
+      if (!when || isNaN(when) || when < since || when > until) return;
 
       const key = bucketSource(f["Lead Source"]);
       const b = (bySource[key] = bySource[key] || { source: key, leads: 0, consulted: 0, signed: 0 });
@@ -257,20 +386,48 @@ exports.handler = async (event) => {
       if (truthy(f["Signed"])) { b.signed++; totals.signed++; }
     });
 
+    // Always show all five dropdown options, even at zero, so a channel that
+    // produced nothing is visible rather than silently missing from the table.
+    LEAD_SOURCES.forEach((s) => {
+      bySource[s] = bySource[s] || { source: s, leads: 0, consulted: 0, signed: 0 };
+    });
+
     out.sales = {
       totals: {
         ...totals,
         showUpRate: totals.leads ? totals.consulted / totals.leads : null,
         closeRate: totals.consulted ? totals.signed / totals.consulted : null,
       },
-      bySource: Object.values(bySource)
-        .map((b) => ({ ...b, closeRate: b.consulted ? b.signed / b.consulted : null }))
-        .sort((a, b) => b.signed - a.signed || b.leads - a.leads),
+      bySource: LEAD_SOURCES
+        .map((s) => bySource[s])
+        .map((b) => ({ ...b, closeRate: b.consulted ? b.signed / b.consulted : null })),
     };
   } catch (err) {
     out.errors.push("Airtable: " + err.message);
     out.sales = { totals: {}, bySource: [] };
   }
 
+  return out;
+}
+
+exports.gather = gather;
+
+exports.handler = async (event) => {
+  if (event.httpMethod === "OPTIONS") return { statusCode: 204, headers, body: "" };
+  if (event.httpMethod !== "POST") {
+    return { statusCode: 405, headers, body: JSON.stringify({ error: "Method not allowed" }) };
+  }
+
+  let payload;
+  try { payload = JSON.parse(event.body || "{}"); }
+  catch { return { statusCode: 400, headers, body: JSON.stringify({ error: "Invalid JSON" }) }; }
+
+  const ownerEmail = (payload.ownerEmail || "").toLowerCase().trim();
+  if (!OWNERS.includes(ownerEmail)) {
+    return { statusCode: 403, headers, body: JSON.stringify({ error: "Owners only" }) };
+  }
+
+  const days = Math.min(Math.max(parseInt(payload.days, 10) || 90, 1), 365);
+  const out = await gather(days);
   return { statusCode: 200, headers, body: JSON.stringify(out) };
 };

@@ -38,8 +38,8 @@
       <h1 class="leads-title">Leads</h1>
       <div class="leads-range" id="range">
         <button type="button" class="range-btn" data-days="7">7d</button>
-        <button type="button" class="range-btn is-active" data-days="28">28d</button>
-        <button type="button" class="range-btn" data-days="90">90d</button>
+        <button type="button" class="range-btn" data-days="28">28d</button>
+        <button type="button" class="range-btn is-active" data-days="90">90d</button>
         <button type="button" class="range-btn" data-days="365">1y</button>
       </div>
     </div>
@@ -55,7 +55,11 @@
 
       <section class="leads-section">
         <h2 class="leads-h2">Where leads come from</h2>
-        <p class="leads-sub">Traffic and on-site behaviour, by the channel someone first arrived from.</p>
+        <div class="mode-switch" id="mode">
+          <button type="button" class="mode-btn is-active" data-mode="first">First-touch</button>
+          <button type="button" class="mode-btn" data-mode="session">Session (history)</button>
+        </div>
+        <p class="leads-sub" id="mode-note"></p>
         <div class="data-table-wrap">
           <table class="data-table" id="channel-table"></table>
         </div>
@@ -63,9 +67,17 @@
 
       <section class="leads-section">
         <h2 class="leads-h2">What happened after the call</h2>
-        <p class="leads-sub">From Airtable. This is the money view, close rate is signed divided by consulted.</p>
+        <p class="leads-sub">From Airtable. This is the money view, close rate is signed divided by showed up. Labelled leads only, so older records with no source are left out.</p>
         <div class="data-table-wrap">
           <table class="data-table" id="sales-table"></table>
+        </div>
+      </section>
+
+      <section class="leads-section">
+        <h2 class="leads-h2">The links page</h2>
+        <p class="leads-sub">Your Instagram bio link. Which of the three options people pick, and who sent them.</p>
+        <div class="data-table-wrap">
+          <table class="data-table" id="links-table"></table>
         </div>
       </section>
 

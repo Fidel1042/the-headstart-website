@@ -12,7 +12,9 @@ const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com"];
 const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1";
 
 let ownerEmail = "";
-let days = 28;
+let days = 90;
+let mode = "first";   // "first" = new first-touch, "session" = GA4 history
+let lastData = null;
 
 const esc = (s) => String(s == null ? "" : s)
   .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -49,6 +51,23 @@ const MOCK = {
     { source: "instagram", medium: "bio", visitors: 380, signups: { job_alerts: 26, audit_roadmap: 3, discovery_call: 5 }, callForms: 5, booked: 4 },
     { source: "direct", medium: "none", visitors: 210, signups: { job_alerts: 8, audit_roadmap: 1, discovery_call: 4 }, callForms: 4, booked: 3 },
   ],
+  linksPage: [
+    { linkId: "job_alerts", label: "Job alerts", total: 88, bySource: { instagram: 71, direct: 17 } },
+    { linkId: "offer_roadmap", label: "Offer roadmap", total: 34, bySource: { instagram: 28, direct: 6 } },
+    { linkId: "mentoring_landing", label: "Mentoring (main site)", total: 19, bySource: { instagram: 15, direct: 4 } },
+  ],
+  channelsSession: [
+    { source: "linkedin", medium: "", visitors: 1776, signups: { job_alerts: 9, audit_roadmap: 0, discovery_call: 46 }, callForms: 46, booked: 48 },
+    { source: "instagram", medium: "", visitors: 1625, signups: { job_alerts: 104, audit_roadmap: 0, discovery_call: 23 }, callForms: 23, booked: 54 },
+    { source: "direct", medium: "", visitors: 1118, signups: { job_alerts: 53, audit_roadmap: 0, discovery_call: 32 }, callForms: 32, booked: 47 },
+  ],
+  weeklySession: [
+    { week: "29", sources: { linkedin: 292, instagram: 187, direct: 141 } },
+    { week: "30", sources: { linkedin: 289, instagram: 141, direct: 148 } },
+    { week: "31", sources: { linkedin: 74, instagram: 79, direct: 71 } },
+    { week: "32", sources: { linkedin: 64, instagram: 183, direct: 85 } },
+    { week: "33", sources: { linkedin: 21, instagram: 153, direct: 41 } },
+  ],
   campaigns: [
     { campaign: "interview-fails", visitors: 180, conversions: 9 },
     { campaign: "grad-programs", visitors: 95, conversions: 3 },
@@ -70,10 +89,11 @@ const MOCK = {
 /* ----------------------------------------------------------- rendering --- */
 
 function renderKpis(d) {
-  const visitors = d.channels.reduce((s, c) => s + c.visitors, 0);
-  const signups = d.channels.reduce(
+  const chans = mode === "session" ? (d.channelsSession || []) : (d.channels || []);
+  const visitors = chans.reduce((s, c) => s + c.visitors, 0);
+  const signups = chans.reduce(
     (s, c) => s + c.signups.job_alerts + c.signups.audit_roadmap + c.signups.discovery_call, 0);
-  const booked = d.channels.reduce((s, c) => s + c.booked, 0);
+  const booked = chans.reduce((s, c) => s + c.booked, 0);
   const t = d.sales.totals || {};
 
   const tiles = [
@@ -93,8 +113,14 @@ function renderKpis(d) {
     </div>`).join("");
 }
 
+const MODE_NOTES = {
+  first: "Where someone FIRST arrived from, remembered across visits and read from your link tags. Started 14 Aug 2026.",
+  session: "GA4's own session attribution. Goes back a year, but it is last-click and undercounts LinkedIn, since its in-app browser hides the referrer and that traffic lands in direct.",
+};
+
 function renderChannels(d) {
-  const rows = d.channels;
+  const rows = mode === "session" ? (d.channelsSession || []) : (d.channels || []);
+  document.getElementById("mode-note").textContent = MODE_NOTES[mode];
   const el = document.getElementById("channel-table");
   if (!rows.length) {
     el.innerHTML = `<tbody><tr><td class="dim">No attributed traffic yet.</td></tr></tbody>`;
@@ -106,7 +132,7 @@ function renderChannels(d) {
       <th class="num">Visitors</th>
       <th class="num">Job alerts</th>
       <th class="num">Roadmap</th>
-      <th class="num">Call form</th>
+      <th class="num">Discovery call</th>
       <th class="num">Booked</th>
       <th class="num">Book rate</th>
     </tr></thead>
@@ -117,7 +143,7 @@ function renderChannels(d) {
         <td class="num strong">${num(c.visitors)}</td>
         <td class="num">${num(c.signups.job_alerts)}</td>
         <td class="num">${num(c.signups.audit_roadmap)}</td>
-        <td class="num">${num(c.callForms)}</td>
+        <td class="num">${num(Math.max(c.signups.discovery_call, c.callForms))}</td>
         <td class="num strong">${num(c.booked)}</td>
         <td class="num ${rateClass(br, 0.03, 0.015)}">${pct(c.booked, c.visitors)}</td>
       </tr>`;
@@ -149,8 +175,38 @@ function renderSales(d) {
       </tr>`).join("")}</tbody>`;
 }
 
+function renderLinks(d) {
+  const rows = d.linksPage || [];
+  const el = document.getElementById("links-table");
+  if (!rows.length) {
+    el.innerHTML = `<tbody><tr><td class="dim">No clicks on the links page yet in this window.</td></tr></tbody>`;
+    return;
+  }
+  const total = rows.reduce((s, r) => s + r.total, 0);
+  // Every source that sent anyone to the links page, biggest first.
+  const sources = [...new Set(rows.flatMap((r) => Object.keys(r.bySource)))]
+    .sort((a, b) => rows.reduce((s, r) => s + (r.bySource[b] || 0), 0)
+                  - rows.reduce((s, r) => s + (r.bySource[a] || 0), 0))
+    .slice(0, 4);
+
+  el.innerHTML = `
+    <thead><tr>
+      <th>Option</th>
+      <th class="num">Clicks</th>
+      <th class="num">Share</th>
+      ${sources.map((s) => `<th class="num">${esc(s)}</th>`).join("")}
+    </tr></thead>
+    <tbody>${rows.map((r) => `
+      <tr>
+        <td class="src">${esc(r.label)}</td>
+        <td class="num strong">${num(r.total)}</td>
+        <td class="num">${pct(r.total, total)}</td>
+        ${sources.map((s) => `<td class="num ${r.bySource[s] ? "" : "dim"}">${num(r.bySource[s] || 0)}</td>`).join("")}
+      </tr>`).join("")}</tbody>`;
+}
+
 function renderTrend(d) {
-  const weeks = d.weekly || [];
+  const weeks = (mode === "session" ? d.weeklySession : d.weekly) || [];
   const el = document.getElementById("trend");
   if (!weeks.length) { el.innerHTML = `<p class="dim">No weekly data yet.</p>`; return; }
 
@@ -243,17 +299,42 @@ async function load() {
 
   data.channels = data.channels || [];
   data.sales = data.sales || { totals: {}, bySource: [] };
+  data.linksPage = data.linksPage || [];
+  data.channelsSession = data.channelsSession || [];
+  data.weeklySession = data.weeklySession || [];
+  lastData = data;
+
+  // Default to whichever view actually has numbers, so the page is never
+  // blank, but keep the switch visible so it is obvious which one is showing.
+  const firstTouchVisitors = data.channels
+    .filter((c) => c.source !== "(not set)" && c.source !== "(unknown)")
+    .reduce((s, c) => s + c.visitors, 0);
+  if (firstTouchVisitors < 20 && data.channelsSession.length) mode = "session";
+  document.querySelectorAll(".mode-btn").forEach((b) =>
+    b.classList.toggle("is-active", b.dataset.mode === mode));
 
   renderKpis(data);
   renderNotice(data);
   renderChannels(data);
   renderSales(data);
+  renderLinks(data);
   renderTrend(data);
   renderCampaigns(data);
 
   loading.hidden = true;
   content.hidden = false;
 }
+
+document.getElementById("mode").addEventListener("click", (e) => {
+  const btn = e.target.closest(".mode-btn");
+  if (!btn || !lastData) return;
+  mode = btn.dataset.mode;
+  document.querySelectorAll(".mode-btn").forEach((b) => b.classList.remove("is-active"));
+  btn.classList.add("is-active");
+  renderKpis(lastData);
+  renderChannels(lastData);
+  renderTrend(lastData);
+});
 
 document.getElementById("range").addEventListener("click", (e) => {
   const btn = e.target.closest(".range-btn");

@@ -130,3 +130,20 @@
   .range-btn { min-height: 44px; }
   .trend-row { grid-template-columns: 4.2rem 1fr 2.8rem; font-size: 0.76rem; }
 }
+
+/* ── attribution mode switch ── */
+.mode-switch { display: inline-flex; gap: 0.3rem; margin: 0 0 0.6rem; }
+.mode-btn {
+  min-height: 34px;
+  padding: 0 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.mode-btn:hover { color: var(--text); }
+.mode-btn.is-active { color: var(--accent); border-color: var(--accent-line); background: var(--accent-soft); }
