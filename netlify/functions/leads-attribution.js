@@ -160,6 +160,55 @@ function bucketSource(raw) {
 }
 
 /**
+ * One canonical channel name from whatever the source string happens to be.
+ *
+ * Applied to BOTH first-touch and session data, and applied at report time
+ * rather than only at capture, so rows recorded before the tracker learned an
+ * alias still merge correctly instead of sitting as a separate line forever.
+ */
+function canonicalChannel(raw) {
+  const s = String(raw || "").trim().toLowerCase();
+
+  if (!s || s === "(not set)" || s === "(unknown)" || s === "(direct)") {
+    return s === "(direct)" ? "direct" : "not tagged";
+  }
+  // com.linkedin.android is the LinkedIn phone app; lnkd.in is their shortener.
+  if (s.includes("linkedin") || s.includes("lnkd")) return "linkedin";
+  if (s === "ig" || s.includes("instagram")) return "instagram";
+  if (s.includes("facebook")) return "facebook";
+  if (s.includes("tiktok")) return "tiktok";
+  if (s.includes("whatsapp")) return "whatsapp";
+  // sendibm*.sendinblue/brevo tracking domains, e.g. nqpeh.r.ag.d.sendibm3.com
+  if (s.includes("brevo") || s.includes("sendib") || s.includes("sendinblue")) return "brevo";
+  if (s.includes("chatgpt") || s.includes("openai")) return "chatgpt";
+  if (s.includes("perplexity")) return "perplexity";
+  if (s.includes("gemini")) return "gemini";
+  if (s.includes("copilot")) return "copilot";
+  if (s.includes("claude")) return "claude";
+  if (s.includes("google")) return "google";
+  if (s.includes("bing")) return "bing";
+  if (s.includes("duckduckgo")) return "duckduckgo";
+  if (s === "lead_magnet") return "lead magnet";
+  if (s === "direct") return "direct";
+  // Mid-flow redirects: someone bounced through Stripe or an auth screen and
+  // came back. That is your own funnel, not an acquisition source.
+  if (s.includes("stripe.com") || s.includes("accounts.google") ||
+      s.includes("calendly.com") || s.includes("netlify.app")) return "direct";
+  // Job boards are outbound destinations from the job alerts page. A referral
+  // FROM one means someone clicked a listing and came back, so it is a return
+  // visit rather than a channel. LinkedIn stays a real channel: the Alex
+  // account posts legitimately drive to the job alerts page.
+  // GA4 tidies known referrers to a plain name, so this arrives as "seek" or
+  // "Seek" rather than "au.seek.com". Match both the name and the domain.
+  const JOB_BOARDS = ["seek", "indeed", "jora", "glassdoor", "adzuna",
+                      "gradconnection", "prosple", "grad connection"];
+  if (JOB_BOARDS.some((b) => s === b || s.includes(b + ".com") || s.includes(b + ".com.au"))) {
+    return "direct";
+  }
+  return s;
+}
+
+/**
  * GA4's own sessionSource is fragmented: LinkedIn arrives as "linkedin.com",
  * "LinkedIn" and "lnkd.in"; Instagram as "ig", "instagram.com",
  * "l.instagram.com" and "instagram_bio". Collapse them so the historical view
@@ -205,14 +254,14 @@ async function gather(days, offset = 0) {
     const token = await ga4Token(GA4_CLIENT_EMAIL, GA4_PRIVATE_KEY);
     const P = GA4_PROPERTY_ID;
 
-    const [visitors, conversions, campaigns, weekly, sessionRows, sessionWeekly, linkClicks] = await Promise.all([
+    const [visitors, conversions, campaigns, weekly, linkUrlRows, ratioRows, sessionRows, sessionWeekly, linkClicks] = await Promise.all([
       // People arriving, by original source
       runReport(token, P, {
         dateRanges: dateRange(days, offset),
         dimensions: [{ name: "customEvent:first_source" }, { name: "customEvent:first_medium" }],
         metrics: [{ name: "totalUsers" }],
         dimensionFilter: eventFilter(["page_view"]),
-        limit: 100,
+        limit: 1000,
       }),
       // Conversions, by source and by which of the three things they signed up for
       runReport(token, P, {
@@ -224,7 +273,7 @@ async function gather(days, offset = 0) {
         ],
         metrics: [{ name: "totalUsers" }],
         dimensionFilter: eventFilter(CONVERSION_EVENTS),
-        limit: 400,
+        limit: 2000,
       }),
       // Per-post performance
       runReport(token, P, {
@@ -232,7 +281,7 @@ async function gather(days, offset = 0) {
         dimensions: [{ name: "customEvent:first_campaign" }, { name: "eventName" }],
         metrics: [{ name: "totalUsers" }],
         dimensionFilter: eventFilter(["page_view", ...CONVERSION_EVENTS]),
-        limit: 400,
+        limit: 2000,
       }),
       // Weekly trend by source
       runReport(token, P, {
@@ -240,7 +289,25 @@ async function gather(days, offset = 0) {
         dimensions: [{ name: "week" }, { name: "customEvent:first_source" }],
         metrics: [{ name: "totalUsers" }],
         dimensionFilter: eventFilter(["page_view"]),
-        limit: 500,
+        limit: 2000,
+      }),
+      // link_id only exists from 14 Aug, but GA4's built-in linkUrl has always
+      // recorded the destination, which identifies the option just as well.
+      runReport(token, P, {
+        dateRanges: dateRange(days, offset),
+        dimensions: [{ name: "linkUrl" }, { name: "customEvent:first_source" }],
+        metrics: [{ name: "totalUsers" }],
+        dimensionFilter: eventFilter(["link_click"]),
+        limit: 1000,
+      }),
+      // Events vs people, so the audit can spot anything firing repeatedly
+      // for the same person.
+      runReport(token, P, {
+        dateRanges: dateRange(days, offset),
+        dimensions: [{ name: "eventName" }],
+        metrics: [{ name: "eventCount" }, { name: "totalUsers" }],
+        dimensionFilter: eventFilter(CONVERSION_EVENTS),
+        limit: 20,
       }),
       // GA4's own session attribution. Rougher than first-touch, but it goes
       // back a year, so the page has something to show before the new
@@ -257,7 +324,7 @@ async function gather(days, offset = 0) {
         dimensions: [{ name: "week" }, { name: "sessionSource" }],
         metrics: [{ name: "totalUsers" }],
         dimensionFilter: eventFilter(["page_view"]),
-        limit: 900,
+        limit: 2000,
       }),
       // The /links page: which of the three options people choose, and who
       // sent them. This is the Instagram bio-link question.
@@ -266,26 +333,33 @@ async function gather(days, offset = 0) {
         dimensions: [{ name: "customEvent:link_id" }, { name: "customEvent:first_source" }],
         metrics: [{ name: "totalUsers" }],
         dimensionFilter: eventFilter(["link_click"]),
-        limit: 200,
+        limit: 1000,
       }),
     ]);
 
     const channels = {};
     const chan = (k) => (channels[k] = channels[k] || {
-      source: k, medium: "", visitors: 0,
+      source: k, medium: "", mediums: {}, visitors: 0,
       signups: { job_alerts: 0, audit_roadmap: 0, discovery_call: 0 },
       callForms: 0, booked: 0,
     });
 
     visitors.forEach(({ dims, mets }) => {
-      const c = chan(dims[0] || "(unknown)");
+      const c = chan(canonicalChannel(dims[0]));
       c.visitors += mets[0];
-      if (!c.medium) c.medium = dims[1] || "";
+      const med = dims[1] && dims[1] !== "(not set)" ? dims[1] : "";
+      if (med) c.mediums[med] = (c.mediums[med] || 0) + mets[0];
+    });
+
+    // Show the mediums that actually carried traffic, biggest first.
+    Object.values(channels).forEach((c) => {
+      c.medium = Object.entries(c.mediums)
+        .sort((a, b) => b[1] - a[1]).slice(0, 3).map(([m]) => m).join(", ");
     });
 
     conversions.forEach(({ dims, mets }) => {
       const [src, evName, signupType] = dims;
-      const c = chan(src || "(unknown)");
+      const c = chan(canonicalChannel(src));
       if (evName === "discovery_form_submit") c.callForms += mets[0];
       if (evName === "invitee_meeting_scheduled") c.booked += mets[0];
       if (Object.prototype.hasOwnProperty.call(c.signups, signupType)) {
@@ -293,8 +367,57 @@ async function gather(days, offset = 0) {
       }
     });
 
+    out.eventRatios = ratioRows.map(({ dims, mets }) => ({
+      event: dims[0], events: mets[0], people: mets[1],
+    }));
+
+    out.leadsTotal = conversions
+      .filter(({ dims }) => dims[1] === "generate_lead")
+      .reduce((sum, { mets }) => sum + mets[0], 0);
+
+    // Fill the gap using GA4's own session attribution.
+    //
+    // Deliberately NOT done by querying "first_source = (not set)": GA4 limits
+    // how far back any query touching a custom dimension can see, so that
+    // approach silently returns the same rows for 90 days and a year. Working
+    // from the difference between the session totals and the first-touch
+    // totals avoids the custom dimension entirely and stays correct at any range.
+    const sessionTotals = {};
+    sessionRows.forEach(({ dims, mets }) => {
+      const [rawSrc, evName] = dims;
+      const key = canonicalChannel(rawSrc);
+      const s = (sessionTotals[key] = sessionTotals[key] || {
+        visitors: 0, booked: 0, callForms: 0, leads: 0,
+      });
+      if (evName === "page_view") s.visitors += mets[0];
+      if (evName === "invitee_meeting_scheduled") s.booked += mets[0];
+      if (evName === "discovery_form_submit") s.callForms += mets[0];
+      if (evName === "generate_lead") s.leads += mets[0];
+    });
+
+    delete channels["not tagged"];
+    let recovered = 0;
+    Object.entries(sessionTotals).forEach(([key, s]) => {
+      if (key === "not tagged") return;
+      const c = chan(key);
+      // Only the part session data can see that first-touch cannot.
+      const extraVisitors = Math.max(0, s.visitors - c.visitors);
+      const extraBooked = Math.max(0, s.booked - c.booked);
+      const extraForms = Math.max(0, s.callForms - c.callForms);
+      if (extraVisitors) {
+        c.backfilled = (c.backfilled || 0) + extraVisitors;
+        c.visitors += extraVisitors;
+        recovered += extraVisitors;
+      }
+      c.booked += extraBooked;
+      c.callForms += extraForms;
+    });
+    out.recoveredFromSession = recovered;
+    out.stillUnknown = (sessionTotals["not tagged"] || {}).visitors || 0;
+
     out.channels = Object.values(channels)
       .filter((c) => c.visitors || c.booked || c.callForms)
+      .map(({ mediums, ...c }) => c)
       .sort((a, b) => b.visitors - a.visitors);
 
     const camp = {};
@@ -319,14 +442,34 @@ async function gather(days, offset = 0) {
     Object.entries(LINK_LABELS).forEach(([id, label]) => {
       links[id] = { linkId: id, label, total: 0, bySource: {} };
     });
+    // Destination URL -> which of the three options it is. Lets clicks from
+    // before link_id existed be counted instead of discarded.
+    const urlToOption = (url) => {
+      const u = String(url || "").toLowerCase();
+      if (u.includes("job-search-audit")) return "offer_roadmap";
+      if (u.includes("job-alerts")) return "job_alerts";       // incl. -signup
+      if (/theheadstartmentoring\.com\/?$/.test(u.replace(/[?#].*$/, ""))) return "mentoring_landing";
+      return null;
+    };
+    linkUrlRows.forEach(({ dims, mets }) => {
+      const opt = urlToOption(dims[0]);
+      if (!opt) return;
+      const l = links[opt];
+      l.recovered = (l.recovered || 0) + mets[0];
+      l.total += mets[0];
+      const s = canonicalChannel(dims[1]);
+      l.bySource[s] = (l.bySource[s] || 0) + mets[0];
+    });
+
     linkClicks.forEach(({ dims, mets }) => {
-      const [linkId, src] = dims;
+      const [linkId] = dims;
       if (!linkId || linkId === "(not set)") return;
       const l = (links[linkId] = links[linkId] || {
         linkId, label: LINK_LABELS[linkId] || linkId, total: 0, bySource: {},
       });
-      l.total += mets[0];
-      l.bySource[src || "(unknown)"] = (l.bySource[src || "(unknown)"] || 0) + mets[0];
+      // linkUrl already counted every click, including these, so only record
+      // the medium detail here rather than adding to the total again.
+      l.hasLinkId = true;
     });
     out.linksPage = Object.values(links).sort((a, b) => b.total - a.total);
 
@@ -334,7 +477,7 @@ async function gather(days, offset = 0) {
     const sess = {};
     sessionRows.forEach(({ dims, mets }) => {
       const [rawSrc, evName] = dims;
-      const key = normaliseSessionSource(rawSrc);
+      const key = canonicalChannel(rawSrc);
       const c = (sess[key] = sess[key] || {
         source: key, medium: "", visitors: 0,
         signups: { job_alerts: 0, audit_roadmap: 0, discovery_call: 0 },
@@ -352,7 +495,7 @@ async function gather(days, offset = 0) {
     const swk = {};
     sessionWeekly.forEach(({ dims, mets }) => {
       const [week, rawSrc] = dims;
-      const key = normaliseSessionSource(rawSrc);
+      const key = canonicalChannel(rawSrc);
       swk[week] = swk[week] || { week, sources: {} };
       swk[week].sources[key] = (swk[week].sources[key] || 0) + mets[0];
     });
@@ -361,8 +504,9 @@ async function gather(days, offset = 0) {
     const wk = {};
     weekly.forEach(({ dims, mets }) => {
       const [week, src] = dims;
+      const key = canonicalChannel(src);
       wk[week] = wk[week] || { week, sources: {} };
-      wk[week].sources[src || "(unknown)"] = mets[0];
+      wk[week].sources[key] = (wk[week].sources[key] || 0) + mets[0];
     });
     out.weekly = Object.values(wk).sort((a, b) => a.week.localeCompare(b.week));
   } catch (err) {
@@ -404,6 +548,15 @@ async function gather(days, offset = 0) {
       bySource[s] = bySource[s] || { source: s, leads: 0, consulted: 0, signed: 0 };
     });
 
+    // Airtable is the source of truth for bookings; the audit compares it
+    // against what GA4 saw.
+    out.airtableBookings = recs.filter((r) => {
+      const mt = (r.fields || {})["Meeting Time"];
+      if (!mt) return false;
+      const d = new Date(mt);
+      return !isNaN(d) && d >= since && d <= until;
+    }).length;
+
     out.sales = {
       totals: {
         ...totals,
@@ -416,6 +569,15 @@ async function gather(days, offset = 0) {
     };
   } catch (err) {
     out.errors.push("Airtable: " + err.message);
+    // Airtable is the source of truth for bookings; the audit compares it
+    // against what GA4 saw.
+    out.airtableBookings = recs.filter((r) => {
+      const mt = (r.fields || {})["Meeting Time"];
+      if (!mt) return false;
+      const d = new Date(mt);
+      return !isNaN(d) && d >= since && d <= until;
+    }).length;
+
     out.sales = { totals: {}, bySource: [] };
   }
 
@@ -423,6 +585,7 @@ async function gather(days, offset = 0) {
 }
 
 exports.gather = gather;
+exports.normalizePrivateKey = normalizePrivateKey;
 
 exports.handler = async (event) => {
   if (event.httpMethod === "OPTIONS") return { statusCode: 204, headers, body: "" };

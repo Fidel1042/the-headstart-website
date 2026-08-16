@@ -170,12 +170,20 @@
       }
     })();
 
+    // The in-page flag only survives one page load, and people reload or come
+    // back to this page after booking, which made Calendly re-announce the
+    // booking and inflated the event count roughly fourfold. Persisting the
+    // flag means one booking is counted once, however often they return.
+    var BOOKED_KEY = 'hs_booking_tracked';
     var bookingTracked = false;
+    try { bookingTracked = sessionStorage.getItem(BOOKED_KEY) === '1'; } catch (e) {}
+
     window.addEventListener('message', function (e) {
       if (String(e.origin || '').indexOf('calendly.com') === -1) return;
       if (!e.data || e.data.event !== 'calendly.event_scheduled') return;
       if (bookingTracked) return;
       bookingTracked = true;
+      try { sessionStorage.setItem(BOOKED_KEY, '1'); } catch (err) {}
       if (typeof window.hsTrack === 'function') {
         var payload = e.data.payload || {};
         var eventType = payload.event_type || {};

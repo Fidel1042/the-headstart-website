@@ -139,7 +139,9 @@ function renderChannels(d) {
     <tbody>${rows.map((c) => {
       const br = c.visitors ? c.booked / c.visitors : null;
       return `<tr>
-        <td class="src">${esc(c.source)}${c.medium ? ` <span class="dim">/ ${esc(c.medium)}</span>` : ""}</td>
+        <td class="src">${esc(c.source)}${
+          c.medium ? ` <span class="dim">/ ${esc(c.medium)}</span>`
+          : (c.backfilled ? ` <span class="dim">/ from session history</span>` : "")}</td>
         <td class="num strong">${num(c.visitors)}</td>
         <td class="num">${num(c.signups.job_alerts)}</td>
         <td class="num">${num(c.signups.audit_roadmap)}</td>
@@ -206,7 +208,10 @@ function renderLinks(d) {
 }
 
 function renderTrend(d) {
-  const weeks = (mode === "session" ? d.weeklySession : d.weekly) || [];
+  // Always the session series, whatever the table above is showing. A trend
+  // needs one method applied to every week; first-touch only exists from
+  // 14 Aug 2026, so using it here would render a year of "(not set)".
+  const weeks = (d.weeklySession && d.weeklySession.length ? d.weeklySession : d.weekly) || [];
   const el = document.getElementById("trend");
   if (!weeks.length) { el.innerHTML = `<p class="dim">No weekly data yet.</p>`; return; }
 
@@ -215,6 +220,11 @@ function renderTrend(d) {
   const top = Object.entries(totals).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([s]) => s);
   const colours = Object.fromEntries(top.map((s, i) => [s, colourFor(s, i)]));
   const max = Math.max(...weeks.map((w) => Object.values(w.sources).reduce((a, b) => a + b, 0)), 1);
+
+  const note = document.getElementById("trend-note");
+  if (note) note.textContent =
+    "GA4 session data, so every week is measured the same way and the shape is comparable. " +
+    "Undercounts LinkedIn slightly, since its in-app browser hides the referrer.";
 
   el.innerHTML = weeks.map((w) => {
     const total = Object.values(w.sources).reduce((a, b) => a + b, 0);
@@ -257,9 +267,15 @@ function renderNotice(d) {
   const el = document.getElementById("notice");
   const msgs = [];
   if (d.errors && d.errors.length) msgs.push(d.errors.join(" · "));
-  const unattributed = (d.channels || []).find((c) => c.source === "(not set)");
-  if (unattributed && unattributed.visitors) {
-    msgs.push(`${num(unattributed.visitors)} visitors have no source recorded. Attribution started 14 Aug 2026, so anything before that is blank.`);
+  if (d.recoveredFromSession) {
+    msgs.push(`${num(d.recoveredFromSession)} visits from before 14 Aug have no first-touch tag, ` +
+      `so their channel was recovered from GA4's own session data and merged in above. ` +
+      (d.stillUnknown ? `${num(d.stillUnknown)} could not be placed at all.`
+                      : `Nothing was left unattributed.`));
+  }
+  const unknown = (d.channels || []).find((c) => c.source === "not tagged");
+  if (unknown && unknown.visitors) {
+    msgs.push(`${num(unknown.visitors)} visitors carry no usable signal in either system.`);
   }
   if (!msgs.length) { el.hidden = true; return; }
   el.textContent = msgs.join(" ");

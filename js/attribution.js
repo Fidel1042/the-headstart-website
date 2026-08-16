@@ -80,7 +80,8 @@
     ig: 'instagram', insta: 'instagram', instagram_bio: 'instagram',
     li: 'linkedin', 'linked-in': 'linkedin', lnkd: 'linkedin',
     fb: 'facebook', wa: 'whatsapp', yt: 'youtube', tt: 'tiktok',
-    email: 'brevo', newsletter: 'brevo',
+    // Deliberately no email -> brevo alias. Brevo is one sender; a link in a
+    // personal signature is not the same channel and should not merge with it.
   };
 
   function param(name) {
@@ -95,6 +96,14 @@
     }
   }
 
+  // Job boards we link OUT to from the job alerts page. Someone clicking a
+  // listing and coming back is mid-journey, not a new arrival, so their
+  // original source must survive the round trip. LinkedIn is deliberately not
+  // in this list: it is a real acquisition channel and we cannot tell a job
+  // round-trip from a genuine post click by referrer alone.
+  var ROUND_TRIP = ['seek.com', 'indeed.com', 'jora.com', 'glassdoor.com',
+                    'adzuna.com', 'gradconnection.com', 'prosple.com'];
+
   function classifyReferrer() {
     var ref = document.referrer || '';
     if (!ref) return ['direct', 'none'];
@@ -107,6 +116,10 @@
     }
 
     if (host === window.location.hostname) return null; // internal navigation
+
+    for (var j = 0; j < ROUND_TRIP.length; j++) {
+      if (host.indexOf(ROUND_TRIP[j]) !== -1) return null;  // came back, not new
+    }
 
     for (var i = 0; i < REFERRER_MAP.length; i++) {
       if (host.indexOf(REFERRER_MAP[i][0]) !== -1) return REFERRER_MAP[i][1];
