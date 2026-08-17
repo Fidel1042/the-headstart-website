@@ -44,6 +44,11 @@ exports.handler = async (event) => {
   // Set by the form after the person logging has confirmed a near-miss is a
   // genuinely separate session.
   const confirmDuplicate = payload.confirmDuplicate === true;
+  // Some sessions run back to back on the same day (a double lesson), so a
+  // mentor can log more than one at a time. Each one becomes its own row: that
+  // is what makes the charge, the payout, the package balance and the P&L all
+  // count it separately. Capped so a stray keypress cannot create twenty.
+  const count = Math.min(Math.max(parseInt(payload.count, 10) || 1, 1), 4);
 
   if (!menteeRecordId || !mentorEmail || !sessionDate) {
     return {
@@ -98,9 +103,28 @@ exports.handler = async (event) => {
       { headers: airtableHeaders }
     );
     const rows = (await res.json()).records || [];
-    const sameDay = rows.find((r) => String(r.fields["Date"] || "").slice(0, 10) === sessionDate);
+    const sameDayRows = rows.filter((r) => String(r.fields["Date"] || "").slice(0, 10) === sessionDate);
+    const sameDay = sameDayRows[0];
 
-    if (sameDay) {
+    // Logging several at once is deliberate, so the same-day block is skipped.
+    // Existing rows on that day are still surfaced, because "I already logged
+    // the double lesson yesterday" is the one way this creates a mess.
+    if (sameDay && count > 1 && !confirmDuplicate) {
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({
+          possibleDuplicate: true,
+          existingDate: sessionDate,
+          days: 0,
+          message: `There ${sameDayRows.length === 1 ? "is already 1 session" : `are already ${sameDayRows.length} sessions`} ` +
+            `logged for this mentee on ${sessionDate}. You are about to add ${count} more. ` +
+            `Confirm only if that many extra sessions really happened.`,
+        }),
+      };
+    }
+
+    if (sameDay && count === 1) {
       // The mentor has caught up on a session Fidel logged for him. Stamp the
       // date so the held panel can say "he has logged this, pay him". The
       // payout itself stays held; only Fidel's click releases it.
@@ -220,7 +244,12 @@ exports.handler = async (event) => {
       const logRes = await fetch(url, {
         method: "POST",
         headers: airtableHeaders,
-        body: JSON.stringify({ fields }),
+        // Every session is its own row, so the charge, the payout, the package
+        // balance and the P&L each count it once. One row with a quantity would
+        // have needed all four of those to learn about quantities.
+        body: JSON.stringify({
+          records: Array.from({ length: count }, () => ({ fields })),
+        }),
       });
 
       if (logRes.ok) { saved = true; break; }
@@ -284,7 +313,10 @@ exports.handler = async (event) => {
       }).length;
 
       // Fire only on the transition to complete (or over), so it alerts once.
-      if (delivered >= PACKAGE_TOTAL && (delivered - 1) < PACKAGE_TOTAL) {
+      // Subtract `count`, not 1: logging a double lesson can take a package from
+      // 4 delivered straight to 6, and "delivered - 1" would step over the
+      // boundary and never alert.
+      if (delivered >= PACKAGE_TOTAL && (delivered - count) < PACKAGE_TOTAL) {
         packageComplete = true;
         if (process.env.BREVO_API_KEY) {
           await fetch("https://api.brevo.com/v3/smtp/email", {
@@ -308,6 +340,8 @@ exports.handler = async (event) => {
     body: JSON.stringify({
       success: true,
       menteeName,
+      // Echoed so the form can say "2 sessions logged" rather than "Logged".
+      count,
       status: isPackage ? "Package" : "Pending",
       packageComplete,
       // Present only if the Sessions table is missing fields — a signal to fix

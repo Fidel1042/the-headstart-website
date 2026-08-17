@@ -44,6 +44,10 @@ export function showAddForm(state) {
       <label>Mentee<select name="mentee" required><option value="">Select&hellip;</option>${opts}</select></label>
       <label>Session date<input type="date" name="date" value="${today}" required /></label>
       <label>Next session date (tentative is fine)<input type="date" name="next" required /></label>
+      <label>Sessions on this date<select name="count">
+        <option value="1" selected>1</option><option value="2">2</option>
+        <option value="3">3</option><option value="4">4</option>
+      </select></label>
       <label>Notes (optional)<textarea name="notes" rows="2"></textarea></label>
       <label class="cal-check">
         <input type="checkbox" name="hold" checked />
@@ -78,6 +82,7 @@ async function submitAdd(e, state) {
           sessionDate: fd.get("date"),
           nextSessionDate: fd.get("next") || "",
           notes: (fd.get("notes") || "").trim(),
+          count: parseInt(fd.get("count"), 10) || 1,
           // Logged for the mentor, so the payout is recorded but withheld from
           // the next payslip until they engage. Unticking pays them as normal.
           payoutHeld: fd.get("hold") === "on",

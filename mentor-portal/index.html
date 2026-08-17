@@ -113,6 +113,7 @@
       const dateInput        = document.getElementById("session-date");
       const nextDateInput    = document.getElementById("next-session-date");
       const notesField       = document.getElementById("session-notes");
+      const countSelect      = document.getElementById("session-count");
       const submitBtn     = document.getElementById("session-submit-btn");
       const errorEl       = document.getElementById("form-error");
       const logCard       = document.getElementById("log-card");
@@ -236,6 +237,8 @@
                 sessionDate,
                 nextSessionDate: nextDateInput.value || "",
                 notes: notesField.value.trim(),
+                // Back-to-back sessions on one date. Each becomes its own row.
+                count: parseInt(countSelect.value, 10) || 1,
                 confirmDuplicate,
               }),
             });
@@ -260,9 +263,12 @@
           successCard.hidden = false;
           // A duplicate is not an error: the session is already on record, so the
           // mentor is told that plainly instead of being shown a second "Logged".
+          const n = result.count || 1;
           successDetail.textContent = result.duplicate
             ? result.message
-            : `Logged for ${result.menteeName}.`;
+            : n > 1
+              ? `${n} sessions logged for ${result.menteeName}.`
+              : `Logged for ${result.menteeName}.`;
           loadHistory();
 
           clearTimeout(window._successTimer);
@@ -950,6 +956,15 @@
             <div class="form-field">
               <label for="next-session-date">Next session <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--accent);opacity:0.6">- required, tentative is fine</span></label>
               <input type="date" id="next-session-date" required />
+            </div>
+            <div class="form-field">
+              <label for="session-count">Sessions <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--accent);opacity:0.6">- on this date</span></label>
+              <select id="session-count">
+                <option value="1" selected>1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+              </select>
             </div>
           </div>
           <div class="form-field">

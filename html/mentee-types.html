@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8" />
 <title>Headstart Mentoring: Difficult Mentees</title>
@@ -218,7 +218,9 @@
   const root = document.documentElement;
   const btn = document.getElementById('theme-toggle');
   const icon = document.getElementById('theme-icon');
-  const saved = localStorage.getItem('hs-theme');
+  // Same key as the rest of the portal, so one toggle carries everywhere.
+  // Light is the default; only a stored choice overrides it.
+  const saved = localStorage.getItem('headstart_theme');
   if (saved) { root.setAttribute('data-theme', saved); }
   const sync = () => {
     icon.innerHTML = root.getAttribute('data-theme') === 'light' ? '&#9789;' : '&#9788;';
@@ -227,7 +229,7 @@
   btn.addEventListener('click', () => {
     const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
     root.setAttribute('data-theme', next);
-    localStorage.setItem('hs-theme', next);
+    localStorage.setItem('headstart_theme', next);
     sync();
   });
 </script>
