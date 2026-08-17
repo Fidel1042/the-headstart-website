@@ -18,14 +18,62 @@ export function configureActions({ ownerEmail: email, onChanged, menteeIndex: in
   if (index) menteeIndex = index;
 }
 
-// A booked date that has already passed means no session was ever logged
-// against it, so it reads as something to chase rather than a live booking.
-export function nextLabel(m) {
-  if (!m.nextBooked) return "Nothing booked";
-  const today = new Date().toISOString().slice(0, 10);
-  if (m.nextBooked >= today) return fmtDate(m.nextBooked);
-  const tip = `Booked for ${fmtDate(m.nextBooked)} but no session was logged. Rebook, or ask the mentor to log it.`;
-  return `<span class="status-row__stale" title="${tip}">Missed ${fmtDate(m.nextBooked)}</span>`;
+/**
+ * "I have nudged the mentor about this one." Parks it for a few days so the
+ * list stops showing work already in flight, without pretending a session is
+ * booked. mentee-state.js decides how long the quiet period lasts.
+ */
+export async function markChased(ids, grid) {
+  // Takes one id or a list: "Mark done" on a mentor's chase bar covers every
+  // mentee that message was about, because one message settles all of them.
+  const list = Array.isArray(ids) ? ids : [ids];
+  const btn = grid.querySelector(`.chase-btn[data-id="${list[0]}"]`)
+    || grid.querySelector(`.chase-done[data-ids="${list.join(",")}"]`);
+  const stateEl = document.getElementById(`fu-state-${list[0]}`);
+  const original = btn ? btn.textContent : "";
+  if (btn) { btn.disabled = true; btn.textContent = "Saving…"; }
+  try {
+    if (!isLocal) {
+      for (const id of list) {
+        const res = await fetch("/.netlify/functions/admin-update", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ kind: "mentee-chased", recordId: id, ownerEmail }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+      }
+    }
+    if (onChangedCb) onChangedCb();
+  } catch (err) {
+    if (btn) { btn.disabled = false; btn.textContent = original; }
+    if (stateEl) stateEl.textContent = err.message || "Could not save";
+  }
+}
+
+/**
+ * Park or unpark from the row itself, so moving a mentee between sections is
+ * one click rather than opening the expand panel and editing a date.
+ */
+export async function setHold(id, holdUntil, grid) {
+  const stateEl = document.getElementById(`fu-state-${id}`);
+  const btn = grid.querySelector(`.hold-btn[data-id="${id}"]`);
+  if (btn) { btn.disabled = true; btn.textContent = "Saving…"; }
+  try {
+    if (!isLocal) {
+      const res = await fetch("/.netlify/functions/admin-update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ kind: "mentee-hold", recordId: id, holdUntil, ownerEmail }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+    }
+    if (onChangedCb) onChangedCb();
+  } catch (err) {
+    if (btn) { btn.disabled = false; btn.textContent = holdUntil ? "Hold" : "Clear hold"; }
+    if (stateEl) stateEl.textContent = err.message || "Could not save";
+  }
 }
 
 export async function dropMentee(id, name, btn) {
@@ -73,13 +121,10 @@ export async function saveNextSession(id, grid) {
     }
     const m = menteeIndex.get(id);
     if (m) m.nextSession = input.value;
-    document.getElementById(`fu-label-${id}`).innerHTML = nextLabel({ nextBooked: input.value });
-    // Booking someone takes them out of the work pile, so drop them to the
-    // bottom of their group straight away rather than only on the next load.
-    // A past date is not a live booking, so that stays put and keeps chasing.
-    if (input.value >= new Date().toISOString().slice(0, 10)) moveToBottom(id, grid);
     stateEl.textContent = "Saved";
-    setTimeout(() => { stateEl.textContent = ""; }, 3000);
+    // A new date changes which group they belong to, so the list is rebuilt
+    // rather than nudged in place.
+    if (onChangedCb) { onChangedCb(); return; }
   } catch (err) {
     stateEl.textContent = err.message || "Could not save";
   }

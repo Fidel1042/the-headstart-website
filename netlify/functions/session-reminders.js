@@ -19,6 +19,7 @@ const FIDEL = { email: "fidelhon@gmail.com", name: "Fidel" };
 const NUDGE_DIGEST_DAY = "Mon";
 
 const { buildEmail, buildNudgeEmail } = require("../shared/reminder-emails");
+const { menteeState, lapseToCount } = require("../shared/mentee-state");
 
 const ymd = (date) =>
   new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" }).format(date);
@@ -89,8 +90,8 @@ exports.handler = async (event) => {
     // Active, acquired mentees with a mentor assigned.
     const menteeRecs = await fetchAll(AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTEE_TABLE_ID,
       ["Name", "Client Pipeline", "Mentor Email Plain", "Mentor Name",
-       "Last Reminded", "First Reminded", "Koko Checked At", "Next Session",
-       "On Hold Until"], AIRTABLE_API_TOKEN);
+       "Last Reminded", "First Reminded", "Next Session", "On Hold Until",
+       "Lapse Count", "Last Chased", "Lapse Counted For", "Created", "Pipeline Changed"], AIRTABLE_API_TOKEN);
     const active = new Map();
     const byName = new Map(); // lowercased mentee name -> record id (for older
                               // session rows whose Mentee Record ID is blank)
@@ -106,11 +107,15 @@ exports.handler = async (event) => {
           mentorName: (Array.isArray(mn) ? mn[0] : mn) || email,
           lastReminded:  (f["Last Reminded"]   || "").slice(0, 10),
           firstReminded: (f["First Reminded"]  || "").slice(0, 10),
-          kokoChecked:   (f["Koko Checked At"] || "").slice(0, 10),
           holdUntil:     (f["On Hold Until"]    || "").slice(0, 10),
-          // Booked by Koko from the admin view rather than by the mentor on a
-          // session row. Counts exactly the same for reminders below.
-          adminNext:     (f["Next Session"]    || "").slice(0, 10),
+          lastChased:    (f["Last Chased"]      || "").slice(0, 10),
+          lapses:        Number(f["Lapse Count"]) || 0,
+          lapseCountedFor: (f["Lapse Counted For"] || "").slice(0, 10),
+          createdAt:     (f["Created"]          || "").slice(0, 10),
+          startedAt:     (f["Pipeline Changed"] || "").slice(0, 10),
+          // The one agreed next session. Mentors write it here when they log,
+          // and the portal writes it here too, so there is a single date to read.
+          expected:      (f["Next Session"]    || "").slice(0, 10),
         });
         if (name) byName.set(name.trim().toLowerCase(), r.id);
       }
@@ -141,10 +146,10 @@ exports.handler = async (event) => {
     // rows so a mentee with no sessions yet still gets an entry: without this
     // they are skipped entirely below and their first booking never reminds.
     active.forEach((m, id) => {
-      if (!m.adminNext) return;
-      const a = agg.get(id) || { lastDate: "", hasFuture: false, tomorrow: false };
-      if (m.adminNext >= today) a.hasFuture = true;
-      if (m.adminNext === tomorrow) a.tomorrow = true;
+      if (!m.expected) return;
+      const a = agg.get(id) || { lastDate: "", hasFuture: false, tomorrow: false, lastBooked: "" };
+      if (m.expected >= today) a.hasFuture = true;
+      if (m.expected === tomorrow) a.tomorrow = true;
       agg.set(id, a);
     });
 
@@ -154,7 +159,8 @@ exports.handler = async (event) => {
       if (!byMentor.has(email)) byMentor.set(email, { name, tomorrow: [], reachout: [] });
       return byMentor.get(email);
     };
-    const nudgeList = []; // quiet mentees for Fidel's Monday list
+    const lapsedList = []; // agreed date came and went, nothing logged
+    const noDateList = []; // nothing in the diary at all
     const toReset  = [];  // booked again: clear the stamps so the cycle restarts
     active.forEach((m, id) => {
       const a = agg.get(id);
@@ -164,7 +170,7 @@ exports.handler = async (event) => {
       // Booked again. Clear the stamps, otherwise a mentee who goes quiet months
       // later would look like they had been chased since the old date.
       if (a.hasFuture) {
-        if (m.lastReminded || m.firstReminded || m.kokoChecked) toReset.push(id);
+        if (m.lastReminded || m.firstReminded) toReset.push(id);
         return;
       }
       if (!a.lastDate) return;
@@ -176,20 +182,24 @@ exports.handler = async (event) => {
         bucket(m.mentorEmail, m.mentorName).reachout.push({ id, name: m.name, gap, first: !m.firstReminded });
       }
 
-      // Fidel's weekly list. A booking that came and went with nothing logged
-      // means the session did not happen, so it belongs here alongside plain
-      // silence. The missed date is carried through as context.
+      // Fidel's weekly list: mentees with NO next session date anywhere, from
+      // either the mentor's session row or the mentee status page.
       //
-      // Two exits: a hold, or a next session set from the mentee status page.
-      // Both mean this one has already been dealt with.
-      const parked = m.holdUntil && m.holdUntil >= today;
-      const booked = m.adminNext && m.adminNext >= today;
-      if (gap >= REACH_OUT_DAYS && !parked && !booked) {
-        nudgeList.push({
-          name: m.name, mentor: m.mentorName, gap,
-          lastDate: a.lastDate,
-          // Only a genuinely missed booking, not one still to come.
-          missed: (a.lastBooked && a.lastBooked < today && a.lastBooked > a.lastDate) ? a.lastBooked : "",
+      // A date that exists but has passed is deliberately not on this list. It
+      // shows on the mentee status page as "Missed", which is a different job:
+      // find out whether that session happened. This email is only for the ones
+      // with nothing in the diary at all, so the action is always the same.
+      // State comes from one shared resolver, so this email, the mentee status
+      // page and the mentor portal can never disagree about who needs chasing.
+      const st = menteeState({
+        expected: m.expected, lastSession: a.lastDate, createdAt: m.createdAt, startedAt: m.startedAt,
+        holdUntil: m.holdUntil, lastChased: m.lastChased, lapses: m.lapses,
+      }, today);
+      if (st.needsAction) {
+        (st.key === "lapsed" ? lapsedList : noDateList).push({
+          name: m.name, mentor: m.mentorName,
+          lastDate: a.lastDate, expected: st.date || "",
+          days: st.days, lapses: st.lapses,
         });
       }
 
@@ -226,26 +236,43 @@ exports.handler = async (event) => {
       }
     }
 
-    // One digest a week, on the fixed day, worst first.
-    nudgeList.sort((a, b) => b.gap - a.gap);
+    // Repeat offenders first, then longest overdue.
+    lapsedList.sort((a, b) => (b.lapses - a.lapses) || (b.days - a.days));
+    noDateList.sort((a, b) => (b.days || 0) - (a.days || 0));
     const nudgeDay = m.weekday === NUDGE_DIGEST_DAY;
-    if (nudgeList.length && nudgeDay && !dryRun && BREVO_API_KEY) {
+    const nudgeTotal = lapsedList.length + noDateList.length;
+    if (nudgeTotal && nudgeDay && !dryRun && BREVO_API_KEY) {
       await sendEmail(BREVO_API_KEY, FIDEL.email, FIDEL.name,
-        `${nudgeList.length} mentee${nudgeList.length === 1 ? "" : "s"} to nudge this week`,
-        buildNudgeEmail(nudgeList, REACH_OUT_DAYS));
+        `${nudgeTotal} to follow up this week`,
+        buildNudgeEmail(lapsedList, noDateList));
+    }
+
+    // Count each missed date once, whether or not it is a send day, so the
+    // lapse tally is accurate even between digests.
+    if (!dryRun) {
+      for (const [id, mm] of active) {
+        const a = agg.get(id);
+        if (!a) continue;
+        const due = lapseToCount({
+          expected: mm.expected, lastSession: a.lastDate, lapseCountedFor: mm.lapseCountedFor,
+        }, today);
+        if (!due) continue;
+        await patchMentee(AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTEE_TABLE_ID, id,
+          { "Lapse Count": (mm.lapses || 0) + 1, "Lapse Counted For": due }, AIRTABLE_API_TOKEN);
+      }
     }
 
 
     if (!dryRun) {
       for (const id of toReset) {
         await patchMentee(AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTEE_TABLE_ID, id,
-          { "Last Reminded": null, "First Reminded": null, "Koko Checked At": null }, AIRTABLE_API_TOKEN);
+          { "Last Reminded": null, "First Reminded": null }, AIRTABLE_API_TOKEN);
       }
     }
 
     return { statusCode: 200, body: JSON.stringify({
       date: today, dryRun, mentorsEmailed: sent, summary,
-      nudgeDigestDay: NUDGE_DIGEST_DAY, nudgeSendsToday: nudgeDay, nudgeList,
+      nudgeDigestDay: NUDGE_DIGEST_DAY, nudgeSendsToday: nudgeDay, lapsedList, noDateList,
       stampsCleared: toReset.length,
     }) };
   } catch (err) {

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <title>Consultation Follow-ups – The Headstart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+  <style id="auth-gate">
+    html:not(.auth-ok) body { visibility: hidden; }
+    html:not(.auth-ok) { background: #fff; }
+  </style>
+  <link rel="stylesheet" href="portal.css" />
+  <link rel="stylesheet" href="portal-nav.css" />
+  <link rel="stylesheet" href="billing.css" />
+  <link rel="stylesheet" href="/mentor-portal/polish.css" />
+  <style>
+    .fu-page { max-width: 900px; margin: 0 auto; padding: 1.6rem 1.2rem 4rem; }
+    .fu-head h1 { font-size: 1.4rem; font-weight: 800; margin: 0 0 0.2rem; }
+    .fu-head p { font-size: 0.85rem; color: var(--text-muted); margin: 0 0 1.4rem; }
+
+    .fu-steps {
+      display: flex; gap: 0.4rem; flex-wrap: wrap;
+      font-size: 0.72rem; color: var(--text-muted); margin-bottom: 1.6rem;
+    }
+    .fu-steps b { color: var(--accent); }
+
+    .fu-sec { margin-bottom: 1.8rem; }
+    .fu-sec__title {
+      font-size: 0.66rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--accent); margin: 0 0 0.7rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .fu-sec__count { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+    .lead {
+      border: 1px solid var(--line); border-radius: 14px;
+      padding: 0.9rem 1.1rem; margin-bottom: 0.6rem; background: var(--bg-card);
+    }
+    .lead__top { display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap; }
+    .lead__name { font-weight: 700; font-size: 0.95rem; }
+    .lead__meta { font-size: 0.74rem; color: var(--text-muted); }
+    .pill {
+      font-size: 0.62rem; font-weight: 800; letter-spacing: 0.05em;
+      border-radius: 999px; padding: 0.15rem 0.5rem; white-space: nowrap;
+    }
+    .pill--touch { background: var(--accent-soft); color: var(--accent); }
+    .pill--late { background: rgba(224,80,80,0.12); color: #c33; }
+    .pill--score { border: 1px solid var(--line); color: var(--text-muted); }
+    .lead__spacer { flex: 1; }
+
+    .lead__msg {
+      margin: 0.7rem 0 0; padding: 0.7rem 0.85rem;
+      background: rgba(0,0,0,0.03); border-radius: 10px;
+      font-size: 0.84rem; line-height: 1.55; white-space: pre-wrap;
+      max-height: 8.5em; overflow-y: auto;
+    }
+    [data-theme="dark"] .lead__msg { background: rgba(255,255,255,0.04); }
+    .lead__subject {
+      margin: 0.6rem 0 0; font-size: 0.78rem; font-weight: 700; color: var(--accent);
+    }
+    .lead__none { font-size: 0.8rem; color: #c33; margin-top: 0.6rem; }
+
+    .lead__actions { display: flex; gap: 0.5rem; margin-top: 0.7rem; flex-wrap: wrap; }
+    .act {
+      font-family: inherit; font-size: 0.68rem; font-weight: 800;
+      letter-spacing: 0.04em; text-transform: uppercase;
+      border-radius: 999px; padding: 0.35rem 0.85rem; cursor: pointer;
+      text-decoration: none; white-space: nowrap;
+    }
+    .act--wa { background: var(--accent); color: var(--bg); border: 1px solid var(--accent); }
+    .act--wa:hover { opacity: 0.88; }
+    .act--ghost { background: transparent; color: var(--accent); border: 1px solid var(--accent-line); }
+    .act--ghost:hover { background: var(--bg-card); }
+    .act:disabled, .act.is-off { opacity: 0.5; cursor: not-allowed; }
+    .state { font-size: 0.9rem; color: var(--text-muted); padding: 2rem 0; text-align: center; }
+    .fu-quiet { font-size: 0.8rem; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+
+  <div id="portal-nav"></div>
+
+  <main class="fu-page">
+    <div class="fu-head">
+      <h1>Consultation follow-ups</h1>
+      <p>Everyone who had a consultation and has not signed yet.</p>
+      <div class="fu-steps">
+        <span><b>t+0</b> straight after the call</span><span>&middot;</span>
+        <span><b>t+1</b> next day</span><span>&middot;</span>
+        <span><b>t+3</b> last standard touch</span><span>&middot;</span>
+        <span><b>t+20</b> one final nudge, 40%+ only</span><span>&middot;</span>
+        <span><b>t+90</b> email check-in</span>
+      </div>
+    </div>
+
+    <p class="state" id="loading">Loading&hellip;</p>
+    <p class="state" id="error" hidden></p>
+
+    <div id="content" hidden>
+      <section class="fu-sec">
+        <p class="fu-sec__title">Due now <span class="fu-sec__count" id="due-count"></span></p>
+        <div id="due-list"></div>
+      </section>
+
+      <section class="fu-sec">
+        <p class="fu-sec__title">Waiting <span class="fu-sec__count" id="wait-count"></span></p>
+        <div id="wait-list"></div>
+      </section>
+
+      <section class="fu-sec">
+        <p class="fu-sec__title">Sequence finished <span class="fu-sec__count" id="done-count"></span></p>
+        <div id="done-list"></div>
+      </section>
+    </div>
+  </main>
+
+  <script type="module">
+    import { requireAuth } from "./auth.js";
+    import { mountPortalNav, initTheme } from "./portal-ui.js";
+
+    initTheme();
+
+    const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+    let ADMIN_EMAIL = "";
+    let DATA = null;
+
+    const esc = (v) => String(v == null ? "" : v)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    const fmt = (d) => d
+      ? new Date(d + "T00:00:00").toLocaleDateString("en-AU", { day: "numeric", month: "short" })
+      : "—";
+
+    requireAuth((session) => {
+      const email = session?.user?.email || "";
+      const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com"];
+      if (!OWNERS.includes(email) && email !== "dev@localhost") {
+        window.location.replace("/mentor-portal/index.html");
+        return;
+      }
+      ADMIN_EMAIL = email;
+      mountPortalNav({ email, isOwner: true, active: "followups" });
+      load();
+    });
+
+    async function load() {
+      const loading = document.getElementById("loading");
+      const errorEl = document.getElementById("error");
+      loading.hidden = false; errorEl.hidden = true;
+      try {
+        const res = await fetch("/.netlify/functions/consult-followups", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ adminEmail: ADMIN_EMAIL }),
+        });
+        DATA = await res.json();
+        if (!res.ok) throw new Error(DATA.error || "Could not load");
+      } catch (err) {
+        loading.hidden = true;
+        errorEl.textContent = err.message || "Could not load — refresh to try again.";
+        errorEl.hidden = false;
+        return;
+      }
+      loading.hidden = true;
+      render();
+      document.getElementById("content").hidden = false;
+    }
+
+    // A lead ready to be contacted: the message is shown in full, because it
+    // gets read before it is sent, not after.
+    function dueCard(l) {
+      // t+90 goes by email: three months on it is a check-in, not a pitch, and
+      // a WhatsApp out of nowhere reads worse than an email.
+      const send = l.channel === "email"
+        ? (l.email
+            ? `<a class="act act--wa" href="mailto:${encodeURIComponent(l.email)}?subject=${encodeURIComponent(l.subject)}&body=${encodeURIComponent(l.message)}">Send email</a>`
+            : `<span class="act act--wa is-off" title="No email in Airtable">No email</span>`)
+        : (l.phone
+            ? `<a class="act act--wa" href="https://wa.me/${l.phone}?text=${encodeURIComponent(l.message)}" target="_blank" rel="noopener">Send on WhatsApp</a>`
+            : `<span class="act act--wa is-off" title="No phone number in Airtable">No number</span>`);
+      return `
+        <div class="lead" data-id="${l.id}">
+          <div class="lead__top">
+            <span class="lead__name">${esc(l.name)}</span>
+            <span class="pill pill--touch">${l.nextLabel}</span>
+            ${l.overdueBy > 0 ? `<span class="pill pill--late">${l.overdueBy}d late</span>` : ""}
+            ${l.score !== null ? `<span class="pill pill--score">${l.score}%</span>` : ""}
+            ${l.channel === "email" ? `<span class="pill pill--score">email</span>` : ""}
+            <span class="lead__spacer"></span>
+            <span class="lead__meta">consult ${fmt(l.consultedOn)}</span>
+          </div>
+          ${l.subject ? `<p class="lead__subject">Subject: ${esc(l.subject)}</p>` : ""}
+          ${l.message
+            ? `<p class="lead__msg">${esc(l.message)}</p>`
+            : `<p class="lead__none">No drafted message for this touch. Write one, or skip.</p>`}
+          <div class="lead__actions">
+            ${send}
+            <button type="button" class="act act--ghost" data-copy="${l.id}">Copy</button>
+            <button type="button" class="act act--ghost" data-sent="${l.id}" data-stage="${l.stage + 1}">Mark sent</button>
+            <button type="button" class="act act--ghost" data-skip="${l.id}" data-stage="${l.planLength}">Skip rest</button>
+            <button type="button" class="act act--ghost" data-drop="${l.id}" data-name="${esc(l.name)}">Drop</button>
+          </div>
+        </div>`;
+    }
+
+    function quietCard(l, note) {
+      return `
+        <div class="lead">
+          <div class="lead__top">
+            <span class="lead__name">${esc(l.name)}</span>
+            ${l.score !== null ? `<span class="pill pill--score">${l.score}%</span>` : ""}
+            <span class="lead__spacer"></span>
+            <span class="lead__meta">${note}</span>
+          </div>
+        </div>`;
+    }
+
+    function render() {
+      document.getElementById("due-count").textContent = DATA.dueNow.length;
+      document.getElementById("wait-count").textContent = DATA.waiting.length;
+      document.getElementById("done-count").textContent = DATA.finished.length;
+
+      document.getElementById("due-list").innerHTML = DATA.dueNow.length
+        ? DATA.dueNow.map(dueCard).join("")
+        : `<p class="fu-quiet">Nothing to send today.</p>`;
+
+      document.getElementById("wait-list").innerHTML = DATA.waiting.length
+        ? DATA.waiting.map((l) => quietCard(l, `${l.nextLabel} on ${fmt(l.dueOn)}`)).join("")
+        : `<p class="fu-quiet">Nobody waiting.</p>`;
+
+      document.getElementById("done-list").innerHTML = DATA.finished.length
+        ? DATA.finished.map((l) => quietCard(l,
+            l.earnsFinal ? "all 4 touches sent" : `3 touches sent, under ${DATA.finalMinPct}%`)).join("")
+        : `<p class="fu-quiet">None yet.</p>`;
+    }
+
+    async function setStage(id, stage, btn) {
+      const original = btn.textContent;
+      btn.disabled = true; btn.textContent = "Saving…";
+      try {
+        const res = await fetch("/.netlify/functions/admin-update", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ kind: "followup-stage", recordId: id, stage, ownerEmail: ADMIN_EMAIL }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        load();
+      } catch (err) {
+        btn.disabled = false; btn.textContent = original;
+        alert(err.message || "Could not save");
+      }
+    }
+
+    async function dropLead(id, name, btn) {
+      if (!confirm(`Mark ${name} as Dropped? They leave this list and every other one.`)) return;
+      const original = btn.textContent;
+      btn.disabled = true; btn.textContent = "Dropping…";
+      try {
+        const res = await fetch("/.netlify/functions/admin-update", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ kind: "mentee-dropped", recordId: id, ownerEmail: ADMIN_EMAIL }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        load();
+      } catch (err) {
+        btn.disabled = false; btn.textContent = original;
+        alert(err.message || "Could not drop");
+      }
+    }
+
+    document.addEventListener("click", (e) => {
+      const copy = e.target.closest("[data-copy]");
+      if (copy) {
+        const lead = [...DATA.dueNow].find((l) => l.id === copy.dataset.copy);
+        if (!lead) return;
+        navigator.clipboard.writeText(lead.message).then(() => {
+          copy.textContent = "Copied";
+          setTimeout(() => { copy.textContent = "Copy"; }, 2000);
+        });
+        return;
+      }
+      const sent = e.target.closest("[data-sent]");
+      if (sent) { setStage(sent.dataset.sent, Number(sent.dataset.stage), sent); return; }
+      // "Skip all" ends the sequence for someone who is clearly not converting,
+      // without having to click through the remaining touches one at a time.
+      const skip = e.target.closest("[data-skip]");
+      if (skip) { setStage(skip.dataset.skip, Number(skip.dataset.stage), skip); return; }
+      // Drop is for a lead who is plainly not coming back. It takes them out of
+      // this list and every other one, so it asks first.
+      const drop = e.target.closest("[data-drop]");
+      if (drop) { dropLead(drop.dataset.drop, drop.dataset.name, drop); return; }
+    });
+  </script>
+</body>
+</html>

@@ -258,3 +258,75 @@
   .status-history { padding-left: 0.9rem; }
   .fu-date, .fu-save, .drop-btn { min-height: 40px; }
 }
+
+/* Repeat lapses. Twice is a pattern, so it is called out on the row rather
+   than left for someone to notice by reading dates. */
+.status-row__reps {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #e05050;
+  margin-left: 0.2rem;
+}
+
+/* ── Chase bar: one message per mentor, above their lapsed mentees ── */
+.chase-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  padding: 0.6rem 0.7rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid var(--accent-line);
+  border-radius: 10px;
+  background: var(--accent-soft);
+}
+.chase-bar__who {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.chase-bar__count {
+  font-size: 0.62rem;
+  font-weight: 800;
+  background: var(--accent);
+  color: var(--bg);
+  border-radius: 999px;
+  padding: 0.05rem 0.35rem;
+}
+/* The message itself, so it is read before it is sent. */
+.chase-bar__msg {
+  flex: 1 1 240px;
+  min-width: 0;
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.chase-send, .chase-done {
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border-radius: 999px;
+  padding: 0.32rem 0.75rem;
+  cursor: pointer;
+  text-decoration: none;
+}
+.chase-send { background: var(--accent); color: var(--bg); border: 1px solid var(--accent); }
+.chase-send:hover { opacity: 0.88; }
+.chase-send.is-off {
+  background: transparent;
+  color: var(--text-muted);
+  border-color: var(--line);
+  cursor: not-allowed;
+}
+.chase-done { background: transparent; color: var(--accent); border: 1px solid var(--accent-line); }
+.chase-done:hover { background: var(--bg-card); }
+.chase-done:disabled { opacity: 0.55; cursor: default; }

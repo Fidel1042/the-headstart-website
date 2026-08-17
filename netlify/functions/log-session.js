@@ -289,6 +289,27 @@ exports.handler = async (event) => {
     };
   }
 
+  // ── Keep the mentee record's expected date in step ──
+  // The date a mentor gives when logging is the agreed next session, so it
+  // belongs on the mentee record where every screen reads it from. Writing it
+  // only onto the session row is what left two competing dates and made the
+  // nudge list unreliable. Best-effort: a failure here must not fail the log.
+  if (nextSessionDate) {
+    await fetch(`https://api.airtable.com/v0/${AIRTABLE_CORE_BASE_ID}/${AIRTABLE_MENTEE_TABLE_ID}/${menteeRecordId}`, {
+      method: "PATCH",
+      headers: airtableHeaders,
+      body: JSON.stringify({ fields: {
+        "Next Session": nextSessionDate,
+        // A fresh date starts a clean cycle, so any earlier chase is spent.
+        "Last Chased": null,
+        // A hold means "waiting on this mentee". They just had a session, so
+        // the wait is over. Without this a held mentee stays parked and
+        // invisible even while they are actively being taught.
+        "On Hold Until": null,
+      } }),
+    }).catch(() => {});
+  }
+
   // ── Package-completion alert ──
   // When a package mentee's delivered sessions reach the package size, email
   // Fidel so he can follow up on a renewal. Fires once, on the session that

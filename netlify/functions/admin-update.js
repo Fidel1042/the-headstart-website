@@ -41,13 +41,28 @@ exports.handler = async (event) => {
   if (kind === "mentee-followup") {
     tableId = AIRTABLE_MENTEE_TABLE_ID;
     fields = { "Last Followed Up": payload.date || null };
+  } else if (kind === "followup-stage") {
+    // How many post-consultation touches have been sent. Set rather than
+    // incremented, so a double click cannot skip a touch.
+    tableId = AIRTABLE_MENTEE_TABLE_ID;
+    fields = { "Follow Up Stage": Number(payload.stage) || 0 };
+  } else if (kind === "mentee-hold") {
+    // Park or unpark, without touching the notes that share the expand panel.
+    tableId = AIRTABLE_MENTEE_TABLE_ID;
+    fields = { "On Hold Until": payload.holdUntil || null };
+  } else if (kind === "mentee-chased") {
+    // "I have nudged the mentor about this one." Parks it for a few days so it
+    // stops appearing while the mentor is being given a chance to respond.
+    tableId = AIRTABLE_MENTEE_TABLE_ID;
+    fields = { "Last Chased": payload.date || new Date().toISOString().slice(0, 10) };
   } else if (kind === "mentee-next-session") {
     // Koko books the next session from the admin view. Mentors record the same
     // thing on the session row they log, but a mentee with no sessions yet has
     // no row to write to, so the admin-set date lives on the mentee record and
     // readers merge the two sources.
     tableId = AIRTABLE_MENTEE_TABLE_ID;
-    fields = { "Next Session": payload.date || null };
+    // Setting a date starts a clean cycle: whatever chasing came before is done.
+    fields = { "Next Session": payload.date || null, "Last Chased": null };
   } else if (kind === "hold-payout" || kind === "release-payout") {
     // Holds a session back from the next payslip, or frees it again. The session
     // row lives in the session log base, not the core directory.

@@ -1,9 +1,13 @@
-// admin-status.js — Nudge / No sessions / Dropped / Active mentee groups, each
-// a labelled list where the next session date can be booked per mentee.
-// The writes behind Set and Drop live in admin-status-actions.js.
+// admin-status.js — the mentee status list, grouped by what needs doing:
+//   Session did not happen  an agreed date passed with nothing logged
+//   No next session agreed  nothing in the diary
+//   On hold / Booked        nothing to do
+// The state itself is decided by netlify/shared/mentee-state.js and arrives on
+// each mentee; this file only renders it. The writes behind Set date, Chased,
+// Hold and Drop live in admin-status-actions.js.
 
 import { avgGapDays, fmtFrequency } from "./admin-utils.js";
-import { configureActions, nextLabel, dropMentee, saveNextSession, saveNotes } from "./admin-status-actions.js";
+import { configureActions, dropMentee, saveNextSession, saveNotes, markChased, setHold } from "./admin-status-actions.js";
 
 const DAY_MS = 86400000;
 
@@ -51,10 +55,15 @@ function item(m, tone) {
           <span class="status-row__last">${m.last ? `${fmtDate(m.last)} <span class="status-row__ago">· ${m.days}d</span>` : "No sessions yet"}</span>
           <span class="status-row__freq">${freqLabel || "&nbsp;"}</span>
         </div>
-        <span class="status-row__fu" id="fu-label-${m.id}">${nextLabel(m)}</span>
+        <span class="status-row__fu" id="fu-label-${m.id}">${stateLabel(m)}</span>
         <div class="status-row__actions">
-          <input type="date" class="fu-date" data-id="${m.id}" value="${(m.nextBooked || "").slice(0, 10)}" aria-label="Next session date for ${m.name}" />
-          <button type="button" class="fu-save" data-id="${m.id}">Set</button>
+          <input type="date" class="fu-date" data-id="${m.id}" value="${(m.nextSession || "").slice(0, 10)}" aria-label="Next session date for ${m.name}" />
+          <button type="button" class="fu-save" data-id="${m.id}">Set date</button>
+          ${m.state && m.state.needsAction
+            ? `<button type="button" class="chase-btn" data-id="${m.id}">Chased</button>` : ""}
+          ${m.state && m.state.key === "hold"
+            ? `<button type="button" class="hold-btn" data-id="${m.id}" data-hold="">Clear hold</button>`
+            : `<button type="button" class="hold-btn" data-id="${m.id}" data-hold="${addDays(HOLD_DEFAULT_DAYS)}">Hold</button>`}
           <button type="button" class="drop-btn" data-id="${m.id}" data-name="${m.name}">Drop</button>
           <span class="fu-state" id="fu-state-${m.id}"></span>
         </div>
@@ -89,6 +98,64 @@ function notesPanel(m) {
 const escapeText = (s) => String(s || "")
   .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
+// What the middle column says, straight from the resolved state. "Missed 3 Aug,
+// 14 days ago" is a different instruction from "no date agreed", and the row has
+// to say which.
+function stateLabel(m) {
+  const st = m.state;
+  if (!st) return "&mdash;";
+  if (st.key === "booked") return fmtDate(st.date);
+  if (st.key === "hold") return `<span class="status-row__hold">On hold to ${fmtDate(st.until)}</span>`;
+  if (st.key === "lapsed") {
+    const rep = st.lapses > 1 ? ` <span class="status-row__reps">${st.lapses}x</span>` : "";
+    const chased = st.chasedOn && !st.needsAction ? ` <span class="status-row__ago">chased ${fmtDate(st.chasedOn)}</span>` : "";
+    return `<span class="status-row__stale">Missed ${fmtDate(st.date)}</span>${rep}${chased}`;
+  }
+  return `<span class="status-row__ago">No date agreed</span>`;
+}
+
+// One message per mentor, covering every lapsed mentee they have, because
+// three separate WhatsApps about three mentees is how a mentor starts ignoring
+// them. One mentee reads as a sentence; several read as a list, because a
+// sentence with four names and four dates in it cannot be skimmed.
+const firstName = (n) => String(n || "").trim().split(/\s+/)[0] || "there";
+
+function chaseMessage(list) {
+  const due = (m) => m.state && m.state.date ? `due at ${fmtShort(m.state.date)}` : "no date set";
+
+  if (list.length === 1) {
+    const m = list[0];
+    return `Checking on ${firstName(m.name)}'s status!\n\n` +
+      `Saw a session ${due(m)} but looks like it wasn't logged.\n\n` +
+      `Could you help me follow up with this please?`;
+  }
+
+  const lines = list.map((m) => `- ${firstName(m.name)} - ${due(m)}`).join("\n");
+  return `Checking on these mentees' status!\n\n${lines}\n\n` +
+    `Looks like the sessions weren't logged.\n\n` +
+    `Could you help me follow up with these please?`;
+}
+
+const fmtShort = (d) => d
+  ? new Date(d.slice(0, 10) + "T00:00:00").toLocaleDateString("en-AU", { day: "numeric", month: "short" })
+  : "";
+
+// The per-mentor action bar that sits above the lapsed rows.
+function chaseBar(mentorName, list, phone) {
+  const msg = chaseMessage(list);
+  const ids = list.map((m) => m.id).join(",");
+  const link = phone
+    ? `<a class="chase-send" href="https://wa.me/${phone}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">Send message</a>`
+    : `<span class="chase-send is-off" title="No usable phone number for this mentor in Airtable">No number</span>`;
+  return `
+    <div class="chase-bar">
+      <span class="chase-bar__who">${mentorName}<span class="chase-bar__count">${list.length}</span></span>
+      <span class="chase-bar__msg">${escapeText(msg).replace(/\n+/g, " ")}</span>
+      ${link}
+      <button type="button" class="chase-done" data-ids="${ids}">Mark done</button>
+    </div>`;
+}
+
 // Column labels, so the row values are not four unlabelled pieces of text.
 // The third column is the mentee's FIRST session in the "no sessions yet"
 // group, which is the date Koko confirms and fills in there.
@@ -102,17 +169,6 @@ function headerRow(firstSession) {
     </div>`;
 }
 
-// Anyone still needing a date sorts above anyone already booked, so the top of
-// each group is always the work left to do. A booking that has already passed
-// counts as unbooked: the session never happened, so it still needs chasing.
-function byUrgency(today) {
-  const handled = (m) => (m.nextBooked && m.nextBooked >= today ? 1 : 0);
-  return (a, b) => {
-    if (handled(a) !== handled(b)) return handled(a) - handled(b);
-    if ((a.days ?? -1) !== (b.days ?? -1)) return (b.days ?? -1) - (a.days ?? -1);
-    return a.name.localeCompare(b.name);
-  };
-}
 
 // Every logged session for this mentee, most recent first.
 function historyList(m) {
@@ -133,20 +189,20 @@ function toggleHistory(btn) {
   btn.setAttribute("aria-expanded", String(open));
 }
 
-// Active = session within 2 weeks, Nudge = 2–4 weeks, Dropped = 4+ weeks.
+// Four states, resolved server-side by mentee-state.js and only rendered here.
 export function renderStatus({ mentees = [], allDelivered = [], rows = [], ownerEmail: email = "", onChanged = null } = {}) {
   const grid = document.getElementById("status-grid");
   if (!grid) return;
 
   const mentorName = new Map(rows.map((m) => [m.email, m.name]));
+  const phoneFor = new Map(rows.map((m) => [m.name, m.phone || ""]));
   configureActions({
     ownerEmail: email,
     onChanged,
     menteeIndex: new Map(mentees.map((m) => [m.id, m])),
   });
 
-  const buckets = { active: [], nudge: [], dropped: [], none: [], hold: [] };
-  const todayHold = new Date().toISOString().slice(0, 10);
+  const buckets = { lapsed: [], nodate: [], booked: [], hold: [] };
   mentees.forEach((m) => {
     const mine = allDelivered.filter((s) => sameMentee(s, m)).sort((a, b) => b.date.localeCompare(a.date));
     const last = mine[0]?.date || "";
@@ -169,29 +225,42 @@ export function renderStatus({ mentees = [], allDelivered = [], rows = [], owner
       // most-recent-first for the history list.
       frequency: avgGapDays([...sessionDates].sort()),
     };
-    // On hold is checked first, so it wins over every group including Dropped:
-    // it means "I have chased this one and they asked for time", so it must
-    // leave the work pile regardless of how long since their last session. The
-    // moment the date passes they fall back into whichever group they belong to.
-    if (it.holdUntil && it.holdUntil >= todayHold) buckets.hold.push(it);
-    else if (days === null) buckets.none.push(it);
-    else if (days <= 14) buckets.active.push(it);
-    else if (days <= 28) buckets.nudge.push(it);
-    else buckets.dropped.push(it);
+    // The state was decided server-side by mentee-state.js. Re-deriving it here
+    // from day counts is exactly what made this page and the Monday email
+    // disagree, so the page now only renders the verdict it was given.
+    const key = it.state ? it.state.key : "nodate";
+    (buckets[key] || buckets.nodate).push(it);
   });
 
-  // Groups are ordered by how much they need doing something about, and only
-  // the two that need action open on load. Active is the biggest group and the
-  // one needing nothing, so leaving it expanded buried the rest.
-  const today = new Date().toISOString().slice(0, 10);
-  Object.values(buckets).forEach((list) => list.sort(byUrgency(today)));
+  // Repeat offenders first, then longest overdue: the top of the list is
+  // always the one that has been ignored most.
+  buckets.lapsed.sort((a, b) => (b.state.lapses - a.state.lapses) || (b.state.days - a.state.days));
+  buckets.nodate.sort((a, b) => (b.days ?? -1) - (a.days ?? -1));
+  buckets.booked.sort((a, b) => (a.state.date || "").localeCompare(b.state.date || ""));
+  buckets.hold.sort((a, b) => (a.holdUntil || "").localeCompare(b.holdUntil || ""));
 
-  const col = (title, tone, items, open, firstSession = false) => `
+  // A chase bar per mentor above whichever group is being chased.
+  const chaseBars = (bucket) => {
+    const byMentor = new Map();
+    bucket.filter((m) => m.state.needsAction).forEach((m) => {
+      const key = m.mentor || "Unassigned";
+      if (!byMentor.has(key)) byMentor.set(key, []);
+      byMentor.get(key).push(m);
+    });
+    if (!byMentor.size) return "";
+    return [...byMentor.entries()]
+      .sort((a, b) => b[1].length - a[1].length)
+      .map(([name, list]) => chaseBar(name, list, phoneFor.get(name) || ""))
+      .join("");
+  };
+
+  const col = (title, tone, items, open, firstSession = false, prefix = "") => `
     <details class="status-col"${open ? " open" : ""}>
       <summary class="status-col__title status-col__title--${tone}">
         <span>${title}</span>
         <span class="status-col__count">${items.length}</span>
       </summary>
+      ${prefix || ""}
       <div class="status-col__items">${
         items.length
           ? headerRow(firstSession) + items.map((m) => item(m, tone)).join("")
@@ -204,11 +273,10 @@ export function renderStatus({ mentees = [], allDelivered = [], rows = [], owner
   buckets.hold.sort((a, b) => (a.holdUntil || "").localeCompare(b.holdUntil || ""));
 
   grid.innerHTML =
-    col("Nudge", "warn", buckets.nudge, true) +
-    (buckets.none.length ? col("No sessions yet", "muted", buckets.none, true, true) : "") +
+    col("Session did not happen", "warn", buckets.lapsed, true, false, chaseBars(buckets.lapsed)) +
+    col("No next session agreed", "bad", buckets.nodate, true, false, chaseBars(buckets.nodate)) +
     (buckets.hold.length ? col("On hold", "muted", buckets.hold, false) : "") +
-    col("Dropped", "bad", buckets.dropped, false) +
-    col("Active", "ok", buckets.active, false);
+    col("Booked", "ok", buckets.booked, false);
 
   if (!bound) {
     bound = true;
@@ -230,6 +298,12 @@ export function renderStatus({ mentees = [], allDelivered = [], rows = [], owner
       if (fu) { saveNextSession(fu.dataset.id, grid); return; }
       const drop = e.target.closest(".drop-btn");
       if (drop) { dropMentee(drop.dataset.id, drop.dataset.name, drop); return; }
+      const chase = e.target.closest(".chase-btn");
+      if (chase) { markChased(chase.dataset.id, grid); return; }
+      const done = e.target.closest(".chase-done");
+      if (done) { markChased(done.dataset.ids.split(","), grid); return; }
+      const hold = e.target.closest(".hold-btn");
+      if (hold) { setHold(hold.dataset.id, hold.dataset.hold || null, grid); return; }
       const toggle = e.target.closest(".status-row__toggle");
       if (toggle) toggleHistory(toggle);
     });

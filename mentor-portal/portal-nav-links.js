@@ -13,6 +13,7 @@ export const NAV_AREAS = [
     label: "Consultation",
     links: [
       { href: "/consultation-tool/index.html", label: "Consultation tool", page: "consultation" },
+      { href: "/mentor-portal/followups.html", label: "Follow-ups", page: "followups" },
     ],
   },
   {

@@ -45,63 +45,99 @@ function buildEmail(b) {
 
 
 /**
- * Fidel's Monday list: acquired mentees who have gone quiet, longest first.
+ * Fidel's Monday list, in the two states that need different conversations.
  *
- * A mentee with a booking that came and went shows that date, because "booked
- * for 1 Aug, never happened" is a different conversation from "no contact at
- * all". Anyone on hold, or with a next session Koko has already confirmed, is
- * excluded upstream.
+ *   lapsed  an agreed date came and went with nothing logged. Check the
+ *           WhatsApp group, then nudge the mentor. A repeat count is shown
+ *           because twice is a pattern and three times is a mentee who has
+ *           quietly stopped.
+ *   nodate  nobody has agreed when to meet again at all.
+ *
+ * Anyone on hold, or chased in the last few days, is excluded upstream.
  */
-function buildNudgeEmail(list, reachOutDays) {
+function buildNudgeEmail(lapsed, noDate) {
   const cell = (v, last) =>
     `<td style="padding:8px ${last ? 0 : 14}px 8px 0;border-bottom:1px solid #e6e1d5">${v}</td>`;
+  const table = (cols, rows) =>
+    `<table style="border-collapse:collapse;font-size:14px;margin-bottom:6px"><tr>` +
+    cols.map((c, i) => `<th align="left" style="padding:0 ${i === cols.length - 1 ? 0 : 14}px 8px 0;border-bottom:2px solid #d9d3c4">${c}</th>`).join("") +
+    `</tr>${rows}</table>`;
 
-  const rows = list.map((n) =>
-    `<tr>${cell(esc(n.name))}${cell(esc(n.mentor))}` +
-    `${cell("<strong>" + n.gap + " days</strong>")}` +
-    `${cell(esc(n.lastDate || "never"))}` +
-    `${cell(n.missed ? "missed " + esc(n.missed) : "&mdash;", true)}</tr>`).join("");
+  let html = `<p>Morning Fidel,</p>`;
 
-  const head = ["Mentee", "Mentor", "Quiet for", "Last session", "Booking"]
-    .map((c, i, arr) => `<th align="left" style="padding:0 ${i === arr.length - 1 ? 0 : 14}px 8px 0;border-bottom:2px solid #d9d3c4">${c}</th>`).join("");
+  if (lapsed.length) {
+    const rows = lapsed.map((n) =>
+      `<tr>${cell(esc(n.name))}${cell(esc(n.mentor))}` +
+      `${cell(esc(n.expected))}${cell("<strong>" + n.days + " days ago</strong>")}` +
+      `${cell(n.lapses > 1 ? `<strong>${n.lapses}x</strong>` : "&mdash;", true)}</tr>`).join("");
+    html += `<p><strong>${lapsed.length} agreed session${lapsed.length === 1 ? " has" : "s have"} not happened.</strong> ` +
+      `Check the WhatsApp group, then nudge the mentor. If a new date comes out of it, ` +
+      `set it on the mentee status page and this clears.</p>` +
+      table(["Mentee", "Mentor", "Was booked for", "Overdue", "Lapsed"], rows);
+  }
 
-  return `<p>Morning Fidel,</p>` +
-    `<p>${list.length} mentee${list.length === 1 ? " has" : "s have"} gone quiet: ` +
-    `${reachOutDays}+ days since their last session, nothing coming up.</p>` +
-    `<table style="border-collapse:collapse;font-size:14px"><tr>${head}</tr>${rows}</table>` +
-    `<p style="margin-top:16px">A mentee drops off this list as soon as you set their next session date, ` +
-    `or park them with Hold, on the mentee status page.</p>`;
+  if (noDate.length) {
+    const rows = noDate.map((n) =>
+      `<tr>${cell(esc(n.name))}${cell(esc(n.mentor))}` +
+      `${cell(esc(n.lastDate || "never"))}` +
+      `${cell(n.days === null ? "&mdash;" : "<strong>" + n.days + " days</strong>", true)}</tr>`).join("");
+    html += `<p style="margin-top:18px"><strong>${noDate.length} ` +
+      `${noDate.length === 1 ? "mentee has" : "mentees have"} no next session agreed at all.</strong></p>` +
+      table(["Mentee", "Mentor", "Last session", "Quiet for"], rows);
+  }
+
+  html += `<p style="margin-top:16px">On the mentee status page: <strong>Set date</strong> once one is agreed, ` +
+    `<strong>Chased</strong> to park it for a few days, or <strong>Hold</strong> if they have asked for time.</p>`;
+  return html;
 }
 
 module.exports = { buildEmail, buildNudgeEmail, firstName, esc };
 
 /**
- * Fidel's Monday list: acquired mentees who have gone quiet, longest first.
+ * Fidel's Monday list, in the two states that need different conversations.
  *
- * A mentee with a booking that came and went shows that date, because "booked
- * for 1 Aug, never happened" is a different conversation from "no contact at
- * all". Anyone on hold, or with a next session Koko has already confirmed, is
- * excluded upstream.
+ *   lapsed  an agreed date came and went with nothing logged. Check the
+ *           WhatsApp group, then nudge the mentor. A repeat count is shown
+ *           because twice is a pattern and three times is a mentee who has
+ *           quietly stopped.
+ *   nodate  nobody has agreed when to meet again at all.
+ *
+ * Anyone on hold, or chased in the last few days, is excluded upstream.
  */
-function buildNudgeEmail(list, reachOutDays) {
+function buildNudgeEmail(lapsed, noDate) {
   const cell = (v, last) =>
     `<td style="padding:8px ${last ? 0 : 14}px 8px 0;border-bottom:1px solid #e6e1d5">${v}</td>`;
+  const table = (cols, rows) =>
+    `<table style="border-collapse:collapse;font-size:14px;margin-bottom:6px"><tr>` +
+    cols.map((c, i) => `<th align="left" style="padding:0 ${i === cols.length - 1 ? 0 : 14}px 8px 0;border-bottom:2px solid #d9d3c4">${c}</th>`).join("") +
+    `</tr>${rows}</table>`;
 
-  const rows = list.map((n) =>
-    `<tr>${cell(esc(n.name))}${cell(esc(n.mentor))}` +
-    `${cell("<strong>" + n.gap + " days</strong>")}` +
-    `${cell(esc(n.lastDate || "never"))}` +
-    `${cell(n.missed ? "missed " + esc(n.missed) : "&mdash;", true)}</tr>`).join("");
+  let html = `<p>Morning Fidel,</p>`;
 
-  const head = ["Mentee", "Mentor", "Quiet for", "Last session", "Booking"]
-    .map((c, i, arr) => `<th align="left" style="padding:0 ${i === arr.length - 1 ? 0 : 14}px 8px 0;border-bottom:2px solid #d9d3c4">${c}</th>`).join("");
+  if (lapsed.length) {
+    const rows = lapsed.map((n) =>
+      `<tr>${cell(esc(n.name))}${cell(esc(n.mentor))}` +
+      `${cell(esc(n.expected))}${cell("<strong>" + n.days + " days ago</strong>")}` +
+      `${cell(n.lapses > 1 ? `<strong>${n.lapses}x</strong>` : "&mdash;", true)}</tr>`).join("");
+    html += `<p><strong>${lapsed.length} agreed session${lapsed.length === 1 ? " has" : "s have"} not happened.</strong> ` +
+      `Check the WhatsApp group, then nudge the mentor. If a new date comes out of it, ` +
+      `set it on the mentee status page and this clears.</p>` +
+      table(["Mentee", "Mentor", "Was booked for", "Overdue", "Lapsed"], rows);
+  }
 
-  return `<p>Morning Fidel,</p>` +
-    `<p>${list.length} mentee${list.length === 1 ? " has" : "s have"} gone quiet: ` +
-    `${reachOutDays}+ days since their last session, nothing coming up.</p>` +
-    `<table style="border-collapse:collapse;font-size:14px"><tr>${head}</tr>${rows}</table>` +
-    `<p style="margin-top:16px">A mentee drops off this list as soon as you set their next session date, ` +
-    `or park them with Hold, on the mentee status page.</p>`;
+  if (noDate.length) {
+    const rows = noDate.map((n) =>
+      `<tr>${cell(esc(n.name))}${cell(esc(n.mentor))}` +
+      `${cell(esc(n.lastDate || "never"))}` +
+      `${cell(n.days === null ? "&mdash;" : "<strong>" + n.days + " days</strong>", true)}</tr>`).join("");
+    html += `<p style="margin-top:18px"><strong>${noDate.length} ` +
+      `${noDate.length === 1 ? "mentee has" : "mentees have"} no next session agreed at all.</strong></p>` +
+      table(["Mentee", "Mentor", "Last session", "Quiet for"], rows);
+  }
+
+  html += `<p style="margin-top:16px">On the mentee status page: <strong>Set date</strong> once one is agreed, ` +
+    `<strong>Chased</strong> to park it for a few days, or <strong>Hold</strong> if they have asked for time.</p>`;
+  return html;
 }
 
 module.exports = { buildEmail, buildNudgeEmail, firstName, esc };
