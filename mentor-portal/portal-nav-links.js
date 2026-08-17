@@ -11,9 +11,12 @@ export const NAV_AREAS = [
   {
     key: "consultation",
     label: "Consultation",
+    // Follow-ups is first deliberately: the nav pill goes to links[0], and the
+    // consultation tool is a separate app that never renders this nav. Landing
+    // there meant the second row, and Follow-ups with it, was unreachable.
     links: [
-      { href: "/consultation-tool/index.html", label: "Consultation tool", page: "consultation" },
       { href: "/mentor-portal/followups.html", label: "Follow-ups", page: "followups" },
+      { href: "/consultation-tool/index.html", label: "Consultation tool", page: "consultation" },
     ],
   },
   {

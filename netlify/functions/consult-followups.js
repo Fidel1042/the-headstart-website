@@ -18,6 +18,10 @@
 // score, so the stage is an index into that lead's own plan, not a global one.
 
 const { draftMessages } = require("../shared/drafts");
+const {
+  TOUCHES, FINAL_TOUCH_MIN_PCT, CHECKIN_SUBJECT, checkinBody,
+  scoreOf, nextTouch, ymd, daysBetween,
+} = require("../shared/followups");
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -32,36 +36,6 @@ const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com", "dev@localho
 // The stage a consultation is in while it is still worth chasing.
 const OPEN_STAGE = "Waiting on Contract";
 
-// Every touch: how many days after the consultation, how it is sent, and
-// whether it needs a minimum score to be earned.
-const TOUCHES = [
-  { day: 0,  channel: "whatsapp" },
-  { day: 1,  channel: "whatsapp" },
-  { day: 3,  channel: "whatsapp" },
-  { day: 20, channel: "whatsapp", minPct: 40 },
-  { day: 90, channel: "email" },
-];
-const FINAL_TOUCH_MIN_PCT = 40;
-
-const CHECKIN_SUBJECT = "How did the job search go?";
-const checkinBody = (first) =>
-  `Hi ${first},\n\n` +
-  `It has been a few months since we spoke about your job search. How did it go in the end, ` +
-  `did you manage to land something?\n\n` +
-  `If you are still looking, happy to jump on a quick call and see where you are at.\n\n` +
-  `Fidel\nHeadstart Mentoring`;
-
-const DAY = 86400000;
-const ymd = (d) => new Date(d).toISOString().slice(0, 10);
-const daysBetween = (a, b) => Math.round((new Date(b + "T00:00:00Z") - new Date(a + "T00:00:00Z")) / DAY);
-
-/** "80 - ready to start" and "40% - early stage" both mean the number in front. */
-function scoreOf(raw) {
-  const m = String(raw || "").match(/^\s*(\d{1,3})/);
-  if (!m) return null;
-  const n = parseInt(m[1], 10);
-  return n >= 0 && n <= 100 ? n : null;
-}
 
 async function fetchAll(baseId, tableId, fields, token) {
   const out = [];
@@ -108,7 +82,7 @@ exports.handler = async (event) => {
   try {
     const recs = await fetchAll(AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTEE_TABLE_ID,
       ["Name", "First Name", "Client Pipeline", "Meeting Time", "Notes filled at",
-       "Conversion %", "Drafts", "Gmail", "Phone Number", "Aussie Number",
+       "Conversion %", "Drafts", "Gmail", "Phone Number", "Aussie Number", "Target Industry",
        "Follow Up Stage"], AIRTABLE_API_TOKEN);
 
     const today = ymd(new Date());
@@ -135,34 +109,25 @@ exports.handler = async (event) => {
           1: drafted[1] ? drafted[1].text : "",
           3: drafted[2] ? drafted[2].text : "",
           20: `Hey ${first}, still looking to get your grad role in Au?`,
-          90: checkinBody(first),
+          90: checkinBody(first, f["Target Industry"]),
         };
 
-        // This lead's own plan: the standard touches, plus the t+20 nudge only
-        // if the call scored well enough. Stage indexes into this, so a lead
-        // who skips t+20 still reaches the check-in.
+        // Where they are in their own sequence, from the shared resolver.
         const earnsFinal = (score || 0) >= FINAL_TOUCH_MIN_PCT;
-        const plan = TOUCHES.filter((t) => !t.minPct || (score || 0) >= t.minPct);
-        const done = stage >= plan.length;
-        const nextIndex = done ? -1 : stage;
-        const next = nextIndex >= 0 ? plan[nextIndex] : null;
-        const dueOn = next && consultedOn
-          ? ymd(new Date(new Date(consultedOn + "T00:00:00Z").getTime() + next.day * DAY))
-          : "";
-        const due = Boolean(next) && age !== null && age >= next.day;
+        const t = nextTouch({ consultedOn, score, stage }, today);
+        const { next, done, dueOn, due, plan } = t;
 
         return {
           id: r.id,
           name: f["Name"] || "Unnamed",
           first,
           consultedOn, age, score, stage, done,
-          nextIndex,
           nextLabel: next ? `t+${next.day}` : "",
           channel: next ? next.channel : "",
           subject: next && next.channel === "email" ? CHECKIN_SUBJECT : "",
           dueOn,
           due,
-          overdueBy: due && age !== null ? age - next.day : 0,
+          overdueBy: t.overdueBy,
           earnsFinal,
           planLength: plan.length,
           message: next ? (byDay[next.day] || "") : "",

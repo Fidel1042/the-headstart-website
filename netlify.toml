@@ -35,6 +35,12 @@
   [headers.values]
     Content-Disposition = 'inline; filename="Stage 4.pdf"'
 
+# The t+90 consultation check-in, Mondays at 2pm Melbourne. Both hours are
+# scheduled because Netlify cron is UTC and Melbourne moves with daylight
+# saving; the function itself checks the local clock and only sends on one.
+[functions."checkin-sender"]
+  schedule = "0 3,4 * * 1"
+
 [functions."monthly-pl"]
   schedule = "0 0 1 * *"
 
