@@ -6,6 +6,9 @@
   <meta name="robots" content="noindex, nofollow" />
   <title>Call Flow — Headstart</title>
   <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="/mentor-portal/portal.css" />
+  <link rel="stylesheet" href="/mentor-portal/portal-nav.css" />
+  <link rel="stylesheet" href="css/chrome.css" />
   <style id="auth-gate">
     html:not(.auth-ok) body { visibility: hidden; }
     html:not(.auth-ok) { background: #000; }
@@ -100,19 +103,7 @@
   </style>
 </head>
 <body>
-  <nav class="tool-nav">
-    <div class="tool-nav__inner">
-      <a class="tool-nav__brand" href="index.html"><img src="../images/headstart-italic-logo.png" alt="Headstart" class="tool-nav__logo" style="height:70px;width:auto;display:block;" /></a>
-      <a class="tool-nav__link" href="/mentor-portal/index.html" style="opacity:0.55;">← Portal</a>
-      <a class="tool-nav__link is-current" href="index.html">Flow</a>
-      <a class="tool-nav__link" href="matrix.html">Where you are</a>
-      <a class="tool-nav__link" href="structure.html">Session structure</a>
-      <a class="tool-nav__link" href="mentors.html">Mentors</a>
-      <a class="tool-nav__link" href="roi.html">ROI</a>
-      <a class="tool-nav__link" href="pricing.html">Pricing</a>
-      <button class="tool-nav__live" onclick="location.href=location.pathname+'?v='+Date.now()"><span class="tool-nav__live__icon">&#8635;</span> Live</button>
-    </div>
-  </nav>
+  <div id="portal-nav"></div>
 
   <main class="flow-shell">
     <p class="flow-head">Sales call &middot; 6 stages &middot; questions, objections, what to say</p>
@@ -242,9 +233,9 @@
 
   </main>
 
-  <script>
-    // Propagate ?v= to nav links so the Live button keeps everything fresh
-    (function(){var v=new URLSearchParams(location.search).get("v");if(!v)return;document.querySelectorAll(".tool-nav__link").forEach(function(a){var u=new URL(a.href,location.href);u.searchParams.set("v",v);a.href=u.pathname+"?v="+v;});})();
+  <script type="module">
+    import { mountConsultNav } from "./js/chrome.js";
+    mountConsultNav("consultation", "light", false);
   </script>
 </body>
 </html>

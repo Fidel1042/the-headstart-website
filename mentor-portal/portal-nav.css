@@ -66,7 +66,15 @@
   white-space: nowrap;
 }
 .nav-pill {
-  padding: 0.45rem 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  /* There is no global box-sizing reset on portal pages, so without this a
+     full-width pill in the mobile menu overflows by its own padding. */
+  box-sizing: border-box;
+  /* Same-role controls, so one shared height. Without it a pill whose label
+     wraps grows taller than its neighbours and the row goes ragged. */
+  min-height: 36px;
+  padding: 0 0.95rem;
   border-radius: 999px;
   border: 1px solid var(--line);
   background: transparent;
@@ -74,8 +82,11 @@
   font-family: inherit;
   font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
+  /* Two-word labels used to break across two lines inside the pill. A nav
+     label is never long enough to earn a wrap. */
+  white-space: nowrap;
   cursor: pointer;
   text-decoration: none;
   transition: border-color 0.15s, background 0.15s, color 0.15s;
@@ -84,8 +95,24 @@
 .nav-pill:focus-visible { outline: 2px solid var(--accent-bright); outline-offset: 3px; }
 .nav-pill.is-active { border-color: var(--accent-line); color: var(--accent-bright); background: var(--accent-soft); }
 
-/* Owner links: inline on desktop, hamburger dropdown on mobile */
-.nav-owner { display: flex; align-items: center; gap: 0.6rem; }
+/* ── Second row: the areas ──
+   These used to share the top row with the email chip and the sign-out button.
+   With six areas that row wrapped, pills broke onto two lines inside their own
+   border, and the whole header read as squashed. They get their own row. */
+.nav-owner { border-top: 1px solid var(--line-soft); }
+.nav-owner-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0.55rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.nav-owner-inner::-webkit-scrollbar { display: none; }
+#view-as { max-width: 15rem; text-transform: none; letter-spacing: 0.01em; }
 .nav-burger {
   display: none;
   width: 40px; height: 40px;
@@ -156,33 +183,24 @@
   .nav-sub-link { transition: none; }
 }
 
-/* Mobile: collapse the five areas into the hamburger dropdown.
-   Must stay at the end of this file: it overrides .nav-owner's base
-   display above, and CSS resolves equal specificity by source order.
-   When this lived in portal.css it lost, because portal.css loads first
-   and the base rule here then re-showed the whole menu over the page. */
+/* Mobile: the areas row collapses behind the hamburger rather than becoming a
+   sideways scroll the user has to discover.
+   Must stay at the end of this file: it overrides .nav-owner's base rules
+   above, and CSS resolves equal specificity by source order. */
 @media (max-width: 700px) {
   .top-nav img { height: 44px; max-width: 140px; }
   .user-chip { display: none; }
 
-  /* Collapse owner links into the hamburger dropdown */
   .nav-burger { display: inline-flex; }
-  .nav-owner {
-    display: none;
-    position: absolute;
-    top: 100%;
-    right: 0.75rem;
+  .nav-owner { display: none; }
+  .top-nav.menu-open .nav-owner { display: block; }
+  .nav-owner-inner {
+    padding: 0.6rem 1rem;
     flex-direction: column;
     align-items: stretch;
     gap: 0.4rem;
-    min-width: 190px;
-    padding: 0.6rem;
-    background: var(--bg);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    box-shadow: 0 14px 34px rgba(0,0,0,0.45);
-    z-index: 120;
+    overflow-x: visible;
   }
-  .top-nav.menu-open .nav-owner { display: flex; }
-  .nav-owner .nav-pill { width: 100%; text-align: left; }
+  .nav-owner .nav-pill { width: 100%; justify-content: flex-start; }
+  #view-as { max-width: none; }
 }

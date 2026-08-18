@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <title>Delivery Check-in – The Headstart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+  <style id="auth-gate">
+    html:not(.auth-ok) body { visibility: hidden; }
+    html:not(.auth-ok) { background: #fff; }
+  </style>
+  <link rel="stylesheet" href="portal.css" />
+  <link rel="stylesheet" href="portal-nav.css" />
+  <link rel="stylesheet" href="/mentor-portal/polish.css" />
+  <style>
+    .dc-page { max-width: 900px; margin: 0 auto; padding: 1.6rem 1.2rem 4rem; }
+    .dc-head h1 { font-size: 1.4rem; font-weight: 800; margin: 0 0 0.2rem; }
+    .dc-head p { font-size: 0.85rem; color: var(--text-muted); margin: 0 0 1.6rem; max-width: 62ch; }
+    .dc-head b { color: var(--accent); }
+    .dc-sec { margin-bottom: 1.8rem; }
+    .dc-quiet { font-size: 0.8rem; color: var(--text-muted); }
+    .dc-sec__title {
+      font-size: 0.66rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--accent); margin: 0 0 0.7rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .dc-sec__count { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+    .m {
+      border: 1px solid var(--line); border-radius: 14px;
+      padding: 0.9rem 1.1rem; margin-bottom: 0.6rem; background: var(--bg-card);
+    }
+    .m__top { display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap; }
+    .m__name { font-weight: 700; font-size: 0.95rem; }
+    .m__meta { font-size: 0.74rem; color: var(--text-muted); }
+    .m__spacer { flex: 1; }
+    .pill {
+      font-size: 0.62rem; font-weight: 800; letter-spacing: 0.05em;
+      border-radius: 999px; padding: 0.15rem 0.5rem; white-space: nowrap;
+    }
+    .pill--why { background: var(--accent-soft); color: var(--accent); }
+    .pill--wait { border: 1px solid var(--line); color: var(--text-muted); }
+    .m__ticks { display: flex; gap: 1.2rem; flex-wrap: wrap; margin-top: 0.8rem; }
+    .tick {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-size: 0.84rem; cursor: pointer; user-select: none;
+    }
+    .tick input { width: 1.05rem; height: 1.05rem; accent-color: var(--accent); cursor: pointer; }
+    .tick.is-busy { opacity: 0.5; pointer-events: none; }
+    .tick__when { font-size: 0.72rem; color: var(--text-muted); }
+    .m__notes {
+      width: 100%; margin-top: 0.8rem; box-sizing: border-box;
+      font-family: inherit; font-size: 0.84rem; line-height: 1.55;
+      color: var(--text); background: var(--bg); resize: vertical; min-height: 5.5rem;
+      border: 1px solid var(--line); border-radius: 10px; padding: 0.65rem 0.8rem;
+    }
+    .m__notes:focus { outline: none; border-color: var(--accent); }
+    .m__saved { font-size: 0.72rem; color: var(--text-muted); margin: 0.35rem 0 0; min-height: 1em; }
+    .state { font-size: 0.9rem; color: var(--text-muted); padding: 2rem 0; text-align: center; }
+    @media (max-width: 520px) { .m__ticks { gap: 0.6rem; flex-direction: column; } }
+  </style>
+</head>
+<body>
+
+  <div id="portal-nav"></div>
+
+  <main class="dc-page">
+    <div class="dc-head">
+      <h1>Mentor session delivery check-in</h1>
+      <p>A mentor lands here once they have <b>3 sessions with the same mentee</b> or
+        <b>5 sessions across different mentees</b>, whichever comes first. Sit in on one
+        of their sessions, write down what you saw, and tick it off.</p>
+    </div>
+
+    <p class="state" id="loading">Loading&hellip;</p>
+    <p class="state" id="error" hidden></p>
+
+    <div id="content" hidden>
+      <section class="dc-sec">
+        <p class="dc-sec__title">Ready to sit in <span class="dc-sec__count" id="due-count"></span></p>
+        <div id="due-list"></div>
+      </section>
+
+      <section class="dc-sec">
+        <p class="dc-sec__title">Not enough sessions yet <span class="dc-sec__count" id="soon-count"></span></p>
+        <div id="soon-list"></div>
+      </section>
+
+      <section class="dc-sec">
+        <p class="dc-sec__title">Checked <span class="dc-sec__count" id="done-count"></span></p>
+        <div id="done-list"></div>
+      </section>
+    </div>
+  </main>
+
+  <script type="module">
+    import { requireAuth } from "./auth.js";
+    import { mountPortalNav, initTheme } from "./portal-ui.js";
+
+    initTheme();
+
+    let ADMIN_EMAIL = "";
+    let DATA = null;
+
+    const esc = (v) => String(v == null ? "" : v)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    const fmt = (d) => d ? new Date(d + "T00:00:00")
+      .toLocaleDateString("en-AU", { day: "numeric", month: "short" }) : "";
+
+    requireAuth((session) => {
+      const email = session?.user?.email || "";
+      const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com"];
+      if (!OWNERS.includes(email) && email !== "dev@localhost") {
+        window.location.replace("/mentor-portal/index.html");
+        return;
+      }
+      ADMIN_EMAIL = email;
+      mountPortalNav({ email, isOwner: true, active: "delivery-checks" });
+      load();
+    });
+
+    async function load() {
+      const loading = document.getElementById("loading");
+      const errorEl = document.getElementById("error");
+      loading.hidden = false; errorEl.hidden = true;
+      try {
+        const res = await fetch("/.netlify/functions/delivery-checks", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ adminEmail: ADMIN_EMAIL }),
+        });
+        // A static preview has no functions runtime, so this comes back as the
+        // site's 404 page. Name the cause instead of letting JSON.parse
+        // complain about an unexpected "<".
+        const body = await res.text();
+        if (body.trim().startsWith("<")) {
+          throw new Error("This page needs the live site. Preview mode cannot run " +
+            "the data function, so there is nothing to show until it is pushed.");
+        }
+        DATA = JSON.parse(body);
+        if (!res.ok) throw new Error(DATA.error || "Could not load");
+      } catch (err) {
+        loading.hidden = true;
+        errorEl.textContent = err.message || "Could not load — refresh to try again.";
+        errorEl.hidden = false;
+        return;
+      }
+      loading.hidden = true;
+      render();
+      document.getElementById("content").hidden = false;
+    }
+
+    // Why this mentor is on the list, in the words that made them qualify.
+    function why(m) {
+      if (!m.hit) return "";
+      return m.hit.rule === "same"
+        ? `${m.hit.count} with ${esc(m.hit.mentee || "one mentee")}`
+        : `${m.hit.count} across ${m.mentees} mentees`;
+    }
+
+    function tick(m, key, label, when) {
+      return `
+        <label class="tick">
+          <input type="checkbox" data-tick="${key}" data-id="${m.id}" ${when ? "checked" : ""} />
+          <span>${label}</span>
+          ${when ? `<span class="tick__when">${fmt(when)}</span>` : ""}
+        </label>`;
+    }
+
+    function card(m, opts) {
+      const showNotes = opts.notes;
+      return `
+        <div class="m" data-mentor="${m.id}">
+          <div class="m__top">
+            <span class="m__name">${esc(m.name)}</span>
+            ${m.hit ? `<span class="pill pill--why">${why(m)}</span>` : ""}
+            ${m.waitingDays !== null && !m.doneOn
+              ? `<span class="pill pill--wait">waiting ${m.waitingDays}d</span>` : ""}
+            <span class="m__spacer"></span>
+            <span class="m__meta">${m.sessions} sessions${m.last ? ` &middot; last ${fmt(m.last)}` : ""}</span>
+          </div>
+          <div class="m__ticks">
+            ${tick(m, "done", "Sat in on a session", m.doneOn)}
+            ${tick(m, "shadowed", "Shadowed one of Koko's sessions", m.shadowedOn)}
+          </div>
+          ${showNotes ? `
+            <textarea class="m__notes" data-notes="${m.id}"
+              placeholder="What you saw. Structure, questions, listening, what to feed back.">${esc(m.notes)}</textarea>
+            <p class="m__saved" data-saved="${m.id}"></p>` : ""}
+        </div>`;
+    }
+
+    function render() {
+      const set = (id, v) => { document.getElementById(id).textContent = v; };
+      set("due-count", DATA.due.length);
+      set("soon-count", DATA.notYet.length);
+      set("done-count", DATA.done.length);
+
+      document.getElementById("due-list").innerHTML = DATA.due.length
+        ? DATA.due.map((m) => card(m, { notes: true })).join("")
+        : `<p class="dc-quiet">Nobody due. Everyone with the reps has been checked.</p>`;
+
+      document.getElementById("soon-list").innerHTML = DATA.notYet.length
+        ? DATA.notYet.map((m) => card(m, { notes: false })).join("")
+        : `<p class="dc-quiet">None.</p>`;
+
+      document.getElementById("done-list").innerHTML = DATA.done.length
+        ? DATA.done.map((m) => card(m, { notes: true })).join("")
+        : `<p class="dc-quiet">None yet.</p>`;
+    }
+
+    async function save(id, body, onOk) {
+      const res = await fetch("/.netlify/functions/delivery-checks", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "save", adminEmail: ADMIN_EMAIL, mentorId: id, ...body }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not save");
+      if (onOk) onOk(data);
+    }
+
+    // Ticking reloads: a mentor with both ticks moves to Checked, and the list
+    // should show that rather than leaving a ghost row behind.
+    document.addEventListener("change", async (e) => {
+      const box = e.target.closest("[data-tick]");
+      if (!box) return;
+      const label = box.closest(".tick");
+      label.classList.add("is-busy");
+      try {
+        await save(box.dataset.id, { [box.dataset.tick]: box.checked });
+        await load();
+      } catch (err) {
+        box.checked = !box.checked;
+        label.classList.remove("is-busy");
+        alert(err.message || "Could not save");
+      }
+    });
+
+    // Notes save when you click away, so nothing is lost and nothing needs a
+    // button. Only writes when the text actually changed.
+    document.addEventListener("focusout", async (e) => {
+      const box = e.target.closest("[data-notes]");
+      if (!box) return;
+      const id = box.dataset.notes;
+      const all = [...DATA.due, ...DATA.notYet, ...DATA.done];
+      const mentor = all.find((m) => m.id === id);
+      if (!mentor || mentor.notes === box.value) return;
+      const flag = document.querySelector(`[data-saved="${id}"]`);
+      if (flag) flag.textContent = "Saving…";
+      try {
+        await save(id, { notes: box.value });
+        mentor.notes = box.value;
+        if (flag) {
+          flag.textContent = "Saved";
+          setTimeout(() => { if (flag.textContent === "Saved") flag.textContent = ""; }, 2500);
+        }
+      } catch (err) {
+        if (flag) flag.textContent = err.message || "Could not save";
+      }
+    });
+  </script>
+</body>
+</html>

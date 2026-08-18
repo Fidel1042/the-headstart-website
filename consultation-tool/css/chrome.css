@@ -1,0 +1,35 @@
+/* chrome.css — reconciles the shared portal nav with the consultation screens.
+   Loaded after portal.css, before the page's own stylesheet. */
+
+/* portal.css paints a grain overlay over the whole body in dark mode. These
+   screens are shown on a screen share, where grain turns into visible noise
+   on the far end's compression, so it comes off. */
+body::before { display: none !important; }
+
+/* base.css scales the root to 110% so the prospect can read the screen from a
+   video call. The nav is for Fidel alone and should stay portal-sized. */
+.top-nav { font-size: 0.91rem; }
+
+/* The old tool nav sat directly on the content. The portal nav has a second
+   row, so the first section needs room to clear it. */
+.page-head { padding-top: 2.2rem; }
+
+/* ── Present mode ──
+   On a screen share the prospect should see the screen and nothing else, so
+   the whole nav goes rather than being dimmed. */
+.is-presenting .top-nav { display: none; }
+
+/* The way back. Nearly invisible until the pointer finds it, which is the
+   point: Fidel knows where it is and the prospect never notices it. */
+#present-exit {
+  position: fixed; top: 0.55rem; right: 0.55rem; z-index: 200;
+  width: 1.25rem; height: 1.25rem; padding: 0;
+  border: none; border-radius: 50%; cursor: pointer;
+  background: var(--accent); opacity: 0.07;
+  transition: opacity 0.2s ease;
+}
+#present-exit:hover, #present-exit:focus-visible { opacity: 0.9; }
+.is-presenting #present-exit { display: block; }
+#present-exit { display: none; }
+
+@media (prefers-reduced-motion: reduce) { #present-exit { transition: none; } }

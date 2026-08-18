@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <title>Onboarding Call – The Headstart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+  <style id="auth-gate">
+    html:not(.auth-ok) body { visibility: hidden; }
+    html:not(.auth-ok) { background: #fff; }
+  </style>
+  <link rel="stylesheet" href="portal.css" />
+  <link rel="stylesheet" href="portal-nav.css" />
+  <link rel="stylesheet" href="/mentor-portal/polish.css" />
+  <style>
+    .oc-page { max-width: 780px; margin: 0 auto; padding: 1.6rem 1.2rem 4rem; }
+    .oc-head { display: flex; align-items: baseline; gap: 0.8rem; flex-wrap: wrap; margin-bottom: 1.6rem; }
+    .oc-head h1 { font-size: 1.4rem; font-weight: 800; margin: 0; }
+    .oc-head span {
+      font-size: 0.68rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--accent); background: var(--accent-soft);
+      border-radius: 999px; padding: 0.2rem 0.6rem;
+    }
+
+    .oc-block {
+      border: 1px solid var(--line); border-radius: 14px;
+      padding: 1.2rem 1.3rem; margin-bottom: 0.9rem; background: var(--bg-card);
+    }
+    .oc-block__title {
+      display: flex; align-items: baseline; gap: 0.6rem;
+      font-size: 1rem; font-weight: 800; margin: 0 0 0.8rem;
+    }
+    .oc-num {
+      font-size: 0.68rem; font-weight: 800; color: var(--accent);
+      background: var(--accent-soft); border-radius: 6px;
+      padding: 0.15rem 0.45rem; flex-shrink: 0;
+    }
+    .oc-ask {
+      font-size: 0.92rem; line-height: 1.6; margin: 0;
+      padding-left: 0.9rem; border-left: 2px solid var(--accent-line);
+      color: var(--text);
+    }
+    .oc-note { font-size: 0.86rem; color: var(--text-muted); margin: 0.7rem 0 0; }
+
+    /* Tick as you go through the call. Nothing is saved: this is a script to
+       keep your place in, not a record to keep. */
+    .oc-list { list-style: none; margin: 0; padding: 0; }
+    .oc-list li {
+      display: flex; align-items: flex-start; gap: 0.6rem;
+      padding: 0.45rem 0; font-size: 0.92rem; line-height: 1.55;
+      cursor: pointer; border-top: 1px solid var(--line);
+    }
+    .oc-list li:first-child { border-top: none; }
+    .oc-box {
+      width: 1rem; height: 1rem; margin-top: 0.2rem; flex-shrink: 0;
+      border: 1.5px solid var(--line); border-radius: 5px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; color: transparent;
+    }
+    .oc-list li.is-done .oc-box { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+    .oc-list li.is-done { color: var(--text-muted); text-decoration: line-through; }
+
+    .oc-case { font-weight: 700; }
+  </style>
+</head>
+<body>
+
+  <div id="portal-nav"></div>
+
+  <main class="oc-page">
+    <div class="oc-head">
+      <h1>Onboarding Call</h1>
+      <span>45 minutes</span>
+    </div>
+
+    <div class="oc-block">
+      <p class="oc-block__title"><span class="oc-num">1</span>Expectation Setting</p>
+      <ul class="oc-list">
+        <li><span class="oc-box">&#10003;</span>Mention sessions should be done weekly, like all other mentors</li>
+        <li><span class="oc-box">&#10003;</span>Get paid every Monday</li>
+        <li><span class="oc-box">&#10003;</span>Log session after call (can send them instructions if they prefer logging on mobile)</li>
+        <li><span class="oc-box">&#10003;</span>Ask what platform they will use to do Zoom</li>
+        <li><span class="oc-box">&#10003;</span>Reply light messages on WhatsApp, but if it needs a long paragraph, say talk in calls</li>
+        <li><span class="oc-box">&#10003;</span>Confirm next session date at the end of the call</li>
+      </ul>
+    </div>
+
+    <div class="oc-block">
+      <p class="oc-block__title"><span class="oc-num">2</span>Values &mdash; how we treat this mentorship</p>
+      <p class="oc-ask">Other than providing industry knowledge and job searching techniques, what else do you think is important to mentorship?</p>
+    </div>
+
+    <div class="oc-block">
+      <p class="oc-block__title"><span class="oc-num">3</span>Mentees don't work well, how would you engage?</p>
+      <ul class="oc-list">
+        <li><span class="oc-box">&#10003;</span><span><span class="oc-case">Case 1.</span> They don't do the agreed work</span></li>
+        <li><span class="oc-box">&#10003;</span><span><span class="oc-case">Case 2.</span> They get defensive and don't agree</span></li>
+      </ul>
+    </div>
+
+    <div class="oc-block">
+      <p class="oc-block__title"><span class="oc-num">4</span>How would you prepare the structure of mentoring in your head?</p>
+      <p class="oc-ask">Lay down a 10 lesson plan.</p>
+    </div>
+
+    <div class="oc-block">
+      <p class="oc-block__title"><span class="oc-num">5</span>Shadowing</p>
+      <ul class="oc-list">
+        <li><span class="oc-box">&#10003;</span>Get them to confirm a slot for shadowing to learn</li>
+      </ul>
+    </div>
+  </main>
+
+  <script type="module">
+    import { requireAuth } from "./auth.js";
+    import { mountPortalNav, initTheme } from "./portal-ui.js";
+
+    initTheme();
+
+    requireAuth((session) => {
+      const email = session?.user?.email || "";
+      const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com"];
+      if (!OWNERS.includes(email) && email !== "dev@localhost") {
+        window.location.replace("/mentor-portal/index.html");
+        return;
+      }
+      mountPortalNav({ email, isOwner: true, active: "onboarding-call" });
+    });
+
+    // Ticking is per-call scratch, deliberately not saved. Reloading gives a
+    // clean sheet for the next mentor.
+    document.addEventListener("click", (e) => {
+      const li = e.target.closest(".oc-list li");
+      if (li) li.classList.toggle("is-done");
+    });
+  </script>
+</body>
+</html>

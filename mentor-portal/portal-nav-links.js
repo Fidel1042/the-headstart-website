@@ -11,18 +11,25 @@ export const NAV_AREAS = [
   {
     key: "consultation",
     label: "Consultation",
-    // Follow-ups is first deliberately: the nav pill goes to links[0], and the
-    // consultation tool is a separate app that never renders this nav. Landing
-    // there meant the second row, and Follow-ups with it, was unreachable.
+    // The six screens of a sales call, in the order they get opened. They used
+    // to carry their own separate nav bar, which made stepping in and out of
+    // the portal feel like leaving it. They are pages of the portal now.
     links: [
-      { href: "/mentor-portal/followups.html", label: "Follow-ups", page: "followups" },
-      { href: "/consultation-tool/index.html", label: "Consultation tool", page: "consultation" },
+      { href: "/consultation-tool/index.html", label: "Call flow", page: "consultation" },
+      { href: "/consultation-tool/matrix.html", label: "Where you are", page: "consult-matrix" },
+      { href: "/consultation-tool/structure.html", label: "Session structure", page: "consult-structure" },
+      { href: "/consultation-tool/mentors.html", label: "Mentors", page: "consult-mentors" },
+      { href: "/consultation-tool/roi.html", label: "ROI", page: "consult-roi" },
+      { href: "/consultation-tool/pricing.html", label: "Pricing", page: "consult-pricing" },
     ],
   },
   {
     key: "preassigned",
     label: "Pre Assigned Mentees",
+    // Follow-ups first: the section pill goes to links[0], so this lands
+    // straight on the list rather than needing a second click.
     links: [
+      { href: "/mentor-portal/followups.html", label: "Follow-ups", page: "followups" },
       { href: "/mentor-portal/contacts.html", label: "Contacts to add", page: "contacts" },
     ],
   },
@@ -40,6 +47,8 @@ export const NAV_AREAS = [
       { href: "/mentor-portal/admin.html?view=overview", label: "Big picture", page: "big-picture" },
       { href: "/mentor-portal/admin.html?view=performance", label: "Detailed performance", page: "performance" },
       { href: "/mentor-portal/admin.html?view=calendar", label: "Calendar", page: "calendar" },
+      { href: "/mentor-portal/onboarding-call.html", label: "Onboarding call", page: "onboarding-call" },
+      { href: "/mentor-portal/delivery-checks.html", label: "Delivery check-in", page: "delivery-checks" },
     ],
   },
   {
@@ -47,6 +56,7 @@ export const NAV_AREAS = [
     key: "leads",
     label: "Leads",
     links: [
+      { href: "/mentor-portal/journey.html", label: "Customer journey", page: "journey" },
       { href: "/mentor-portal/leads.html", label: "Attribution", page: "leads" },
     ],
   },

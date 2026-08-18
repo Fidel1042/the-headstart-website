@@ -32,8 +32,12 @@ export function initTheme() {
  * @param {string}  opts.loginEmail the real signed-in owner, for link filtering
  *                                  (defaults to email; matters when email is a
  *                                  "viewing as …" label)
+ * @param {string}  opts.lockTheme  "dark" | "light" to pin the page's theme and
+ *                                  drop the toggle. For pages whose content is
+ *                                  built for one theme only, such as the
+ *                                  consultation screens shown to a prospect.
  */
-export function mountPortalNav({ email = "", isOwner = false, active = "", loginEmail = "" } = {}) {
+export function mountPortalNav({ email = "", isOwner = false, active = "", loginEmail = "", lockTheme = "" } = {}) {
   const mount = document.getElementById("portal-nav");
   if (!mount) return;
 
@@ -73,28 +77,35 @@ export function mountPortalNav({ email = "", isOwner = false, active = "", login
           <span class="top-nav-subtitle">Internal use only</span>
         </div>
         <div class="top-nav-actions">
-          ${isOwner ? '<button class="nav-burger" id="nav-burger" type="button" aria-label="Menu">&#9776;</button>' : ""}
-          <div class="nav-owner" id="nav-owner">
-            <select id="view-as" class="nav-pill" style="display:none;" title="View the portal as a mentor" aria-label="View as mentor"></select>
-            ${ownerLinks}
-          </div>
           <span class="user-chip" id="user-chip" ${email ? "" : "hidden"}></span>
-          <button class="nav-pill" id="theme-toggle" type="button" title="Switch between light and dark mode">Light mode</button>
+          ${lockTheme ? "" : '<button class="nav-pill" id="theme-toggle" type="button" title="Switch between light and dark mode">Light mode</button>'}
           <button class="nav-pill" id="signout-btn" type="button" title="Sign out">Sign out</button>
+          ${isOwner ? '<button class="nav-burger" id="nav-burger" type="button" aria-label="Menu">&#9776;</button>' : ""}
         </div>
       </div>
+      ${isOwner ? `<div class="nav-owner" id="nav-owner"><div class="nav-owner-inner">
+            <select id="view-as" class="nav-pill" style="display:none;" title="View the portal as a mentor" aria-label="View as mentor"></select>
+            ${ownerLinks}
+          </div></div>` : ""}
       ${subLinks}
     </header>`;
 
   const chip = document.getElementById("user-chip");
   if (chip && email) chip.textContent = email;
 
-  // Re-apply so the freshly injected icon matches the current theme.
-  initTheme();
-  document.getElementById("theme-toggle").addEventListener("click", () => {
-    const current = document.documentElement.getAttribute("data-theme") || "light";
-    applyTheme(current === "dark" ? "light" : "dark");
-  });
+  // A locked page pins its theme without touching what the rest of the portal
+  // is set to, so switching the portal to light does not white out a screen
+  // that is built dark.
+  if (lockTheme) {
+    document.documentElement.setAttribute("data-theme", lockTheme);
+  } else {
+    // Re-apply so the freshly injected icon matches the current theme.
+    initTheme();
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+      const current = document.documentElement.getAttribute("data-theme") || "light";
+      applyTheme(current === "dark" ? "light" : "dark");
+    });
+  }
 
   document.getElementById("signout-btn").addEventListener("click", (e) => {
     e.preventDefault();

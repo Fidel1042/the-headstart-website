@@ -7,6 +7,9 @@
   <title>Mentor profile — Headstart</title>
   <link rel="stylesheet" href="css/base.css" />
   <link rel="stylesheet" href="css/profile.css" />
+  <link rel="stylesheet" href="/mentor-portal/portal.css" />
+  <link rel="stylesheet" href="/mentor-portal/portal-nav.css" />
+  <link rel="stylesheet" href="css/chrome.css" />
   <style id="auth-gate">
     html:not(.auth-ok) body { visibility: hidden; }
     html:not(.auth-ok) { background: #000; }
@@ -51,19 +54,7 @@
   </script>
 </head>
 <body>
-  <nav class="tool-nav">
-    <div class="tool-nav__inner">
-      <a class="tool-nav__brand" href="index.html"><img src="../images/headstart-italic-logo.png" alt="Headstart" class="tool-nav__logo" style="height:70px;width:auto;display:block;" /></a>
-      <a class="tool-nav__link" href="/mentor-portal/index.html" style="opacity:0.55;">← Portal</a>
-      <a class="tool-nav__link" href="index.html">Notes</a>
-      <a class="tool-nav__link" href="matrix.html">Where you are</a>
-      <a class="tool-nav__link" href="structure.html">Session structure</a>
-      <a class="tool-nav__link is-current" href="mentors.html">Mentors</a>
-      <a class="tool-nav__link" href="roi.html">ROI</a>
-      <a class="tool-nav__link" href="pricing.html">Pricing</a>
-      <button class="tool-nav__live" onclick="location.href=location.pathname+'?v='+Date.now()"><span class="tool-nav__live__icon">&#8635;</span> Live</button>
-    </div>
-  </nav>
+  <div id="portal-nav"></div>
 
   <section class="profile-card-section">
     <img class="profile-card-img" id="profileCardImg" src="" alt="Mentor profile card" />
@@ -75,9 +66,10 @@
     <div class="shell">Headstart Mentoring — internal consultation resource.</div>
   </footer>
 
-  <script>// Propagate ?v= to all nav links so every navigation is cache-fresh
-(function(){var v=new URLSearchParams(location.search).get("v");if(!v)return;document.querySelectorAll(".tool-nav__link").forEach(function(a){var u=new URL(a.href,location.href);u.searchParams.set("v",v);a.href=u.pathname+"?v="+v;});})();
-</script>
   <script type="module">const v=new URLSearchParams(location.search).get("v")||"0";await import(`./js/profile.js?v=${v}`);</script>
+  <script type="module">
+    import { mountConsultNav } from "./js/chrome.js";
+    mountConsultNav("consult-mentors", "dark");
+  </script>
 </body>
 </html>
