@@ -16,7 +16,20 @@
   <style>
     .jr-page { max-width: 1100px; margin: 0 auto; padding: 1.6rem 1.2rem 4rem; }
     .jr-head h1 { font-size: 1.4rem; font-weight: 800; margin: 0 0 0.2rem; }
-    .jr-head p { font-size: 0.85rem; color: var(--text-muted); margin: 0 0 2rem; }
+    .jr-head p { font-size: 0.85rem; color: var(--text-muted); margin: 0 0 1rem; }
+
+    .win { display: flex; gap: 0.35rem; margin-bottom: 2rem; }
+    .win__b {
+      font-family: inherit; font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.04em; text-transform: uppercase;
+      min-height: 34px; padding: 0 0.85rem; box-sizing: border-box;
+      border: 1px solid var(--line); border-radius: 999px;
+      background: transparent; color: var(--text-muted); cursor: pointer;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+    }
+    .win__b:hover { color: var(--text); border-color: var(--accent-line); }
+    .win__b.is-on { background: var(--accent-soft); border-color: var(--accent-line); color: var(--accent); }
+    .win.is-busy { opacity: 0.5; pointer-events: none; }
 
     /* ── The flow: four circles, dotted line between them ── */
     .flow {
@@ -69,9 +82,23 @@
       min-height: 2.6em; line-height: 1.3; padding: 0 0.2rem; }
     .node.is-off .node__dot { background: var(--text-muted); box-shadow: none; }
 
-    .link { flex: 0 0 auto; display: flex; align-items: center; gap: 0.4rem;
-      padding: 0 0.5rem; margin-top: 3.3rem; }
-    .link i { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-line); }
+    /* The gap between two circles, carrying its conversion rate. A button, so
+       it opens a panel the same way a circle does. */
+    .link {
+      flex: 0 0 auto; display: flex; flex-direction: column; align-items: center;
+      gap: 0.1rem; padding: 0.3rem 0.45rem; margin-top: 2.6rem;
+      font-family: inherit; background: none; cursor: pointer;
+      border: 1px solid transparent; border-radius: 10px;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .link:hover { border-color: var(--line); background: var(--bg-card); }
+    .link.is-on { border-color: var(--accent-line); background: var(--accent-soft); }
+    .link__rate {
+      font-size: 0.78rem; font-weight: 800; color: var(--accent);
+      font-variant-numeric: tabular-nums;
+    }
+    .link__arrow { font-size: 0.9rem; color: var(--accent-line); line-height: 1; }
+    .link.is-on .link__arrow { color: var(--accent); }
 
     /* ── The panel a circle opens ── */
     .panel {
@@ -102,7 +129,12 @@
     th, td { text-align: left; padding: 0.45rem 0.8rem 0.45rem 0; border-bottom: 1px solid var(--line-soft); }
     th { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }
     td:not(:first-child), th:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
-    .tbl-note { font-size: 0.72rem; color: var(--text-muted); margin: 0.6rem 0 0; }
+    .tbl-note { font-size: 0.72rem; color: var(--text-muted); margin: 0.6rem 0 1.4rem; }
+    .tbl-title {
+      font-size: 0.68rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--accent); margin: 0 0 0.5rem;
+    }
+    tbody tr:last-child td { font-weight: 700; border-bottom: none; }
 
     .state { font-size: 0.9rem; color: var(--text-muted); padding: 2rem 0; text-align: center; }
     .jr-foot { font-size: 0.72rem; color: var(--text-muted); margin-top: 1.6rem; text-align: center; }
@@ -123,6 +155,11 @@
     <div class="jr-head">
       <h1>Customer journey</h1>
       <p>Every stage from first visit to a mentee who keeps showing up. Click a circle.</p>
+      <div class="win" id="win" role="group" aria-label="Time window">
+        <button type="button" class="win__b" data-w="7">7 days</button>
+        <button type="button" class="win__b is-on" data-w="28">28 days</button>
+        <button type="button" class="win__b" data-w="90">90 days</button>
+      </div>
     </div>
 
     <p class="state" id="loading">Loading&hellip;</p>

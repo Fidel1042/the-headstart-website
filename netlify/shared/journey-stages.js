@@ -31,28 +31,96 @@ function sessionsByMentee(sessionRecs) {
   return by;
 }
 
+/**
+ * GA4 hands back dozens of raw source strings for what are really a handful of
+ * places. "ig", "instagram.com", "l.instagram.com" and "instagram_bio" are all
+ * Instagram. Group them, or the table is a list of spellings rather than an
+ * answer.
+ */
+const SOURCE_GROUPS = [
+  ["Instagram", /instagram|^ig$/i],
+  ["LinkedIn", /linkedin|lnkd\.in/i],
+  ["Email", /sendib|brevo|mail\.google/i],
+  ["Search", /^google|bing|duckduckgo|chatgpt|perplexity/i],
+  ["Direct", /^\(direct\)|^\(not set\)|^\(data not available\)/i],
+];
+function groupSource(raw) {
+  const s = String(raw || "(direct)");
+  const hit = SOURCE_GROUPS.find(([, re]) => re.test(s));
+  return hit ? hit[0] : "Other";
+}
+
 /** 1. Traffic. What GA4 saw before anybody spoke to us. */
 function traffic(ga) {
-  const leads = ga.events.find((e) => e.name === "generate_lead");
-  const booked = ga.events.find((e) => e.name === "invitee_meeting_scheduled");
+  // People, not fires. The Calendly embed raises its event several times per
+  // booking, so the raw count reads about five times the truth.
+  const people = (name) => {
+    const e = ga.events.find((x) => x.name === name);
+    return e ? e.users : 0;
+  };
+  const booked = people("invitee_meeting_scheduled");
+  const signups = ga.signups || [];
+  const totalSignups = signups.reduce((a, d) => a + d.people, 0);
+  const find = (k) => (signups.find((d) => d.key === k) || {}).people || 0;
+  const freeCall = signups.find((d) => d.key === "free_call") || {};
+
+  const grouped = {};
+  ga.sources.forEach((s) => {
+    const g = groupSource(s.source);
+    grouped[g] = grouped[g] || { users: 0, sessions: 0 };
+    grouped[g].users += s.users;
+    grouped[g].sessions += s.sessions;
+  });
+  // Share is against the grouped total, not the visitor count. One person who
+  // arrives from Instagram and later from LinkedIn is counted by GA4 under
+  // both, so measuring against visitors makes the column add up to over 100%.
+  const totalGrouped = Object.values(grouped).reduce((a, v) => a + v.users, 0);
+  const rows = Object.entries(grouped)
+    .sort((a, b) => b[1].users - a[1].users)
+    .map(([g, v]) => [g, v.users, `${pct(v.users, totalGrouped)}%`]);
+
   return {
     key: "traffic",
     label: "Traffic",
+    raw: { visitors: ga.users, signups: totalSignups, booked },
     headline: ga.users ? `${ga.users} visitors` : "No GA4 data",
     sub: `${ga.sessions} sessions over ${ga.windowDays} days`,
     stats: [
       { label: "Visitors", value: ga.users },
       { label: "Sessions", value: ga.sessions },
-      { label: "Signed up on site", value: leads ? leads.count : 0,
-        note: ga.users ? `${pct(leads ? leads.count : 0, ga.users)}% of visitors` : "" },
-      { label: "Booked a consultation", value: booked ? booked.count : 0 },
+      // A rate only when the funnel runs the right way. More bookings than
+      // site-form submits is not a 130% conversion, it means people are
+      // reaching Calendly by a route that skips the form, so say that instead
+      // of printing a percentage that cannot be true.
+      { label: "Free call booked", value: booked,
+        note: !freeCall.started ? ""
+          : booked <= freeCall.started
+            ? `${pct(booked, freeCall.started)}% of the ${freeCall.started} who filled the form`
+            : `${booked - freeCall.started} booked without the site form`,
+        warn: freeCall.started > 0 && booked > freeCall.started * 1.5 },
+      { label: "Lead magnet", value: find("audit"), note: "job search audit" },
+      { label: "Job alerts", value: find("job_alerts"), note: "signed up for the list" },
     ],
-    // Where they came from, biggest first. This is the only place the site's
-    // own attribution and the call outcomes sit side by side.
-    table: {
-      head: ["Source", "Visitors", "Sessions"],
-      rows: ga.sources.slice(0, 8).map((s) => [s.source, s.users, s.sessions]),
-    },
+    // Two tables: where they came from, and what they signed up to.
+    tables: [
+      {
+        title: "Where signups went",
+        head: ["Destination", "People", "Share"],
+        rows: signups
+          .sort((a, b) => b.people - a.people)
+          .map((d) => [d.label, d.people, `${pct(d.people, totalSignups)}%`])
+          .concat([["Total", totalSignups, "100%"]]),
+        note: "Allocated by the page the signup finished on, not by form tag: two thirds of " +
+          "lead events carry no form tag, and custom tags never apply to past data.",
+      },
+      {
+        title: "Where they came from",
+        head: ["Source", "Visitors", "Share"],
+        rows,
+        note: "Counted as people, not clicks. Someone arriving from two channels is " +
+          "counted under both, so the rows total slightly more than the visitor count.",
+      },
+    ],
   };
 }
 
@@ -66,9 +134,12 @@ function traffic(ga) {
  * This is the same rule as the Airtable "Showed Up Rate" formula, which reads
  * IF(TRIM({Raw Notes}) = "", 0, 1).
  */
-function splitCalls(clients, today) {
+function splitCalls(clients, today, from) {
+  // Never reach back past the transcript era, whatever window is asked for:
+  // before it, a missing transcript means nothing.
+  const floor = from > TRANSCRIPT_ERA_START ? from : TRANSCRIPT_ERA_START;
   const past = clients.filter((c) =>
-    c.meeting && c.meeting < today && c.meeting >= TRANSCRIPT_ERA_START);
+    c.meeting && c.meeting < today && c.meeting >= floor);
   const showed = past.filter((c) => c.transcript);
   const noShow = past.filter((c) => !c.transcript);
   // Marked by hand as well as missing a transcript. The two agree, so this is
@@ -77,11 +148,31 @@ function splitCalls(clients, today) {
   return { past, showed, noShow, flagged };
 }
 
+/**
+ * A click is the only signal Apple's pre-fetching cannot fake, so a nil says
+ * something worth saying rather than being left as a bare zero.
+ */
+function clickNote(email) {
+  if (!email.length) return "";
+  const withLinks = email.filter((e) => e.clicked > 0);
+  if (withLinks.length === email.length) return "Every one carries a tracked link.";
+  const dead = email.filter((e) => !e.clicked).map((e) => e.name);
+  return `No clicks recorded on ${dead.join(", ")}. Brevo only counts a click on a real ` +
+    `<a> link, so a bare URL in a plain-text email registers nothing. A click is the one ` +
+    `signal a mail app cannot fake, so an email with no tracked link cannot be measured properly.`;
+}
+
 /** Show rate per month, so one bad month cannot hide inside the average. */
-function monthlyShowRate(past) {
+function monthlyShowRate(past, today) {
+  // Months are useless on a 7-day window, so bucket by week when the span is
+  // short enough that a month would be one row.
+  const span = past.length ? days([...past].sort((a, b) => a.meeting.localeCompare(b.meeting))[0].meeting, today) : 0;
+  const weekly = span <= 45;
   const m = {};
   past.forEach((c) => {
-    const k = c.meeting.slice(0, 7);
+    const d = new Date(c.meeting + "T00:00:00Z");
+    const monday = new Date(d); monday.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7));
+    const k = weekly ? ymd(monday) : c.meeting.slice(0, 7);
     m[k] = m[k] || { held: 0, showed: 0 };
     m[k].held += 1;
     if (c.transcript) m[k].showed += 1;
@@ -90,11 +181,12 @@ function monthlyShowRate(past) {
 }
 
 /** 2. The call. Did the emails land, and did they turn up. */
-function consultation(clients, email, today) {
-  const { past, showed, noShow, flagged } = splitCalls(clients, today);
+function consultation(clients, email, today, from) {
+  const { past, showed, noShow, flagged } = splitCalls(clients, today, from);
   return {
     key: "consultation",
     label: "Consultation",
+    raw: { booked: past.length, showed: showed.length },
     headline: `${pct(showed.length, past.length)}% show rate`,
     sub: `${past.length} calls booked, ${noShow.length} did not turn up`,
     stats: [
@@ -102,32 +194,38 @@ function consultation(clients, email, today) {
       { label: "Showed up", value: showed.length, note: "transcript recorded" },
       { label: "No-shows", value: noShow.length, note: `${pct(noShow.length, past.length)}% of bookings`,
         warn: pct(noShow.length, past.length) >= 25 },
-      { label: "No-shows marked in Airtable", value: flagged.length,
-        note: flagged.length < noShow.length ? `${noShow.length - flagged.length} never labelled` : "all labelled" },
     ],
-    table: {
-      head: ["Month", "Booked", "Showed", "Show rate"],
-      rows: monthlyShowRate(past),
-      note: `A call with no transcript is a no-show: Fathom records every call that happens. ` +
-        `Counted from ${TRANSCRIPT_ERA_START}, the first call with a recorded transcript. ` +
-        `Reminder emails: ` + (email.length
-          ? email.map((e) => `${e.name} ${e.openRate}% opened (${e.provenRate}% proven)`).join(", ")
-          : "no Brevo data") + ".",
-    },
+    tables: [
+      {
+        title: "Show rate over time",
+        head: [past.length && days(past[0].meeting, today) <= 45 ? "Week of" : "Month",
+               "Booked", "Showed", "Show rate"],
+        rows: monthlyShowRate(past, today),
+        note: `A call with no transcript is a no-show: Fathom records every call that happens. ` +
+          `Counted from ${TRANSCRIPT_ERA_START}, the first call with a recorded transcript.`,
+      },
+      {
+        title: "The three emails before the call",
+        head: ["Email", "Sent", "Opened", "Clicked"],
+        rows: email.length
+          ? email.map((e) => [e.name, e.delivered, `${e.openRate}%`,
+              e.clicked ? `${e.clickRate}%` : "none"])
+          : [["No Brevo data", "—", "—", "—"]],
+        note: "Open rate is measured on the recipients no mail-app proxy touched, then " +
+          "applied to all of them. Apple's pre-fetch both fakes opens and hides real ones, " +
+          "so counting the raw event is wrong in both directions. " + clickNote(email),
+      },
+    ],
   };
 }
 
 /** 3. The close. Signing, and how long the first session took to happen. */
-function close(clients, byMentee, today) {
+function close(clients, byMentee, today, from) {
   // Only people who actually had the call can be closed, which is the same
   // denominator as the Airtable Close Rate formula.
-  const { showed } = splitCalls(clients, today);
+  const { showed } = splitCalls(clients, today, from);
   const acquired = showed.filter((c) => c.pipeline === "Acquired");
-  const waiting = showed.filter((c) => c.pipeline === "Waiting on Contract");
   const dropped = showed.filter((c) => c.pipeline === "Dropped");
-  // Decided cases only: someone still waiting has not said no yet, and
-  // counting them as a loss makes the close rate look worse than it is.
-  const decided = acquired.length + dropped.length;
 
   const gaps = [];
   acquired.forEach((c) => {
@@ -141,16 +239,14 @@ function close(clients, byMentee, today) {
   return {
     key: "close",
     label: "Close",
+    raw: { showed: showed.length, acquired: acquired.length, started: gaps.length },
     headline: `${pct(acquired.length, showed.length)}% convert`,
     sub: gaps.length ? `${median(gaps)} days to the first session` : "No matched first sessions",
     stats: [
       { label: "Signed up", value: acquired.length },
-      { label: "Still deciding", value: waiting.length },
       { label: "Said no", value: dropped.length },
       { label: "Close rate", value: `${pct(acquired.length, showed.length)}%`,
         note: `${acquired.length} of ${showed.length} who showed` },
-      { label: "Close rate once decided", value: `${pct(acquired.length, decided)}%`,
-        note: `${acquired.length} of ${decided}, ignoring the undecided` },
       { label: "Median days to first session", value: median(gaps) ?? "—" },
       { label: "Slowest start", value: gaps.length ? `${Math.max(...gaps)} days` : "—" },
     ],
@@ -158,7 +254,15 @@ function close(clients, byMentee, today) {
 }
 
 /** 4. Continuity. Whether anybody stays past the first couple of sessions. */
-function continuity(byMentee, target) {
+function continuity(byMentee, target, from) {
+  // Only sessions inside the window, and only mentees who have one there, so a
+  // 7-day view describes this week rather than all time.
+  const win = {};
+  Object.entries(byMentee).forEach(([k, dates]) => {
+    const d = dates.filter((x) => x >= from);
+    if (d.length) win[k] = d;
+  });
+  byMentee = win;
   const counts = Object.values(byMentee).map((a) => a.length);
   const starters = counts.length;
   const reached = (n) => counts.filter((c) => c >= n).length;
@@ -178,6 +282,7 @@ function continuity(byMentee, target) {
   return {
     key: "continuity",
     label: "Continuity",
+    raw: { starters, repeat: reached(2) },
     headline: `${pct(reached(3), starters)}% reach 3+`,
     sub: `${total} sessions delivered across ${starters} mentees`,
     stats: [
@@ -196,7 +301,37 @@ function continuity(byMentee, target) {
   };
 }
 
+/**
+ * The gaps between the circles. Each one is a single conversion, phrased as
+ * the question it answers, so the arrow carries a number rather than being
+ * decoration.
+ */
+function connectors(stages) {
+  const raw = (k) => (stages.find((s) => s.key === k) || {}).raw || {};
+  // Three gaps between four circles, so exactly three connectors.
+  const t = raw("traffic"), c = raw("consultation"), cl = raw("close");
+
+  const link = (label, question, n, d, rows) => ({
+    label, question,
+    headline: d ? `${pct(n, d)}%` : "—",
+    stats: [{ label: question, value: d ? `${pct(n, d)}%` : "—", note: `${n} of ${d}` }],
+    table: rows && rows.length ? { head: ["Step", "People"], rows } : null,
+  });
+
+  return [
+    link("Signup to booking", "Of everyone who signed up, how many booked a call?",
+      c.booked || 0, t.signups || 0,
+      [["Signed up on the site", t.signups || 0], ["Booked a consultation", c.booked || 0]]),
+    link("Booking to showing up", "Of the calls booked, how many happened?",
+      c.showed || 0, c.booked || 0,
+      [["Calls booked", c.booked || 0], ["Turned up", c.showed || 0]]),
+    link("Call to signing", "Of the calls that happened, how many signed?",
+      cl.acquired || 0, cl.showed || 0,
+      [["Had the call", cl.showed || 0], ["Signed up", cl.acquired || 0]]),
+  ];
+}
+
 module.exports = {
-  sessionsByMentee, traffic, consultation, close, continuity, ymd, pct,
+  sessionsByMentee, traffic, consultation, close, continuity, connectors, ymd, pct,
   TRANSCRIPT_ERA_START,
 };

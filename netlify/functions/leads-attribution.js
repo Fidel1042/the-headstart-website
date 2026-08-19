@@ -6,7 +6,9 @@
 // GA4 auth is a hand-rolled service-account JWT so this function needs no npm
 // dependencies. Node's crypto does the RS256 signing.
 
-const { ga4Token, runReport, dateRange, eventFilter } = require("../shared/ga4");
+const {
+  ga4Token, runReport, dateRange, eventFilter, normalizePrivateKey,
+} = require("../shared/ga4");
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -480,6 +482,8 @@ async function gather(days, offset = 0) {
 }
 
 exports.gather = gather;
+// Re-exported because reminders.js imports it from here. It now lives in
+// shared/ga4.js; this line is the shim that keeps that import working.
 exports.normalizePrivateKey = normalizePrivateKey;
 
 exports.handler = async (event) => {

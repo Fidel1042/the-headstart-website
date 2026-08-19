@@ -6,7 +6,7 @@
 // needs its key, Airtable is the only hard requirement.
 
 const {
-  sessionsByMentee, traffic, consultation, close, continuity, ymd,
+  sessionsByMentee, traffic, consultation, close, continuity, connectors, ymd,
 } = require("../shared/journey-stages");
 const { ga4Token, runReport, dateRange, eventFilter } = require("../shared/ga4");
 
@@ -19,10 +19,33 @@ const headers = {
 const json = (statusCode, body) => ({ statusCode, headers, body: JSON.stringify(body) });
 
 const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com", "dev@localhost"];
-const WINDOW_DAYS = 28;
+// The windows the page offers. 7 for "what happened this week", 90 for a
+// trend that survives a quiet fortnight.
+const WINDOWS = [7, 28, 90];
+const DEFAULT_WINDOW = 28;
 const TARGET_GAP_DAYS = 7;
 
 const KEY_EVENTS = ["generate_lead", "discovery_form_submit", "invitee_meeting_scheduled"];
+
+// Where a signup actually went. Allocated by pagePath, which is a built-in
+// GA4 dimension: form_id and signup_type are custom dimensions, they are not
+// retroactive, and roughly two thirds of generate_lead rows carry no form_id
+// at all. The page the event fired on has no such gap.
+//
+// Each entry names the event that counts as the finish line for that
+// destination, so the numbers are completions and not intentions.
+const DESTINATIONS = [
+  { key: "free_call", label: "Free call booked",
+    pages: [/^\/free-call-submitted/], event: "invitee_meeting_scheduled",
+    startPages: [/^\/discovery-call/], startEvent: "discovery_form_submit" },
+  { key: "audit", label: "Lead magnet (job search audit)",
+    pages: [/^\/job-search-audit/], event: "generate_lead" },
+  { key: "job_alerts", label: "Job alerts",
+    pages: [/^\/job-alerts/], event: "generate_lead" },
+  { key: "community", label: "Community question",
+    pages: [/^\/ask/], event: "generate_lead" },
+];
+const SIGNUP_EVENTS = ["generate_lead", "discovery_form_submit", "invitee_meeting_scheduled"];
 
 // The reminder emails, matched by shape because the subject carries a date.
 const EMAILS = [
@@ -48,34 +71,68 @@ async function fetchAll(baseId, tableId, fields, token) {
 }
 
 /** GA4 totals, key events and top sources. Returns null if it is not set up. */
-async function ga4Block(env) {
+async function ga4Block(env, windowDays) {
   const { GA4_PROPERTY_ID, GA4_CLIENT_EMAIL, GA4_PRIVATE_KEY } = env;
   if (!GA4_PROPERTY_ID || !GA4_CLIENT_EMAIL || !GA4_PRIVATE_KEY) return null;
   const token = await ga4Token(GA4_CLIENT_EMAIL, GA4_PRIVATE_KEY);
-  const range = dateRange(WINDOW_DAYS);
+  const range = dateRange(windowDays);
 
-  const [totals, events, sources] = await Promise.all([
+  const [totals, events, sources, forms] = await Promise.all([
     runReport(token, GA4_PROPERTY_ID, {
       dateRanges: range, metrics: [{ name: "totalUsers" }, { name: "sessions" }],
     }),
     runReport(token, GA4_PROPERTY_ID, {
-      dateRanges: range, dimensions: [{ name: "eventName" }], metrics: [{ name: "eventCount" }],
+      dateRanges: range, dimensions: [{ name: "eventName" }],
+      metrics: [{ name: "eventCount" }, { name: "totalUsers" }],
       dimensionFilter: eventFilter(KEY_EVENTS),
     }),
     runReport(token, GA4_PROPERTY_ID, {
       dateRanges: range, dimensions: [{ name: "sessionSource" }],
       metrics: [{ name: "totalUsers" }, { name: "sessions" }],
-      orderBys: [{ metric: { metricName: "totalUsers" }, desc: true }], limit: 10,
+      orderBys: [{ metric: { metricName: "totalUsers" }, desc: true }], limit: 50,
     }),
+    // Signup completions by page. The limit is deliberately generous: a row
+    // cap tuned for a week silently truncates over ninety days.
+    runReport(token, GA4_PROPERTY_ID, {
+      dateRanges: range,
+      dimensions: [{ name: "pagePath" }, { name: "eventName" }], metrics: [{ name: "totalUsers" }],
+      dimensionFilter: eventFilter(SIGNUP_EVENTS),
+      orderBys: [{ metric: { metricName: "totalUsers" }, desc: true }], limit: 300,
+    }).catch(() => []),
   ]);
 
   return {
-    windowDays: WINDOW_DAYS,
+    windowDays,
     users: totals[0] ? totals[0].mets[0] : 0,
     sessions: totals[0] ? totals[0].mets[1] : 0,
-    events: events.map((r) => ({ name: r.dims[0], count: r.mets[0] })),
+    // users, not eventCount: one booking fires the Calendly event many times.
+    events: events.map((r) => ({ name: r.dims[0], count: r.mets[0], users: r.mets[1] })),
     sources: sources.map((r) => ({ source: r.dims[0] || "(direct)", users: r.mets[0], sessions: r.mets[1] })),
+    signups: allocate(forms),
   };
+}
+
+/** Roll the page-and-event rows into one line per signup destination. */
+function allocate(rows) {
+  const tally = (pages, event) => rows
+    .filter((r) => r.dims[1] === event && pages.some((re) => re.test(String(r.dims[0] || "").replace(/\/$/, "") || "/")))
+    .reduce((a, r) => a + r.mets[0], 0);
+
+  const out = DESTINATIONS.map((d) => ({
+    key: d.key, label: d.label,
+    people: tally(d.pages, d.event),
+    started: d.startPages ? tally(d.startPages, d.startEvent) : null,
+  }));
+
+  // Anything that fired a signup event on a page no destination claims. Shown
+  // rather than dropped, so the rows still add up to the total.
+  const claimed = DESTINATIONS.flatMap((d) => d.pages.concat(d.startPages || []));
+  const other = rows
+    .filter((r) => r.dims[1] !== "discovery_form_submit")
+    .filter((r) => !claimed.some((re) => re.test(String(r.dims[0] || "").replace(/\/$/, "") || "/")))
+    .reduce((a, r) => a + r.mets[0], 0);
+  if (other) out.push({ key: "other", label: "Other pages", people: other, started: null });
+  return out.filter((d) => d.people || d.started);
 }
 
 /** Open rates for the three reminder emails. Returns [] if Brevo is not set up. */
@@ -91,8 +148,8 @@ async function emailBlock(apiKey) {
     const data = await res.json();
     return data.code ? [] : (data.events || []);
   };
-  const [delivered, opened, proxy] = await Promise.all(
-    ["delivered", "opened", "loadedByProxy"].map(pull));
+  const [delivered, opened, proxy, clicked] = await Promise.all(
+    ["delivered", "opened", "loadedByProxy", "clicks"].map(pull));
 
   const idsFor = (rows, re) =>
     new Set(rows.filter((x) => re.test(String(x.subject || "").trim())).map((x) => x.messageId));
@@ -101,12 +158,25 @@ async function emailBlock(apiKey) {
     const d = idsFor(delivered, re);
     const o = idsFor(opened, re);
     const p = idsFor(proxy, re);
-    const clean = [...o].filter((id) => !p.has(id)).length;
+    const c = idsFor(clicked, re);
+
+    // One open rate, measured only on the people a mail-app proxy never
+    // touched. Among them an open means a person, and a non-open means nobody
+    // read it, so the rate is clean. It is then taken as the rate for
+    // everybody.
+    //
+    // The raw "opened / delivered" is not a ceiling to sit under: Apple's
+    // pre-fetch suppresses the real open event as often as it fabricates one,
+    // so the raw figure is biased downward for proxy-heavy audiences and this
+    // estimate can sit slightly above it.
+    const cleanOpens = [...o].filter((id) => !p.has(id)).length;
+    const cleanRecipients = d.size - [...p].filter((id) => d.has(id)).length;
     const base = d.size || 1;
     return {
-      name, delivered: d.size, opened: o.size,
-      openRate: Math.round((o.size / base) * 100),
-      provenRate: Math.round((clean / base) * 100),
+      name, delivered: d.size, opened: o.size, clicked: c.size, proxy: p.size,
+      openRate: cleanRecipients ? Math.round((cleanOpens / cleanRecipients) * 100)
+                                : Math.round((o.size / base) * 100),
+      clickRate: Math.round((c.size / base) * 100),
     };
   }).filter((e) => e.delivered > 0);
 }
@@ -121,6 +191,10 @@ exports.handler = async (event) => {
   if (!OWNERS.includes((payload.adminEmail || "").toLowerCase().trim())) {
     return json(403, { error: "Not authorised" });
   }
+  // Only the offered windows, so a hand-edited request cannot ask GA4 for two
+  // years of data and time the function out.
+  const windowDays = WINDOWS.includes(Number(payload.windowDays))
+    ? Number(payload.windowDays) : DEFAULT_WINDOW;
 
   const {
     AIRTABLE_API_TOKEN, AIRTABLE_CORE_BASE_ID, AIRTABLE_BASE_ID,
@@ -140,7 +214,7 @@ exports.handler = async (event) => {
     // should grey out one circle, not break the page.
     const notes = [];
     const [ga, email] = await Promise.all([
-      ga4Block(process.env).catch((e) => { notes.push(`GA4: ${e.message}`); return null; }),
+      ga4Block(process.env, windowDays).catch((e) => { notes.push(`GA4: ${e.message}`); return null; }),
       emailBlock(BREVO_API_KEY).catch((e) => { notes.push(`Brevo: ${e.message}`); return []; }),
     ]);
 
@@ -155,18 +229,23 @@ exports.handler = async (event) => {
     }));
     const byMentee = sessionsByMentee(sessionRecs);
     const today = ymd(Date.now());
+    const from = ymd(Date.now() - windowDays * 86400000);
 
     const stages = [
       ga ? traffic(ga) : {
         key: "traffic", label: "Traffic", headline: "Not connected",
         sub: "GA4 env vars missing", stats: [], unavailable: true,
       },
-      consultation(clients, email, today),
-      close(clients, byMentee, today),
-      continuity(byMentee, `${TARGET_GAP_DAYS} days`),
+      consultation(clients, email, today, from),
+      close(clients, byMentee, today, from),
+      continuity(byMentee, `${TARGET_GAP_DAYS} days`, from),
     ];
 
-    return json(200, { stages, notes, generatedAt: new Date().toISOString() });
+    return json(200, {
+      stages, links: connectors(stages),
+      notes, windowDays, windows: WINDOWS, from, to: today,
+      generatedAt: new Date().toISOString(),
+    });
   } catch (err) {
     return json(502, { error: err.message || "Could not build the journey" });
   }

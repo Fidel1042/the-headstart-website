@@ -11,7 +11,8 @@ initTheme();
 
 let ADMIN_EMAIL = "";
 let DATA = null;
-let OPEN = 0;
+let OPEN = "s0";  // "s<i>" for a circle, "l<i>" for a connector
+let WINDOW_DAYS = 28;
 
 const esc = (v) => String(v == null ? "" : v)
   .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -41,7 +42,7 @@ async function load() {
   try {
     const res = await fetch("/.netlify/functions/journey-stats", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ adminEmail: ADMIN_EMAIL }),
+      body: JSON.stringify({ adminEmail: ADMIN_EMAIL, windowDays: WINDOW_DAYS }),
     });
     // A static preview has no functions runtime, so the call comes back as the
     // site's 404 page. Say that, rather than letting JSON.parse complain about
@@ -63,24 +64,27 @@ async function load() {
   renderFlow();
   renderPanel();
   document.getElementById("content").hidden = false;
+  document.querySelectorAll(".win__b").forEach((b) =>
+    b.classList.toggle("is-on", Number(b.dataset.w) === WINDOW_DAYS));
 
   const foot = document.getElementById("foot");
   const when = new Date(DATA.generatedAt).toLocaleString("en-AU",
     { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
-  foot.textContent = (DATA.notes || []).length
+  const span = DATA.from ? `${DATA.from} to ${DATA.to} · ` : "";
+  foot.textContent = span + ((DATA.notes || []).length
     ? `${DATA.notes.join(" · ")} — everything else is live as of ${when}`
-    : `Live as of ${when}`;
+    : `live as of ${when}`);
 }
 
 /** Built once. Selecting a stage only toggles classes, so the buttons are
     never replaced mid-interaction and keyboard focus survives a click. */
 function renderFlow() {
-  const dots = "<i></i><i></i><i></i>";
+  const links = DATA.links || [];
   document.getElementById("flow").innerHTML = DATA.stages.map((s, i) => {
     const { big, unit } = split(s.headline);
     const node = `
       <button type="button" class="node${s.unavailable ? " is-off" : ""}"
-              data-i="${i}" aria-pressed="false">
+              data-k="s${i}" aria-pressed="false">
         <span class="node__dot">
           <span class="node__big">${esc(big)}</span>
           ${unit ? `<span class="node__unit">${esc(unit)}</span>` : ""}
@@ -88,27 +92,47 @@ function renderFlow() {
         <span class="node__name">${esc(s.label)}</span>
         <span class="node__cap">${esc(s.sub)}</span>
       </button>`;
-    return i === 0 ? node : `<span class="link">${dots}</span>${node}`;
+    if (i === 0) return node;
+    // The gap between two circles is itself a number worth opening, so the
+    // arrow is a button carrying the conversion rate rather than decoration.
+    const l = links[i - 1];
+    const arrow = l
+      ? `<button type="button" class="link" data-k="l${i - 1}" aria-pressed="false"
+                 title="${esc(l.question)}">
+           <span class="link__rate">${esc(l.headline)}</span>
+           <span class="link__arrow">&rarr;</span>
+         </button>`
+      : `<span class="link"><span class="link__arrow">&rarr;</span></span>`;
+    return arrow + node;
   }).join("");
   markOpen();
 }
 
 function markOpen() {
-  document.querySelectorAll(".node").forEach((n) => {
-    const on = Number(n.dataset.i) === OPEN;
+  document.querySelectorAll("[data-k]").forEach((n) => {
+    const on = n.dataset.k === OPEN;
     n.classList.toggle("is-on", on);
     n.setAttribute("aria-pressed", String(on));
   });
 }
 
-function select(i) {
-  OPEN = i;
+function select(key) {
+  OPEN = key;
   markOpen();
   renderPanel();
 }
 
+/** Whatever is open: a stage, or the connector between two stages. */
+function current() {
+  const i = Number(OPEN.slice(1));
+  return OPEN[0] === "l"
+    ? { ...(DATA.links || [])[i], sub: (DATA.links || [])[i].question }
+    : DATA.stages[i];
+}
+
 function renderPanel() {
-  const s = DATA.stages[OPEN];
+  const s = current();
+  if (!s) return;
   const cells = (s.stats || []).map((x) => `
     <div class="cell${x.warn ? " is-warn" : ""}">
       <div class="cell__v">${esc(x.value)}</div>
@@ -116,15 +140,18 @@ function renderPanel() {
       <div class="cell__n">${esc(x.note || "")}</div>
     </div>`).join("");
 
-  const table = s.table ? `
+  // A stage may carry one table or several; both shapes render the same way.
+  const list = s.tables || (s.table ? [s.table] : []);
+  const table = list.map((t) => `
+    ${t.title ? `<p class="tbl-title">${esc(t.title)}</p>` : ""}
     <div class="tbl-wrap">
       <table>
-        <thead><tr>${s.table.head.map((h) => `<th>${esc(h)}</th>`).join("")}</tr></thead>
-        <tbody>${s.table.rows.map((r) =>
+        <thead><tr>${t.head.map((h) => `<th>${esc(h)}</th>`).join("")}</tr></thead>
+        <tbody>${t.rows.map((r) =>
           `<tr>${r.map((c) => `<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody>
       </table>
     </div>
-    ${s.table.note ? `<p class="tbl-note">${esc(s.table.note)}</p>` : ""}` : "";
+    ${t.note ? `<p class="tbl-note">${esc(t.note)}</p>` : ""}`).join("");
 
   document.getElementById("panel").innerHTML = `
     <div class="panel">
@@ -138,16 +165,32 @@ function renderPanel() {
 }
 
 document.addEventListener("click", (e) => {
-  const node = e.target.closest("[data-i]");
-  if (node) select(Number(node.dataset.i));
+  const node = e.target.closest("[data-k]");
+  if (node) { select(node.dataset.k); return; }
+
+  // Switching the window refetches. The open circle stays open, so comparing
+  // one stage across 7, 28 and 90 days is three clicks in the same place.
+  const win = e.target.closest("[data-w]");
+  if (win) {
+    const next = Number(win.dataset.w);
+    if (next === WINDOW_DAYS) return;
+    WINDOW_DAYS = next;
+    document.querySelectorAll(".win__b").forEach((b) =>
+      b.classList.toggle("is-on", Number(b.dataset.w) === next));
+    document.getElementById("win").classList.add("is-busy");
+    load().finally(() => document.getElementById("win").classList.remove("is-busy"));
+  }
 });
 
 // Left and right arrows walk the flow, so the whole page works from the
 // keyboard once a circle has focus.
 document.addEventListener("keydown", (e) => {
   if (!DATA || (e.key !== "ArrowRight" && e.key !== "ArrowLeft")) return;
-  if (!document.activeElement?.closest(".node")) return;
+  if (!document.activeElement?.closest("[data-k]")) return;
   e.preventDefault();
-  select((OPEN + (e.key === "ArrowRight" ? 1 : -1) + DATA.stages.length) % DATA.stages.length);
-  document.querySelector(`.node[data-i="${OPEN}"]`)?.focus();
+  // Arrows walk the whole row, circles and connectors alike, in visual order.
+  const keys = [...document.querySelectorAll("[data-k]")].map((n) => n.dataset.k);
+  const at = keys.indexOf(OPEN);
+  select(keys[(at + (e.key === "ArrowRight" ? 1 : -1) + keys.length) % keys.length]);
+  document.querySelector(`[data-k="${OPEN}"]`)?.focus();
 });
