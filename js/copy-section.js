@@ -144,11 +144,16 @@ async function copySection(section, btn) {
 function initCopySections(selector = "main section[id]") {
   document.querySelectorAll(selector).forEach((section) => {
     const heading = section.querySelector("h2");
-    if (!heading || section.querySelector(".copy-section-btn")) return;
+    // The guard looks for this button's own marker, not its class. The resume
+    // section styles its "Save as PDF" and "Open in new tab" controls with the
+    // same class, and checking the class made this function think it had
+    // already run there, so section 4 was the one section with no Copy button.
+    if (!heading || section.querySelector("[data-copy-section]")) return;
 
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "copy-section-btn";
+    btn.dataset.copySection = "";
     btn.textContent = "Copy section";
     btn.setAttribute("aria-label", `Copy the ${heading.textContent.trim()} section`);
 

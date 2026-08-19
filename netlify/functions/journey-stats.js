@@ -130,7 +130,7 @@ exports.handler = async (event) => {
   try {
     const [clientRecs, sessionRecs] = await Promise.all([
       fetchAll(AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTEE_TABLE_ID,
-        ["Name", "Meeting Time", "Client Pipeline", "Conversion %"], AIRTABLE_API_TOKEN),
+        ["Name", "Meeting Time", "Client Pipeline", "Raw Notes"], AIRTABLE_API_TOKEN),
       fetchAll(AIRTABLE_BASE_ID, AIRTABLE_SESSION_TABLE_ID,
         ["Date", "Mentee Name", "Mentee Record ID", "Payment Status", "Amount Charged"],
         AIRTABLE_API_TOKEN),
@@ -149,6 +149,9 @@ exports.handler = async (event) => {
       name: r.fields["Name"] || "",
       meeting: r.fields["Meeting Time"] ? ymd(r.fields["Meeting Time"]) : "",
       pipeline: r.fields["Client Pipeline"] || "",
+      // A transcript is the evidence the call happened, and the same test the
+      // Airtable "Showed Up Rate" formula uses.
+      transcript: String(r.fields["Raw Notes"] || "").trim() !== "",
     }));
     const byMentee = sessionsByMentee(sessionRecs);
     const today = ymd(Date.now());

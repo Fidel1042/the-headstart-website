@@ -3,6 +3,11 @@
 // One stage per circle on the journey page. Kept apart from the fetching so
 // the maths can be read, and argued with, without wading through API calls.
 
+// The first consultation with a recorded transcript. Before this, Fathom was
+// not running, so a missing transcript says nothing about whether the call
+// happened and every rate built on it would be wrong.
+const TRANSCRIPT_ERA_START = "2026-06-17";
+
 const DAY = 86400000;
 const ymd = (d) => new Date(d).toISOString().slice(0, 10);
 const days = (a, b) => Math.round((new Date(b) - new Date(a)) / DAY);
@@ -51,40 +56,75 @@ function traffic(ga) {
   };
 }
 
+/**
+ * Split past calls in two. The transcript is the source of truth: Fathom
+ * records every call that happens, so no transcript means nobody turned up.
+ * The "No show" pipeline value is only a manual label on top of that, and it
+ * was not applied at all before the no-show email automation went in, so it
+ * cannot be the test.
+ *
+ * This is the same rule as the Airtable "Showed Up Rate" formula, which reads
+ * IF(TRIM({Raw Notes}) = "", 0, 1).
+ */
+function splitCalls(clients, today) {
+  const past = clients.filter((c) =>
+    c.meeting && c.meeting < today && c.meeting >= TRANSCRIPT_ERA_START);
+  const showed = past.filter((c) => c.transcript);
+  const noShow = past.filter((c) => !c.transcript);
+  // Marked by hand as well as missing a transcript. The two agree, so this is
+  // only here to show how much of the no-show pile has been worked through.
+  const flagged = noShow.filter((c) => c.pipeline === "No show");
+  return { past, showed, noShow, flagged };
+}
+
+/** Show rate per month, so one bad month cannot hide inside the average. */
+function monthlyShowRate(past) {
+  const m = {};
+  past.forEach((c) => {
+    const k = c.meeting.slice(0, 7);
+    m[k] = m[k] || { held: 0, showed: 0 };
+    m[k].held += 1;
+    if (c.transcript) m[k].showed += 1;
+  });
+  return Object.keys(m).sort().map((k) => [k, m[k].held, m[k].showed, `${pct(m[k].showed, m[k].held)}%`]);
+}
+
 /** 2. The call. Did the emails land, and did they turn up. */
 function consultation(clients, email, today) {
-  const past = clients.filter((c) => c.meeting && c.meeting < today);
-  const noShow = past.filter((c) => c.pipeline === "No show");
-  const showed = past.length - noShow.length;
-  // A past call still sitting on "Initial Consultation Booked" was never moved
-  // on. It is not a stage, it is a record nobody updated.
-  const stale = past.filter((c) => c.pipeline === "Initial Consultation Booked");
+  const { past, showed, noShow, flagged } = splitCalls(clients, today);
   return {
     key: "consultation",
     label: "Consultation",
-    headline: `${pct(showed, past.length)}% show rate`,
-    sub: `${past.length} calls held, ${noShow.length} no-shows`,
+    headline: `${pct(showed.length, past.length)}% show rate`,
+    sub: `${past.length} calls booked, ${noShow.length} did not turn up`,
     stats: [
-      { label: "Consultations held", value: past.length },
-      { label: "Showed up", value: showed, note: `${pct(showed, past.length)}%` },
-      { label: "No-shows", value: noShow.length, note: `${pct(noShow.length, past.length)}%` },
-      { label: "Never updated after the call", value: stale.length,
-        note: stale.length ? "pipeline not moved on" : "", warn: stale.length > 0 },
+      { label: "Calls booked", value: past.length },
+      { label: "Showed up", value: showed.length, note: "transcript recorded" },
+      { label: "No-shows", value: noShow.length, note: `${pct(noShow.length, past.length)}% of bookings`,
+        warn: pct(noShow.length, past.length) >= 25 },
+      { label: "No-shows marked in Airtable", value: flagged.length,
+        note: flagged.length < noShow.length ? `${noShow.length - flagged.length} never labelled` : "all labelled" },
     ],
     table: {
-      head: ["Reminder email", "Sent", "Opened", "Proven"],
-      rows: email.map((e) => [e.name, e.delivered, `${e.openRate}%`, `${e.provenRate}%`]),
-      note: "Proven excludes opens that were only a mail-app pre-fetch.",
+      head: ["Month", "Booked", "Showed", "Show rate"],
+      rows: monthlyShowRate(past),
+      note: `A call with no transcript is a no-show: Fathom records every call that happens. ` +
+        `Counted from ${TRANSCRIPT_ERA_START}, the first call with a recorded transcript. ` +
+        `Reminder emails: ` + (email.length
+          ? email.map((e) => `${e.name} ${e.openRate}% opened (${e.provenRate}% proven)`).join(", ")
+          : "no Brevo data") + ".",
     },
   };
 }
 
 /** 3. The close. Signing, and how long the first session took to happen. */
 function close(clients, byMentee, today) {
-  const past = clients.filter((c) => c.meeting && c.meeting < today && c.pipeline !== "No show");
-  const acquired = clients.filter((c) => c.pipeline === "Acquired");
-  const waiting = clients.filter((c) => c.pipeline === "Waiting on Contract");
-  const dropped = clients.filter((c) => c.pipeline === "Dropped");
+  // Only people who actually had the call can be closed, which is the same
+  // denominator as the Airtable Close Rate formula.
+  const { showed } = splitCalls(clients, today);
+  const acquired = showed.filter((c) => c.pipeline === "Acquired");
+  const waiting = showed.filter((c) => c.pipeline === "Waiting on Contract");
+  const dropped = showed.filter((c) => c.pipeline === "Dropped");
   // Decided cases only: someone still waiting has not said no yet, and
   // counting them as a loss makes the close rate look worse than it is.
   const decided = acquired.length + dropped.length;
@@ -101,14 +141,16 @@ function close(clients, byMentee, today) {
   return {
     key: "close",
     label: "Close",
-    headline: `${pct(acquired.length, past.length)}% convert`,
+    headline: `${pct(acquired.length, showed.length)}% convert`,
     sub: gaps.length ? `${median(gaps)} days to the first session` : "No matched first sessions",
     stats: [
       { label: "Signed up", value: acquired.length },
       { label: "Still deciding", value: waiting.length },
       { label: "Said no", value: dropped.length },
+      { label: "Close rate", value: `${pct(acquired.length, showed.length)}%`,
+        note: `${acquired.length} of ${showed.length} who showed` },
       { label: "Close rate once decided", value: `${pct(acquired.length, decided)}%`,
-        note: `${acquired.length} of ${decided}` },
+        note: `${acquired.length} of ${decided}, ignoring the undecided` },
       { label: "Median days to first session", value: median(gaps) ?? "—" },
       { label: "Slowest start", value: gaps.length ? `${Math.max(...gaps)} days` : "—" },
     ],
@@ -154,4 +196,7 @@ function continuity(byMentee, target) {
   };
 }
 
-module.exports = { sessionsByMentee, traffic, consultation, close, continuity, ymd, pct };
+module.exports = {
+  sessionsByMentee, traffic, consultation, close, continuity, ymd, pct,
+  TRANSCRIPT_ERA_START,
+};
