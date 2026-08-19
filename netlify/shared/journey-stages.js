@@ -193,7 +193,7 @@ function consultation(clients, email, today, from) {
       { label: "Calls booked", value: past.length },
       { label: "Showed up", value: showed.length, note: "transcript recorded" },
       { label: "No-shows", value: noShow.length, note: `${pct(noShow.length, past.length)}% of bookings`,
-        warn: pct(noShow.length, past.length) >= 25 },
+        warn: pct(noShow.length, past.length) >= 25, lowerIsBetter: true },
     ],
     tables: [
       {
@@ -203,17 +203,6 @@ function consultation(clients, email, today, from) {
         rows: monthlyShowRate(past, today),
         note: `A call with no transcript is a no-show: Fathom records every call that happens. ` +
           `Counted from ${TRANSCRIPT_ERA_START}, the first call with a recorded transcript.`,
-      },
-      {
-        title: "The three emails before the call",
-        head: ["Email", "Sent", "Opened", "Clicked"],
-        rows: email.length
-          ? email.map((e) => [e.name, e.delivered, `${e.openRate}%`,
-              e.clicked ? `${e.clickRate}%` : "none"])
-          : [["No Brevo data", "—", "—", "—"]],
-        note: "Open rate is measured on the recipients no mail-app proxy touched, then " +
-          "applied to all of them. Apple's pre-fetch both fakes opens and hides real ones, " +
-          "so counting the raw event is wrong in both directions. " + clickNote(email),
       },
     ],
   };
@@ -244,11 +233,11 @@ function close(clients, byMentee, today, from) {
     sub: gaps.length ? `${median(gaps)} days to the first session` : "No matched first sessions",
     stats: [
       { label: "Signed up", value: acquired.length },
-      { label: "Said no", value: dropped.length },
+      { label: "Said no", value: dropped.length, lowerIsBetter: true },
       { label: "Close rate", value: `${pct(acquired.length, showed.length)}%`,
         note: `${acquired.length} of ${showed.length} who showed` },
-      { label: "Median days to first session", value: median(gaps) ?? "—" },
-      { label: "Slowest start", value: gaps.length ? `${Math.max(...gaps)} days` : "—" },
+      { label: "Median days to first session", value: median(gaps) ?? "—", lowerIsBetter: true },
+      { label: "Slowest start", value: gaps.length ? `${Math.max(...gaps)} days` : "—", lowerIsBetter: true },
     ],
   };
 }
@@ -290,7 +279,7 @@ function continuity(byMentee, target, from) {
       { label: "Sessions delivered", value: total },
       { label: "Median sessions each", value: median(counts) ?? 0 },
       { label: "Median days between sessions", value: median(gaps) ?? "—",
-        note: `target ${target}` },
+        note: `target ${target}`, lowerIsBetter: true },
     ],
     table: {
       head: ["Milestone", "Mentees", "Share of starters"],
@@ -301,37 +290,46 @@ function continuity(byMentee, target, from) {
   };
 }
 
+/** The reminder sequence, as the first gap in the journey. */
+function emailCheckpoints(email) {
+  if (!email.length) {
+    return { label: "Reminder emails", question: "No Brevo data", headline: "—", stats: [], table: null };
+  }
+  // Weighted across the three: every reminder sent, and the share opened.
+  const opens = email.reduce((a, e) => a + Math.round((e.openRate / 100) * e.delivered), 0);
+  const sent = email.reduce((a, e) => a + e.delivered, 0);
+  return {
+    label: "Reminder emails",
+    question: "Do the three emails before the call get read?",
+    headline: sent ? `${pct(opens, sent)}%` : "—",
+    stats: email.map((e) => ({
+      label: e.name, value: `${e.openRate}%`,
+      note: `${e.delivered} sent${e.clicked ? `, ${e.clickRate}% clicked` : ", no clicks"}`,
+      warn: e.openRate < 50,
+    })),
+    table: {
+      head: ["Email", "Sent", "Opened", "Clicked"],
+      rows: email.map((e) => [e.name, e.delivered, `${e.openRate}%`,
+        e.clicked ? `${e.clickRate}%` : "none"]),
+      note: "Open rate is measured on the recipients no mail-app proxy touched, then " +
+        "applied to all of them. Apple's pre-fetch both fakes opens and hides real ones, " +
+        "so counting the raw event is wrong in both directions. " + clickNote(email),
+    },
+  };
+}
+
 /**
- * The gaps between the circles. Each one is a single conversion, phrased as
- * the question it answers, so the arrow carries a number rather than being
- * decoration.
+ * A midpoint sits between two circles. Index 0 means "between the first and
+ * second stage". Only the reminder sequence earns one: the other gaps would
+ * repeat the number already printed on the circle they point at, since
+ * "booking to showing up" IS the show rate and "call to signing" IS the
+ * convert rate.
  */
-function connectors(stages) {
-  const raw = (k) => (stages.find((s) => s.key === k) || {}).raw || {};
-  // Three gaps between four circles, so exactly three connectors.
-  const t = raw("traffic"), c = raw("consultation"), cl = raw("close");
-
-  const link = (label, question, n, d, rows) => ({
-    label, question,
-    headline: d ? `${pct(n, d)}%` : "—",
-    stats: [{ label: question, value: d ? `${pct(n, d)}%` : "—", note: `${n} of ${d}` }],
-    table: rows && rows.length ? { head: ["Step", "People"], rows } : null,
-  });
-
-  return [
-    link("Signup to booking", "Of everyone who signed up, how many booked a call?",
-      c.booked || 0, t.signups || 0,
-      [["Signed up on the site", t.signups || 0], ["Booked a consultation", c.booked || 0]]),
-    link("Booking to showing up", "Of the calls booked, how many happened?",
-      c.showed || 0, c.booked || 0,
-      [["Calls booked", c.booked || 0], ["Turned up", c.showed || 0]]),
-    link("Call to signing", "Of the calls that happened, how many signed?",
-      cl.acquired || 0, cl.showed || 0,
-      [["Had the call", cl.showed || 0], ["Signed up", cl.acquired || 0]]),
-  ];
+function midpoints(email) {
+  return [emailCheckpoints(email)];
 }
 
 module.exports = {
-  sessionsByMentee, traffic, consultation, close, continuity, connectors, ymd, pct,
+  sessionsByMentee, traffic, consultation, close, continuity, midpoints, ymd, pct,
   TRANSCRIPT_ERA_START,
 };

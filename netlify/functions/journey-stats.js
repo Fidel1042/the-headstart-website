@@ -6,7 +6,7 @@
 // needs its key, Airtable is the only hard requirement.
 
 const {
-  sessionsByMentee, traffic, consultation, close, continuity, connectors, ymd,
+  sessionsByMentee, traffic, consultation, close, continuity, midpoints, ymd,
 } = require("../shared/journey-stages");
 const { ga4Token, runReport, dateRange, eventFilter } = require("../shared/ga4");
 
@@ -136,11 +136,13 @@ function allocate(rows) {
 }
 
 /** Open rates for the three reminder emails. Returns [] if Brevo is not set up. */
-async function emailBlock(apiKey) {
+async function emailBlock(apiKey, windowDays) {
   if (!apiKey) return [];
   // Brevo reads dates as UTC, so "today" in Melbourne reads as the future.
+  // Capped at 89: Brevo refuses a range wider than 90 days.
   const end = ymd(Date.now() - 86400000);
-  const start = ymd(Date.now() - 86400000 - 89 * 86400000);
+  const span = Math.min(windowDays, 89);
+  const start = ymd(Date.now() - 86400000 - span * 86400000);
   const pull = async (event) => {
     const url = `https://api.brevo.com/v3/smtp/statistics/events` +
       `?limit=2500&startDate=${start}&endDate=${end}&event=${event}`;
@@ -215,7 +217,7 @@ exports.handler = async (event) => {
     const notes = [];
     const [ga, email] = await Promise.all([
       ga4Block(process.env, windowDays).catch((e) => { notes.push(`GA4: ${e.message}`); return null; }),
-      emailBlock(BREVO_API_KEY).catch((e) => { notes.push(`Brevo: ${e.message}`); return []; }),
+      emailBlock(BREVO_API_KEY, windowDays).catch((e) => { notes.push(`Brevo: ${e.message}`); return []; }),
     ]);
 
     const clients = clientRecs.map((r) => ({
@@ -242,7 +244,7 @@ exports.handler = async (event) => {
     ];
 
     return json(200, {
-      stages, links: connectors(stages),
+      stages, links: midpoints(email),
       notes, windowDays, windows: WINDOWS, from, to: today,
       generatedAt: new Date().toISOString(),
     });

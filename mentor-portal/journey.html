@@ -31,6 +31,26 @@
     .win__b.is-on { background: var(--accent-soft); border-color: var(--accent-line); color: var(--accent); }
     .win.is-busy { opacity: 0.5; pointer-events: none; }
 
+    .cmp-bar { display: flex; align-items: center; gap: 0.9rem; flex-wrap: wrap;
+      margin: -1.2rem 0 2rem; }
+    .cmp__lead { font-size: 0.72rem; color: var(--text-muted); }
+    .cmp__box { display: flex; align-items: center; gap: 0.35rem;
+      font-size: 0.75rem; cursor: pointer; user-select: none; }
+    .cmp__box input { width: 0.95rem; height: 0.95rem; accent-color: var(--accent); cursor: pointer; }
+
+    /* The comparison line under a stat. Green when the window being viewed is
+       better than the one compared against, red when worse. "Better" is not
+       always higher: a rise in no-shows or in days waited is worse, and those
+       stats are marked so the colour cannot invert. */
+    .cell__cmp { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.45rem;
+      padding-top: 0.4rem; border-top: 1px solid var(--line-soft); }
+    .cmp { font-size: 0.7rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+    .cmp b { font-weight: 700; opacity: 0.7; margin-right: 0.15rem; }
+    .cmp.is-up { color: #2e7d52; }
+    .cmp.is-down { color: #c33; }
+    [data-theme="dark"] .cmp.is-up { color: #6fd39b; }
+    [data-theme="dark"] .cmp.is-down { color: #ff8b8b; }
+
     /* ── The flow: four circles, dotted line between them ── */
     .flow {
       display: flex; align-items: flex-start;
@@ -82,23 +102,32 @@
       min-height: 2.6em; line-height: 1.3; padding: 0 0.2rem; }
     .node.is-off .node__dot { background: var(--text-muted); box-shadow: none; }
 
-    /* The gap between two circles, carrying its conversion rate. A button, so
-       it opens a panel the same way a circle does. */
-    .link {
+    .link { flex: 0 0 auto; display: flex; align-items: center; padding: 0 0.35rem; margin-top: 3.1rem; }
+    .link__arrow { font-size: 1rem; color: var(--accent-line); line-height: 1; }
+
+    /* A midpoint: a small circle between two arrows, opening a panel like the
+       big circles do. Only a gap with something of its own to say gets one. */
+    .mid {
       flex: 0 0 auto; display: flex; flex-direction: column; align-items: center;
-      gap: 0.1rem; padding: 0.3rem 0.45rem; margin-top: 2.6rem;
-      font-family: inherit; background: none; cursor: pointer;
-      border: 1px solid transparent; border-radius: 10px;
-      transition: border-color 0.15s, background 0.15s;
+      background: none; border: 0; padding: 0; cursor: pointer;
+      font-family: inherit; color: var(--text); width: 5.4rem;
     }
-    .link:hover { border-color: var(--line); background: var(--bg-card); }
-    .link.is-on { border-color: var(--accent-line); background: var(--accent-soft); }
-    .link__rate {
-      font-size: 0.78rem; font-weight: 800; color: var(--accent);
-      font-variant-numeric: tabular-nums;
+    .mid__dot {
+      width: 3.4rem; height: 3.4rem; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; font-weight: 800; font-variant-numeric: tabular-nums;
+      background: var(--bg-card); color: var(--accent);
+      border: 1.5px solid var(--accent-line);
+      transition: transform 0.18s cubic-bezier(0.2,0.8,0.3,1), background 0.15s;
     }
-    .link__arrow { font-size: 0.9rem; color: var(--accent-line); line-height: 1; }
-    .link.is-on .link__arrow { color: var(--accent); }
+    .mid:hover .mid__dot { transform: translateY(-2px); }
+    .mid.is-on .mid__dot { background: var(--accent-soft); border-width: 2.5px; }
+    .mid__name {
+      font-size: 0.63rem; font-weight: 700; color: var(--text-muted);
+      margin-top: 0.45rem; line-height: 1.25; text-align: center;
+    }
+    /* Sits level with the big circles' centres, which are 7rem tall. */
+    .mid { margin-top: 1.8rem; }
 
     /* ── The panel a circle opens ── */
     .panel {
@@ -143,7 +172,9 @@
       .node { width: 7.5rem; }
       .node__dot { width: 5.5rem; height: 5.5rem; }
       .node__big { font-size: 1.1rem; }
-      .link { margin-top: 2.6rem; }
+      .link { margin-top: 2.4rem; }
+      .mid { width: 4.4rem; margin-top: 1.4rem; }
+      .mid__dot { width: 2.8rem; height: 2.8rem; font-size: 0.74rem; }
     }
   </style>
 </head>
@@ -160,6 +191,7 @@
         <button type="button" class="win__b is-on" data-w="28">28 days</button>
         <button type="button" class="win__b" data-w="90">90 days</button>
       </div>
+      <div class="cmp-bar" id="cmp"></div>
     </div>
 
     <p class="state" id="loading">Loading&hellip;</p>

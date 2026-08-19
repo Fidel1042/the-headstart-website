@@ -13,6 +13,8 @@ let ADMIN_EMAIL = "";
 let DATA = null;
 let OPEN = "s0";  // "s<i>" for a circle, "l<i>" for a connector
 let WINDOW_DAYS = 28;
+const COMPARE = new Set();   // other windows ticked for side-by-side
+const CACHE = new Map();     // windowDays -> payload, so re-ticking is instant
 
 const esc = (v) => String(v == null ? "" : v)
   .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -35,25 +37,31 @@ requireAuth((session) => {
   load();
 });
 
+/** One window's payload, cached so ticking a comparison does not refetch. */
+async function fetchWindow(days) {
+  if (CACHE.has(days)) return CACHE.get(days);
+  const res = await fetch("/.netlify/functions/journey-stats", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ adminEmail: ADMIN_EMAIL, windowDays: days }),
+  });
+  const body = await res.text();
+  if (body.trim().startsWith("<")) {
+    throw new Error("This page needs the live site. Preview mode cannot run " +
+      "the data function, so there is nothing to show until it is pushed.");
+  }
+  const data = JSON.parse(body);
+  if (!res.ok) throw new Error(data.error || "Could not load");
+  CACHE.set(days, data);
+  return data;
+}
+
 async function load() {
   const loading = document.getElementById("loading");
   const errorEl = document.getElementById("error");
   loading.hidden = false; errorEl.hidden = true;
   try {
-    const res = await fetch("/.netlify/functions/journey-stats", {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ adminEmail: ADMIN_EMAIL, windowDays: WINDOW_DAYS }),
-    });
-    // A static preview has no functions runtime, so the call comes back as the
-    // site's 404 page. Say that, rather than letting JSON.parse complain about
-    // an unexpected "<" and leaving it looking like the page is broken.
-    const body = await res.text();
-    if (body.trim().startsWith("<")) {
-      throw new Error("This page needs the live site. Preview mode cannot run " +
-        "the data function, so there is nothing to show until it is pushed.");
-    }
-    DATA = JSON.parse(body);
-    if (!res.ok) throw new Error(DATA.error || "Could not load");
+    DATA = await fetchWindow(WINDOW_DAYS);
+    await Promise.all([...COMPARE].map(fetchWindow));
   } catch (err) {
     loading.hidden = true;
     errorEl.textContent = err.message || "Could not load — refresh to try again.";
@@ -66,6 +74,7 @@ async function load() {
   document.getElementById("content").hidden = false;
   document.querySelectorAll(".win__b").forEach((b) =>
     b.classList.toggle("is-on", Number(b.dataset.w) === WINDOW_DAYS));
+  renderCompareBar();
 
   const foot = document.getElementById("foot");
   const when = new Date(DATA.generatedAt).toLocaleString("en-AU",
@@ -93,19 +102,32 @@ function renderFlow() {
         <span class="node__cap">${esc(s.sub)}</span>
       </button>`;
     if (i === 0) return node;
-    // The gap between two circles is itself a number worth opening, so the
-    // arrow is a button carrying the conversion rate rather than decoration.
+    // A gap either holds a midpoint of its own, drawn as a small circle
+    // between two arrows, or it is just an arrow. The other gaps carry no
+    // number because it would repeat the circle they point at.
     const l = links[i - 1];
-    const arrow = l
-      ? `<button type="button" class="link" data-k="l${i - 1}" aria-pressed="false"
-                 title="${esc(l.question)}">
-           <span class="link__rate">${esc(l.headline)}</span>
-           <span class="link__arrow">&rarr;</span>
-         </button>`
-      : `<span class="link"><span class="link__arrow">&rarr;</span></span>`;
-    return arrow + node;
+    const arrow = `<span class="link"><span class="link__arrow">&rarr;</span></span>`;
+    if (!l) return arrow + node;
+    return arrow + `
+      <button type="button" class="mid" data-k="l${i - 1}" aria-pressed="false"
+              title="${esc(l.question)}">
+        <span class="mid__dot">${esc(l.headline)}</span>
+        <span class="mid__name">${esc(l.label)}</span>
+      </button>` + arrow + node;
   }).join("");
   markOpen();
+}
+
+/** The compare tick boxes: every window except the one being viewed. */
+function renderCompareBar() {
+  const bar = document.getElementById("cmp");
+  if (!bar || !DATA) return;
+  const others = (DATA.windows || [7, 28, 90]).filter((w) => w !== WINDOW_DAYS);
+  bar.innerHTML = `<span class="cmp__lead">Compare with</span>` + others.map((w) => `
+    <label class="cmp__box">
+      <input type="checkbox" data-cmp="${w}" ${COMPARE.has(w) ? "checked" : ""} />
+      <span>${w} days</span>
+    </label>`).join("");
 }
 
 function markOpen() {
@@ -120,6 +142,45 @@ function select(key) {
   OPEN = key;
   markOpen();
   renderPanel();
+}
+
+/** First number in a value like "63%", "13 days" or 40. Null when there is none. */
+function num(v) {
+  const m = String(v ?? "").replace(/,/g, "").match(/-?\d+(\.\d+)?/);
+  return m ? Number(m[0]) : null;
+}
+
+/** The same panel from another window, so its stats can be looked up by label. */
+function panelFor(payload) {
+  if (!payload) return null;
+  const i = Number(OPEN.slice(1));
+  return OPEN[0] === "l" ? (payload.links || [])[i] : (payload.stages || [])[i];
+}
+
+/**
+ * One comparison line under a stat: the other window's value, coloured by
+ * whether the current window is better. "Better" is usually higher, but a
+ * rising no-show count or a longer wait is worse, and the backend marks those.
+ */
+function compareLine(stat) {
+  if (!COMPARE.size) return "";
+  const now = num(stat.value);
+  // A rate survives a change of window length; a headcount does not. Of course
+  // 28 days has more visitors than 7, so colouring that green would dress a
+  // truism up as good news. Counts are shown for reference, uncoloured.
+  const comparable = /%|day/i.test(String(stat.value));
+  return [...COMPARE].sort((a, b) => a - b).map((days) => {
+    const other = (panelFor(CACHE.get(days)) || {}).stats || [];
+    const match = other.find((x) => x.label === stat.label);
+    if (!match) return `<span class="cmp"><b>${days}d</b> —</span>`;
+    const then = num(match.value);
+    let cls = "";
+    if (comparable && now !== null && then !== null && now !== then) {
+      const up = now > then;
+      cls = (stat.lowerIsBetter ? !up : up) ? " is-up" : " is-down";
+    }
+    return `<span class="cmp${cls}"><b>${days}d</b> ${esc(match.value)}</span>`;
+  }).join("");
 }
 
 /** Whatever is open: a stage, or the connector between two stages. */
@@ -138,6 +199,7 @@ function renderPanel() {
       <div class="cell__v">${esc(x.value)}</div>
       <div class="cell__l">${esc(x.label)}</div>
       <div class="cell__n">${esc(x.note || "")}</div>
+      ${COMPARE.size ? `<div class="cell__cmp">${compareLine(x)}</div>` : ""}
     </div>`).join("");
 
   // A stage may carry one table or several; both shapes render the same way.
@@ -170,11 +232,26 @@ document.addEventListener("click", (e) => {
 
   // Switching the window refetches. The open circle stays open, so comparing
   // one stage across 7, 28 and 90 days is three clicks in the same place.
+  // Ticking a comparison only re-renders; the other window is fetched once and
+  // cached, so toggling it back on is instant.
+  const cmp = e.target.closest("[data-cmp]");
+  if (cmp) {
+    const days = Number(cmp.dataset.cmp);
+    if (COMPARE.has(days)) { COMPARE.delete(days); renderPanel(); renderCompareBar(); return; }
+    COMPARE.add(days);
+    renderCompareBar();
+    fetchWindow(days).then(() => { renderPanel(); renderCompareBar(); })
+      .catch(() => { COMPARE.delete(days); renderCompareBar(); });
+    return;
+  }
+
   const win = e.target.closest("[data-w]");
   if (win) {
     const next = Number(win.dataset.w);
     if (next === WINDOW_DAYS) return;
     WINDOW_DAYS = next;
+    // The window you are viewing can never also be a comparison.
+    COMPARE.delete(next);
     document.querySelectorAll(".win__b").forEach((b) =>
       b.classList.toggle("is-on", Number(b.dataset.w) === next));
     document.getElementById("win").classList.add("is-busy");

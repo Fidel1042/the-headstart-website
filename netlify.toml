@@ -41,6 +41,15 @@
 [functions."checkin-sender"]
   schedule = "0 3,4 * * 1"
 
+# Copies Brevo email stats into the Airtable "Email Stats" table, one row per
+# email per week. Brevo only answers 90 days; Airtable keeps it forever, so a
+# full-year view builds itself. Runs daily rather than weekly because opens
+# keep arriving for days after a send and each run rewrites the whole window,
+# so a week keeps correcting itself until it ages out of Brevo's reach.
+# Upserts on a "week|email" key, so running it twice changes nothing.
+[functions."email-snapshot"]
+  schedule = "23 17 * * *"
+
 [functions."monthly-pl"]
   schedule = "0 0 1 * *"
 
