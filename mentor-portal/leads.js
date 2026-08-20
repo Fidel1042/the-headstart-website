@@ -68,6 +68,15 @@ const MOCK = {
     { week: "32", sources: { linkedin: 64, instagram: 183, direct: 85 } },
     { week: "33", sources: { linkedin: 21, instagram: 153, direct: 41 } },
   ],
+  statsUpdated: "2026-08-20T04:00:00Z",
+  reach: [
+    { week: "33", monday: "2026-08-10", channels: {
+      linkedin: { impressions: 25921, visits: 44, ctr: 44/25921, partial: false },
+      instagram: { impressions: null, visits: 231, ctr: null, partial: false } } },
+    { week: "34", monday: "2026-08-17", channels: {
+      linkedin: { impressions: 45012, visits: 54, ctr: 54/45012, partial: true },
+      instagram: { impressions: null, visits: 143, ctr: null, partial: false } } },
+  ],
   campaigns: [
     { campaign: "interview-fails", visitors: 180, conversions: 9 },
     { campaign: "grad-programs", visitors: 95, conversions: 3 },
@@ -135,6 +144,7 @@ function renderChannels(d) {
       <th class="num">Discovery call</th>
       <th class="num">Booked</th>
       <th class="num">Book rate</th>
+      <th class="num">Tracked</th>
     </tr></thead>
     <tbody>${rows.map((c) => {
       const br = c.visitors ? c.booked / c.visitors : null;
@@ -148,6 +158,9 @@ function renderChannels(d) {
         <td class="num">${num(Math.max(c.signups.discovery_call, c.callForms))}</td>
         <td class="num strong">${num(c.booked)}</td>
         <td class="num ${rateClass(br, 0.03, 0.015)}">${pct(c.booked, c.visitors)}</td>
+        <td class="num ${c.confidence == null ? "dim" : rateClass(c.confidence, 0.9, 0.6)}"
+            title="Of the bookings you labelled as this channel in Airtable, the share GA4 also caught.">
+          ${c.confidence == null ? "—" : (c.confidence * 100).toFixed(0) + "%"}</td>
       </tr>`;
     }).join("")}</tbody>`;
 }
@@ -204,6 +217,83 @@ function renderLinks(d) {
         <td class="num strong">${num(r.total)}</td>
         <td class="num">${pct(r.total, total)}</td>
         ${sources.map((s) => `<td class="num ${r.bySource[s] ? "" : "dim"}">${num(r.bySource[s] || 0)}</td>`).join("")}
+      </tr>`).join("")}</tbody>`;
+}
+
+function renderReach(d) {
+  const rows = (d.reach || []).filter((r) =>
+    r.channels.linkedin.impressions != null || r.channels.instagram.impressions != null ||
+    r.channels.linkedin.visits || r.channels.instagram.visits).slice(-10);
+  const el = document.getElementById("reach-table");
+  const note = document.getElementById("reach-note");
+
+  if (!rows.length) {
+    el.innerHTML = `<tbody><tr><td class="dim">No reach data yet. Run
+      Operations/analytics/import-channel-stats.py after downloading a LinkedIn export.</td></tr></tbody>`;
+    if (note) note.textContent = "";
+    return;
+  }
+
+  el.innerHTML = `
+    <thead><tr>
+      <th>Week of</th>
+      <th class="num">LI reach</th>
+      <th class="num">LI visits</th>
+      <th class="num">LI click rate</th>
+      <th class="num">IG reach</th>
+      <th class="num">IG visits</th>
+      <th class="num">IG click rate</th>
+    </tr></thead>
+    <tbody>${rows.map((r) => {
+      const l = r.channels.linkedin, i = r.channels.instagram;
+      const cell = (c) => `
+        <td class="num">${c.impressions == null ? "<span class=\"dim\">—</span>" : num(c.impressions)}</td>
+        <td class="num strong">${num(c.visits)}</td>
+        <td class="num ${c.ctr == null ? "dim" : rateClass(c.ctr, 0.004, 0.002)}">${
+          c.ctr == null ? "—" : (c.ctr * 100).toFixed(2) + "%"}</td>`;
+      return `<tr>
+        <td class="src">${esc(r.monday)}${l.partial || i.partial ? ` <span class="dim">part week</span>` : ""}</td>
+        ${cell(l)}${cell(i)}
+      </tr>`;
+    }).join("")}</tbody>`;
+
+  if (note) {
+    note.textContent = d.statsUpdated
+      ? `Impressions last imported ${new Date(d.statsUpdated).toLocaleDateString("en-AU",
+          { day: "numeric", month: "short" })}. Instagram reach is entered by hand; blank means not yet entered.`
+      : "";
+  }
+}
+
+function renderPosts(d) {
+  const rows = d.topPosts || [];
+  const el = document.getElementById("posts-table");
+  if (!rows.length) {
+    el.innerHTML = `<tbody><tr><td class="dim">No posts archived for this window yet. Run
+      import-instagram-posts.py and import-channel-stats.py.</td></tr></tbody>`;
+    return;
+  }
+  el.innerHTML = `
+    <thead><tr>
+      <th>Post</th>
+      <th class="num">Reach</th>
+      <th class="num">Engagements</th>
+      <th class="num">Profile visits</th>
+      <th class="num">Saves</th>
+    </tr></thead>
+    <tbody>${rows.slice(0, 10).map((p) => `
+      <tr>
+        <td>
+          <span class="src">${esc(p.channel)}</span>
+          <span class="dim">${esc(p.date)}</span><br>
+          ${p.permalink
+            ? `<a href="${esc(p.permalink)}" target="_blank" rel="noopener">${esc(p.title.slice(0, 62))}</a>`
+            : esc(p.title.slice(0, 62))}
+        </td>
+        <td class="num strong">${num(p.reach)}</td>
+        <td class="num">${num(p.engagements)}</td>
+        <td class="num ${p.profileVisits == null ? "dim" : ""}">${p.profileVisits == null ? "—" : num(p.profileVisits)}</td>
+        <td class="num ${p.saves == null ? "dim" : ""}">${p.saves == null ? "—" : num(p.saves)}</td>
       </tr>`).join("")}</tbody>`;
 }
 
@@ -316,6 +406,8 @@ async function load() {
   data.channels = data.channels || [];
   data.sales = data.sales || { totals: {}, bySource: [] };
   data.linksPage = data.linksPage || [];
+  data.reach = data.reach || [];
+  data.topPosts = data.topPosts || [];
   data.channelsSession = data.channelsSession || [];
   data.weeklySession = data.weeklySession || [];
   lastData = data;
@@ -334,6 +426,8 @@ async function load() {
   renderChannels(data);
   renderSales(data);
   renderLinks(data);
+  renderReach(data);
+  renderPosts(data);
   renderTrend(data);
   renderCampaigns(data);
 

@@ -127,6 +127,85 @@ function normaliseSessionSource(raw) {
 
 const truthy = (v) => v === 1 || v === true || v === "Yes" || v === "yes";
 
+// Platform reach, imported from the LinkedIn export by
+// Operations/analytics/import-channel-stats.py. LinkedIn has no API for a
+// personal profile, so this is the only way to get impressions.
+function instagramPosts() {
+  try { return require("../data/instagram-posts.json").posts || {}; }
+  catch (e) { return {}; }
+}
+
+/**
+ * Best posts in the window, both platforms side by side.
+ *
+ * Archived locally rather than fetched live: the Instagram API only serves a
+ * rolling window, so anything not captured before it rolls past is gone.
+ */
+function topPosts(days) {
+  const since = new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
+  const ig = Object.values(instagramPosts())
+    .filter((p) => p.date && p.date >= since)
+    .sort((a, b) => (b.reach || 0) - (a.reach || 0))
+    .slice(0, 5)
+    .map((p) => ({
+      channel: "instagram", date: p.date, permalink: p.permalink,
+      title: p.caption || "(no caption)", type: p.type,
+      reach: p.reach || 0, engagements: p.total_interactions || 0,
+      profileVisits: p.profile_visits || 0, saves: p.saved || 0, shares: p.shares || 0,
+    }));
+
+  const stats = channelStats();
+  const li = Object.values(stats.posts_linkedin || {})
+    .filter((p) => p.date && p.date >= since)
+    .sort((a, b) => (b.impressions || 0) - (a.impressions || 0))
+    .slice(0, 5)
+    .map((p) => ({
+      channel: "linkedin", date: p.date, permalink: p.permalink,
+      title: "LinkedIn post", type: "POST",
+      reach: p.impressions || 0, engagements: p.engagements || 0,
+      profileVisits: null, saves: null, shares: null,
+    }));
+
+  return [...li, ...ig].sort((a, b) => b.reach - a.reach);
+}
+
+function channelStats() {
+  try {
+    return require("../data/channel-stats.json");
+  } catch (e) {
+    return { linkedin: {}, instagram: {}, updated: null };
+  }
+}
+
+/**
+ * How much of a channel GA4 actually catches, graded against Fidel's own
+ * labelling in Airtable.
+ *
+ * Airtable is the better source for WHERE a lead came from, because he asks
+ * them. GA4 has to infer it, and loses LinkedIn whenever the in-app browser
+ * strips the referrer or the link was posted untagged.
+ *
+ * This never rewrites GA4's numbers. It publishes the gap so a low number can
+ * be read as "GA4 is undercounting this" rather than "this channel is weak".
+ */
+function confidence(channels, salesBySource) {
+  const labelled = {};
+  (salesBySource || []).forEach((s) => {
+    labelled[s.source.toLowerCase()] = s.booked || 0;
+  });
+  return channels.map((c) => {
+    const theirs = labelled[c.source];
+    // Bookings against bookings. Below 3 the ratio swings on one record, so
+    // it is left blank rather than shown as a precise-looking number.
+    if (!theirs || theirs < 3) return { ...c, confidence: null, labelledBookings: theirs || 0 };
+    return {
+      ...c,
+      labelledBookings: theirs,
+      confidence: Math.min(1, (c.booked || 0) / theirs),
+    };
+  });
+}
+
 /* ------------------------------------------------------------ handler --- */
 
 /**
@@ -398,6 +477,46 @@ async function gather(days, offset = 0) {
     });
     out.weeklySession = Object.values(swk).sort((a, b) => a.week.localeCompare(b.week));
 
+    // Reach -> visits, per week. The impressions come from the platform
+    // export; the visits from GA4. Click rate is the honest measure of
+    // whether content moved anyone, separate from how many saw it.
+    const stats = channelStats();
+    out.statsUpdated = stats.updated || null;
+    out.topPosts = topPosts(days);
+    const byMonday = {};
+    sessionWeekly.forEach(({ dims, mets }) => {
+      const [week, rawSrc] = dims;
+      const key = canonicalChannel(rawSrc);
+      if (key !== "linkedin" && key !== "instagram") return;
+      byMonday[week] = byMonday[week] || {};
+      byMonday[week][key] = (byMonday[week][key] || 0) + mets[0];
+    });
+    // GA4 "week" is an ISO week number; convert to the Monday date so it can
+    // join to the export, which is keyed by date.
+    const yr = new Date().getUTCFullYear();
+    const mondayOfIsoWeek = (w) => {
+      const simple = new Date(Date.UTC(yr, 0, 1 + (Number(w) - 1) * 7));
+      const dow = simple.getUTCDay() || 7;
+      simple.setUTCDate(simple.getUTCDate() - dow + 1);
+      return simple.toISOString().slice(0, 10);
+    };
+    out.reach = Object.entries(byMonday).map(([w, visitsByCh]) => {
+      const monday = mondayOfIsoWeek(w);
+      const row = { week: w, monday, channels: {} };
+      ["linkedin", "instagram"].forEach((ch) => {
+        const s = (stats[ch] || {})[monday];
+        const visits = visitsByCh[ch] || 0;
+        row.channels[ch] = {
+          impressions: s ? s.impressions : null,
+          engagements: s ? s.engagements : null,
+          partial: s ? Boolean(s.partial) : false,
+          visits,
+          ctr: s && s.impressions ? visits / s.impressions : null,
+        };
+      });
+      return row;
+    }).sort((a, b) => a.monday.localeCompare(b.monday));
+
     const wk = {};
     weekly.forEach(({ dims, mets }) => {
       const [week, src] = dims;
@@ -432,9 +551,10 @@ async function gather(days, offset = 0) {
       if (!when || isNaN(when) || when < since || when > until) return;
 
       const key = bucketSource(f["Lead Source"]);
-      const b = (bySource[key] = bySource[key] || { source: key, leads: 0, consulted: 0, signed: 0 });
+      const b = (bySource[key] = bySource[key] || { source: key, leads: 0, booked: 0, consulted: 0, signed: 0 });
 
       b.leads++; totals.leads++;
+      if (f["Meeting Time"]) { b.booked = (b.booked || 0) + 1; totals.booked = (totals.booked || 0) + 1; }
       if (truthy(f["Did Consultation?"]) || f["Showed Up Rate"] === 1) { b.consulted++; totals.consulted++; }
       if (truthy(f["Signed"])) { b.signed++; totals.signed++; }
     });
@@ -442,7 +562,7 @@ async function gather(days, offset = 0) {
     // Always show all five dropdown options, even at zero, so a channel that
     // produced nothing is visible rather than silently missing from the table.
     LEAD_SOURCES.forEach((s) => {
-      bySource[s] = bySource[s] || { source: s, leads: 0, consulted: 0, signed: 0 };
+      bySource[s] = bySource[s] || { source: s, leads: 0, booked: 0, consulted: 0, signed: 0 };
     });
 
     // Airtable is the source of truth for bookings; the audit compares it
@@ -476,6 +596,10 @@ async function gather(days, offset = 0) {
     }).length;
 
     out.sales = { totals: {}, bySource: [] };
+  }
+
+  if (out.channels && out.sales) {
+    out.channels = confidence(out.channels, out.sales.bySource);
   }
 
   return out;

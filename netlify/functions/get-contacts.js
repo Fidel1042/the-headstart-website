@@ -10,6 +10,7 @@ const headers = {
 };
 
 const { draftMessages } = require("../shared/drafts");
+const { shortIndustry } = require("../shared/followups");
 
 const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com"];
 // Only paying, acquired mentees need adding to WhatsApp.
@@ -79,7 +80,7 @@ exports.handler = async (event) => {
       fetchAll(AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTEE_TABLE_ID,
         ["Name", "Phone Number", "Aussie Number", "Client Pipeline", "Mentor Email Plain",
          "WhatsApp Added", "Raw Notes", "Consult Contact Saved", "Last Modified",
-         "Drafts", "Meeting Time", "Notes filled at"],
+         "Drafts", "Meeting Time", "Notes filled at", "Target Industry"],
         AIRTABLE_API_TOKEN),
       fetchAll(AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTOR_TABLE_ID,
         ["Name", "Email"], AIRTABLE_API_TOKEN),
@@ -102,6 +103,7 @@ exports.handler = async (event) => {
         mentor:   mentorEmail ? (mentorName.get(mentorEmail) || mentorEmail) : "Not matched yet",
         modified: f["Last Modified"] || "",
         messages: draftMessages(f["Drafts"] || ""),
+        industry: shortIndustry(f["Target Industry"] || ""),
       };
     };
     const newestFirst = (a, b) => (b.modified || "").localeCompare(a.modified || "");
@@ -140,7 +142,15 @@ exports.handler = async (event) => {
       })
       .map(shape).sort(newestFirst);
 
-    return { statusCode: 200, headers, body: JSON.stringify({ matched, consults }) };
+    // Signed, but nobody is teaching them yet. This is the list that needs a
+    // mentor asked, and it empties itself: the moment a mentor is assigned in
+    // Airtable the mentee drops out of it.
+    const needsMentor = menteeRecs
+      .filter((r) => (r.fields["Client Pipeline"] || "") === "Acquired"
+        && (r.fields["Mentor Email Plain"] || "").trim() === "")
+      .map(shape).sort(newestFirst);
+
+    return { statusCode: 200, headers, body: JSON.stringify({ needsMentor, matched, consults }) };
   } catch (err) {
     return { statusCode: 502, headers, body: JSON.stringify({ error: err.message || "Could not reach Airtable" }) };
   }

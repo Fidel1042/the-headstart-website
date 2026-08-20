@@ -47,6 +47,7 @@ export const NAV_AREAS = [
       { href: "/mentor-portal/admin.html?view=overview", label: "Big picture", page: "big-picture" },
       { href: "/mentor-portal/admin.html?view=performance", label: "Detailed performance", page: "performance" },
       { href: "/mentor-portal/admin.html?view=calendar", label: "Calendar", page: "calendar" },
+      { href: "/mentor-portal/onboarding-plan.html", label: "Onboarding plan", page: "onboarding-plan" },
       { href: "/mentor-portal/onboarding-call.html", label: "Onboarding call", page: "onboarding-call" },
       { href: "/mentor-portal/delivery-checks.html", label: "Delivery check-in", page: "delivery-checks" },
     ],
@@ -69,6 +70,7 @@ export const NAV_AREAS = [
       { href: "/mentor-portal/billing.html", label: "Billing", page: "billing" },
       { href: "/mentor-portal/payslips.html", label: "Payslips", page: "payslips" },
       { href: "/mentor-portal/pl.html", label: "P&amp;L", page: "pl" },
+      { href: "/mentor-portal/ltv.html", label: "LTV", page: "ltv" },
     ],
   },
 ];

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <title>Onboarding Plan – The Headstart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+  <style id="auth-gate">
+    html:not(.auth-ok) body { visibility: hidden; }
+    html:not(.auth-ok) { background: #fff; }
+  </style>
+  <link rel="stylesheet" href="portal.css" />
+  <link rel="stylesheet" href="portal-nav.css" />
+  <link rel="stylesheet" href="/mentor-portal/polish.css" />
+  <style>
+    .op-page { max-width: 760px; margin: 0 auto; padding: 1.6rem 1.2rem 4rem; }
+    .op-head h1 { font-size: 1.4rem; font-weight: 800; margin: 0 0 0.2rem; }
+    .op-head p { font-size: 0.85rem; color: var(--text-muted); margin: 0 0 1.8rem; max-width: 60ch; }
+
+    .step {
+      position: relative; padding: 0 0 1.6rem 3.1rem;
+    }
+    .step::before {
+      content: ""; position: absolute; left: 1.05rem; top: 2.2rem; bottom: -0.2rem;
+      width: 2px; background: var(--line);
+    }
+    .step:last-child::before { display: none; }
+    .step__num {
+      position: absolute; left: 0; top: 0;
+      width: 2.1rem; height: 2.1rem; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; font-weight: 800;
+      background: var(--accent); color: #fff;
+    }
+    [data-theme="dark"] .step__num { color: #241703; }
+    .step__name { font-size: 1rem; font-weight: 800; margin: 0.15rem 0 0.3rem; }
+    .step__body { font-size: 0.88rem; line-height: 1.6; color: var(--text-muted); margin: 0; }
+
+    /* The probation band. Steps 4 and 5 are the gate, so they read as one
+       block rather than two unrelated steps. */
+    .step.is-gate .step__num { background: var(--bg-card); color: var(--accent); border: 2px solid var(--accent-line); }
+    .gate {
+      border: 1px solid var(--accent-line); border-left-width: 1px;
+      background: var(--accent-soft); border-radius: 12px;
+      padding: 0.9rem 1.1rem; margin: 0 0 1.6rem 3.1rem;
+    }
+    .gate__title {
+      font-size: 0.66rem; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase;
+      color: var(--accent); margin: 0 0 0.4rem;
+    }
+    .gate p { font-size: 0.86rem; line-height: 1.6; margin: 0; }
+
+    .must { font-weight: 700; color: var(--text); }
+    .tbd { font-style: italic; }
+    .op-note { font-size: 0.78rem; color: var(--text-muted); margin-top: 2rem; }
+  </style>
+</head>
+<body>
+
+  <div id="portal-nav"></div>
+
+  <main class="op-page">
+    <div class="op-head">
+      <h1>Onboarding plan</h1>
+      <p>The order a new mentor goes through, from the doc to a full mentor.
+        Steps 4 and 5 are a probation gate and are internal only.</p>
+    </div>
+
+    <div class="step">
+      <div class="step__num">1</div>
+      <p class="step__name">Onboarding doc</p>
+      <p class="step__body">They read it before anything else happens.</p>
+    </div>
+
+    <div class="step">
+      <div class="step__num">2</div>
+      <p class="step__name">Onboarding call</p>
+      <p class="step__body">45 minutes, covering expectations, values, how they handle a
+        mentee who does not do the work, and their lesson plan.</p>
+    </div>
+
+    <div class="step">
+      <div class="step__num">3</div>
+      <p class="step__name">Shadow sessions <span class="must">&middot; must have</span></p>
+      <p class="step__body">Not optional. They sit in before they run anything of their own.</p>
+    </div>
+
+    <div class="step is-gate">
+      <div class="step__num">4</div>
+      <p class="step__name">Another shadow session, if their continuity rate says so</p>
+      <p class="step__body">Depends on the continuity rate.
+        <span class="tbd">Definition still to be set.</span></p>
+    </div>
+
+    <div class="step is-gate">
+      <div class="step__num">5</div>
+      <p class="step__name">Fidel sits in on a session</p>
+      <p class="step__body">Once they have done 3 sessions with one mentee, or 5 sessions
+        in total, whichever comes first.</p>
+    </div>
+
+    <div class="gate">
+      <p class="gate__title">Probation &middot; internal only</p>
+      <p>Steps 4 and 5 are the gate. A mentor stays on if they prove their continuity.
+        Never described to mentors in these terms.</p>
+    </div>
+
+    <div class="step">
+      <div class="step__num">6</div>
+      <p class="step__name">Feedback check-in call</p>
+      <p class="step__body">After the sit-in. What was seen, what changes.</p>
+    </div>
+
+    <p class="op-note">Steps 3 and 5 are tracked on the Delivery check-in page, which
+      lists every mentor who has hit the 3-with-one or 5-in-total mark.</p>
+  </main>
+
+  <script type="module">
+    import { requireAuth } from "./auth.js";
+    import { mountPortalNav, initTheme } from "./portal-ui.js";
+
+    initTheme();
+
+    requireAuth((session) => {
+      const email = session?.user?.email || "";
+      const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com"];
+      if (!OWNERS.includes(email) && email !== "dev@localhost") {
+        window.location.replace("/mentor-portal/index.html");
+        return;
+      }
+      mountPortalNav({ email, isOwner: true, active: "onboarding-plan" });
+    });
+  </script>
+</body>
+</html>

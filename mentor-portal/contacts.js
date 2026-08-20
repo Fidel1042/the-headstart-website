@@ -1,4 +1,5 @@
-// contacts.js — owner-only "contacts to add", in two lists:
+// contacts.js — owner-only "contacts to add", in three lists:
+//   needsMentor      signed mentees with nobody teaching them yet
 //   matched  (Koko)  mentees who now have a mentor and need a WhatsApp contact
 //   consults (Fidel) mentees whose initial consultation is written up
 // Saving uses a vCard so one tap opens "Add contact" on a phone.
@@ -17,11 +18,34 @@ const byId = new Map();
 const esc = (s) => String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 const GROUPS = [
+  // No "kind": this list clears itself when a mentor is set in Airtable, so
+  // there is nothing to mark done.
+  { key: "needsMentor", kind: "" },
   { key: "matched",  kind: "mentee-contact-added" },
   { key: "consults", kind: "mentee-consult-saved" },
 ];
 
+// What a mentor is told when asked to take someone on. The two expectations
+// are fixed on purpose: they are the deal, not a per-mentee negotiation.
+// Change them here and every message follows.
+const PITCH = { sessions: "10-15", frequency: "Weekly", firstSession: "Next week / week after" };
+
+function mentorAsk(c) {
+  const field = c.industry
+    ? `who wants to go into ${c.industry}`
+    : "who is still working out which industry they want";
+  return `Hey! I got a new mentee for you ${field}.\n\n` +
+    `Session amount expectation: ${PITCH.sessions}\n` +
+    `Frequency expectation: ${PITCH.frequency}\n` +
+    `First session timeline: ${PITCH.firstSession}\n\n` +
+    `Let me know if you are keen to take the mentee!`;
+}
+
 const MOCK = {
+  needsMentor: [
+    { id: "recN1", name: "Rutuja Raorane", phone: "61400000000", stage: "Acquired",
+      mentor: "Not matched yet", industry: "Marketing" },
+  ],
   matched: [
     { id: "recC1", name: "Mary Chen", phone: "61412345678", stage: "Acquired", mentor: "Angelica" },
   ],
@@ -59,6 +83,25 @@ async function load() {
 function card(c, kind) {
   const hasPhone = Boolean(c.phone);
   const readable = hasPhone ? "+" + c.phone : "No number in Airtable";
+  // The ask goes to a mentor, not to the mentee, so this card carries the
+  // message itself rather than a contact action.
+  if (kind === "") {
+    const msg = mentorAsk(c);
+    return `
+    <article class="contact-card" data-card="${c.id}">
+      <div class="contact-card__info">
+        <h3 class="contact-card__name">${esc(c.name)}</h3>
+        <p class="contact-card__meta">${c.industry ? `Wants ${esc(c.industry)}` : "No industry recorded"}</p>
+      </div>
+      <div class="contact-card__actions">
+        <button type="button" class="c-btn c-btn--save" data-act="copyask" data-id="${c.id}">Copy message</button>
+      </div>
+      <details class="contact-msg" open>
+        <summary>The message to send a mentor</summary>
+        <p class="contact-msg__body">${esc(msg)}</p>
+      </details>
+    </article>`;
+  }
   return `
     <article class="contact-card" data-card="${c.id}">
       <div class="contact-card__info">
@@ -183,6 +226,7 @@ document.querySelector(".contacts-page").addEventListener("click", (e) => {
     const m = (c.messages || [])[Number(btn.dataset.msg)];
     if (m) copyToClipboard(btn, m.text);
   }
+  if (btn.dataset.act === "copyask" && c) copyToClipboard(btn, mentorAsk(c));
   if (btn.dataset.act === "done") markDone(btn.dataset.id, btn.dataset.kind, btn);
 });
 

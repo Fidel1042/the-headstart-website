@@ -51,6 +51,106 @@ function groupSource(raw) {
 }
 
 /** 1. Traffic. What GA4 saw before anybody spoke to us. */
+/**
+ * Stage zero: how many people saw the content at all.
+ *
+ * Sits before Traffic because the journey does not start at the website, it
+ * starts on a feed. Impressions come from the platform export (LinkedIn has
+ * no API for a personal profile), so this stage goes quiet rather than
+ * guessing when the import is stale.
+ *
+ * The click rate is the honest read on whether content moved anyone. A big
+ * reach week with a tiny click rate usually means there was no link in the
+ * caption, which is a choice rather than a failure.
+ */
+function reach(stats, ga, windowDays, igPosts) {
+  const since = new Date(Date.now() - windowDays * 86400000).toISOString().slice(0, 10);
+  const sum = (channel) => {
+    const weeks = (stats || {})[channel] || {};
+    return Object.entries(weeks)
+      .filter(([monday]) => monday >= since)
+      .reduce((a, [, w]) => a + (w.impressions || 0), 0);
+  };
+  const li = sum("linkedin");
+  const ig = sum("instagram");
+  const total = li + ig;
+
+  // Visits for the same channels, so the click rate compares like with like.
+  const visitsFor = (names) => (ga && ga.sources ? ga.sources : [])
+    .filter((s) => names.some((n) => String(s.source || "").toLowerCase().includes(n)))
+    .reduce((a, s) => a + s.users, 0);
+  const liVisits = visitsFor(["linkedin", "lnkd"]);
+  const igVisits = visitsFor(["instagram", "ig"]);
+  const visits = liVisits + igVisits;
+
+  // Only count visits from channels whose reach we actually have. Dividing
+  // every social visit by LinkedIn-only impressions would overstate the rate
+  // for as long as Instagram reach is missing.
+  const measuredVisits = (li ? liVisits : 0) + (ig ? igVisits : 0);
+
+  const rate = (v, i) => (i ? `${(v / i * 100).toFixed(2)}%` : "—");
+
+  return {
+    key: "reach",
+    label: "Reach",
+    raw: { impressions: total, visits },
+    headline: total ? `${total.toLocaleString()} impressions` : "No reach imported",
+    sub: total
+      ? `${rate(measuredVisits, total)} of them came to the site` +
+        (ig ? "" : ", LinkedIn only until Instagram reach is entered")
+      : "Run import-channel-stats.py after a LinkedIn export",
+    unavailable: !total,
+    stats: [
+      { label: "LinkedIn reach", value: li, note: li ? `${liVisits} visits, ${rate(liVisits, li)}` : "not imported" },
+      { label: "Instagram reach", value: ig, note: ig ? `${igVisits} visits, ${rate(igVisits, ig)}` : "entered by hand, not yet in" },
+      { label: "Visits from social", value: visits },
+    ],
+    tables: total ? [
+      {
+        title: "Reach to visits",
+        head: ["Channel", "Impressions", "Visits", "Click rate"],
+        rows: [
+          li ? ["LinkedIn", li, liVisits, rate(liVisits, li)] : null,
+          ig ? ["Instagram", ig, igVisits, rate(igVisits, ig)] : null,
+        ].filter(Boolean),
+      },
+      // What actually earned the reach. Profile visits matter more than raw
+      // reach here: it is the step immediately before someone taps the bio
+      // link, and it does not track reach at all.
+      ...(topPosts(stats, igPosts, since).length ? [{
+        title: "Top posts in this window",
+        head: ["Post", "Reach", "Profile visits"],
+        rows: topPosts(stats, igPosts, since).map((x) => [x.label, x.reach, x.visits]),
+      }] : []),
+    ] : [],
+    notes: total ? [
+      "Impressions are imported from the platform export, not live. Re-run the importer for fresh numbers.",
+      "A low click rate with high reach usually means no link in the caption.",
+    ] : [],
+  };
+}
+
+/** Best posts across both platforms, newest archive wins. */
+function topPosts(stats, igPosts, since) {
+  const ig = Object.values(igPosts || {})
+    .filter((p) => p.date && p.date >= since)
+    .map((p) => ({
+      label: `IG · ${(p.caption || "(no caption)").slice(0, 44)}`,
+      reach: p.reach || 0,
+      visits: p.profile_visits == null ? "—" : p.profile_visits,
+    }));
+  const li = Object.values((stats || {}).posts_linkedin || {})
+    .filter((p) => p.date && p.date >= since)
+    .map((p) => ({
+      label: `LI · post ${p.date}`,
+      reach: p.impressions || 0,
+      visits: "—",
+    }));
+  return [...ig, ...li]
+    .sort((a, b) => b.reach - a.reach)
+    .slice(0, 5);
+}
+
 function traffic(ga) {
   // People, not fires. The Calendly embed raises its event several times per
   // booking, so the raw count reads about five times the truth.
@@ -330,6 +430,6 @@ function midpoints(email) {
 }
 
 module.exports = {
-  sessionsByMentee, traffic, consultation, close, continuity, midpoints, ymd, pct,
+  sessionsByMentee, reach, traffic, consultation, close, continuity, midpoints, ymd, pct,
   TRANSCRIPT_ERA_START,
 };

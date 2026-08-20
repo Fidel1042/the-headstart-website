@@ -6,8 +6,18 @@
 // needs its key, Airtable is the only hard requirement.
 
 const {
-  sessionsByMentee, traffic, consultation, close, continuity, midpoints, ymd,
+  sessionsByMentee, traffic, consultation, close, continuity, midpoints, ymd, reach,
 } = require("../shared/journey-stages");
+
+function channelStats() {
+  try { return require("../data/channel-stats.json"); }
+  catch (e) { return { linkedin: {}, instagram: {} }; }
+}
+
+function instagramPosts() {
+  try { return require("../data/instagram-posts.json").posts || {}; }
+  catch (e) { return {}; }
+}
 const { ga4Token, runReport, dateRange, eventFilter } = require("../shared/ga4");
 
 const headers = {
@@ -234,6 +244,7 @@ exports.handler = async (event) => {
     const from = ymd(Date.now() - windowDays * 86400000);
 
     const stages = [
+      reach(channelStats(), ga, windowDays, instagramPosts()),
       ga ? traffic(ga) : {
         key: "traffic", label: "Traffic", headline: "Not connected",
         sub: "GA4 env vars missing", stats: [], unavailable: true,
