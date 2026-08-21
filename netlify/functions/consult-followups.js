@@ -23,6 +23,9 @@ const {
   scoreOf, nextTouch, ymd, daysBetween,
 } = require("../shared/followups");
 
+// The one touch this page is for.
+const FINAL_TOUCH_DAY = 20;
+
 const headers = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -119,6 +122,7 @@ exports.handler = async (event) => {
 
         return {
           id: r.id,
+          next,
           name: f["Name"] || "Unnamed",
           first,
           consultedOn, age, score, stage, done,
@@ -137,18 +141,29 @@ exports.handler = async (event) => {
         };
       });
 
+    // Only the t+20 nudge. The first three touches happen in the day or two
+    // after a call, when the lead is still front of mind and the message is
+    // already drafted; they never needed a screen. t+20 is three weeks later,
+    // against someone long forgotten, and only for the calls that scored well
+    // enough to be worth one more try. That is the list worth showing.
+    const atFinal = leads.filter((l) => l.next && l.next.day === FINAL_TOUCH_DAY);
+
     // Due first, most overdue at the top: that is the order to work down.
-    const dueNow = leads.filter((l) => l.due)
+    const dueNow = atFinal.filter((l) => l.due)
       .sort((a, b) => b.overdueBy - a.overdueBy);
-    const waiting = leads.filter((l) => !l.due && !l.done)
+    const waiting = atFinal.filter((l) => !l.due)
       .sort((a, b) => (a.dueOn || "").localeCompare(b.dueOn || ""));
+    // Everyone who has been through it, plus everyone who never earned one.
     const finished = leads.filter((l) => l.done)
+      .sort((a, b) => (b.consultedOn || "").localeCompare(a.consultedOn || ""));
+    const skipped = leads.filter((l) => !l.done && !l.earnsFinal)
       .sort((a, b) => (b.consultedOn || "").localeCompare(a.consultedOn || ""));
 
     return json(200, {
-      dueNow, waiting, finished,
+      dueNow, waiting, finished, skipped,
       touches: TOUCHES.map((t) => t.day),
       finalMinPct: FINAL_TOUCH_MIN_PCT,
+      finalDay: FINAL_TOUCH_DAY,
     });
   } catch (err) {
     return json(502, { error: err.message || "Could not reach Airtable" });

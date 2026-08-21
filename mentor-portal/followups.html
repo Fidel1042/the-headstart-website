@@ -83,14 +83,12 @@
 
   <main class="fu-page">
     <div class="fu-head">
-      <h1>Consultation follow-ups</h1>
-      <p>Everyone who had a consultation and has not signed yet.</p>
+      <h1>The t+20 nudge</h1>
+      <p>Three weeks after a consultation, one last message to the people who
+        scored 40% or better and still have not signed.</p>
       <div class="fu-steps">
-        <span><b>t+0</b> straight after the call</span><span>&middot;</span>
-        <span><b>t+1</b> next day</span><span>&middot;</span>
-        <span><b>t+3</b> last standard touch</span><span>&middot;</span>
-        <span><b>t+20</b> one final nudge, 40%+ only</span><span>&middot;</span>
-        <span><b>t+90</b> email check-in</span>
+        <span>t+0, t+1 and t+3 happen while the call is still warm and the message is
+          already drafted, so they are not listed here.</span>
       </div>
     </div>
 
@@ -104,13 +102,18 @@
       </section>
 
       <section class="fu-sec">
-        <p class="fu-sec__title">Waiting <span class="fu-sec__count" id="wait-count"></span></p>
+        <p class="fu-sec__title">Coming up <span class="fu-sec__count" id="wait-count"></span></p>
         <div id="wait-list"></div>
       </section>
 
       <section class="fu-sec">
-        <p class="fu-sec__title">Sequence finished <span class="fu-sec__count" id="done-count"></span></p>
+        <p class="fu-sec__title">Nudge sent <span class="fu-sec__count" id="done-count"></span></p>
         <div id="done-list"></div>
+      </section>
+
+      <section class="fu-sec">
+        <p class="fu-sec__title">Below the bar <span class="fu-sec__count" id="skip-count"></span></p>
+        <div id="skip-list"></div>
       </section>
     </div>
   </main>
@@ -218,19 +221,26 @@
       document.getElementById("due-count").textContent = DATA.dueNow.length;
       document.getElementById("wait-count").textContent = DATA.waiting.length;
       document.getElementById("done-count").textContent = DATA.finished.length;
+      document.getElementById("skip-count").textContent = (DATA.skipped || []).length;
 
       document.getElementById("due-list").innerHTML = DATA.dueNow.length
         ? DATA.dueNow.map(dueCard).join("")
-        : `<p class="fu-quiet">Nothing to send today.</p>`;
+        : `<p class="fu-quiet">Nobody is due a t+${DATA.finalDay} nudge today.</p>`;
 
       document.getElementById("wait-list").innerHTML = DATA.waiting.length
-        ? DATA.waiting.map((l) => quietCard(l, `${l.nextLabel} on ${fmt(l.dueOn)}`)).join("")
+        ? DATA.waiting.map((l) => quietCard(l, `due ${fmt(l.dueOn)}`)).join("")
         : `<p class="fu-quiet">Nobody waiting.</p>`;
 
       document.getElementById("done-list").innerHTML = DATA.finished.length
-        ? DATA.finished.map((l) => quietCard(l,
-            l.earnsFinal ? "all 4 touches sent" : `3 touches sent, under ${DATA.finalMinPct}%`)).join("")
+        ? DATA.finished.map((l) => quietCard(l, "nudged")).join("")
         : `<p class="fu-quiet">None yet.</p>`;
+
+      // Scored under the bar, so no t+20 is coming. Listed so the reason is
+      // visible rather than the person just never appearing.
+      const skipped = DATA.skipped || [];
+      document.getElementById("skip-list").innerHTML = skipped.length
+        ? skipped.map((l) => quietCard(l, `scored under ${DATA.finalMinPct}%, no nudge`)).join("")
+        : `<p class="fu-quiet">None.</p>`;
     }
 
     async function setStage(id, stage, btn) {

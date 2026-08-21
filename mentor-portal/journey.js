@@ -13,8 +13,10 @@ let ADMIN_EMAIL = "";
 let DATA = null;
 let OPEN = "s0";  // "s<i>" for a circle, "l<i>" for a connector
 let WINDOW_DAYS = 28;
-const COMPARE = new Set();   // other windows ticked for side-by-side
-const CACHE = new Map();     // windowDays -> payload, so re-ticking is instant
+// Ticked comparisons. A key is either a window length ("7", "90") or "prev",
+// meaning the same length shifted back by one of itself.
+const COMPARE = new Set();
+const CACHE = new Map();     // cache key -> payload, so re-ticking is instant
 
 const esc = (v) => String(v == null ? "" : v)
   .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -37,12 +39,25 @@ requireAuth((session) => {
   load();
 });
 
+/** The request behind a compare key, and the label shown against it. */
+function spec(key) {
+  return key === "prev"
+    ? { windowDays: WINDOW_DAYS, previousPeriod: true, label: "prev" }
+    : { windowDays: Number(key), previousPeriod: false, label: `${key}d` };
+}
+// A function declaration, not a const: requireAuth calls back synchronously on
+// localhost, so load() can run before a const further down has initialised.
+function cacheKey(sp) { return `${sp.windowDays}|${sp.previousPeriod ? 1 : 0}`; }
+
 /** One window's payload, cached so ticking a comparison does not refetch. */
-async function fetchWindow(days) {
-  if (CACHE.has(days)) return CACHE.get(days);
+async function fetchWindow(sp) {
+  const ck = cacheKey(sp);
+  if (CACHE.has(ck)) return CACHE.get(ck);
   const res = await fetch("/.netlify/functions/journey-stats", {
     method: "POST", headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ adminEmail: ADMIN_EMAIL, windowDays: days }),
+    body: JSON.stringify({
+      adminEmail: ADMIN_EMAIL, windowDays: sp.windowDays, previousPeriod: sp.previousPeriod,
+    }),
   });
   const body = await res.text();
   if (body.trim().startsWith("<")) {
@@ -51,7 +66,7 @@ async function fetchWindow(days) {
   }
   const data = JSON.parse(body);
   if (!res.ok) throw new Error(data.error || "Could not load");
-  CACHE.set(days, data);
+  CACHE.set(ck, data);
   return data;
 }
 
@@ -60,8 +75,8 @@ async function load() {
   const errorEl = document.getElementById("error");
   loading.hidden = false; errorEl.hidden = true;
   try {
-    DATA = await fetchWindow(WINDOW_DAYS);
-    await Promise.all([...COMPARE].map(fetchWindow));
+    DATA = await fetchWindow(spec(String(WINDOW_DAYS)));
+    await Promise.all([...COMPARE].map((k) => fetchWindow(spec(k))));
   } catch (err) {
     loading.hidden = true;
     errorEl.textContent = err.message || "Could not load — refresh to try again.";
@@ -122,11 +137,12 @@ function renderFlow() {
 function renderCompareBar() {
   const bar = document.getElementById("cmp");
   if (!bar || !DATA) return;
-  const others = (DATA.windows || [7, 28, 90]).filter((w) => w !== WINDOW_DAYS);
-  bar.innerHTML = `<span class="cmp__lead">Compare with</span>` + others.map((w) => `
+  const others = (DATA.windows || [7, 28, 90])
+    .filter((w) => w !== WINDOW_DAYS).map(String).concat("prev");
+  bar.innerHTML = `<span class="cmp__lead">Compare with</span>` + others.map((k) => `
     <label class="cmp__box">
-      <input type="checkbox" data-cmp="${w}" ${COMPARE.has(w) ? "checked" : ""} />
-      <span>${w} days</span>
+      <input type="checkbox" data-cmp="${k}" ${COMPARE.has(k) ? "checked" : ""} />
+      <span>${k === "prev" ? `previous ${WINDOW_DAYS} days` : `${k} days`}</span>
     </label>`).join("");
 }
 
@@ -169,17 +185,22 @@ function compareLine(stat) {
   // 28 days has more visitors than 7, so colouring that green would dress a
   // truism up as good news. Counts are shown for reference, uncoloured.
   const comparable = /%|day/i.test(String(stat.value));
-  return [...COMPARE].sort((a, b) => a - b).map((days) => {
-    const other = (panelFor(CACHE.get(days)) || {}).stats || [];
+  // "prev" last: the window comparisons are a size question, the previous
+  // period is a time question, and they read better grouped that way.
+  const keys = [...COMPARE].sort((a, b) =>
+    (a === "prev" ? 1e9 : Number(a)) - (b === "prev" ? 1e9 : Number(b)));
+  return keys.map((key) => {
+    const sp = spec(key);
+    const other = (panelFor(CACHE.get(cacheKey(sp))) || {}).stats || [];
     const match = other.find((x) => x.label === stat.label);
-    if (!match) return `<span class="cmp"><b>${days}d</b> —</span>`;
+    if (!match) return `<span class="cmp"><b>${sp.label}</b> —</span>`;
     const then = num(match.value);
     let cls = "";
     if (comparable && now !== null && then !== null && now !== then) {
       const up = now > then;
       cls = (stat.lowerIsBetter ? !up : up) ? " is-up" : " is-down";
     }
-    return `<span class="cmp${cls}"><b>${days}d</b> ${esc(match.value)}</span>`;
+    return `<span class="cmp${cls}"><b>${sp.label}</b> ${esc(match.value)}</span>`;
   }).join("");
 }
 
@@ -236,12 +257,12 @@ document.addEventListener("click", (e) => {
   // cached, so toggling it back on is instant.
   const cmp = e.target.closest("[data-cmp]");
   if (cmp) {
-    const days = Number(cmp.dataset.cmp);
-    if (COMPARE.has(days)) { COMPARE.delete(days); renderPanel(); renderCompareBar(); return; }
-    COMPARE.add(days);
+    const key = cmp.dataset.cmp;
+    if (COMPARE.has(key)) { COMPARE.delete(key); renderPanel(); renderCompareBar(); return; }
+    COMPARE.add(key);
     renderCompareBar();
-    fetchWindow(days).then(() => { renderPanel(); renderCompareBar(); })
-      .catch(() => { COMPARE.delete(days); renderCompareBar(); });
+    fetchWindow(spec(key)).then(() => { renderPanel(); renderCompareBar(); })
+      .catch(() => { COMPARE.delete(key); renderCompareBar(); });
     return;
   }
 
@@ -250,8 +271,9 @@ document.addEventListener("click", (e) => {
     const next = Number(win.dataset.w);
     if (next === WINDOW_DAYS) return;
     WINDOW_DAYS = next;
-    // The window you are viewing can never also be a comparison.
-    COMPARE.delete(next);
+    // The window you are viewing can never also be a comparison. "prev" is
+    // kept: it means "the period before this one", whatever this one is.
+    COMPARE.delete(String(next));
     document.querySelectorAll(".win__b").forEach((b) =>
       b.classList.toggle("is-on", Number(b.dataset.w) === next));
     document.getElementById("win").classList.add("is-busy");

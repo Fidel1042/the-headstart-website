@@ -81,11 +81,13 @@ async function fetchAll(baseId, tableId, fields, token) {
 }
 
 /** GA4 totals, key events and top sources. Returns null if it is not set up. */
-async function ga4Block(env, windowDays) {
+async function ga4Block(env, windowDays, offsetDays) {
   const { GA4_PROPERTY_ID, GA4_CLIENT_EMAIL, GA4_PRIVATE_KEY } = env;
   if (!GA4_PROPERTY_ID || !GA4_CLIENT_EMAIL || !GA4_PRIVATE_KEY) return null;
   const token = await ga4Token(GA4_CLIENT_EMAIL, GA4_PRIVATE_KEY);
-  const range = dateRange(windowDays);
+  // dateRange(28, 28) is "56 days ago to 28 days ago": the 28 days before the
+  // 28 being viewed.
+  const range = dateRange(windowDays, offsetDays);
 
   const [totals, events, sources, forms] = await Promise.all([
     runReport(token, GA4_PROPERTY_ID, {
@@ -146,13 +148,13 @@ function allocate(rows) {
 }
 
 /** Open rates for the three reminder emails. Returns [] if Brevo is not set up. */
-async function emailBlock(apiKey, windowDays) {
+async function emailBlock(apiKey, windowDays, offsetDays) {
   if (!apiKey) return [];
   // Brevo reads dates as UTC, so "today" in Melbourne reads as the future.
   // Capped at 89: Brevo refuses a range wider than 90 days.
-  const end = ymd(Date.now() - 86400000);
   const span = Math.min(windowDays, 89);
-  const start = ymd(Date.now() - 86400000 - span * 86400000);
+  const end = ymd(Date.now() - 86400000 - offsetDays * 86400000);
+  const start = ymd(new Date(end + "T00:00:00Z").getTime() - span * 86400000);
   const pull = async (event) => {
     const url = `https://api.brevo.com/v3/smtp/statistics/events` +
       `?limit=2500&startDate=${start}&endDate=${end}&event=${event}`;
@@ -207,6 +209,9 @@ exports.handler = async (event) => {
   // years of data and time the function out.
   const windowDays = WINDOWS.includes(Number(payload.windowDays))
     ? Number(payload.windowDays) : DEFAULT_WINDOW;
+  // Shift the whole window back by one of its own lengths, for "vs the period
+  // before". Only ever 0 or one window, so the two spans sit end to end.
+  const offsetDays = payload.previousPeriod ? windowDays : 0;
 
   const {
     AIRTABLE_API_TOKEN, AIRTABLE_CORE_BASE_ID, AIRTABLE_BASE_ID,
@@ -226,8 +231,8 @@ exports.handler = async (event) => {
     // should grey out one circle, not break the page.
     const notes = [];
     const [ga, email] = await Promise.all([
-      ga4Block(process.env, windowDays).catch((e) => { notes.push(`GA4: ${e.message}`); return null; }),
-      emailBlock(BREVO_API_KEY, windowDays).catch((e) => { notes.push(`Brevo: ${e.message}`); return []; }),
+      ga4Block(process.env, windowDays, offsetDays).catch((e) => { notes.push(`GA4: ${e.message}`); return null; }),
+      emailBlock(BREVO_API_KEY, windowDays, offsetDays).catch((e) => { notes.push(`Brevo: ${e.message}`); return []; }),
     ]);
 
     const clients = clientRecs.map((r) => ({
@@ -240,23 +245,26 @@ exports.handler = async (event) => {
       transcript: String(r.fields["Raw Notes"] || "").trim() !== "",
     }));
     const byMentee = sessionsByMentee(sessionRecs);
-    const today = ymd(Date.now());
-    const from = ymd(Date.now() - windowDays * 86400000);
+    // "to" is the end of the window being asked for, which is today unless the
+    // previous period was requested. Every stage treats it as its upper bound.
+    const to = ymd(Date.now() - offsetDays * 86400000);
+    const from = ymd(Date.now() - (offsetDays + windowDays) * 86400000);
 
     const stages = [
-      reach(channelStats(), ga, windowDays, instagramPosts()),
+      reach(channelStats(), ga, instagramPosts(), from, to),
       ga ? traffic(ga) : {
         key: "traffic", label: "Traffic", headline: "Not connected",
         sub: "GA4 env vars missing", stats: [], unavailable: true,
       },
-      consultation(clients, email, today, from),
-      close(clients, byMentee, today, from),
-      continuity(byMentee, `${TARGET_GAP_DAYS} days`, from),
+      consultation(clients, email, to, from),
+      close(clients, byMentee, to, from),
+      continuity(byMentee, `${TARGET_GAP_DAYS} days`, from, to),
     ];
 
     return json(200, {
       stages, links: midpoints(email),
-      notes, windowDays, windows: WINDOWS, from, to: today,
+      notes, windowDays, windows: WINDOWS, from, to,
+      previousPeriod: Boolean(payload.previousPeriod),
       generatedAt: new Date().toISOString(),
     });
   } catch (err) {

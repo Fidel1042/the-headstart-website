@@ -266,26 +266,21 @@ function renderReach(d) {
 }
 
 function renderPosts(d) {
-  const rows = d.topPosts || [];
+  const groups = d.topPosts || {};
+  const rows = [...(groups.linkedin || []), ...(groups.instagram || [])];
   const el = document.getElementById("posts-table");
   if (!rows.length) {
     el.innerHTML = `<tbody><tr><td class="dim">No posts archived for this window yet. Run
       import-instagram-posts.py and import-channel-stats.py.</td></tr></tbody>`;
     return;
   }
-  el.innerHTML = `
-    <thead><tr>
-      <th>Post</th>
-      <th class="num">Reach</th>
-      <th class="num">Engagements</th>
-      <th class="num">Profile visits</th>
-      <th class="num">Saves</th>
-    </tr></thead>
-    <tbody>${rows.slice(0, 10).map((p) => `
+  const block = (label, list) => !list.length ? "" : `
+    <tr><td colspan="5" class="posts-head">${esc(label)}</td></tr>
+    ${list.map((p) => `
       <tr>
         <td>
-          <span class="src">${esc(p.channel)}</span>
-          <span class="dim">${esc(p.date)}</span><br>
+          <span class="dim">${esc(p.date)}</span>
+          ${p.approx ? `<span class="dim" title="Matched to a draft by order within the week, not by exact day">~</span>` : ""}<br>
           ${p.permalink
             ? `<a href="${esc(p.permalink)}" target="_blank" rel="noopener">${esc(p.title.slice(0, 62))}</a>`
             : esc(p.title.slice(0, 62))}
@@ -294,7 +289,20 @@ function renderPosts(d) {
         <td class="num">${num(p.engagements)}</td>
         <td class="num ${p.profileVisits == null ? "dim" : ""}">${p.profileVisits == null ? "—" : num(p.profileVisits)}</td>
         <td class="num ${p.saves == null ? "dim" : ""}">${p.saves == null ? "—" : num(p.saves)}</td>
-      </tr>`).join("")}</tbody>`;
+      </tr>`).join("")}`;
+
+  el.innerHTML = `
+    <thead><tr>
+      <th>Post</th>
+      <th class="num">Reach</th>
+      <th class="num">Engagements</th>
+      <th class="num">Profile visits</th>
+      <th class="num">Saves</th>
+    </tr></thead>
+    <tbody>
+      ${block("LinkedIn", groups.linkedin || [])}
+      ${block("Instagram", groups.instagram || [])}
+    </tbody>`;
 }
 
 function renderTrend(d) {
@@ -407,7 +415,7 @@ async function load() {
   data.sales = data.sales || { totals: {}, bySource: [] };
   data.linksPage = data.linksPage || [];
   data.reach = data.reach || [];
-  data.topPosts = data.topPosts || [];
+  data.topPosts = data.topPosts || {};
   data.channelsSession = data.channelsSession || [];
   data.weeklySession = data.weeklySession || [];
   lastData = data;

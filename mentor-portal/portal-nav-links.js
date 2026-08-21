@@ -26,11 +26,11 @@ export const NAV_AREAS = [
   {
     key: "preassigned",
     label: "Pre Assigned Mentees",
-    // Follow-ups first: the section pill goes to links[0], so this lands
-    // straight on the list rather than needing a second click.
+    // Contacts first: the section pill goes to links[0], and this is the list
+    // worked every day. Follow-ups is a weekly sweep.
     links: [
-      { href: "/mentor-portal/followups.html", label: "Follow-ups", page: "followups" },
       { href: "/mentor-portal/contacts.html", label: "Contacts to add", page: "contacts" },
+      { href: "/mentor-portal/followups.html", label: "Follow-ups", page: "followups" },
     ],
   },
   {

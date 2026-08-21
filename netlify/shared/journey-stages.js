@@ -63,12 +63,14 @@ function groupSource(raw) {
  * reach week with a tiny click rate usually means there was no link in the
  * caption, which is a choice rather than a failure.
  */
-function reach(stats, ga, windowDays, igPosts) {
-  const since = new Date(Date.now() - windowDays * 86400000).toISOString().slice(0, 10);
+function reach(stats, ga, igPosts, from, to) {
+  // Both bounds, not just a start: without an upper bound "the previous 28
+  // days" would return exactly the same impressions as the current 28.
+  const inWindow = (d) => d && d >= from && (!to || d < to);
   const sum = (channel) => {
     const weeks = (stats || {})[channel] || {};
     return Object.entries(weeks)
-      .filter(([monday]) => monday >= since)
+      .filter(([monday]) => inWindow(monday))
       .reduce((a, [, w]) => a + (w.impressions || 0), 0);
   };
   const li = sum("linkedin");
@@ -89,6 +91,7 @@ function reach(stats, ga, windowDays, igPosts) {
   const measuredVisits = (li ? liVisits : 0) + (ig ? igVisits : 0);
 
   const rate = (v, i) => (i ? `${(v / i * 100).toFixed(2)}%` : "—");
+  const top = topPosts(stats, igPosts, from, to);
 
   return {
     key: "reach",
@@ -114,13 +117,21 @@ function reach(stats, ga, windowDays, igPosts) {
           ig ? ["Instagram", ig, igVisits, rate(igVisits, ig)] : null,
         ].filter(Boolean),
       },
-      // What actually earned the reach. Profile visits matter more than raw
-      // reach here: it is the step immediately before someone taps the bio
-      // link, and it does not track reach at all.
-      ...(topPosts(stats, igPosts, since).length ? [{
-        title: "Top posts in this window",
+      // What actually earned the reach, five per platform. Merging them would
+      // be almost all Instagram, which out-reaches LinkedIn several times
+      // over, and the best LinkedIn post would never appear.
+      ...(top.li.length ? [{
+        title: "Top LinkedIn posts",
+        head: ["Post", "Impressions", "Engagements"],
+        rows: top.li,
+      }] : []),
+      // For Instagram, profile visits beat raw reach as a signal: it is the
+      // step immediately before someone taps the bio link, and it does not
+      // track reach at all.
+      ...(top.ig.length ? [{
+        title: "Top Instagram posts",
         head: ["Post", "Reach", "Profile visits"],
-        rows: topPosts(stats, igPosts, since).map((x) => [x.label, x.reach, x.visits]),
+        rows: top.ig,
       }] : []),
     ] : [],
     notes: total ? [
@@ -130,25 +141,34 @@ function reach(stats, ga, windowDays, igPosts) {
   };
 }
 
-/** Best posts across both platforms, newest archive wins. */
-function topPosts(stats, igPosts, since) {
+/** Top five per platform, kept apart so neither hides the other. */
+function topPosts(stats, igPosts, from, to) {
+  const inWindow = (d) => d && d >= from && (!to || d < to);
+
   const ig = Object.values(igPosts || {})
-    .filter((p) => p.date && p.date >= since)
-    .map((p) => ({
-      label: `IG · ${(p.caption || "(no caption)").slice(0, 44)}`,
-      reach: p.reach || 0,
-      visits: p.profile_visits == null ? "—" : p.profile_visits,
-    }));
+    .filter((p) => inWindow(p.date))
+    .sort((a, b) => (b.reach || 0) - (a.reach || 0))
+    .slice(0, 5)
+    .map((p) => [
+      (p.caption || "(no caption)").slice(0, 46),
+      p.reach || 0,
+      p.profile_visits == null ? "—" : p.profile_visits,
+    ]);
+
   const li = Object.values((stats || {}).posts_linkedin || {})
-    .filter((p) => p.date && p.date >= since)
-    .map((p) => ({
-      label: `LI · post ${p.date}`,
-      reach: p.impressions || 0,
-      visits: "—",
-    }));
-  return [...ig, ...li]
-    .sort((a, b) => b.reach - a.reach)
-    .slice(0, 5);
+    .filter((p) => inWindow(p.date))
+    .sort((a, b) => (b.impressions || 0) - (a.impressions || 0))
+    .slice(0, 5)
+    .map((p) => [
+      // The LinkedIn export carries no post text, so the title comes from the
+      // matching draft in the repo. A tilde means it was paired by order
+      // within the week rather than by an exact day: a good guess, not a fact.
+      (p.title || `post ${p.date}`) + (p.title_approx ? " ~" : ""),
+      p.impressions || 0,
+      p.engagements || 0,
+    ]);
+
+  return { ig, li };
 }
 
 function traffic(ga) {
@@ -343,12 +363,13 @@ function close(clients, byMentee, today, from) {
 }
 
 /** 4. Continuity. Whether anybody stays past the first couple of sessions. */
-function continuity(byMentee, target, from) {
+function continuity(byMentee, target, from, to) {
   // Only sessions inside the window, and only mentees who have one there, so a
-  // 7-day view describes this week rather than all time.
+  // 7-day view describes this week rather than all time. The upper bound
+  // matters for "the period before this one".
   const win = {};
   Object.entries(byMentee).forEach(([k, dates]) => {
-    const d = dates.filter((x) => x >= from);
+    const d = dates.filter((x) => x >= from && (!to || x < to));
     if (d.length) win[k] = d;
   });
   byMentee = win;
@@ -425,8 +446,25 @@ function emailCheckpoints(email) {
  * "booking to showing up" IS the show rate and "call to signing" IS the
  * convert rate.
  */
+/**
+ * Midpoints sit IN the gaps between circles: links[i - 1] is drawn before
+ * stage i. So the array is positional and must be padded to line up.
+ *
+ * Stages are: 0 Reach, 1 Traffic, 2 Consultation, 3 Close, 4 Continuity.
+ * The reminder emails go out after someone books and before the call, so the
+ * checkpoint belongs in the gap before Consultation, which is index 1.
+ * A null leaves that gap as a plain arrow.
+ *
+ * If a stage is ever added or reordered, this padding has to move with it.
+ */
+const EMAIL_GAP_INDEX = 1;   // gap between Traffic and Consultation
+
 function midpoints(email) {
-  return [emailCheckpoints(email)];
+  const out = [];
+  out[EMAIL_GAP_INDEX] = emailCheckpoints(email);
+  // Fill the holes so the array has no undefined slots before the checkpoint.
+  for (let i = 0; i < out.length; i++) if (!out[i]) out[i] = null;
+  return out;
 }
 
 module.exports = {

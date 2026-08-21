@@ -161,12 +161,16 @@ function topPosts(days) {
     .slice(0, 5)
     .map((p) => ({
       channel: "linkedin", date: p.date, permalink: p.permalink,
-      title: "LinkedIn post", type: "POST",
+      title: p.title || `LinkedIn post ${p.date}`,
+      approx: Boolean(p.title_approx), type: "POST",
       reach: p.impressions || 0, engagements: p.engagements || 0,
       profileVisits: null, saves: null, shares: null,
     }));
 
-  return [...li, ...ig].sort((a, b) => b.reach - a.reach);
+  // Kept apart rather than merged: Instagram out-reaches LinkedIn several
+  // times over, so one combined list would be almost all Instagram and hide
+  // the best LinkedIn post entirely.
+  return { instagram: ig, linkedin: li };
 }
 
 function channelStats() {

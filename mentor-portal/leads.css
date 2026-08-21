@@ -147,3 +147,14 @@
 }
 .mode-btn:hover { color: var(--text); }
 .mode-btn.is-active { color: var(--accent); border-color: var(--accent-line); background: var(--accent-soft); }
+
+/* Section label inside the top-posts table, so the two platforms read as two
+   lists without needing two separate tables side by side. */
+.posts-head {
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  font-weight: 700;
+}
