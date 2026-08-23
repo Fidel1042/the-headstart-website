@@ -178,13 +178,49 @@ function panelFor(payload) {
  * whether the current window is better. "Better" is usually higher, but a
  * rising no-show count or a longer wait is worse, and the backend marks those.
  */
+/**
+ * Whether a change is worth colouring.
+ *
+ * A rate survives any comparison. A headcount only survives one against an
+ * equally long span: 28 days having more visitors than 7 is arithmetic, not
+ * good news, so that stays grey. Against the previous period of the same
+ * length, a count is a fair fight and gets coloured like anything else.
+ */
+function colourable(stat, key) {
+  return /%|day/i.test(String(stat.value)) || key === "prev";
+}
+
+/** Green when the current window is better, red when worse. */
+function direction(stat, now, then) {
+  if (now === null || then === null || now === then) return "";
+  const up = now > then;
+  return (stat.lowerIsBetter ? !up : up) ? "is-up" : "is-down";
+}
+
+/**
+ * The headline change, shown at the same size as the number itself because it
+ * is the point of ticking a comparison. Prefers the previous period when it is
+ * ticked, since that is the like-for-like one.
+ */
+function delta(stat) {
+  if (!COMPARE.size) return "";
+  const key = COMPARE.has("prev") ? "prev" : [...COMPARE][0];
+  if (!colourable(stat, key)) return "";
+  const sp = spec(key);
+  const other = (panelFor(CACHE.get(cacheKey(sp))) || {}).stats || [];
+  const match = other.find((x) => x.label === stat.label);
+  if (!match) return "";
+  const now = num(stat.value), then = num(match.value);
+  if (now === null || then === null || !then) return "";
+  const pc = Math.round(((now - then) / Math.abs(then)) * 100);
+  if (!pc) return `<span class="cell__d">no change</span>`;
+  const cls = direction(stat, now, then);
+  return `<span class="cell__d ${cls}">${pc > 0 ? "+" : "&minus;"}${Math.abs(pc)}%</span>`;
+}
+
 function compareLine(stat) {
   if (!COMPARE.size) return "";
   const now = num(stat.value);
-  // A rate survives a change of window length; a headcount does not. Of course
-  // 28 days has more visitors than 7, so colouring that green would dress a
-  // truism up as good news. Counts are shown for reference, uncoloured.
-  const comparable = /%|day/i.test(String(stat.value));
   // "prev" last: the window comparisons are a size question, the previous
   // period is a time question, and they read better grouped that way.
   const keys = [...COMPARE].sort((a, b) =>
@@ -195,11 +231,7 @@ function compareLine(stat) {
     const match = other.find((x) => x.label === stat.label);
     if (!match) return `<span class="cmp"><b>${sp.label}</b> —</span>`;
     const then = num(match.value);
-    let cls = "";
-    if (comparable && now !== null && then !== null && now !== then) {
-      const up = now > then;
-      cls = (stat.lowerIsBetter ? !up : up) ? " is-up" : " is-down";
-    }
+    const cls = colourable(stat, key) ? " " + direction(stat, now, then) : "";
     return `<span class="cmp${cls}"><b>${sp.label}</b> ${esc(match.value)}</span>`;
   }).join("");
 }
@@ -217,7 +249,7 @@ function renderPanel() {
   if (!s) return;
   const cells = (s.stats || []).map((x) => `
     <div class="cell${x.warn ? " is-warn" : ""}">
-      <div class="cell__v">${esc(x.value)}</div>
+      <div class="cell__top"><span class="cell__v">${esc(x.value)}</span>${delta(x)}</div>
       <div class="cell__l">${esc(x.label)}</div>
       <div class="cell__n">${esc(x.note || "")}</div>
       ${COMPARE.size ? `<div class="cell__cmp">${compareLine(x)}</div>` : ""}

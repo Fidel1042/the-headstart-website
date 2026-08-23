@@ -147,7 +147,18 @@
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
       gap: 0.7rem; margin-bottom: 1.2rem; }
     .cell { border: 1px solid var(--line); border-radius: 12px; padding: 0.75rem 0.9rem; }
+    /* The change sits beside the number at the same weight and size, because
+       when a comparison is ticked it is the thing being looked at. */
+    .cell__top { display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap; }
     .cell__v { font-size: 1.3rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .cell__d {
+      font-size: 1.3rem; font-weight: 800; font-variant-numeric: tabular-nums;
+      color: var(--text-muted);
+    }
+    .cell__d.is-up { color: #2e7d52; }
+    .cell__d.is-down { color: #c33; }
+    [data-theme="dark"] .cell__d.is-up { color: #6fd39b; }
+    [data-theme="dark"] .cell__d.is-down { color: #ff8b8b; }
     .cell__l { font-size: 0.74rem; color: var(--text-muted); margin-top: 0.15rem; }
     .cell__n { font-size: 0.7rem; color: var(--accent); margin-top: 0.25rem; min-height: 1em; }
     .cell.is-warn { border-color: rgba(224,80,80,0.45); }
