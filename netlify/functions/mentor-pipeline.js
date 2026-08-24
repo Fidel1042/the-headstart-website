@@ -18,17 +18,29 @@ const json = (statusCode, body) => ({ statusCode, headers, body: JSON.stringify(
 const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com", "dev@localhost"];
 
 // The order somebody actually moves through. Hired is the far end and lives on
-// the Agreements page, so it is not offered here as a step.
+// the Agreements page. Hold parks somebody without ending it; Dropped ends it.
 const STAGES = ["Screen", "First Interview", "Second Interview",
-                "Waiting on signed contract", "Hired", "Dropped"];
+                "Waiting on signed contract", "Hold", "Hired", "Dropped"];
 
-// Everyone still in the running. Hired and Dropped have their own homes.
+// Everyone still being worked on. Hired, Hold and Dropped have their own homes.
 const IN_PIPELINE = ["Screen", "First Interview", "Second Interview",
                      "Waiting on signed contract"];
 
+// Where the write-up goes, by the stage the person is at. First Interview and
+// Screen share one, because a screen that turns into notes is still interview
+// one. Fidel pastes the Fathom transcript or share link into it.
+const NOTES_FIELD = {
+  "Screen": "Int 1 transcript",
+  "First Interview": "Int 1 transcript",
+  "Second Interview": "Interview 2 Transcript",
+  "Waiting on signed contract": "Interview 2 Transcript",
+  "Hold": "Int 1 transcript",
+};
+
 const FIELDS = ["Name", "Email", "Phone", "Status", "Rate", "First Interview Date",
                 "Industry", "Company", "Role", "LinkedIn", "Koko Notified",
-                "Agreement Signed", "Legacy Agreement", "Invite Sent"];
+                "Agreement Signed", "Legacy Agreement", "Invite Sent",
+                "Int 1 transcript", "Interview 2 Transcript"];
 
 const SENDER = { name: "Fidel @Headstart Mentoring", email: "fidel@theheadstartmentoring.com" };
 
@@ -146,6 +158,10 @@ const shape = (r) => {
     signed: (f["Agreement Signed"] || "").slice(0, 10),
     legacy: Boolean(f["Legacy Agreement"]),
     inviteSent: f["Invite Sent"] || "",
+    // The write-up for whichever interview they are up to, so the page shows
+    // and saves one box rather than four.
+    notes: f[NOTES_FIELD[f["Status"]] || "Int 1 transcript"] || "",
+    notesField: NOTES_FIELD[f["Status"]] || "Int 1 transcript",
   };
 };
 
@@ -188,6 +204,14 @@ exports.handler = async (event) => {
           fields["First Interview Date"] = d.toISOString();
         }
       }
+      if (p.notes !== undefined) {
+        // Written against the stage the row was showing when Fidel typed, which
+        // is what the box was labelled with. Not the stage being saved: writing
+        // up interview one and promoting to Second Interview in the same Save
+        // would otherwise file those notes under interview two.
+        const target = NOTES_FIELD[p.notesStage] || "Int 1 transcript";
+        fields[target] = String(p.notes);
+      }
       if (!Object.keys(fields).length) return json(400, { error: "Nothing to change" });
 
       const saved = await at(`${base}/${table}/${p.mentorId}`,
@@ -228,10 +252,14 @@ exports.handler = async (event) => {
       // details in the calendar event as the invitation email does. One
       // source, so the two can never drift apart.
       zoom: ZOOM,
+      // Parked, not finished. Kept out of the working list but still reachable,
+      // because the whole point of Hold is coming back to them.
+      onHold: all.filter((r) => (r.fields["Status"] || "") === "Hold")
+        .map(shape).sort((a, b) => a.name.localeCompare(b.name)),
       // How many are already through, so the page can say where the far end is
-      // without listing everybody.
+      // without listing everybody. Dropped is deliberately not counted or
+      // returned: their record stays in Airtable and leaves the portal.
       hired: all.filter((r) => (r.fields["Status"] || "") === "Hired").length,
-      dropped: all.filter((r) => (r.fields["Status"] || "") === "Dropped").length,
     });
   } catch (err) {
     return json(502, { error: err.message || "Could not load the pipeline" });

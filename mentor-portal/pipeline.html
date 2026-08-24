@@ -63,6 +63,23 @@
     [data-theme="dark"] .saved { color: #6fd39b; }
     .oops { font-size: 0.72rem; color: #c33; }
 
+    .wr { display: block; margin-top: 0.75rem; }
+    .wr__label { display: block; font-size: 0.7rem; color: var(--text-muted); margin-bottom: 0.3rem; }
+    textarea[data-f="notes"] {
+      font-family: inherit; font-size: 0.8rem; line-height: 1.55; width: 100%;
+      box-sizing: border-box; padding: 0.5rem 0.6rem; border: 1px solid var(--line);
+      border-radius: 8px; background: var(--bg); color: var(--text); resize: vertical;
+    }
+    textarea[data-f="notes"]:focus { outline: none; border-color: var(--accent); }
+
+    .held { margin-top: 1.8rem; }
+    .held > summary {
+      cursor: pointer; font-size: 0.66rem; font-weight: 800; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.7rem;
+      min-height: 36px; display: flex; align-items: center;
+    }
+    .held > summary:hover { color: var(--accent); }
+
     .state { font-size: 0.9rem; color: var(--text-muted); padding: 2rem 0; text-align: center; }
     .quiet { font-size: 0.8rem; color: var(--text-muted); }
     .pl-foot { font-size: 0.75rem; color: var(--text-muted); margin-top: 2rem; }
@@ -219,6 +236,11 @@
             <span class="note" data-note="${m.id}">${m.inviteSent
               ? `<span class="m__meta">invited ${esc(readable(m.inviteSent))}</span>` : ""}</span>
           </div>
+          <label class="wr">
+            <span class="wr__label">Write-up &mdash; saves to ${esc(m.notesField)}</span>
+            <textarea data-f="notes" rows="3" data-stage="${esc(m.status)}"
+              placeholder="Paste the Fathom transcript or share link, and what you made of them.">${esc(m.notes)}</textarea>
+          </label>
         </div>`;
     }
 
@@ -228,16 +250,28 @@
       // Furthest along first: the people closest to hiring are the ones being
       // worked on today.
       const order = ["Waiting on signed contract", "Second Interview", "First Interview", "Screen"];
-      document.getElementById("stages").innerHTML = order
-        .filter((s) => byStage[s])
-        .map((s) => `
+      const held = DATA.onHold || [];
+      // Parked rather than finished, so they sit closed at the bottom. Dropped
+      // people are not here at all: their record stays in Airtable and they
+      // leave the portal.
+      const holdBlock = held.length
+        ? `<details class="held">
+             <summary>On hold (${held.length})</summary>
+             ${held.map(card).join("")}
+           </details>`
+        : "";
+
+      document.getElementById("stages").innerHTML =
+        (order.filter((s) => byStage[s])
+          .map((s) => `
           <p class="stage__title">${esc(s)} <span class="stage__count">${byStage[s].length}</span></p>
           ${byStage[s].map(card).join("")}`).join("")
-        || `<p class="quiet">Nobody in the pipeline. Everyone is hired or dropped.</p>`;
+          || (held.length ? "" : `<p class="quiet">Nobody in the pipeline. Everyone is hired, on hold or dropped.</p>`))
+        + holdBlock;
 
       document.getElementById("foot").textContent =
-        `${DATA.pipeline.length} in the pipeline · ${DATA.hired} hired · ${DATA.dropped} dropped. ` +
-        `Setting someone to Hired moves them to the Agreements page, where their link lives.`;
+        `${DATA.pipeline.length} in the pipeline · ${held.length} on hold · ${DATA.hired} hired. ` +
+        `Setting someone to Hired moves them to the Agreements page. Dropped removes them from here.`;
     }
 
     document.addEventListener("click", async (e) => {
@@ -278,8 +312,13 @@
       btn.textContent = "Saving…";
       note.textContent = "";
       try {
+        const box = row.querySelector('[data-f="notes"]');
         const res = await post({
           action: "update", mentorId: btn.dataset.save,
+          notes: box.value,
+          // The stage the box was labelled with, so the write-up lands where
+          // the label said even if the stage is being changed in the same Save.
+          notesStage: box.dataset.stage,
           status: get("status"),
           rate: get("rate") === "" ? 0 : get("rate"),
           // datetime-local has no zone, so it is read as this browser's local
@@ -287,13 +326,13 @@
           interviewAt: get("interviewAt") ? new Date(get("interviewAt")).toISOString() : "",
         });
         note.className = "saved";
-        note.textContent = res.mentor.status === "Hired"
-          ? "Hired — now on Agreements" : "Saved";
-        // A hired mentor no longer belongs on this page, so reload rather than
-        // leaving a row that is no longer in the pipeline.
-        if (res.mentor.status === "Hired" || res.mentor.status === "Dropped") {
-          setTimeout(load, 900);
-        }
+        const moved = { "Hired": "Hired — now on Agreements",
+                        "Dropped": "Dropped — out of the portal",
+                        "Hold": "On hold" };
+        note.textContent = moved[res.mentor.status] || "Saved";
+        // They no longer belong under the heading they are sitting under, so
+        // reload rather than leaving a row in the wrong place.
+        if (moved[res.mentor.status]) setTimeout(load, 900);
       } catch (err) {
         note.className = "oops";
         note.textContent = err.message;
