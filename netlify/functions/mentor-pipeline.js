@@ -224,6 +224,10 @@ exports.handler = async (event) => {
     return json(200, {
       pipeline,
       stages: STAGES,
+      // Sent to the page so the "Add to calendar" link puts the same Zoom
+      // details in the calendar event as the invitation email does. One
+      // source, so the two can never drift apart.
+      zoom: ZOOM,
       // How many are already through, so the page can say where the far end is
       // without listing everybody.
       hired: all.filter((r) => (r.fields["Status"] || "") === "Hired").length,

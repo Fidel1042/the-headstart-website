@@ -52,6 +52,11 @@
     }
     .act:hover { background: var(--accent-soft); }
     .act:disabled { opacity: 0.45; cursor: not-allowed; }
+    .act--cal {
+      border-color: var(--line); color: var(--text-muted);
+      display: inline-flex; align-items: center; text-decoration: none;
+    }
+    .act--cal:hover { border-color: var(--accent-line); color: var(--accent); }
     .act--send { border-color: var(--line); color: var(--text-muted); }
     .act--send:hover:not(:disabled) { border-color: var(--accent-line); color: var(--accent); }
     .saved { font-size: 0.72rem; color: #2e7d52; }
@@ -152,6 +157,28 @@
       document.getElementById("content").hidden = false;
     }
 
+    // 30 minutes, which is what a first interview runs to. The event is a block
+    // in Fidel's own calendar with nobody invited: the candidate already has
+    // the time and the Zoom link from the invitation email, so adding them as
+    // a guest would send a second, competing invite.
+    const INTERVIEW_MINUTES = 30;
+
+    function calendarLink(m) {
+      const start = new Date(m.interviewAt);
+      const end = new Date(start.getTime() + INTERVIEW_MINUTES * 60000);
+      const stamp = (d) => d.toISOString().replace(/[-:]|\.\d{3}/g, "");
+      const z = DATA.zoom || {};
+      const q = new URLSearchParams({
+        action: "TEMPLATE",
+        text: `Mentor interview — ${m.name}`,
+        dates: `${stamp(start)}/${stamp(end)}`,
+        location: z.link || "",
+        details: [`${m.status} with ${m.name}`, m.email,
+                  z.passcode ? `Passcode: ${z.passcode}` : ""].filter(Boolean).join("\n"),
+      });
+      return `https://calendar.google.com/calendar/render?${q}`;
+    }
+
     function card(m) {
       const where = [m.role, m.company].filter(Boolean).join(" at ");
       return `
@@ -180,6 +207,9 @@
                      value="${m.rateSet ? m.rate : ""}" placeholder="—" />
             </span>
             <span class="m__spacer"></span>
+            ${m.interviewAt ? `<a class="act act--cal" target="_blank" rel="noopener"
+              href="${esc(calendarLink(m))}"
+              title="Blocks the time in your own calendar. It does not invite them.">Add to calendar</a>` : ""}
             <button type="button" class="act" data-save="${m.id}">Save</button>
             <button type="button" class="act act--send" data-invite="${m.id}"
                     ${m.interviewAt ? "" : "disabled"}
