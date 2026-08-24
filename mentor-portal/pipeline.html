@@ -196,6 +196,13 @@
       return `https://calendar.google.com/calendar/render?${q}`;
     }
 
+    // Somebody sitting on a retired stage keeps it as an option, only for them.
+    // Without this their stage would not be in the list, the select would fall
+    // back to the first option, and the next Save would quietly move them.
+    function stagesFor(m) {
+      return DATA.stages.includes(m.status) ? DATA.stages : [m.status, ...DATA.stages];
+    }
+
     function card(m) {
       const where = [m.role, m.company].filter(Boolean).join(" at ");
       return `
@@ -210,7 +217,7 @@
             <span class="fld">
               <label>Stage</label>
               <select data-f="status">
-                ${DATA.stages.map((s) =>
+                ${stagesFor(m).map((s) =>
                   `<option value="${esc(s)}"${s === m.status ? " selected" : ""}>${esc(s)}</option>`).join("")}
               </select>
             </span>

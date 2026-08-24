@@ -19,8 +19,14 @@ const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com", "dev@localho
 
 // The order somebody actually moves through. Hired is the far end and lives on
 // the Agreements page. Hold parks somebody without ending it; Dropped ends it.
-const STAGES = ["Screen", "First Interview", "Second Interview",
+//
+// Second Interview was retired in August 2026. It is not offered as a choice
+// any more, but it is still recognised below so the people already sitting on
+// it stay visible instead of vanishing out of the portal.
+const STAGES = ["Screen", "First Interview",
                 "Waiting on signed contract", "Hold", "Hired", "Dropped"];
+
+const RETIRED = ["Second Interview"];
 
 // Everyone still being worked on. Hired, Hold and Dropped have their own homes.
 const IN_PIPELINE = ["Screen", "First Interview", "Second Interview",
@@ -184,7 +190,11 @@ exports.handler = async (event) => {
       const fields = {};
 
       if (p.status !== undefined) {
-        if (!STAGES.includes(p.status)) return json(400, { error: "Unknown stage" });
+        // Retired stages are accepted so saving an untouched old row does not
+        // fail, but they are never offered as a new choice.
+        if (![...STAGES, ...RETIRED].includes(p.status)) {
+          return json(400, { error: "Unknown stage" });
+        }
         fields["Status"] = p.status;
       }
       if (p.rate !== undefined) {
@@ -252,6 +262,7 @@ exports.handler = async (event) => {
       // details in the calendar event as the invitation email does. One
       // source, so the two can never drift apart.
       zoom: ZOOM,
+      retired: RETIRED,
       // Parked, not finished. Kept out of the working list but still reachable,
       // because the whole point of Hold is coming back to them.
       onHold: all.filter((r) => (r.fields["Status"] || "") === "Hold")
