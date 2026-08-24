@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Book your first session – The Headstart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="robots" content="noindex, nofollow" />
+  <style>
+    /* The mentee half of the shared calendar. Same look as the mentor page so
+       the pair feel like one thing. No login: the link carries who they are. */
+    :root {
+      --bg: #0b0b0b; --card: #151515; --line: #2a2a2a;
+      --text: #f4f4f4; --muted: #9a9a9a;
+      --gold: #c79b3b; --gold-soft: rgba(199,155,59,0.16);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg); color: var(--text);
+      padding: 1.1rem 0.9rem 3rem; line-height: 1.5;
+    }
+    .wrap { max-width: 480px; margin: 0 auto; }
+    h1 { font-size: 1.25rem; font-weight: 800; margin-bottom: 0.25rem; }
+    .lead { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.2rem; }
+
+    .day-label {
+      font-size: 0.72rem; font-weight: 800; letter-spacing: 0.07em;
+      text-transform: uppercase; color: var(--gold);
+      margin: 1.1rem 0 0.45rem;
+    }
+    .pick {
+      display: flex; align-items: center; gap: 0.7rem; width: 100%;
+      min-height: 56px; padding: 0.7rem 1rem; margin-bottom: 0.5rem;
+      border: 1px solid var(--line); border-radius: 14px;
+      background: var(--card); color: var(--text);
+      font: inherit; font-size: 0.95rem; font-weight: 600;
+      cursor: pointer; text-align: left;
+    }
+    .pick:hover { border-color: var(--gold); }
+    .pick__go { margin-left: auto; color: var(--gold); font-size: 0.8rem; font-weight: 800; }
+
+    .done {
+      border: 1px solid var(--gold); background: var(--gold-soft);
+      border-radius: 16px; padding: 1.1rem 1.2rem; text-align: center;
+    }
+    .done__when { font-size: 1.15rem; font-weight: 800; margin: 0.4rem 0 0.5rem; }
+    .done__note { font-size: 0.85rem; color: var(--muted); }
+
+    .empty {
+      border: 1px dashed var(--line); border-radius: 14px;
+      padding: 1.2rem; text-align: center; color: var(--muted); font-size: 0.88rem;
+    }
+    .err { color: #ff8b8b; font-size: 0.88rem; }
+    .tz { font-size: 0.72rem; color: var(--muted); margin-top: 1.2rem; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1 id="title">Book your first session</h1>
+    <p class="lead" id="lead">Loading&hellip;</p>
+    <div id="body"></div>
+    <p class="tz" id="tz"></p>
+  </div>
+
+  <script>
+    var MENTEE = new URLSearchParams(location.search).get("c") || "";
+    var DAY_NAMES = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+    var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+    function human(iso) {
+      var d = new Date(iso + "T00:00:00");
+      return DAY_NAMES[d.getDay()] + " " + d.getDate() + " " + MONTHS[d.getMonth()];
+    }
+
+    function post(body) {
+      return fetch("/.netlify/functions/availability", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      }).then(function (r) { return r.json().then(function (j) {
+        if (!r.ok) throw new Error(j.error || "Something went wrong"); return j; }); });
+    }
+
+    function confirmed(mentor, date, label) {
+      document.getElementById("lead").textContent = "";
+      document.getElementById("body").innerHTML =
+        '<div class="done">' +
+          '<div>You are booked in with ' + esc(mentor) + '</div>' +
+          '<div class="done__when">' + esc(human(date)) + '<br>' + esc(label) + '</div>' +
+          '<div class="done__note">Your mentor will send the meeting link in your ' +
+            'WhatsApp group and confirm the exact start time.</div>' +
+        '</div>';
+    }
+
+    function esc(v) {
+      return String(v == null ? "" : v).replace(/&/g, "&amp;").replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    function show(data) {
+      var body = document.getElementById("body");
+      var lead = document.getElementById("lead");
+
+      if (data.booked) { confirmed(data.mentor, data.booked.date, data.booked.label); return; }
+
+      if (data.noMentor) {
+        lead.textContent = "";
+        body.innerHTML = '<div class="empty">You do not have a mentor assigned yet. ' +
+          'Fidel will sort that out and come back to you.</div>';
+        return;
+      }
+
+      document.getElementById("title").textContent =
+        (data.name ? "Hi " + esc(data.name) + ", " : "") + "book your first session";
+
+      if (!data.blocks.length) {
+        lead.textContent = "";
+        body.innerHTML = '<div class="empty">' + esc(data.mentor) +
+          ' has not put any times up yet. Give them a nudge in your WhatsApp group.</div>';
+        return;
+      }
+
+      lead.textContent = "Pick a time that suits you with " + data.mentor +
+        ". Tap one and it is booked.";
+
+      // Grouped by day, because a flat list of 40 buttons is unreadable.
+      var byDay = {};
+      data.blocks.forEach(function (b) { (byDay[b.date] = byDay[b.date] || []).push(b); });
+      body.innerHTML = Object.keys(byDay).sort().map(function (date) {
+        return '<p class="day-label">' + esc(human(date)) + '</p>' +
+          byDay[date].map(function (b) {
+            return '<button type="button" class="pick" data-id="' + b.id + '">' +
+              esc(b.label) + '<span class="pick__go">Book</span></button>';
+          }).join("");
+      }).join("");
+    }
+
+    document.addEventListener("click", function (e) {
+      var btn = e.target.closest(".pick");
+      if (!btn) return;
+      document.querySelectorAll(".pick").forEach(function (b) { b.disabled = true; });
+      btn.querySelector(".pick__go").textContent = "Booking…";
+      post({ action: "book", menteeId: MENTEE, blockId: btn.dataset.id })
+        .then(function (j) { confirmed(j.mentor, j.date, j.label); })
+        .catch(function (err) {
+          // Usually means somebody took it a second earlier. Reload so the
+          // list is honest rather than showing a time that has gone.
+          document.getElementById("lead").innerHTML = '<span class="err">' + esc(err.message) + '</span>';
+          post({ action: "mentee", menteeId: MENTEE }).then(show);
+        });
+    });
+
+    try {
+      document.getElementById("tz").textContent =
+        "Times are in " + Intl.DateTimeFormat().resolvedOptions().timeZone.replace(/_/g, " ") + ".";
+    } catch (err) { /* no Intl, no line */ }
+
+    if (!MENTEE) {
+      document.getElementById("lead").innerHTML =
+        '<span class="err">This link is missing its code. Ask Fidel to resend it.</span>';
+    } else {
+      post({ action: "mentee", menteeId: MENTEE }).then(show).catch(function (err) {
+        document.getElementById("lead").innerHTML = '<span class="err">' + esc(err.message) + '</span>';
+      });
+    }
+  </script>
+</body>
+</html>

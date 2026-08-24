@@ -183,13 +183,20 @@ async function emailBlock(apiKey, windowDays, offsetDays) {
     // pre-fetch suppresses the real open event as often as it fabricates one,
     // so the raw figure is biased downward for proxy-heavy audiences and this
     // estimate can sit slightly above it.
-    const cleanOpens = [...o].filter((id) => !p.has(id)).length;
+    // Numerator and denominator must describe the same population. An email
+    // delivered before the window but opened inside it used to count as an
+    // open with no recipient behind it, which is how a 104% open rate got on
+    // screen. Only opens on messages delivered in this window count.
+    const cleanOpens = [...o].filter((id) => d.has(id) && !p.has(id)).length;
     const cleanRecipients = d.size - [...p].filter((id) => d.has(id)).length;
     const base = d.size || 1;
     return {
       name, delivered: d.size, opened: o.size, clicked: c.size, proxy: p.size,
-      openRate: cleanRecipients ? Math.round((cleanOpens / cleanRecipients) * 100)
-                                : Math.round((o.size / base) * 100),
+      // Clamped as well as fixed: a rate above 100% is always a bug, and it
+      // should never be the thing a reader has to notice.
+      openRate: Math.min(100, cleanRecipients
+        ? Math.round((cleanOpens / cleanRecipients) * 100)
+        : Math.round((o.size / base) * 100)),
       clickRate: Math.round((c.size / base) * 100),
     };
   }).filter((e) => e.delivered > 0);
@@ -221,7 +228,8 @@ exports.handler = async (event) => {
   try {
     const [clientRecs, sessionRecs] = await Promise.all([
       fetchAll(AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTEE_TABLE_ID,
-        ["Name", "Meeting Time", "Client Pipeline", "Raw Notes"], AIRTABLE_API_TOKEN),
+        ["Name", "Meeting Time", "Client Pipeline", "Raw Notes", "Pipeline Changed"],
+        AIRTABLE_API_TOKEN),
       fetchAll(AIRTABLE_BASE_ID, AIRTABLE_SESSION_TABLE_ID,
         ["Date", "Mentee Name", "Mentee Record ID", "Payment Status", "Amount Charged"],
         AIRTABLE_API_TOKEN),
@@ -243,6 +251,9 @@ exports.handler = async (event) => {
       // A transcript is the evidence the call happened, and the same test the
       // Airtable "Showed Up Rate" formula uses.
       transcript: String(r.fields["Raw Notes"] || "").trim() !== "",
+      // When the label last moved. A close is dated from here, not from the
+      // call and not from the first lesson.
+      changed: r.fields["Pipeline Changed"] ? ymd(r.fields["Pipeline Changed"]) : "",
     }));
     const byMentee = sessionsByMentee(sessionRecs);
     // "to" is the end of the window being asked for, which is today unless the

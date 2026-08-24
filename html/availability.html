@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Send your availability – The Headstart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="robots" content="noindex, nofollow" />
+  <style>
+    /* No login, no server, nothing stored. Everything happens in the browser
+       and leaves as text on the clipboard, so the page can be opened straight
+       from a WhatsApp link with no account and no setup. */
+    :root {
+      --bg: #0b0b0b; --card: #151515; --line: #2a2a2a;
+      --text: #f4f4f4; --muted: #9a9a9a;
+      --gold: #c79b3b; --gold-soft: rgba(199,155,59,0.16);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg); color: var(--text);
+      padding: 1.1rem 0.9rem 7rem; line-height: 1.5;
+    }
+    .wrap { max-width: 480px; margin: 0 auto; }
+
+    h1 { font-size: 1.25rem; font-weight: 800; margin-bottom: 0.25rem; }
+    .lead { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.1rem; }
+
+    .day {
+      border: 1px solid var(--line); border-radius: 14px;
+      background: var(--card); margin-bottom: 0.55rem; overflow: hidden;
+    }
+    .day__head {
+      display: flex; align-items: center; gap: 0.6rem; width: 100%;
+      padding: 0.8rem 0.95rem; background: none; border: 0; cursor: pointer;
+      font: inherit; color: var(--text); text-align: left;
+    }
+    .day__name { font-weight: 700; font-size: 0.95rem; }
+    .day__picked { margin-left: auto; font-size: 0.78rem; color: var(--gold); }
+    .day__chev { color: var(--muted); font-size: 0.8rem; transition: transform 0.18s; }
+    .day.is-open .day__chev { transform: rotate(90deg); }
+
+    .slots { display: none; gap: 0.4rem; flex-wrap: wrap; padding: 0 0.95rem 0.9rem; }
+    .day.is-open .slots { display: flex; }
+    .slot {
+      font: inherit; font-size: 0.82rem; font-weight: 600;
+      /* 44px is the smallest comfortable touch target on a phone. */
+      min-height: 44px; padding: 0 0.85rem;
+      border: 1px solid var(--line); border-radius: 999px;
+      background: transparent; color: var(--text); cursor: pointer;
+    }
+    .slot.is-on { background: var(--gold-soft); border-color: var(--gold); color: var(--gold); }
+
+    .out {
+      margin-top: 1.2rem; border: 1px solid var(--line); border-radius: 14px;
+      background: var(--card); padding: 0.9rem 1rem;
+      font-size: 0.88rem; white-space: pre-wrap; min-height: 4rem; color: var(--muted);
+    }
+    .out.has-text { color: var(--text); }
+
+    .bar {
+      position: fixed; left: 0; right: 0; bottom: 0;
+      padding: 0.7rem 0.9rem calc(0.7rem + env(safe-area-inset-bottom));
+      background: rgba(11,11,11,0.94); border-top: 1px solid var(--line);
+      backdrop-filter: blur(10px);
+    }
+    .bar__inner { max-width: 480px; margin: 0 auto; display: flex; gap: 0.5rem; }
+    .btn {
+      flex: 1; min-height: 48px; border-radius: 999px; border: 1px solid var(--gold);
+      background: var(--gold); color: #201503; font: inherit; font-weight: 800;
+      font-size: 0.9rem; cursor: pointer;
+    }
+    .btn--ghost { background: transparent; color: var(--muted); border-color: var(--line); flex: 0 0 34%; }
+    .btn:disabled { opacity: 0.45; }
+    .tz { font-size: 0.72rem; color: var(--muted); margin-top: 0.7rem; text-align: center; }
+    @media (prefers-reduced-motion: reduce) { .day__chev { transition: none; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1 id="title">Your availability</h1>
+    <p class="lead" id="lead">Loading&hellip;</p>
+
+    <div id="days"></div>
+
+    <div class="out" id="out">Pick the times you could do.</div>
+    <p class="tz" id="tz"></p>
+  </div>
+
+  <div class="bar">
+    <div class="bar__inner">
+      <button type="button" class="btn btn--ghost" id="clear">Clear</button>
+      <button type="button" class="btn" id="save" disabled>Save</button>
+    </div>
+  </div>
+
+  <script>
+    // Coarse blocks, not exact hours. A mentor picking "6pm to 9pm" in one tap
+    // is the whole point; asking for a start and end time is just typing again.
+    var SLOTS = [
+      { key: "morning", label: "Morning", text: "9am to 12pm", from: 9 },
+      { key: "arvo",    label: "Afternoon", text: "12pm to 3pm", from: 12 },
+      { key: "late",    label: "Late arvo", text: "3pm to 6pm", from: 15 },
+      { key: "evening", label: "Evening", text: "6pm to 9pm", from: 18 }
+    ];
+    var DAYS = 21;
+    var picked = {};   // "2026-08-26" -> { evening: true }
+    var MENTOR = new URLSearchParams(location.search).get("m") || "";
+
+    var DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    var ymd = function (d) {
+      return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") +
+             "-" + String(d.getDate()).padStart(2, "0");
+    };
+    var human = function (d) {
+      return DAY_NAMES[d.getDay()] + " " + d.getDate() + " " + MONTHS[d.getMonth()];
+    };
+
+    var dates = [];
+    for (var i = 0; i < DAYS; i++) {
+      var d = new Date();
+      d.setDate(d.getDate() + i);
+      dates.push(d);
+    }
+
+    document.getElementById("days").innerHTML = dates.map(function (d, i) {
+      var key = ymd(d);
+      return '<div class="day" data-day="' + key + '">' +
+        '<button type="button" class="day__head">' +
+          '<span class="day__chev">&#9656;</span>' +
+          '<span class="day__name">' + (i === 0 ? "Today" : human(d)) + '</span>' +
+          '<span class="day__picked" data-picked="' + key + '"></span>' +
+        '</button>' +
+        '<div class="slots">' + SLOTS.map(function (s) {
+          return '<button type="button" class="slot" data-day="' + key +
+                 '" data-slot="' + s.key + '">' + s.label + '</button>';
+        }).join("") + '</div>' +
+      '</div>';
+    }).join("");
+
+    // Blocks that touch are merged: three taps in a row should read
+    // "9am to 6pm", not three separate lines.
+    function describe(chosen) {
+      var runs = [];
+      SLOTS.forEach(function (s) {
+        if (!chosen[s.key]) return;
+        var last = runs[runs.length - 1];
+        if (last && last.end === s.from) { last.end = s.from + 3; last.to = s.text.split(" to ")[1]; }
+        else runs.push({ from: s.text.split(" to ")[0], to: s.text.split(" to ")[1], end: s.from + 3 });
+      });
+      return runs.map(function (r) { return r.from + " to " + r.to; }).join(", ");
+    }
+
+    function render() {
+      var lines = [];
+      dates.forEach(function (d, i) {
+        var key = ymd(d);
+        var text = describe(picked[key] || {});
+        var badge = document.querySelector('[data-picked="' + key + '"]');
+        if (badge) badge.textContent = text || "";
+        if (text) lines.push((i === 0 ? "Today" : human(d)) + " \u2014 " + text);
+      });
+
+      var out = document.getElementById("out");
+      var save = document.getElementById("save");
+      if (!lines.length) {
+        out.textContent = "Pick the times you could do.";
+        out.classList.remove("has-text");
+        save.disabled = true;
+      } else {
+        out.textContent = lines.join("\n");
+        out.classList.add("has-text");
+        save.disabled = false;
+      }
+      save.textContent = "Save";
+    }
+
+    function post(body) {
+      return fetch("/.netlify/functions/availability", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      }).then(function (r) { return r.json().then(function (j) {
+        if (!r.ok) throw new Error(j.error || "Something went wrong"); return j; }); });
+    }
+
+    /** Turn what is picked into the flat list the server stores. */
+    function chosenBlocks() {
+      var out = [];
+      Object.keys(picked).forEach(function (date) {
+        Object.keys(picked[date]).forEach(function (slot) {
+          if (picked[date][slot]) out.push({ date: date, slot: slot });
+        });
+      });
+      return out;
+    }
+
+    document.addEventListener("click", function (e) {
+      var head = e.target.closest(".day__head");
+      if (head) { head.parentNode.classList.toggle("is-open"); return; }
+
+      var slot = e.target.closest(".slot");
+      if (slot) {
+        var day = slot.dataset.day, k = slot.dataset.slot;
+        picked[day] = picked[day] || {};
+        picked[day][k] = !picked[day][k];
+        slot.classList.toggle("is-on", picked[day][k]);
+        render();
+        return;
+      }
+
+      if (e.target.id === "clear") {
+        picked = {};
+        document.querySelectorAll(".slot.is-on").forEach(function (s) { s.classList.remove("is-on"); });
+        render();
+        return;
+      }
+
+      if (e.target.id === "save") {
+        var btn = e.target;
+        btn.disabled = true; btn.textContent = "Saving\u2026";
+        post({ action: "save", mentorId: MENTOR, blocks: chosenBlocks() })
+          .then(function (j) {
+            btn.textContent = "Saved";
+            var lead = document.getElementById("lead");
+            lead.textContent = j.saved + (j.saved === 1 ? " time" : " times") +
+              " saved. Your mentee can book any of them now." +
+              (j.kept ? " " + j.kept + " already booked, left alone." : "");
+            setTimeout(function () { btn.textContent = "Save"; btn.disabled = false; }, 2500);
+          })
+          .catch(function (err) {
+            btn.textContent = "Save";
+            btn.disabled = false;
+            document.getElementById("lead").textContent = err.message;
+          });
+      }
+    });
+
+    // Named so nobody has to guess whose clock this is.
+    try {
+      document.getElementById("tz").textContent =
+        "Times are in " + Intl.DateTimeFormat().resolvedOptions().timeZone.replace(/_/g, " ") + ".";
+    } catch (err) { /* no Intl, no line */ }
+
+    // Load whatever this mentor has already offered, so the page opens showing
+    // their current availability rather than a blank grid every time.
+    if (!MENTOR) {
+      document.getElementById("lead").textContent =
+        "This link is missing its mentor code. Ask Fidel for your own link.";
+      document.getElementById("days").innerHTML = "";
+    } else {
+      post({ action: "mentor", mentorId: MENTOR })
+        .then(function (j) {
+          document.getElementById("title").textContent =
+            (j.name ? j.name.split(" ")[0] + "'s" : "Your") + " availability";
+          document.getElementById("lead").textContent =
+            "Tap the times you could take a session over the next three weeks, then save. " +
+            "Your mentee books straight from this.";
+          (j.blocks || []).forEach(function (b) {
+            picked[b.date] = picked[b.date] || {};
+            picked[b.date][b.slot] = true;
+            var el = document.querySelector('.slot[data-day="' + b.date + '"][data-slot="' + b.slot + '"]');
+            if (el) { el.classList.add("is-on"); el.closest(".day").classList.add("is-open"); }
+          });
+          render();
+        })
+        .catch(function (err) {
+          document.getElementById("lead").textContent = err.message;
+          document.getElementById("days").innerHTML = "";
+        });
+    }
+
+    render();
+  </script>
+</body>
+</html>

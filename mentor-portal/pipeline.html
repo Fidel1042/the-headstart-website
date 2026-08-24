@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mentor Pipeline – The Headstart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+  <style id="auth-gate">
+    html:not(.auth-ok) body { visibility: hidden; }
+    html:not(.auth-ok) { background: #fff; }
+  </style>
+  <link rel="stylesheet" href="portal.css" />
+  <link rel="stylesheet" href="portal-nav.css" />
+  <link rel="stylesheet" href="/mentor-portal/polish.css" />
+  <style>
+    .pl-page { max-width: 940px; margin: 0 auto; padding: 1.6rem 1.2rem 4rem; }
+    .pl-head h1 { font-size: 1.4rem; font-weight: 800; margin: 0 0 0.2rem; }
+    .pl-head p { font-size: 0.85rem; color: var(--text-muted); margin: 0 0 1.6rem; max-width: 66ch; }
+
+    .stage__title {
+      font-size: 0.66rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--accent); margin: 1.6rem 0 0.7rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .stage__count { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+    .m { border: 1px solid var(--line); border-radius: 14px; background: var(--bg-card);
+      padding: 0.9rem 1.05rem; margin-bottom: 0.6rem; }
+    .m__top { display: flex; align-items: baseline; gap: 0.7rem; flex-wrap: wrap; }
+    .m__name { font-weight: 700; font-size: 0.95rem; }
+    .m__meta { font-size: 0.74rem; color: var(--text-muted); }
+    .m__spacer { flex: 1; }
+
+    .m__row { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem; }
+    .fld { display: flex; align-items: center; gap: 0.35rem; }
+    .fld label { font-size: 0.7rem; color: var(--text-muted); }
+    select, input[type="number"], input[type="datetime-local"] {
+      font-family: inherit; font-size: 0.8rem; min-height: 36px; box-sizing: border-box;
+      padding: 0 0.55rem; border: 1px solid var(--line); border-radius: 8px;
+      background: var(--bg); color: var(--text);
+    }
+    input[type="number"] { width: 5.2rem; }
+    select:focus, input:focus { outline: none; border-color: var(--accent); }
+
+    .act {
+      font-family: inherit; font-size: 0.68rem; font-weight: 800;
+      letter-spacing: 0.04em; text-transform: uppercase;
+      min-height: 36px; padding: 0 0.85rem; box-sizing: border-box;
+      border-radius: 999px; cursor: pointer; white-space: nowrap;
+      background: transparent; color: var(--accent); border: 1px solid var(--accent-line);
+    }
+    .act:hover { background: var(--accent-soft); }
+    .act:disabled { opacity: 0.45; cursor: not-allowed; }
+    .act--send { border-color: var(--line); color: var(--text-muted); }
+    .act--send:hover:not(:disabled) { border-color: var(--accent-line); color: var(--accent); }
+    .saved { font-size: 0.72rem; color: #2e7d52; }
+    [data-theme="dark"] .saved { color: #6fd39b; }
+    .oops { font-size: 0.72rem; color: #c33; }
+
+    .state { font-size: 0.9rem; color: var(--text-muted); padding: 2rem 0; text-align: center; }
+    .quiet { font-size: 0.8rem; color: var(--text-muted); }
+    .pl-foot { font-size: 0.75rem; color: var(--text-muted); margin-top: 2rem; }
+  </style>
+</head>
+<body>
+
+  <div id="portal-nav"></div>
+
+  <main class="pl-page">
+    <div class="pl-head">
+      <h1>Mentor pipeline</h1>
+      <p>Everyone being screened or interviewed. Move someone along, set their interview
+        time, and set their rate, all from here. Once they are Hired they move to
+        Agreements.</p>
+    </div>
+
+    <p class="state" id="loading">Loading&hellip;</p>
+    <p class="state" id="error" hidden></p>
+
+    <div id="content" hidden>
+      <div id="stages"></div>
+      <p class="pl-foot" id="foot"></p>
+    </div>
+  </main>
+
+  <script type="module">
+    import { requireAuth } from "./auth.js";
+    import { mountPortalNav, initTheme } from "./portal-ui.js";
+
+    initTheme();
+
+    let ADMIN_EMAIL = "";
+    let DATA = null;
+
+    const esc = (v) => String(v == null ? "" : v)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+    // Airtable hands back UTC; the input wants local wall time with no zone.
+    function forInput(iso) {
+      if (!iso) return "";
+      const d = new Date(iso);
+      const pad = (n) => String(n).padStart(2, "0");
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}` +
+        `T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+    const readable = (iso) => iso
+      ? new Date(iso).toLocaleString("en-AU",
+          { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })
+      : "";
+
+    requireAuth((session) => {
+      const email = session?.user?.email || "";
+      const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com"];
+      if (!OWNERS.includes(email) && email !== "dev@localhost") {
+        window.location.replace("/mentor-portal/index.html");
+        return;
+      }
+      ADMIN_EMAIL = email;
+      mountPortalNav({ email, isOwner: true, active: "pipeline" });
+      load();
+    });
+
+    async function post(body) {
+      const res = await fetch("/.netlify/functions/mentor-pipeline", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ adminEmail: ADMIN_EMAIL, ...body }),
+      });
+      const text = await res.text();
+      if (text.trim().startsWith("<")) {
+        throw new Error("This page needs the live site. Preview mode cannot run " +
+          "the data function, so there is nothing to show until it is pushed.");
+      }
+      const data = JSON.parse(text);
+      if (!res.ok) throw new Error(data.error || "Could not save");
+      return data;
+    }
+
+    async function load() {
+      const loading = document.getElementById("loading");
+      const errorEl = document.getElementById("error");
+      loading.hidden = false; errorEl.hidden = true;
+      try { DATA = await post({}); }
+      catch (err) {
+        loading.hidden = true;
+        errorEl.textContent = err.message || "Could not load — refresh to try again.";
+        errorEl.hidden = false;
+        return;
+      }
+      loading.hidden = true;
+      render();
+      document.getElementById("content").hidden = false;
+    }
+
+    function card(m) {
+      const where = [m.role, m.company].filter(Boolean).join(" at ");
+      return `
+        <div class="m" data-id="${m.id}">
+          <div class="m__top">
+            <span class="m__name">${esc(m.name)}</span>
+            ${where ? `<span class="m__meta">${esc(where)}</span>` : ""}
+            <span class="m__spacer"></span>
+            ${m.interviewAt ? `<span class="m__meta">interview ${esc(readable(m.interviewAt))}</span>` : ""}
+          </div>
+          <div class="m__row">
+            <span class="fld">
+              <label>Stage</label>
+              <select data-f="status">
+                ${DATA.stages.map((s) =>
+                  `<option value="${esc(s)}"${s === m.status ? " selected" : ""}>${esc(s)}</option>`).join("")}
+              </select>
+            </span>
+            <span class="fld">
+              <label>Interview</label>
+              <input type="datetime-local" data-f="interviewAt" value="${esc(forInput(m.interviewAt))}" />
+            </span>
+            <span class="fld">
+              <label>Rate $</label>
+              <input type="number" data-f="rate" min="0" max="500" step="1"
+                     value="${m.rateSet ? m.rate : ""}" placeholder="—" />
+            </span>
+            <span class="m__spacer"></span>
+            <button type="button" class="act" data-save="${m.id}">Save</button>
+            <button type="button" class="act act--send" data-invite="${m.id}"
+                    ${m.interviewAt ? "" : "disabled"}
+                    title="${m.interviewAt ? "Emails the interview time" : "Set and save an interview time first"}">
+              ${m.inviteSent ? "Resend invite" : "Send invite"}
+            </button>
+            <span class="note" data-note="${m.id}">${m.inviteSent
+              ? `<span class="m__meta">invited ${esc(readable(m.inviteSent))}</span>` : ""}</span>
+          </div>
+        </div>`;
+    }
+
+    function render() {
+      const byStage = {};
+      DATA.pipeline.forEach((m) => { (byStage[m.status] = byStage[m.status] || []).push(m); });
+      // Furthest along first: the people closest to hiring are the ones being
+      // worked on today.
+      const order = ["Waiting on signed contract", "Second Interview", "First Interview", "Screen"];
+      document.getElementById("stages").innerHTML = order
+        .filter((s) => byStage[s])
+        .map((s) => `
+          <p class="stage__title">${esc(s)} <span class="stage__count">${byStage[s].length}</span></p>
+          ${byStage[s].map(card).join("")}`).join("")
+        || `<p class="quiet">Nobody in the pipeline. Everyone is hired or dropped.</p>`;
+
+      document.getElementById("foot").textContent =
+        `${DATA.pipeline.length} in the pipeline · ${DATA.hired} hired · ${DATA.dropped} dropped. ` +
+        `Setting someone to Hired moves them to the Agreements page, where their link lives.`;
+    }
+
+    document.addEventListener("click", async (e) => {
+      const inv = e.target.closest("[data-invite]");
+      if (inv) {
+        const row = inv.closest(".m");
+        const note = row.querySelector("[data-note]");
+        const name = row.querySelector(".m__name").textContent;
+        // An email to a real person, so it asks. Save first if the time on
+        // screen has not been written yet, or the invite quotes the old one.
+        if (!confirm(`Email ${name} their interview invitation?\n\n` +
+            `It uses the interview time that is saved, so hit Save first if you just changed it.`)) return;
+        inv.disabled = true;
+        const was = inv.textContent;
+        inv.textContent = "Sending…";
+        note.textContent = "";
+        try {
+          const res = await post({ action: "invite", mentorId: inv.dataset.invite });
+          note.className = "saved";
+          note.textContent = `Invited for ${res.when}`;
+          inv.textContent = "Resend invite";
+        } catch (err) {
+          note.className = "oops";
+          note.textContent = err.message;
+          inv.textContent = was;
+        } finally { inv.disabled = false; }
+        return;
+      }
+
+      const btn = e.target.closest("[data-save]");
+      if (!btn) return;
+      const row = btn.closest(".m");
+      const note = row.querySelector("[data-note]");
+      const get = (f) => row.querySelector(`[data-f="${f}"]`).value;
+
+      btn.disabled = true;
+      const original = btn.textContent;
+      btn.textContent = "Saving…";
+      note.textContent = "";
+      try {
+        const res = await post({
+          action: "update", mentorId: btn.dataset.save,
+          status: get("status"),
+          rate: get("rate") === "" ? 0 : get("rate"),
+          // datetime-local has no zone, so it is read as this browser's local
+          // time, which is the time Fidel just typed.
+          interviewAt: get("interviewAt") ? new Date(get("interviewAt")).toISOString() : "",
+        });
+        note.className = "saved";
+        note.textContent = res.mentor.status === "Hired"
+          ? "Hired — now on Agreements" : "Saved";
+        // A hired mentor no longer belongs on this page, so reload rather than
+        // leaving a row that is no longer in the pipeline.
+        if (res.mentor.status === "Hired" || res.mentor.status === "Dropped") {
+          setTimeout(load, 900);
+        }
+      } catch (err) {
+        note.className = "oops";
+        note.textContent = err.message;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = original;
+      }
+    });
+  </script>
+</body>
+</html>

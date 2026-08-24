@@ -30,6 +30,7 @@ export const NAV_AREAS = [
     // worked every day. Follow-ups is a weekly sweep.
     links: [
       { href: "/mentor-portal/contacts.html", label: "Contacts to add", page: "contacts" },
+      { href: "/mentor-portal/assign.html", label: "Assign mentees", page: "assign" },
       { href: "/mentor-portal/followups.html", label: "Follow-ups", page: "followups" },
     ],
   },
@@ -47,6 +48,8 @@ export const NAV_AREAS = [
       { href: "/mentor-portal/admin.html?view=overview", label: "Big picture", page: "big-picture" },
       { href: "/mentor-portal/admin.html?view=performance", label: "Detailed performance", page: "performance" },
       { href: "/mentor-portal/admin.html?view=calendar", label: "Calendar", page: "calendar" },
+      { href: "/mentor-portal/pipeline.html", label: "Pipeline", page: "pipeline" },
+      { href: "/mentor-portal/agreements.html", label: "Agreements", page: "agreements" },
       { href: "/mentor-portal/onboarding-plan.html", label: "Onboarding plan", page: "onboarding-plan" },
       { href: "/mentor-portal/onboarding-call.html", label: "Onboarding call", page: "onboarding-call" },
       { href: "/mentor-portal/delivery-checks.html", label: "Delivery check-in", page: "delivery-checks" },

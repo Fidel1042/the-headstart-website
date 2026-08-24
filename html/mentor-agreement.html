@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Mentor Agreement | Headstart Mentoring</title>
+  <style>
+    /* Everything in this agreement is identical for every mentor except the
+       rate, which is read from Airtable when the page loads. Changing someone's
+       pay is an edit in Airtable, not a deploy. */
+    :root {
+      --bg: #000; --card: rgba(255,255,255,0.03); --line: rgba(255,255,255,0.12);
+      --text: #f4f4f4; --muted: rgba(255,255,255,0.6);
+      --gold: #c79b3b; --gold-bright: #f0c75c; --gold-soft: rgba(199,155,59,0.14);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg); color: var(--text); line-height: 1.65;
+      padding: 2rem 1.1rem 4rem;
+    }
+    .wrap { max-width: 640px; margin: 0 auto; }
+    h1 { font-size: 1.6rem; font-weight: 800; color: var(--gold); margin-bottom: 0.4rem; }
+    .sub { color: var(--muted); font-size: 0.92rem; margin-bottom: 1.8rem; }
+
+    .terms { border: 1px solid var(--line); border-radius: 14px; background: var(--card);
+      padding: 1.2rem 1.3rem; margin-bottom: 1.5rem; }
+    .terms h2 { font-size: 0.95rem; font-weight: 800; margin: 1.2rem 0 0.4rem; }
+    .terms h2:first-child { margin-top: 0; }
+    .terms p, .terms li { font-size: 0.9rem; color: var(--muted); }
+    .terms ul { margin: 0.3rem 0 0 1.1rem; }
+    .terms strong { color: var(--text); }
+    .terms__meta {
+      font-size: 0.66rem; font-weight: 800; letter-spacing: 0.09em;
+      text-transform: uppercase; color: var(--gold); margin-bottom: 0.9rem;
+    }
+    /* A long legal document on a phone needs its own scroll, or the sign
+       button sits three thousand pixels below the fold. */
+    .terms { max-height: 60vh; overflow-y: auto; }
+
+    .pay { border: 1px solid var(--gold); background: var(--gold-soft);
+      border-radius: 14px; padding: 1.1rem 1.2rem; margin-bottom: 1.5rem; }
+    .pay__label { font-size: 0.68rem; font-weight: 800; letter-spacing: 0.09em;
+      text-transform: uppercase; color: var(--gold); }
+    .pay__rate { font-size: 1.7rem; font-weight: 800; margin: 0.25rem 0 0.2rem; }
+    .pay__note { font-size: 0.85rem; color: var(--muted); }
+
+    form { display: grid; gap: 1rem; }
+    label { display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.3rem; }
+    input[type="text"], input[type="email"], input[type="date"] {
+      width: 100%; min-height: 48px; padding: 0 0.9rem;
+      border: 1px solid var(--line); border-radius: 10px;
+      background: rgba(255,255,255,0.04); color: var(--text);
+      font: inherit; font-size: 0.95rem;
+    }
+    input:focus { outline: none; border-color: var(--gold); }
+    .check { display: flex; gap: 0.6rem; align-items: flex-start; font-size: 0.88rem; }
+    .check input { width: 1.1rem; height: 1.1rem; margin-top: 0.25rem; accent-color: var(--gold); }
+    .submit {
+      min-height: 52px; border: none; border-radius: 999px;
+      background: linear-gradient(135deg, #fdf5c4, #f7d37d 45%, #c08a2d);
+      color: #2b1b09; font: inherit; font-weight: 800; font-size: 0.95rem; cursor: pointer;
+    }
+    .submit:disabled { opacity: 0.45; cursor: not-allowed; }
+    .err { color: #ff8b8b; font-size: 0.85rem; }
+    .bank {
+      display: grid; gap: 1rem;
+      border: 1px solid var(--line); border-radius: 14px;
+      background: var(--card); padding: 1.1rem 1.2rem;
+    }
+    .bank__title { font-size: 0.9rem; font-weight: 800; }
+    .bank__note { font-size: 0.8rem; color: var(--muted); margin-top: -0.6rem; }
+    .honeypot { position: absolute; left: -9999px; }
+    .state { color: var(--muted); font-size: 0.92rem; padding: 2rem 0; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Mentor Agreement</h1>
+    <p class="sub" id="sub">Loading&hellip;</p>
+
+    <p class="state" id="gate"></p>
+
+    <div id="content" hidden>
+      <div class="pay">
+        <div class="pay__label">Your rate</div>
+        <div class="pay__rate" id="rate"></div>
+        <div class="pay__note">Paid weekly in arrears. See clause 6.</div>
+      </div>
+
+      <div class="terms">
+        <p class="terms__meta">The Headstart &middot; Mentor Contractor Agreement &middot; Confidential</p>
+
+        <h2>1. Background</h2>
+        <p>A. We are of the opinion that you have the necessary qualifications, experience, and abilities to provide mentoring services to The Headstart.</p>
+        <p>B. You agree to provide such services on the terms and conditions set out in this Agreement.</p>
+        <p>C. This Agreement supersedes any prior discussion, agreement, or understanding relating to its subject matter.</p>
+        <p>D. If any provision of this Agreement is unenforceable, illegal, or void, that provision will be severed and the remaining provisions will continue in force.</p>
+
+        <h2>2. Capacity / independent contractor</h2>
+        <p>2.1 In providing the services under this Agreement, you act strictly as an independent contractor and not as an employee, partner, or agent of The Headstart.</p>
+        <p>2.2 Nothing in this Agreement creates a relationship of employment, partnership, or joint venture.</p>
+        <p>2.3 You are solely responsible for all taxation, superannuation, insurance, and statutory obligations arising from payments made under this Agreement.</p>
+        <p>2.4 You have no authority to bind or represent The Headstart unless expressly authorised in writing.</p>
+
+        <h2>3. Position</h2>
+        <p>3.1 You are engaged as a Mentor, or such other role as may be agreed in writing from time to time.</p>
+        <p>3.2 You will provide services independently and, where required, in collaboration with representatives of The Headstart.</p>
+
+        <h2>4. Commencement</h2>
+        <p>This Agreement commences on the date set out in Item 1 of the Schedule.</p>
+
+        <h2>5. Responsibilities</h2>
+        <p>5.1 Your role and responsibilities are described in Item 2 of the Schedule and may be varied by us from time to time.</p>
+        <p>5.2 In performing your duties, you must:</p>
+        <ul>
+          <li>(a) promote our interests;</li>
+          <li>(b) protect and promote our reputation;</li>
+          <li>(c) avoid acting in conflict with our interests;</li>
+          <li>(d) act honestly, diligently, and professionally; and</li>
+          <li>(e) perform the services to the best of your skill and ability.</li>
+        </ul>
+        <p>5.3 We may direct you to perform or refrain from performing any part of your duties at any time.</p>
+
+        <h2>6. Method and frequency of payment</h2>
+        <p>6.1 You will be paid at the rate agreed in writing and set out in Item 3 of the Schedule.</p>
+        <p>6.2 You must submit an invoice in accordance with our invoicing process. We may provide an invoice template or system for this purpose.</p>
+        <p>6.3 Payment will be made weekly in arrears.</p>
+        <p>6.4 No payment is owed for services not delivered or not approved by us.</p>
+
+        <h2>7. Expenses</h2>
+        <p>7.1 You are responsible for all expenses incurred in connection with providing the services.</p>
+        <p>7.2 No expenses will be reimbursed unless pre-approved by us in writing.</p>
+
+        <h2>8. Term and termination</h2>
+        <p>8.1 This Agreement remains in force until terminated in accordance with this clause.</p>
+        <p>8.2 Either party may terminate this Agreement by providing 14 days&rsquo; written notice.</p>
+        <p>8.3 We may terminate this Agreement immediately if you:</p>
+        <ul>
+          <li>(a) breach any material provision of this Agreement;</li>
+          <li>(b) breach confidentiality obligations;</li>
+          <li>(c) engage in misconduct or behaviour that may damage our reputation;</li>
+          <li>(d) solicit or attempt to solicit our clients or students; or</li>
+          <li>(e) otherwise act contrary to our interests.</li>
+        </ul>
+        <p>8.4 Upon termination, your obligations under clauses relating to confidentiality, intellectual property, Resource Packs, and non-solicitation continue.</p>
+
+        <h2>9. Our property</h2>
+        <p>9.1 All property belonging to The Headstart remains our property at all times.</p>
+        <p>9.2 Our property includes, without limitation, Confidential Information, Intellectual Property, Resource Packs, documents, records, and data in any form.</p>
+        <p>9.3 Upon request or termination, you must immediately return or permanently delete all such property.</p>
+
+        <h2>10. Confidential information</h2>
+        <p>10.1 You must keep confidential all information relating to The Headstart, its students, mentors, operations, systems, pricing, and business affairs (&ldquo;Confidential Information&rdquo;).</p>
+        <p>10.2 Confidential Information must not be disclosed or used except as required to perform the services or as required by law.</p>
+        <p>10.3 Any breach of this clause constitutes serious misconduct and grounds for immediate termination.</p>
+        <p>10.4 This clause continues indefinitely after termination.</p>
+
+        <h2>11. Intellectual property</h2>
+        <p>11.1 All Intellectual Property created, developed, or conceived by you in the course of or arising out of your services is the exclusive property of The Headstart.</p>
+        <p>11.2 This applies whether created alone or jointly, during or outside working hours.</p>
+        <p>11.3 You must immediately disclose any such Intellectual Property to us.</p>
+        <p>11.4 You assign all rights, title, and interest in that Intellectual Property to The Headstart and must do all acts necessary to perfect that ownership.</p>
+        <p>11.5 You must not use, reproduce, or distribute that Intellectual Property without our prior written consent.</p>
+        <p>11.6 This clause continues after termination.</p>
+
+        <h2>12. Resource Packs and materials</h2>
+        <p>12.1 &ldquo;Resource Packs&rdquo; means any guides, frameworks, templates, slide decks, worksheets, session plans, video or audio content, written materials, and any other resources produced, curated, or branded by The Headstart for use in connection with the mentoring services, in any format (digital or physical), and whether complete or in development.</p>
+        <p>12.2 The Headstart may make Resource Packs available to you for use in your sessions with students. Where we direct you to use a Resource Pack in a particular way, you must do so.</p>
+        <p>12.3 Resource Packs are Confidential Information and remain the exclusive property of The Headstart at all times. Clauses 10 and 11 apply to Resource Packs in full.</p>
+        <p>12.4 You must not:</p>
+        <ul>
+          <li>(a) copy, distribute, share, publish, sell, or sublicense any Resource Pack to any person other than students engaged through The Headstart for the purpose of delivering the services;</li>
+          <li>(b) use any Resource Pack to deliver services outside this Agreement, including to students or clients not engaged through The Headstart; or</li>
+          <li>(c) modify, rebrand, or present any Resource Pack as your own work or as the work of any other person or organisation.</li>
+        </ul>
+        <p>12.5 If you create, improve, contribute to, or develop any Resource Pack (or any part of one) in the course of or arising out of your services, that contribution forms part of the Resource Pack and is owned by The Headstart in accordance with Clause 11.</p>
+        <p>12.6 On request, or on termination of this Agreement, you must immediately return or permanently delete all Resource Packs and any copies, derivatives, or extracts of them in your possession or control.</p>
+        <p>12.7 This clause continues indefinitely after termination.</p>
+
+        <h2>13. Non-solicitation</h2>
+        <p>13.1 During the term of this Agreement and for 12 months after termination, you must not directly or indirectly:</p>
+        <ul>
+          <li>(a) solicit, induce, or attempt to solicit any student or client of The Headstart;</li>
+          <li>(b) provide services to any student or client introduced to you through The Headstart outside of this Agreement; or</li>
+          <li>(c) induce any contractor or mentor of The Headstart to cease their engagement.</li>
+        </ul>
+
+        <h2>14. General</h2>
+        <p>14.1 This Agreement may only be amended in writing signed by both parties.</p>
+        <p>14.2 You may not assign or transfer your obligations without our prior written consent.</p>
+        <p>14.3 This Agreement is governed by the laws of Australia, and where applicable, the laws of New South Wales.</p>
+        <p>14.4 Each party agrees to do all things reasonably necessary to give effect to this Agreement.</p>
+
+        <h2>15. Marketing &amp; publicity consent</h2>
+        <p>15.1 You consent to The Headstart using your name, photograph, professional background, and general career information for marketing and promotional purposes, including but not limited to use on our website, social media platforms (including Instagram and LinkedIn), and other promotional materials.</p>
+        <p>15.2 Such use will be limited to representing you as a Mentor of The Headstart and will not include disclosure of confidential or sensitive personal information.</p>
+        <p>15.3 You may withdraw this consent at any time by providing written notice. Withdrawal will apply to future publications only and will not require removal of previously published content.</p>
+
+        <h2>Schedule</h2>
+        <p><strong>Item 1 &ndash; Commencement date.</strong> The date you sign below.</p>
+        <p><strong>Item 2 &ndash; Role description.</strong> Mentor, provision of 1:1 mentoring sessions to students of The Headstart, using The Headstart&rsquo;s Resource Packs and materials as directed, and contributing to the development of Resource Packs where requested.</p>
+        <p><strong>Item 3 &ndash; Rate.</strong> <span id="schedule-rate"></span></p>
+      </div>
+
+      <form class="agreement-form" id="form" name="mentor-agreement" method="POST"
+            data-netlify="true" netlify-honeypot="bot-field" action="/mentor-agreement-submitted">
+        <input type="hidden" name="form-name" value="mentor-agreement" />
+        <input type="hidden" name="agreement_version" value="Mentor Contractor Agreement v1.0 (25/08/2026)" />
+        <input type="hidden" name="mentor_id" id="f-id" />
+        <!-- The rate is submitted too, so the record shows what was actually
+             agreed to rather than whatever Airtable says months later. -->
+        <input type="hidden" name="rate_agreed" id="f-rate" />
+
+        <p class="honeypot"><label>Don't fill this out if you're human: <input name="bot-field" /></label></p>
+
+        <div>
+          <label for="f-name">Full name</label>
+          <input type="text" id="f-name" name="full_name" required autocomplete="name" />
+        </div>
+        <div>
+          <label for="f-email">Email</label>
+          <input type="email" id="f-email" name="email" required autocomplete="email" />
+        </div>
+        <div>
+          <label for="f-sign">Signature (type your full name)</label>
+          <input type="text" id="f-sign" name="signature" required />
+        </div>
+        <div>
+          <label for="f-date">Date</label>
+          <input type="date" id="f-date" name="date" required />
+        </div>
+
+        <div class="bank">
+          <p class="bank__title">Where we pay you</p>
+          <p class="bank__note">Paid by bank transfer, weekly in arrears, per clause 6.
+            Australian accounts only. Check these carefully &mdash; a wrong digit means a
+            failed payment.</p>
+
+          <div>
+            <label for="f-acct-name">Account name</label>
+            <input type="text" id="f-acct-name" name="account_name" required
+                   autocomplete="off" placeholder="As it appears on your account" />
+          </div>
+          <div>
+            <label for="f-bsb">BSB</label>
+            <input type="text" id="f-bsb" name="bsb" required inputmode="numeric"
+                   autocomplete="off" placeholder="123-456" maxlength="7" />
+          </div>
+          <div>
+            <label for="f-acct">Account number</label>
+            <input type="text" id="f-acct" name="account_number" required inputmode="numeric"
+                   autocomplete="off" placeholder="12345678" maxlength="10" />
+          </div>
+        </div>
+
+        <label class="check">
+          <input type="checkbox" id="f-contractor" name="contractor_ack" value="yes" required />
+          <span>I understand I am engaged as an independent contractor, not an employee,
+            and I am responsible for my own tax.</span>
+        </label>
+
+        <label class="check">
+          <input type="checkbox" id="f-agree" name="agreed" value="yes" required />
+          <span>I acknowledge that I have read and understood this Agreement, have had the
+            opportunity to obtain independent legal advice, and accept its terms, including
+            the rate shown.</span>
+        </label>
+
+        <p class="err" id="err" aria-live="polite"></p>
+        <button type="submit" class="submit" id="f-submit">Sign agreement</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    var ID = new URLSearchParams(location.search).get("m") || "";
+    var money = function (n) { return "$" + Number(n).toFixed(0); };
+
+    function fail(msg) {
+      document.getElementById("sub").textContent = "";
+      document.getElementById("gate").textContent = msg;
+    }
+
+    if (!ID) {
+      fail("This link is missing its code. Ask Fidel to resend your agreement link.");
+    } else {
+      fetch("/.netlify/functions/mentor-terms", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mentorId: ID })
+      })
+      .then(function (r) { return r.json().then(function (j) {
+        if (!r.ok) throw new Error(j.error || "Could not load"); return j; }); })
+      .then(function (m) {
+        // Nobody should be asked to sign a rate that has not been set.
+        if (!m.rateSet) {
+          fail("Your rate has not been set yet. Let Fidel know and he will sort it out.");
+          return;
+        }
+        document.getElementById("sub").textContent =
+          (m.name ? m.name + ", this" : "This") + " is your agreement with Headstart Mentoring. " +
+          "Read it, then sign at the bottom.";
+        document.getElementById("rate").textContent = money(m.rate) + " per 40 minute session";
+        document.getElementById("schedule-rate").textContent =
+          money(m.rate) + " per 40 minute session.";
+        document.getElementById("f-id").value = m.mentorId;
+        document.getElementById("f-rate").value = m.rate;
+        if (m.name) document.getElementById("f-name").value = m.name;
+        if (m.email) document.getElementById("f-email").value = m.email;
+        document.getElementById("f-date").value = new Date().toISOString().slice(0, 10);
+        document.getElementById("gate").textContent = "";
+        document.getElementById("content").hidden = false;
+      })
+      .catch(function (e) { fail(e.message); });
+    }
+
+    // Format the BSB as they type: everyone writes it 123-456, and a stored
+    // value that sometimes has the dash and sometimes does not is a nuisance
+    // at pay time.
+    document.getElementById("f-bsb").addEventListener("input", function (e) {
+      var v = e.target.value.replace(/\D/g, "").slice(0, 6);
+      e.target.value = v.length > 3 ? v.slice(0, 3) + "-" + v.slice(3) : v;
+    });
+    document.getElementById("f-acct").addEventListener("input", function (e) {
+      e.target.value = e.target.value.replace(/\D/g, "").slice(0, 10);
+    });
+
+    // A typed signature has to match the name, or it is not a signature.
+    document.getElementById("form").addEventListener("submit", function (e) {
+      var name = document.getElementById("f-name").value.trim().toLowerCase();
+      var sign = document.getElementById("f-sign").value.trim().toLowerCase();
+      var err = document.getElementById("err");
+      if (!sign) { e.preventDefault(); err.textContent = "Please type your signature."; return; }
+      if (name && sign !== name) {
+        e.preventDefault();
+        err.textContent = "Your signature needs to match your full name exactly.";
+        return;
+      }
+      // A wrong digit here is a failed transfer and a chase, so it is checked
+      // rather than accepted and discovered on Monday.
+      var bsb = document.getElementById("f-bsb").value.replace(/\D/g, "");
+      if (bsb.length !== 6) {
+        e.preventDefault();
+        err.textContent = "A BSB is 6 digits, like 123-456.";
+        document.getElementById("f-bsb").focus();
+        return;
+      }
+      var acct = document.getElementById("f-acct").value.replace(/\D/g, "");
+      if (acct.length < 5 || acct.length > 10) {
+        e.preventDefault();
+        err.textContent = "An account number is between 5 and 10 digits.";
+        document.getElementById("f-acct").focus();
+        return;
+      }
+      err.textContent = "";
+      document.getElementById("f-submit").disabled = true;
+      document.getElementById("f-submit").textContent = "Sending…";
+    });
+  </script>
+</body>
+</html>

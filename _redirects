@@ -7,6 +7,8 @@
 /job-application /html/job-application.html 200
 /mentor-role /html/mentor-role.html 200
 /mentor-application /html/mentor-application.html 200
+/mentor-agreement /html/mentor-agreement.html 200
+/mentor-agreement-submitted /html/mentor-agreement-submitted.html 200
 /mentee-agreement /html/mentee-agreement.html 200
 /mentee-agreement-popup /html/mentee-agreement-popup.html 200
 /mentee-agreement-submitted /html/mentee-agreement-submitted.html 200
@@ -20,6 +22,8 @@
 /mentor-onboarding/professional-standards /html/mentor-onboarding-professional-standards.html 200
 /mentor-onboarding/extra-services /html/mentor-onboarding-extra-services.html 200
 /mentor-onboarding/teachworks-payment /html/mentor-onboarding-teachworks-payment.html 200
+/availability /html/availability.html 200
+/book-session /html/book-session.html 200
 /reviews /html/reviews.html 200
 /job-alerts /html/job-alerts.html 200
 /job-alerts-signup /html/job-alerts-signup.html 200

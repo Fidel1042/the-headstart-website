@@ -12,6 +12,12 @@ initTheme();
 const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com"];
 const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1";
 const NAME_PREFIX = "THS Mentee - ";
+const SITE = "https://theheadstartmentoring.com";
+
+// The two halves of the shared calendar. Both get pasted into the same
+// WhatsApp group at onboarding: the mentor puts times up, the mentee books one.
+const availabilityLink = (c) => `${SITE}/availability?m=${c.mentorId}`;
+const bookingLink = (c) => `${SITE}/book-session?c=${c.id}`;
 let ownerEmail = "";
 const byId = new Map();
 
@@ -114,6 +120,10 @@ function card(c, kind) {
         ${(c.messages || []).map((m, i) =>
           `<button type="button" class="c-btn" data-act="copymsg" data-id="${c.id}" data-msg="${i}"
              title="${esc(m.when || "")}">Copy ${esc(m.label)}</button>`).join("")}
+        ${c.mentorId ? `<button type="button" class="c-btn" data-act="copyavail" data-id="${c.id}"
+          title="Send this to the mentor">Mentor availability link</button>` : ""}
+        <button type="button" class="c-btn" data-act="copybook" data-id="${c.id}"
+          title="Send this to the mentee">Mentee booking link</button>
         <a class="c-btn c-btn--msg${hasPhone ? "" : " is-disabled"}" ${hasPhone ? `href="https://wa.me/${c.phone}" target="_blank" rel="noopener"` : 'aria-disabled="true"'}>Message</a>
         <button type="button" class="c-btn c-btn--done" data-act="done" data-id="${c.id}" data-kind="${kind}">Mark done</button>
       </div>
@@ -227,6 +237,8 @@ document.querySelector(".contacts-page").addEventListener("click", (e) => {
     if (m) copyToClipboard(btn, m.text);
   }
   if (btn.dataset.act === "copyask" && c) copyToClipboard(btn, mentorAsk(c));
+  if (btn.dataset.act === "copyavail" && c) copyToClipboard(btn, availabilityLink(c));
+  if (btn.dataset.act === "copybook" && c) copyToClipboard(btn, bookingLink(c));
   if (btn.dataset.act === "done") markDone(btn.dataset.id, btn.dataset.kind, btn);
 });
 

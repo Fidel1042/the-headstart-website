@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <title>Assign Mentees – The Headstart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+  <style id="auth-gate">
+    html:not(.auth-ok) body { visibility: hidden; }
+    html:not(.auth-ok) { background: #fff; }
+  </style>
+  <link rel="stylesheet" href="portal.css" />
+  <link rel="stylesheet" href="portal-nav.css" />
+  <link rel="stylesheet" href="/mentor-portal/polish.css" />
+  <style>
+    .as-page { max-width: 940px; margin: 0 auto; padding: 1.6rem 1.2rem 4rem; }
+    .as-head h1 { font-size: 1.4rem; font-weight: 800; margin: 0 0 0.2rem; }
+    .as-head p { font-size: 0.85rem; color: var(--text-muted); margin: 0 0 1.6rem; max-width: 66ch; }
+
+    .grp__title {
+      font-size: 0.66rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--accent); margin: 1.6rem 0 0.7rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .grp__count { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+    .m { border: 1px solid var(--line); border-radius: 14px; background: var(--bg-card);
+      padding: 0.9rem 1.05rem; margin-bottom: 0.6rem; }
+    .m__top { display: flex; align-items: baseline; gap: 0.7rem; flex-wrap: wrap; }
+    .m__name { font-weight: 700; font-size: 0.95rem; }
+    .m__meta { font-size: 0.74rem; color: var(--text-muted); }
+    .m__spacer { flex: 1; }
+    .m__warn { font-size: 0.74rem; color: #c33; }
+
+    .m__row { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem; }
+    .fld { display: flex; align-items: center; gap: 0.35rem; }
+    .fld label { font-size: 0.7rem; color: var(--text-muted); }
+    select {
+      font-family: inherit; font-size: 0.8rem; min-height: 36px; box-sizing: border-box;
+      padding: 0 0.55rem; border: 1px solid var(--line); border-radius: 8px;
+      background: var(--bg); color: var(--text); max-width: 15rem;
+    }
+    select:focus { outline: none; border-color: var(--accent); }
+
+    .act {
+      font-family: inherit; font-size: 0.68rem; font-weight: 800;
+      letter-spacing: 0.04em; text-transform: uppercase;
+      min-height: 36px; padding: 0 0.85rem; box-sizing: border-box;
+      border-radius: 999px; cursor: pointer; white-space: nowrap;
+      background: transparent; color: var(--accent); border: 1px solid var(--accent-line);
+    }
+    .act:hover:not(:disabled) { background: var(--accent-soft); }
+    .act:disabled { opacity: 0.45; cursor: not-allowed; }
+    .act--send { border-color: var(--line); color: var(--text-muted); }
+    .act--send:hover:not(:disabled) { border-color: var(--accent-line); color: var(--accent); }
+    .saved { font-size: 0.72rem; color: #2e7d52; }
+    [data-theme="dark"] .saved { color: #6fd39b; }
+    .oops { font-size: 0.72rem; color: #c33; }
+
+    .plan {
+      margin-top: 0.7rem; font-size: 0.78rem; line-height: 1.55; color: var(--text-muted);
+      white-space: pre-wrap; border-left: 1px solid var(--line); padding-left: 0.8rem;
+      max-height: 7.5rem; overflow: auto;
+    }
+    .plan--missing { color: #c33; border-left-color: #c33; }
+
+    .older { margin-top: 1.8rem; }
+    .older > summary {
+      cursor: pointer; font-size: 0.66rem; font-weight: 800; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.7rem;
+      min-height: 36px; display: flex; align-items: center;
+    }
+    .older > summary:hover { color: var(--accent); }
+
+    .state { font-size: 0.9rem; color: var(--text-muted); padding: 2rem 0; text-align: center; }
+    .quiet { font-size: 0.8rem; color: var(--text-muted); }
+    .as-foot { font-size: 0.75rem; color: var(--text-muted); margin-top: 2rem; }
+  </style>
+</head>
+<body>
+
+  <div id="portal-nav"></div>
+
+  <main class="as-page">
+    <div class="as-head">
+      <h1>Assign mentees</h1>
+      <p>Every signed mentee and who is mentoring them. Assigning is one step and
+        emailing the mentor is another, so fixing a wrong pick never sends a
+        second email. The email body is the Suggested Plan from the mentee&rsquo;s
+        Airtable record.</p>
+    </div>
+
+    <p class="state" id="loading">Loading&hellip;</p>
+    <p class="state" id="error" hidden></p>
+
+    <div id="content" hidden>
+      <div id="groups"></div>
+      <p class="as-foot" id="foot"></p>
+    </div>
+  </main>
+
+  <script type="module">
+    import { requireAuth } from "./auth.js";
+    import { mountPortalNav, initTheme } from "./portal-ui.js";
+
+    initTheme();
+
+    let ADMIN_EMAIL = "";
+    let DATA = null;
+
+    const esc = (v) => String(v == null ? "" : v)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+    const readable = (iso) => iso
+      ? new Date(iso).toLocaleString("en-AU",
+          { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })
+      : "";
+
+    requireAuth((session) => {
+      const email = session?.user?.email || "";
+      const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com"];
+      if (!OWNERS.includes(email) && email !== "dev@localhost") {
+        window.location.replace("/mentor-portal/index.html");
+        return;
+      }
+      ADMIN_EMAIL = email;
+      mountPortalNav({ email, isOwner: true, active: "assign" });
+      load();
+    });
+
+    async function post(body) {
+      const res = await fetch("/.netlify/functions/assign-mentee", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ adminEmail: ADMIN_EMAIL, ...body }),
+      });
+      const text = await res.text();
+      if (text.trim().startsWith("<")) {
+        throw new Error("This page needs the live site. Preview mode cannot run " +
+          "the data function, so there is nothing to show until it is pushed.");
+      }
+      const data = JSON.parse(text);
+      if (!res.ok) throw new Error(data.error || "Could not save");
+      return data;
+    }
+
+    async function load() {
+      const loading = document.getElementById("loading");
+      const errorEl = document.getElementById("error");
+      loading.hidden = false; errorEl.hidden = true;
+      try { DATA = await post({}); }
+      catch (err) {
+        loading.hidden = true;
+        errorEl.textContent = err.message || "Could not load — refresh to try again.";
+        errorEl.hidden = false;
+        return;
+      }
+      loading.hidden = true;
+      render();
+      document.getElementById("content").hidden = false;
+    }
+
+    function card(m) {
+      const where = [m.university, m.major].filter(Boolean).join(", ");
+      const hasPlan = Boolean((m.plan || "").trim());
+      return `
+        <div class="m" data-id="${m.id}">
+          <div class="m__top">
+            <span class="m__name">${esc(m.name)}</span>
+            ${where ? `<span class="m__meta">${esc(where)}</span>` : ""}
+            ${m.industry ? `<span class="m__meta">&rarr; ${esc(m.industry)}</span>` : ""}
+            <span class="m__spacer"></span>
+            ${m.linkedin ? "" : `<span class="m__warn">no LinkedIn on file</span>`}
+            ${m.staleMentor ? `<span class="m__warn">mentor is no longer hired</span>` : ""}
+          </div>
+          <div class="m__row">
+            <span class="fld">
+              <label>Mentor</label>
+              <select data-f="mentor">
+                <option value="">Nobody yet</option>
+                ${DATA.mentors.map((x) =>
+                  `<option value="${esc(x.id)}"${x.id === m.mentorId ? " selected" : ""}>${esc(x.name)}${x.industry ? ` (${esc(x.industry)})` : ""}</option>`).join("")}
+              </select>
+            </span>
+            <span class="m__spacer"></span>
+            <button type="button" class="act" data-save="${m.id}">Save</button>
+            <button type="button" class="act act--send" data-send="${m.id}"
+                    ${m.mentorId && hasPlan ? "" : "disabled"}
+                    title="${!m.mentorId ? "Assign a mentor and save first"
+                            : !hasPlan ? "Write a Suggested Plan in Airtable first"
+                            : "Emails the mentor this mentee's plan and LinkedIn"}">
+              ${m.sent ? "Resend info" : "Send info"}
+            </button>
+            <span class="note" data-note="${m.id}">${m.sent
+              ? `<span class="m__meta">sent ${esc(readable(m.sent))}</span>` : ""}</span>
+          </div>
+          <div class="plan${hasPlan ? "" : " plan--missing"}">${hasPlan
+            ? esc(m.plan) : "No Suggested Plan yet. That field is the whole email body."}</div>
+        </div>`;
+    }
+
+    function render() {
+      const groups = [
+        ["Waiting on a mentor", DATA.waiting],
+        ["Assigned", DATA.assigned],
+      ].filter(([, list]) => list.length);
+
+      const settled = DATA.settled || [];
+      // Everyone paired before this page existed. Their mentor was emailed by
+      // the old Airtable automation, so they are out of the way by default and
+      // only there to be reassigned.
+      const older = settled.length
+        ? `<details class="older">
+             <summary>Already with a mentor from before (${settled.length})</summary>
+             ${settled.map(card).join("")}
+           </details>`
+        : "";
+
+      document.getElementById("groups").innerHTML =
+        (groups.map(([title, list]) => `
+          <p class="grp__title">${esc(title)} <span class="grp__count">${list.length}</span></p>
+          ${list.map(card).join("")}`).join("") + older)
+        || `<p class="quiet">No signed mentees yet.</p>`;
+
+      const unsent = DATA.assigned.filter((m) => !m.sent).length;
+      document.getElementById("foot").textContent =
+        `${DATA.waiting.length} waiting on a mentor · ${unsent} assigned but not yet emailed · ` +
+        `${settled.length} paired before this page existed. ` +
+        `Changing somebody's mentor puts them back in the list to email.`;
+    }
+
+    document.addEventListener("click", async (e) => {
+      const send = e.target.closest("[data-send]");
+      if (send) {
+        const row = send.closest(".m");
+        const note = row.querySelector("[data-note]");
+        const name = row.querySelector(".m__name").textContent;
+        const mentor = row.querySelector('[data-f="mentor"]');
+        const to = mentor.options[mentor.selectedIndex].textContent;
+        // An email to a real person, so it asks. It uses the saved mentor, not
+        // whatever the dropdown shows right now.
+        if (!confirm(`Email ${to.split(" (")[0]} the details for ${name}?\n\n` +
+            `It uses the mentor that is saved, so hit Save first if you just changed it.`)) return;
+        send.disabled = true;
+        const was = send.textContent;
+        send.textContent = "Sending…";
+        note.textContent = "";
+        try {
+          const res = await post({ action: "send", menteeId: send.dataset.send });
+          note.className = "saved";
+          note.textContent = `Sent to ${res.to}`;
+          send.textContent = "Resend info";
+        } catch (err) {
+          note.className = "oops";
+          note.textContent = err.message;
+          send.textContent = was;
+        } finally { send.disabled = false; }
+        return;
+      }
+
+      const btn = e.target.closest("[data-save]");
+      if (!btn) return;
+      const row = btn.closest(".m");
+      const note = row.querySelector("[data-note]");
+      const picked = row.querySelector('[data-f="mentor"]').value;
+
+      btn.disabled = true;
+      const original = btn.textContent;
+      btn.textContent = "Saving…";
+      note.textContent = "";
+      try {
+        const res = await post({ action: "assign", menteeId: btn.dataset.save, mentorId: picked });
+        note.className = "saved";
+        note.textContent = res.mentee.mentorId ? "Saved" : "Mentor cleared";
+        // The row belongs in the other group now, so reload rather than leaving
+        // it under a heading that no longer describes it.
+        setTimeout(load, 900);
+      } catch (err) {
+        note.className = "oops";
+        note.textContent = err.message;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = original;
+      }
+    });
+  </script>
+</body>
+</html>

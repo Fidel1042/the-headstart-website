@@ -87,9 +87,14 @@ exports.handler = async (event) => {
     ]);
 
     const mentorName = new Map();
+    const mentorId = new Map();
     mentorRecs.forEach((r) => {
       const e = (r.fields["Email"] || "").toLowerCase().trim();
-      if (e) mentorName.set(e, r.fields["Name"] || e);
+      if (!e) return;
+      mentorName.set(e, r.fields["Name"] || e);
+      // Carried through so the portal can build that mentor's availability
+      // link without a second lookup.
+      mentorId.set(e, r.id);
     });
 
     const shape = (r) => {
@@ -104,6 +109,7 @@ exports.handler = async (event) => {
         modified: f["Last Modified"] || "",
         messages: draftMessages(f["Drafts"] || ""),
         industry: shortIndustry(f["Target Industry"] || ""),
+        mentorId: mentorEmail ? (mentorId.get(mentorEmail) || "") : "",
       };
     };
     const newestFirst = (a, b) => (b.modified || "").localeCompare(a.modified || "");

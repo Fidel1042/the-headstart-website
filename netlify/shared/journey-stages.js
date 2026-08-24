@@ -328,36 +328,51 @@ function consultation(clients, email, today, from) {
   };
 }
 
-/** 3. The close. Signing, and how long the first session took to happen. */
+/**
+ * 3. The close.
+ *
+ * A close is dated from when the mentee's label became "Acquired", not from
+ * the call and not from the first lesson. Those are different days: a call on
+ * 30 July can become a close on 14 August, and a first lesson can be a week
+ * after that again. Only the label says "they signed".
+ */
 function close(clients, byMentee, today, from) {
-  // Only people who actually had the call can be closed, which is the same
-  // denominator as the Airtable Close Rate formula.
+  const inWindow = (d) => d && d >= from && d < today;
+  const signed = clients.filter((c) => c.pipeline === "Acquired" && inWindow(c.changed));
+  const lost = clients.filter((c) => c.pipeline === "Dropped" && inWindow(c.changed));
+
+  // The calls held in the same window, as the denominator. The two cohorts do
+  // not perfectly overlap, since a close this week can come from a call last
+  // month, so the rate is a period rate rather than a cohort one. That is the
+  // useful reading for "how did this month go" and it is capped, because a
+  // backlog clearing can otherwise print more closes than calls.
   const { showed } = splitCalls(clients, today, from);
-  const acquired = showed.filter((c) => c.pipeline === "Acquired");
-  const dropped = showed.filter((c) => c.pipeline === "Dropped");
+  const rate = Math.min(100, pct(signed.length, showed.length));
 
   const gaps = [];
-  acquired.forEach((c) => {
-    if (!c.meeting) return;
+  signed.forEach((c) => {
     const s = byMentee[c.id] || byMentee[c.name.trim().toLowerCase()];
-    if (!s || !s.length) return;
-    const g = days(c.meeting, s[0]);
+    if (!s || !s.length || !c.changed) return;
+    const g = days(c.changed, s[0]);
     if (g >= -1 && g < 180) gaps.push(g);
   });
 
   return {
     key: "close",
     label: "Close",
-    raw: { showed: showed.length, acquired: acquired.length, started: gaps.length },
-    headline: `${pct(acquired.length, showed.length)}% convert`,
-    sub: gaps.length ? `${median(gaps)} days to the first session` : "No matched first sessions",
+    raw: { showed: showed.length, acquired: signed.length, started: gaps.length },
+    headline: `${rate}% convert`,
+    sub: `${signed.length} signed, ${showed.length} call${showed.length === 1 ? "" : "s"} held`,
     stats: [
-      { label: "Signed up", value: acquired.length },
-      { label: "Said no", value: dropped.length, lowerIsBetter: true },
-      { label: "Close rate", value: `${pct(acquired.length, showed.length)}%`,
-        note: `${acquired.length} of ${showed.length} who showed` },
-      { label: "Median days to first session", value: median(gaps) ?? "—", lowerIsBetter: true },
-      { label: "Slowest start", value: gaps.length ? `${Math.max(...gaps)} days` : "—", lowerIsBetter: true },
+      { label: "Signed up", value: signed.length, note: "label moved to Acquired" },
+      { label: "Said no", value: lost.length, note: "label moved to Dropped", lowerIsBetter: true },
+      { label: "Close rate", value: `${rate}%`,
+        note: `${signed.length} signed against ${showed.length} calls held` },
+      { label: "Median days to first session", value: median(gaps) ?? "—",
+        note: gaps.length ? `from signing, ${gaps.length} matched` : "none started yet",
+        lowerIsBetter: true },
+      { label: "Slowest start", value: gaps.length ? `${Math.max(...gaps)} days` : "—",
+        lowerIsBetter: true },
     ],
   };
 }
