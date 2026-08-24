@@ -109,4 +109,26 @@ const eventFilter = (names) => ({
   filter: { fieldName: "eventName", inListFilter: { values: names } },
 });
 
-module.exports = { ga4Token, runReport, dateRange, eventFilter, normalizePrivateKey };
+/**
+ * Run report requests a few at a time.
+ *
+ * GA4 caps CONCURRENT requests per property (10), not just requests per day.
+ * Firing a whole dashboard at once with Promise.all quietly blows that cap and
+ * some queries come back as errors, which reads downstream as "no data" rather
+ * than as a failure. Four at a time stays well inside the cap and costs about
+ * a second.
+ */
+async function runAll(tasks, limit = 4) {
+  const out = new Array(tasks.length);
+  let next = 0;
+  const workers = Array.from({ length: Math.min(limit, tasks.length) }, async () => {
+    while (next < tasks.length) {
+      const i = next++;
+      out[i] = await tasks[i]();
+    }
+  });
+  await Promise.all(workers);
+  return out;
+}
+
+module.exports = { ga4Token, runReport, dateRange, eventFilter, normalizePrivateKey, runAll };

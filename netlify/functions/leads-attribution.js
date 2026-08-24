@@ -7,7 +7,7 @@
 // dependencies. Node's crypto does the RS256 signing.
 
 const {
-  ga4Token, runReport, dateRange, eventFilter, normalizePrivateKey,
+  ga4Token, runReport, dateRange, eventFilter, normalizePrivateKey, runAll,
 } = require("../shared/ga4");
 
 const headers = {
@@ -234,9 +234,10 @@ async function gather(days, offset = 0) {
     const token = await ga4Token(GA4_CLIENT_EMAIL, GA4_PRIVATE_KEY);
     const P = GA4_PROPERTY_ID;
 
-    const [visitors, conversions, campaigns, weekly, linkUrlRows, ratioRows, sessionRows, sessionWeekly, linkClicks] = await Promise.all([
+    // NOTE: this order must match the order of the queries below exactly.
+    const [visitors, conversions, campaigns, weekly, linkUrlRows, totalRows, ratioRows, sessionRows, sessionWeekly, linkClicks] = await runAll([
       // People arriving, by original source
-      runReport(token, P, {
+      () => runReport(token, P, {
         dateRanges: dateRange(days, offset),
         dimensions: [{ name: "customEvent:first_source" }, { name: "customEvent:first_medium" }],
         metrics: [{ name: "totalUsers" }],
@@ -244,7 +245,7 @@ async function gather(days, offset = 0) {
         limit: 1000,
       }),
       // Conversions, by source and by which of the three things they signed up for
-      runReport(token, P, {
+      () => runReport(token, P, {
         dateRanges: dateRange(days, offset),
         dimensions: [
           { name: "customEvent:first_source" },
@@ -256,7 +257,7 @@ async function gather(days, offset = 0) {
         limit: 2000,
       }),
       // Per-post performance
-      runReport(token, P, {
+      () => runReport(token, P, {
         dateRanges: dateRange(days, offset),
         dimensions: [{ name: "customEvent:first_campaign" }, { name: "eventName" }],
         metrics: [{ name: "totalUsers" }],
@@ -264,7 +265,7 @@ async function gather(days, offset = 0) {
         limit: 2000,
       }),
       // Weekly trend by source
-      runReport(token, P, {
+      () => runReport(token, P, {
         dateRanges: dateRange(days, offset),
         dimensions: [{ name: "week" }, { name: "customEvent:first_source" }],
         metrics: [{ name: "totalUsers" }],
@@ -273,16 +274,26 @@ async function gather(days, offset = 0) {
       }),
       // link_id only exists from 14 Aug, but GA4's built-in linkUrl has always
       // recorded the destination, which identifies the option just as well.
-      runReport(token, P, {
+      () => runReport(token, P, {
         dateRanges: dateRange(days, offset),
         dimensions: [{ name: "linkUrl" }, { name: "customEvent:first_source" }],
         metrics: [{ name: "totalUsers" }],
         dimensionFilter: eventFilter(["link_click"]),
         limit: 1000,
       }),
+      // Totals with NO dimension. Summing a per-channel breakdown counts one
+      // person once per channel they appear under, which inflated bookings
+      // from 17 to 31. Only an undimensioned query gives unique people.
+      () => runReport(token, P, {
+        dateRanges: dateRange(days, offset),
+        dimensions: [{ name: "eventName" }],
+        metrics: [{ name: "totalUsers" }],
+        dimensionFilter: eventFilter(["page_view", ...CONVERSION_EVENTS]),
+        limit: 20,
+      }),
       // Events vs people, so the audit can spot anything firing repeatedly
       // for the same person.
-      runReport(token, P, {
+      () => runReport(token, P, {
         dateRanges: dateRange(days, offset),
         dimensions: [{ name: "eventName" }],
         metrics: [{ name: "eventCount" }, { name: "totalUsers" }],
@@ -292,14 +303,14 @@ async function gather(days, offset = 0) {
       // GA4's own session attribution. Rougher than first-touch, but it goes
       // back a year, so the page has something to show before the new
       // dimensions have accumulated.
-      runReport(token, P, {
+      () => runReport(token, P, {
         dateRanges: dateRange(days, offset),
         dimensions: [{ name: "sessionSource" }, { name: "eventName" }],
         metrics: [{ name: "totalUsers" }],
         dimensionFilter: eventFilter(["page_view", ...CONVERSION_EVENTS]),
         limit: 600,
       }),
-      runReport(token, P, {
+      () => runReport(token, P, {
         dateRanges: dateRange(days, offset),
         dimensions: [{ name: "week" }, { name: "sessionSource" }],
         metrics: [{ name: "totalUsers" }],
@@ -308,7 +319,7 @@ async function gather(days, offset = 0) {
       }),
       // The /links page: which of the three options people choose, and who
       // sent them. This is the Instagram bio-link question.
-      runReport(token, P, {
+      () => runReport(token, P, {
         dateRanges: dateRange(days, offset),
         dimensions: [{ name: "customEvent:link_id" }, { name: "customEvent:first_source" }],
         metrics: [{ name: "totalUsers" }],
@@ -346,6 +357,17 @@ async function gather(days, offset = 0) {
         c.signups[signupType] += mets[0];
       }
     });
+
+    // The truth for headline numbers. Channel rows will sum higher; that is
+    // expected and is flagged rather than hidden.
+    const totalsByEvent = {};
+    totalRows.forEach(({ dims, mets }) => { totalsByEvent[dims[0]] = mets[0]; });
+    out.totals = {
+      visitors: totalsByEvent.page_view || 0,
+      booked: totalsByEvent.invitee_meeting_scheduled || 0,
+      callForms: totalsByEvent.discovery_form_submit || 0,
+      leads: totalsByEvent.generate_lead || 0,
+    };
 
     out.eventRatios = ratioRows.map(({ dims, mets }) => ({
       event: dims[0], events: mets[0], people: mets[1],
@@ -569,13 +591,16 @@ async function gather(days, offset = 0) {
       bySource[s] = bySource[s] || { source: s, leads: 0, booked: 0, consulted: 0, signed: 0 };
     });
 
-    // Airtable is the source of truth for bookings; the audit compares it
-    // against what GA4 saw.
+    // Airtable is the source of truth for bookings, and the audit compares it
+    // against GA4. Both sides must count the same event: the moment someone
+    // BOOKED, not the date of the call. Counting meetings held in the window
+    // dropped anyone who booked this week for a slot next week, which halved
+    // the Airtable side and made the comparison meaningless.
     out.airtableBookings = recs.filter((r) => {
-      const mt = (r.fields || {})["Meeting Time"];
-      if (!mt) return false;
-      const d = new Date(mt);
-      return !isNaN(d) && d >= since && d <= until;
+      const f = r.fields || {};
+      if (!f["Meeting Time"]) return false;      // never picked a slot
+      const made = new Date(f["Created"] || f["Meeting Time"]);
+      return !isNaN(made) && made >= since && made <= until;
     }).length;
 
     out.sales = {
@@ -590,13 +615,16 @@ async function gather(days, offset = 0) {
     };
   } catch (err) {
     out.errors.push("Airtable: " + err.message);
-    // Airtable is the source of truth for bookings; the audit compares it
-    // against what GA4 saw.
+    // Airtable is the source of truth for bookings, and the audit compares it
+    // against GA4. Both sides must count the same event: the moment someone
+    // BOOKED, not the date of the call. Counting meetings held in the window
+    // dropped anyone who booked this week for a slot next week, which halved
+    // the Airtable side and made the comparison meaningless.
     out.airtableBookings = recs.filter((r) => {
-      const mt = (r.fields || {})["Meeting Time"];
-      if (!mt) return false;
-      const d = new Date(mt);
-      return !isNaN(d) && d >= since && d <= until;
+      const f = r.fields || {};
+      if (!f["Meeting Time"]) return false;      // never picked a slot
+      const made = new Date(f["Created"] || f["Meeting Time"]);
+      return !isNaN(made) && made >= since && made <= until;
     }).length;
 
     out.sales = { totals: {}, bySource: [] };

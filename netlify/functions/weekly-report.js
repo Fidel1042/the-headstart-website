@@ -94,9 +94,13 @@ function table(headers, rows) {
  * out of step with the tables underneath it.
  */
 function execSummary(now, prev, sales) {
+  // Unique people, not the sum of the channel rows. Summing counts anyone
+  // who arrived from two channels twice.
   const sum = (d, f) => (d.channels || []).reduce((s, c) => s + f(c), 0);
-  const v = sum(now, (c) => c.visitors), vPrev = sum(prev, (c) => c.visitors);
-  const b = sum(now, (c) => c.booked), bPrev = sum(prev, (c) => c.booked);
+  const v = (now.totals || {}).visitors || 0;
+  const vPrev = (prev.totals || {}).visitors || 0;
+  const b = (now.totals || {}).booked || 0;
+  const bPrev = (prev.totals || {}).booked || 0;
   const change = vPrev ? ((v - vPrev) / vPrev) * 100 : 0;
 
   // Each item carries its own supporting numbers, so a claim in the summary
@@ -170,7 +174,7 @@ function execSummary(now, prev, sales) {
   if (b === 0 && v > 50) {
     watch.push({
       text: "No calls booked at all this week",
-      detail: `${v} visitors and ${sum(now, (c) => c.callForms)} booking form(s) started. ` +
+      detail: `${v} visitors and ${(now.totals || {}).callForms || 0} booking form(s) started. ` +
         "If forms were submitted but nothing booked, the Calendly step is where they are dropping.",
     });
   }
@@ -200,7 +204,7 @@ function execSummary(now, prev, sales) {
 
   return [
     { kind: "Overall", items: [{ text: headline,
-        detail: `${sum(now, (c) => c.callForms)} booking form(s) started, ` +
+        detail: `${(now.totals || {}).callForms || 0} booking form(s) started, ` +
           `${sum(now, (c) => c.signups.job_alerts + c.signups.audit_roadmap)} free resource signup(s). ` +
           `Sales figures below cover 90 days, not this week.` }] },
     { kind: "Working", items: wins.slice(0, 2) },
@@ -217,12 +221,36 @@ function execSummary(now, prev, sales) {
  */
 function auditNumbers(now, prev, sales, airtableBookings) {
   const issues = [];
+
+  // A previous window that failed used to come back empty, so every change
+  // read as "new" and every rate as "0% last week". Say so instead.
+  if (prev && (prev.errors || []).length) {
+    issues.push({ level: "warn",
+      text: "Last week's figures could not be loaded (" + prev.errors.join("; ") +
+        "), so every comparison on this email is against zero and should be ignored." });
+  } else if (prev && (!prev.totals || !prev.totals.visitors)) {
+    issues.push({ level: "warn",
+      text: "Last week returned no data, so the week-on-week changes here are " +
+        "meaningless. The numbers for THIS week are still correct." });
+  }
+
+  // Channel rows counting one person under several channels.
+  const chSum = (now.channels || []).reduce((s, c) => s + c.booked, 0);
+  const trueBooked = now.totals ? now.totals.booked : 0;
+  if (trueBooked && chSum > trueBooked * 1.15) {
+    issues.push({ level: "check",
+      text: `The channel table shows ${chSum} bookings against a true ${trueBooked} people. ` +
+        "Someone who arrived from two channels is counted under both, so the rows " +
+        "add up higher than the total. Headline figures use the true count." });
+  }
   const ch = now.channels || [];
   const sum = (f) => ch.reduce((s, c) => s + f(c), 0);
 
-  const visitors = sum((c) => c.visitors);
-  const booked = sum((c) => c.booked);
-  const forms = sum((c) => c.callForms);
+  // Unique people for every comparison, so the audit never argues with itself.
+  const T = now.totals || {};
+  const visitors = T.visitors || sum((c) => c.visitors);
+  const booked = T.booked || sum((c) => c.booked);
+  const forms = T.callForms || sum((c) => c.callForms);
 
   // 1. You cannot confirm a time without first submitting the form.
   if (booked > forms) {
@@ -298,8 +326,11 @@ function auditNumbers(now, prev, sales, airtableBookings) {
 }
 
 function buildHtml(now, prev, when, sales, audit) {
-  const sumVisitors = (d) => (d.channels || []).reduce((s, c) => s + c.visitors, 0);
-  const sumBooked = (d) => (d.channels || []).reduce((s, c) => s + c.booked, 0);
+  // Headline numbers come from the undimensioned totals, never from summing
+  // the channel rows: a person who arrives from two channels is counted in
+  // both, which nearly doubled the booking figure.
+  const sumVisitors = (d) => (d.totals ? d.totals.visitors : 0);
+  const sumBooked = (d) => (d.totals ? d.totals.booked : 0);
   const sumSignups = (d) => (d.channels || []).reduce(
     (s, c) => s + c.signups.job_alerts + c.signups.audit_roadmap + c.signups.discovery_call, 0);
 
@@ -314,8 +345,8 @@ function buildHtml(now, prev, when, sales, audit) {
   // Counted from the discovery_form_submit event itself. Counting it via
   // signup_type would undercount, because that tag is newer than the event
   // and cached pages still fire the old version.
-  const dc = (now.channels || []).reduce((s, c) => s + c.callForms, 0);
-  const dcPrev = (prev.channels || []).reduce((s, c) => s + c.callForms, 0);
+  const dc = now.totals ? now.totals.callForms : 0;
+  const dcPrev = prev.totals ? prev.totals.callForms : 0;
 
   const ch = now.channels || [];
   const t90 = sales.totals || {};
@@ -444,7 +475,12 @@ exports.handler = async (event) => {
   }
 
   try {
-    const [now, prev, quarter] = await Promise.all([gather(7), gather(7, 7), gather(90)]);
+    // Sequential on purpose. Three windows at once meant thirty concurrent
+    // GA4 queries against a cap of ten, and the loser came back empty, which
+    // is how last week silently read as zero.
+    const now = await gather(7);
+    const prev = await gather(7, 7);
+    const quarter = await gather(90);
     const audit = auditNumbers(now, prev, quarter.sales, now.airtableBookings);
     const when = `${syd.day} ${syd.month}`;
 

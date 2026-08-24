@@ -157,44 +157,87 @@ async function channelStats(days) {
 
 const REMINDERS = [
   {
-    id: "price-hide-test",
-    date: "2026-08-31",
-    subject: "Starting today: the hide-the-price test",
+    // Price came off the site 2026-08-24. Fidel stayed on $55 for a month on
+    // purpose, so the close rate has one cause instead of two: a drop in the
+    // same window as both changes could not be blamed on either.
+    id: "price-55-hold-ends",
+    date: "2026-09-24",
+    subject: "Your month on $55 is done",
     async build() {
       const pages = await landingStats(28);
-      const chans = await channelStats(28);
       const home = pages["/"] || {};
       const landed = home.page_view || 0;
-      const booked = home.invitee_meeting_scheduled || 0;
+      const forms = home.discovery_form_submit || 0;
+
+      return shell("Hold expired", "You held $55 for the month, that month is done",
+        "Pricing came off the site on 24 August and you stayed on $55 so the close rate would " +
+        "have one cause, not two. You are now free to move the price if you want to.",
+        callout("Baseline to beat, frozen 24 August",
+          "Sign-up rate <b>3.69%</b> of homepage visitors. Close rate <b>38.7%</b> at $55. " +
+          "Combined, <b>1.34 to 1.43 signed clients per 100 homepage visitors</b>.") +
+        tbl(["Metric", "Since the price came off", ""], [
+          ["Homepage visitors", landed, ""],
+          ["Discovery form submits", `<b>${forms}</b>`, ""],
+          ["Sign-up rate", `<b>${pctStr(forms, landed)}</b>`, "was 3.69%"],
+        ]) +
+        callout("Before you move off $55",
+          "The sign-up number above is the clean one, since a hidden price cannot be affected " +
+          "by the level you charge. Read it now and write it down, because the moment you leave " +
+          "$55 the close rate carries both changes and stops being readable on its own.") +
+        `<p style="font-size:14px;line-height:1.65;color:#4a453c;margin:0 0 8px">
+        Close rate is in Airtable, not here, and it needs a maturity cutoff. Anyone consulted in
+        the last fortnight has not had time to sign, so counting them drags the recent cohort
+        down. Compare at 14 days matured or you will scare yourself with a fake drop.</p>`);
+    },
+  },
+  {
+    id: "price-hide-review",
+    date: "2026-10-19",
+    subject: "Eight weeks without a price on the site",
+    async build() {
+      const pages = await landingStats(56);
+      const chans = await channelStats(56);
+      const home = pages["/"] || {};
+      const landed = home.page_view || 0;
+      const forms = home.discovery_form_submit || 0;
+      const rate = landed ? forms / landed : 0;
 
       const chanRows = ["LinkedIn", "Instagram", "Direct", "Other"]
         .filter((k) => chans[k])
         .map((k) => [k, chans[k].visitors,
           pctStr(chans[k].visitors, Object.values(chans).reduce((s, c) => s + c.visitors, 0))]);
 
-      return shell("Test starting", "Hide-the-price test: your baseline",
-        "You wanted a nudge to start this. Here is the last 28 days, frozen as your before-period. " +
-        "Screenshot this email; it is the number you will compare against.",
-        callout(`Baseline: ${pctStr(booked, landed)} of homepage visitors book a call`,
-          `${booked} bookings from ${landed} homepage visitors over 28 days.`) +
-        tbl(["Metric", "Last 28 days", ""], [
-          ["Homepage visitors", landed, ""],
-          ["Booked a call", `<b>${booked}</b>`, ""],
-          ["Booking rate", `<b>${pctStr(booked, landed)}</b>`, ""],
+      // 602 homepage visitors per arm is the smallest readable effect at this
+      // baseline, and it only detects a doubling. Below that, any verdict is
+      // a story told about noise.
+      const readable = landed >= 602;
+      const verdict = !readable
+        ? "Not enough traffic to call it — leave the price off and stop watching"
+        : rate >= 0.0554 ? "Clear lift, keep the price off"
+        : rate <= 0.0246 ? "Clear drop, put the price back"
+        : "Inside the noise band, no verdict";
+
+      return shell("Decision", "Did hiding the price do anything?",
+        "You removed pricing on 24 August against a baseline of 3.69%. Here is the after-period.",
+        callout(verdict,
+          `${forms} submits from ${landed} homepage visitors, <b>${pctStr(forms, landed)}</b>, ` +
+          `against a 3.69% baseline.`) +
+        tbl(["Metric", "Last 8 weeks", "Baseline"], [
+          ["Homepage visitors", landed, "2,007 over 10 wks"],
+          ["Discovery form submits", `<b>${forms}</b>`, "74"],
+          ["Sign-up rate", `<b>${pctStr(forms, landed)}</b>`, "3.69%"],
         ]) +
-        `<h2 style="font-size:13px;letter-spacing:.05em;text-transform:uppercase;color:#6b6455;margin:0 0 10px">Traffic mix right now</h2>` +
+        `<h2 style="font-size:13px;letter-spacing:.05em;text-transform:uppercase;color:#6b6455;margin:0 0 10px">Traffic mix, check this before believing the number</h2>` +
         tbl(["Channel", "Visitors", "Share"], chanRows) +
-        callout("Read this before you start",
-          "This is a before-and-after, not a randomised test, so anything else that changes in " +
-          "the window will contaminate it. Three rules. One: run it four full weeks, do not peek and stop early. " +
-          "Two: change nothing else on the site or in your posting rhythm. " +
-          "Three: check the traffic mix above at the end. If your LinkedIn share moves much, the " +
-          "comparison is worthless because those visitors convert differently.") +
+        callout("How to read it honestly",
+          "This is a before-and-after, not a randomised test. At this baseline only a doubling " +
+          "or a halving is statistically readable, so the bands above are deliberately wide. " +
+          "If the channel mix has shifted much since August the comparison is worthless, because " +
+          "LinkedIn and Instagram visitors convert at completely different rates.") +
         `<p style="font-size:14px;line-height:1.65;color:#4a453c;margin:0 0 8px">
-        <b>What would count as a real result?</b> At roughly ${Math.round(landed / 28 * 30)} homepage
-        visitors a month, only a very large swing is readable. Under about a 50% change either way,
-        treat it as noise and keep the price visible, since visible pricing also filters out people
-        who were never going to pay.</p>`);
+        <b>The number that actually decides it</b> is signed clients per 100 homepage visitors,
+        baseline 1.34 to 1.43. Sign-up rate alone can rise while the extra people are all
+        unqualified. Pull the close rate from Airtable at 14 days matured and multiply.</p>`);
     },
   },
   {

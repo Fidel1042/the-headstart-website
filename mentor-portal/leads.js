@@ -99,10 +99,14 @@ const MOCK = {
 
 function renderKpis(d) {
   const chans = mode === "session" ? (d.channelsSession || []) : (d.channels || []);
-  const visitors = chans.reduce((s, c) => s + c.visitors, 0);
+  // Tiles show unique people from the undimensioned totals. Adding up the
+  // channel rows counts anyone who arrived from two channels twice, which
+  // overstated bookings by nearly double.
+  const t0 = d.totals || {};
+  const visitors = t0.visitors || chans.reduce((s, c) => s + c.visitors, 0);
   const signups = chans.reduce(
     (s, c) => s + c.signups.job_alerts + c.signups.audit_roadmap + c.signups.discovery_call, 0);
-  const booked = chans.reduce((s, c) => s + c.booked, 0);
+  const booked = t0.booked || chans.reduce((s, c) => s + c.booked, 0);
   const t = d.sales.totals || {};
 
   const tiles = [

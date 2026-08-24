@@ -843,6 +843,7 @@
       font-weight: 700;
       letter-spacing: 0.02em;
       text-decoration: none;
+      margin-top: auto;
       margin-bottom: 0;
       transition: background 0.2s, border-color 0.2s, transform 0.2s;
     }
@@ -1217,7 +1218,6 @@
       </button>
       <nav class="nav-links" id="navLinks">
         <a href="/mentors">Mentors</a>
-        <a href="/#pricing">Pricing</a>
         <a href="/reviews">Reviews</a>
         <a href="/careers">Careers</a>
         <div class="nav-more">
@@ -1513,10 +1513,10 @@
       </section>
 
       <!-- ── Pricing ── -->
-      <section class="section pricing-section" id="pricing">
+      <section class="section pricing-section" id="how-it-works">
         <div class="section-inner">
           <div class="pricing-head reveal reveal--up">
-            <p class="mentoring-eyebrow">Pricing</p>
+            <p class="mentoring-eyebrow">How it works</p>
           </div>
           <div class="pricing-grid">
             <div class="pricing-box reveal" style="--reveal-delay:0s">
@@ -1543,9 +1543,6 @@
                 <li>Currently working in Australia</li>
                 <li>Change mentors at no extra cost</li>
               </ul>
-              <div class="pricing-box__price">
-                <span class="pricing-box__amount">$55</span><span class="pricing-box__unit">/session</span>
-              </div>
               <a class="pricing-box__cta" href="/discovery-call">Book a free call &rarr;</a>
             </div>
           </div>
@@ -1683,7 +1680,7 @@
               <span class="cost-calc__total-label">Total cost of staying stuck</span>
               <span class="cost-calc__total-value" id="home-calc-grand">$14,700+</span>
             </div>
-            <p class="cost-calc__note">Our sessions are $55 each. <span id="home-calc-note-months">2 months</span> without a job costs you roughly <strong class="cost-calc__multiplier" id="home-calc-multiplier">164x</strong> that in salary alone.</p>
+            <p class="cost-calc__note"><span id="home-calc-note-months">2 months</span> without a job costs you roughly <strong class="cost-calc__multiplier" id="home-calc-multiplier">$9,000</strong> in salary alone.</p>
           </div>
         </div>
       </section>
@@ -1791,10 +1788,10 @@
           }
         });
         gsap.to(multProxy, {
-          val: homeCalcState.mult, duration: 1.0, ease: "power2.out",
+          val: homeCalcState.salary, duration: 1.0, ease: "power2.out",
           onUpdate: function() {
             var el = document.getElementById("home-calc-multiplier");
-            if (el) el.textContent = Math.round(multProxy.val) + "x";
+            if (el) el.textContent = "$" + Math.round(multProxy.val).toLocaleString();
           }
         });
       }
@@ -1834,19 +1831,18 @@
       if (noteEl) noteEl.textContent = monthLabel;
       var newSal   = Math.round(HOME_SALARY * months);
       var newGrand = newSal + HOME_VISA;
-      var newMult  = Math.round(newSal / 55);
       homeTween("salary", document.getElementById("home-calc-salary"), newSal,   "", "");
       homeTween("grand",  document.getElementById("home-calc-grand"),  newGrand, "", "+");
-      // Tween multiplier
+      // Tween the salary-lost figure in the note
       if (homeActiveTweens["mult"]) homeActiveTweens["mult"].kill();
       var multProxy = { val: homeCalcState.mult };
       homeActiveTweens["mult"] = gsap.to(multProxy, {
-        val: newMult, duration: 0.45, ease: "power2.out",
+        val: newSal, duration: 0.45, ease: "power2.out",
         onUpdate: function() {
           var el = document.getElementById("home-calc-multiplier");
-          if (el) el.textContent = Math.round(multProxy.val) + "x";
+          if (el) el.textContent = "$" + Math.round(multProxy.val).toLocaleString();
         },
-        onComplete: function() { homeCalcState.mult = newMult; }
+        onComplete: function() { homeCalcState.mult = newSal; }
       });
     }
 
