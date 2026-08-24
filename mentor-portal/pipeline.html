@@ -63,6 +63,16 @@
     [data-theme="dark"] .saved { color: #6fd39b; }
     .oops { font-size: 0.72rem; color: #c33; }
 
+    .qs { border: 1px solid var(--line); border-radius: 14px; background: var(--bg-card);
+      padding: 0.6rem 1.05rem; margin-bottom: 1.4rem; }
+    .qs > summary {
+      cursor: pointer; font-size: 0.66rem; font-weight: 800; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--accent);
+      min-height: 36px; display: flex; align-items: center;
+    }
+    .qs__list { margin: 0.3rem 0 0.7rem; padding-left: 1.4rem; }
+    .qs__list li { font-size: 0.85rem; line-height: 1.6; margin-bottom: 0.55rem; max-width: 70ch; }
+
     .wr { display: block; margin-top: 0.75rem; }
     .wr__label { display: block; font-size: 0.7rem; color: var(--text-muted); margin-bottom: 0.3rem; }
     textarea[data-f="notes"] {
@@ -96,6 +106,21 @@
         time, and set their rate, all from here. Once they are Hired they move to
         Agreements.</p>
     </div>
+
+    <details class="qs">
+      <summary>Interview questions</summary>
+      <ol class="qs__list">
+        <li>Introduction</li>
+        <li>How did you get this role?</li>
+        <li>Why do you want to be a Mentor at the Headstart?</li>
+        <li>What steps would you take to understand their needs and their working style in the first session</li>
+        <li>Do you have 1 trick that you used that helped you stand out from other candidates yourself?</li>
+        <li>Are you comfortable mentoring mentees not going into your industry exactly?</li>
+        <li>On a high level, how would you structure weekly sessions with the mentee that lasts around 12-15 sessions?</li>
+        <li>If you take a mentee, the expectation is you do 1 session per week with them, how many hours do you have per week for that?</li>
+        <li>Tell them about the rate - $20 to start</li>
+      </ol>
+    </details>
 
     <p class="state" id="loading">Loading&hellip;</p>
     <p class="state" id="error" hidden></p>
