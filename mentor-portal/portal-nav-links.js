@@ -4,6 +4,11 @@
 // "what am I working on" rather than listing every page at once. Areas with a
 // single page link straight to it and show no second row.
 //
+// Inside an area, `group` splits the second row into labelled runs. Mentors
+// covers three unrelated jobs (hiring, onboarding, watching performance) and
+// nine links in one flat row gave no clue where one job ended and the next
+// began. A link with no group sits in an unlabelled run at the front.
+//
 // `page` keys are what a page passes as `active` to mountPortalNav.
 // Some sub-links deep-link into a tab on admin.html via ?view=.
 
@@ -24,39 +29,6 @@ export const NAV_AREAS = [
     ],
   },
   {
-    key: "preassigned",
-    label: "Pre Assigned Mentees",
-    // Contacts first: the section pill goes to links[0], and this is the list
-    // worked every day. Follow-ups is a weekly sweep.
-    links: [
-      { href: "/mentor-portal/contacts.html", label: "Contacts to add", page: "contacts" },
-      { href: "/mentor-portal/assign.html", label: "Assign mentees", page: "assign" },
-      { href: "/mentor-portal/followups.html", label: "Follow-ups", page: "followups" },
-    ],
-  },
-  {
-    key: "mentees",
-    label: "Current Mentees",
-    links: [
-      { href: "/mentor-portal/admin.html?view=mentees", label: "Mentee status", page: "mentee-status" },
-    ],
-  },
-  {
-    key: "mentors",
-    label: "Mentors",
-    links: [
-      { href: "/mentor-portal/admin.html?view=overview", label: "Big picture", page: "big-picture" },
-      { href: "/mentor-portal/admin.html?view=performance", label: "Detailed performance", page: "performance" },
-      { href: "/mentor-portal/admin.html?view=calendar", label: "Calendar", page: "calendar" },
-      { href: "/mentor-portal/pipeline.html", label: "Pipeline", page: "pipeline" },
-      { href: "/mentor-portal/agreements.html", label: "Agreements", page: "agreements" },
-      { href: "/mentor-portal/drafts.html", label: "Profiles", page: "drafts" },
-      { href: "/mentor-portal/onboarding-plan.html", label: "Onboarding plan", page: "onboarding-plan" },
-      { href: "/mentor-portal/onboarding-call.html", label: "Onboarding call", page: "onboarding-call" },
-      { href: "/mentor-portal/delivery-checks.html", label: "Delivery check-in", page: "delivery-checks" },
-    ],
-  },
-  {
     // Top of the funnel: where leads come from and what they turn into.
     key: "leads",
     label: "Leads",
@@ -66,15 +38,42 @@ export const NAV_AREAS = [
     ],
   },
   {
+    // Was two areas, "Pre Assigned Mentees" and "Current Mentees". They are the
+    // same people at different points, so they are one area with two runs.
+    key: "mentees",
+    label: "Mentees",
+    links: [
+      { href: "/mentor-portal/contacts.html", label: "Contacts to add", page: "contacts", group: "Before a mentor" },
+      { href: "/mentor-portal/assign.html", label: "Assign mentees", page: "assign", group: "Before a mentor" },
+      { href: "/mentor-portal/followups.html", label: "Follow-ups", page: "followups", group: "Before a mentor" },
+      { href: "/mentor-portal/admin.html?view=mentees", label: "Mentee status", page: "mentee-status", group: "Once mentoring" },
+    ],
+  },
+  {
+    key: "mentors",
+    label: "Mentors",
+    links: [
+      { href: "/mentor-portal/pipeline.html", label: "Pipeline", page: "pipeline", group: "Hiring" },
+      { href: "/mentor-portal/agreements.html", label: "Agreements", page: "agreements", group: "Hiring" },
+      { href: "/mentor-portal/drafts.html", label: "Profiles", page: "drafts", group: "Hiring" },
+      { href: "/mentor-portal/onboarding-plan.html", label: "Plan", page: "onboarding-plan", group: "Onboarding" },
+      { href: "/mentor-portal/onboarding-call.html", label: "Call", page: "onboarding-call", group: "Onboarding" },
+      { href: "/mentor-portal/delivery-checks.html", label: "Delivery check-in", page: "delivery-checks", group: "Onboarding" },
+      { href: "/mentor-portal/admin.html?view=overview", label: "Big picture", page: "big-picture", group: "Performance" },
+      { href: "/mentor-portal/admin.html?view=performance", label: "Detailed", page: "performance", group: "Performance" },
+      { href: "/mentor-portal/admin.html?view=calendar", label: "Calendar", page: "calendar", group: "Performance" },
+    ],
+  },
+  {
     // Money in and money out. Billing and payslips sit here rather than under
     // Mentors: they are the finance run, not mentor management.
     key: "admin",
     label: "Admin",
     links: [
-      { href: "/mentor-portal/billing.html", label: "Billing", page: "billing" },
-      { href: "/mentor-portal/payslips.html", label: "Payslips", page: "payslips" },
-      { href: "/mentor-portal/pl.html", label: "P&amp;L", page: "pl" },
-      { href: "/mentor-portal/ltv.html", label: "LTV", page: "ltv" },
+      { href: "/mentor-portal/billing.html", label: "Billing", page: "billing", group: "Money" },
+      { href: "/mentor-portal/payslips.html", label: "Payslips", page: "payslips", group: "Money" },
+      { href: "/mentor-portal/pl.html", label: "P&amp;L", page: "pl", group: "Reporting" },
+      { href: "/mentor-portal/ltv.html", label: "LTV", page: "ltv", group: "Reporting" },
     ],
   },
 ];
@@ -87,4 +86,20 @@ export function areaFor(page) {
 /** Page keys inside an area, for the per-owner visibility filter. */
 export function pagesIn(area) {
   return area.links.map((l) => l.page);
+}
+
+/**
+ * An area's links as labelled runs, in the order the groups first appear.
+ * Ungrouped links come first under no label, so an area that never sets
+ * `group` renders exactly as it always did.
+ */
+export function groupsIn(links) {
+  const out = [];
+  for (const l of links) {
+    const name = l.group || "";
+    const last = out[out.length - 1];
+    if (last && last.name === name) last.links.push(l);
+    else out.push({ name, links: [l] });
+  }
+  return out;
 }

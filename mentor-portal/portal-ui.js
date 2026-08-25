@@ -3,7 +3,7 @@
 // Keeps every portal page's header identical: edit here, updates everywhere.
 
 import { signOut, ownerCanSee } from "./auth.js";
-import { NAV_AREAS } from "./portal-nav-links.js";
+import { NAV_AREAS, groupsIn } from "./portal-nav-links.js";
 
 const THEME_KEY = "headstart_theme";
 
@@ -58,11 +58,14 @@ export function mountPortalNav({ email = "", isOwner = false, active = "", login
     : "";
 
   // Second row only earns its place when the area has somewhere else to go.
+  // Labelled runs so nine links read as three jobs rather than one long list.
   const subLinks = (isOwner && current && current.links.length > 1)
     ? `<div class="nav-sub"><div class="nav-sub-inner">${
-        current.links.map((l) =>
+        groupsIn(current.links).map((g) => `<span class="nav-run">${
+          g.name ? `<span class="nav-run-label">${g.name}</span>` : ""
+        }${g.links.map((l) =>
           `<a href="${l.href}" class="nav-sub-link${l.page === active ? " is-active" : ""}">${l.label}</a>`
-        ).join("")
+        ).join("")}</span>`).join("")
       }</div></div>`
     : "";
 

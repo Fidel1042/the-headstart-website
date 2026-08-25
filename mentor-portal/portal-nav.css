@@ -161,6 +161,28 @@
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
+/* One labelled run of links. The label names the job; the divider keeps two
+   runs from reading as one long list on a wide screen. */
+.nav-run {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.1rem;
+}
+.nav-run + .nav-run {
+  margin-left: 1.1rem;
+  padding-left: 1.1rem;
+  border-left: 1px solid var(--line-soft);
+}
+.nav-run-label {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  opacity: 0.75;
+  white-space: nowrap;
+}
+
 .nav-sub-link {
   font-size: 0.8rem;
   font-weight: 600;
@@ -177,6 +199,9 @@
 
 @media (max-width: 700px) {
   .nav-sub-inner { padding: 0.4rem 1rem; gap: 0.9rem; }
+  /* No room for dividers on a phone; the labels alone carry the grouping. */
+  .nav-run { gap: 0.9rem; }
+  .nav-run + .nav-run { margin-left: 0.9rem; padding-left: 0.9rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
