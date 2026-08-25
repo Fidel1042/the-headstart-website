@@ -57,12 +57,48 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
 
-/** Check if an email is on the mentor allowlist. */
+/** Check if an email is on the hardcoded fallback list. */
 export function isAllowedEmail(email) {
   if (!email) return false;
   return ALLOWED_MENTOR_EMAILS
     .map((e) => e.trim().toLowerCase())
     .includes(email.trim().toLowerCase());
+}
+
+/**
+ * Whether this email may use the portal, with Airtable as the authority:
+ * Status "Hired" gets in, anything else does not. That means hiring somebody
+ * grants access with no deploy, and dropping somebody removes it the same way.
+ *
+ * The list above is the fallback, used only when the lookup cannot be reached.
+ * A broken lookup must never lock the team out of their own portal, and it must
+ * never let somebody in who was never on the list to begin with.
+ *
+ * Cached for the tab so it costs one request per session, not one per page.
+ */
+const ACCESS_KEY = "headstart_portal_access";
+
+export async function checkAccess(email) {
+  if (!email) return false;
+  const key = email.trim().toLowerCase();
+  try {
+    const cached = sessionStorage.getItem(`${ACCESS_KEY}:${key}`);
+    if (cached !== null) return cached === "1";
+  } catch (e) { /* private mode, just ask again */ }
+
+  try {
+    const res = await fetch("/.netlify/functions/portal-access", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: key }),
+    });
+    if (!res.ok) return isAllowedEmail(key);
+    const data = await res.json();
+    if (typeof data.allowed !== "boolean") return isAllowedEmail(key);
+    try { sessionStorage.setItem(`${ACCESS_KEY}:${key}`, data.allowed ? "1" : "0"); } catch (e) {}
+    return data.allowed;
+  } catch (e) {
+    return isAllowedEmail(key);
+  }
 }
 
 /**
@@ -118,7 +154,7 @@ export async function requireAuth(onAuth) {
   }
   // Verify allowlist (defence in depth — server should also enforce via RLS / trigger)
   const email = session.user?.email;
-  if (!isAllowedEmail(email)) {
+  if (!(await checkAccess(email))) {
     await supabase.auth.signOut();
     window.location.replace(
       `/mentor-portal/login.html?error=${encodeURIComponent(

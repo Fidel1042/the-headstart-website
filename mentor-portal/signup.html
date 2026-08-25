@@ -64,7 +64,7 @@
   </main>
 
   <script type="module">
-    import { supabase, isAllowedEmail, getSession, saveCredential } from "./auth.js";
+    import { supabase, checkAccess, getSession, saveCredential } from "./auth.js";
 
     const params = new URLSearchParams(window.location.search);
     const nextPath = params.get("next") || "./";
@@ -98,7 +98,7 @@
         showError("Passwords don't match.");
         return;
       }
-      if (!isAllowedEmail(email)) {
+      if (!(await checkAccess(email))) {
         showError("This email isn't on the mentor allowlist. Contact Fidel to be added.");
         return;
       }
