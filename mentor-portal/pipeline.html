@@ -205,6 +205,11 @@
     // a guest would send a second, competing invite.
     const INTERVIEW_MINUTES = 30;
 
+    // Google opens whichever account the browser is signed into first, which
+    // is not necessarily this one. Naming the account pins the event to the
+    // right calendar instead of whichever tab happened to be open.
+    const CALENDAR_ACCOUNT = "fidelhon@gmail.com";
+
     function calendarLink(m) {
       const start = new Date(m.interviewAt);
       const end = new Date(start.getTime() + INTERVIEW_MINUTES * 60000);
@@ -212,6 +217,7 @@
       const z = DATA.zoom || {};
       const q = new URLSearchParams({
         action: "TEMPLATE",
+        authuser: CALENDAR_ACCOUNT,
         text: `Mentor interview — ${m.name}`,
         dates: `${stamp(start)}/${stamp(end)}`,
         location: z.link || "",
