@@ -175,7 +175,6 @@ exports.handler = async (event) => {
   for (const [email, m] of Object.entries(active)) {
     if (byMentor[email]) continue;
     if (OWNERS.includes(email)) continue;
-    const lastReadable = formatDate(m.last);
     const r = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
       headers: { "api-key": BREVO_API_KEY, "Content-Type": "application/json" },
@@ -183,7 +182,7 @@ exports.handler = async (event) => {
         sender: { name: "The Headstart", email: "fidel@theheadstartmentoring.com" },
         to: [{ email, name: m.name }],
         subject: `Nothing to pay you this week — check your log`,
-        htmlContent: nudgeHtml(m.name, weekLabel, lastReadable),
+        htmlContent: nudgeHtml(m.name),
       }),
     });
     nudged.push({ email, name: m.name, success: r.ok, last: m.last });

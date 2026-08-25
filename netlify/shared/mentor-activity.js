@@ -105,8 +105,15 @@ const portalPrompt = (label) => `
     and it goes on the next payslip.
   </p>`;
 
-/** Sent to an active mentor whose pay run came to nothing. */
-const nudgeHtml = (name, weekLabel, last) => `
+/**
+ * Sent to an active mentor whose pay run came to nothing.
+ *
+ * Deliberately quotes no dates. An earlier version named their last logged
+ * session next to the pay run date, and the two read as contradicting each
+ * other. What matters is only this: nothing is logged since the last payslip,
+ * and anything they log now gets paid next week.
+ */
+const nudgeHtml = (name) => `
 <!DOCTYPE html>
 <html>
 <body style="margin:0;padding:0;font-family:system-ui,-apple-system,sans-serif;background:#f9f9f9;">
@@ -117,10 +124,9 @@ const nudgeHtml = (name, weekLabel, last) => `
     </div>
     <div style="padding:32px;">
       <p style="margin:0 0 6px;font-size:15px;color:#111;">Hi ${name},</p>
-      <p style="margin:0 0 16px;font-size:14px;color:#555;">There are no unpaid sessions against your name for <strong>${weekLabel}</strong>, so there is no payout going out to you.</p>
-      <p style="margin:0 0 16px;font-size:14px;color:#555;">Your last logged session was <strong>${last}</strong>. If you have run any since then, they are not in the system yet, which means they will not be paid.</p>
-      ${portalPrompt("Ran a session that is not on here?")}
-      <p style="margin:16px 0 0;font-size:13px;color:#888;">If you genuinely had no sessions, ignore this.</p>
+      <p style="margin:0 0 16px;font-size:14px;color:#555;">You have not logged any sessions since your last payslip, so there is nothing to pay you this week.</p>
+      <p style="margin:0 0 24px;font-size:14px;color:#555;">If you did run sessions, <a href="${PORTAL_URL}" style="color:#8a6210;font-weight:600;">log them in the portal</a> now and they go out on next week's payslip.</p>
+      <p style="margin:0;font-size:13px;color:#888;">If you genuinely had no sessions, ignore this.</p>
     </div>
     <div style="background:#f5f5f5;padding:16px 32px;">
       <p style="margin:0;font-size:12px;color:#aaa;">The Headstart Mentoring &nbsp;·&nbsp; Internal payslip</p>
