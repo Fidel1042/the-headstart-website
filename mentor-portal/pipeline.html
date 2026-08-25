@@ -25,9 +25,25 @@
     }
     .stage__count { color: var(--text-muted); font-variant-numeric: tabular-nums; }
 
-    .m { border: 1px solid var(--line); border-radius: 14px; background: var(--bg-card);
-      padding: 0.9rem 1.05rem; margin-bottom: 0.6rem; }
-    .m__top { display: flex; align-items: baseline; gap: 0.7rem; flex-wrap: wrap; }
+    /* The shared card border is deliberately faint, which works for one card on
+       a page and turns to mush for a stacked list. Stronger edge plus a shadow
+       so each row reads as its own object. */
+    .m { --m-line: rgba(255,255,255,0.18); }
+    [data-theme="light"] .m { --m-line: rgba(0,0,0,0.16); }
+    .m { border: 1px solid var(--m-line); border-radius: 14px; background: var(--bg-card);
+      box-shadow: var(--shadow-card); padding: 0; margin-bottom: 0.75rem; }
+    .m[open] { border-color: var(--accent-line); }
+
+    .m__sum {
+      cursor: pointer; list-style: none;
+      display: flex; align-items: baseline; gap: 0.7rem; flex-wrap: wrap;
+      padding: 0.85rem 1.05rem; min-height: 44px;
+    }
+    .m__sum::-webkit-details-marker { display: none; }
+    .m__sum:hover { background: var(--bg-card-hover); border-radius: 13px; }
+    .m[open] .m__sum { border-bottom: 1px solid var(--line-soft); border-radius: 13px 13px 0 0; }
+    .m__when { font-size: 0.78rem; font-weight: 700; color: var(--accent); }
+    .m__body { padding: 0.2rem 1.05rem 0.95rem; }
     .m__name { font-weight: 700; font-size: 0.95rem; }
     .m__meta { font-size: 0.74rem; color: var(--text-muted); }
     .m__spacer { flex: 1; }
@@ -237,14 +253,19 @@
 
     function card(m) {
       const where = [m.role, m.company].filter(Boolean).join(" at ");
+      // A booked interview is settled, so it collapses to one line. Anything
+      // without a time still needs a decision and stays open.
+      const settled = Boolean(m.interviewAt);
       return `
-        <div class="m" data-id="${m.id}">
-          <div class="m__top">
+        <details class="m" data-id="${m.id}"${settled ? "" : " open"}>
+          <summary class="m__sum">
             <span class="m__name">${esc(m.name)}</span>
             ${where ? `<span class="m__meta">${esc(where)}</span>` : ""}
             <span class="m__spacer"></span>
-            ${m.interviewAt ? `<span class="m__meta">interview ${esc(readable(m.interviewAt))}</span>` : ""}
-          </div>
+            ${m.interviewAt ? `<span class="m__when">${esc(readable(m.interviewAt))}</span>` : ""}
+            ${m.inviteSent ? `<span class="m__meta">invited</span>` : ""}
+          </summary>
+          <div class="m__body">
           <div class="m__row">
             <span class="fld">
               <label>Stage</label>
@@ -279,7 +300,8 @@
             <span class="wr__label">Write-up &mdash; saves to ${esc(m.notesField)}. Fathom fills this in on its own.</span>
             <textarea data-f="notes" rows="3" data-stage="${esc(m.status)}">${esc(m.notes)}</textarea>
           </label>
-        </div>`;
+          </div>
+        </details>`;
     }
 
     function render() {
@@ -381,6 +403,7 @@
           const fresh = document.createElement("div");
           fresh.innerHTML = card(res.mentor);
           const el = fresh.firstElementChild;
+          el.open = row.open;
           el.querySelector("[data-note]").outerHTML = note.outerHTML;
           row.replaceWith(el);
         }
