@@ -58,6 +58,9 @@ const offerText = (firstName, link) =>
   `Have fun career coaching!\n\n` +
   `Best Regards,\nFidel Hon\nCo-Founder at Headstart Mentoring\n+61 402 238 701`;
 
+// Exported so the email can be previewed without sending a real one.
+exports.preview = { offerSubject, offerHtml, offerText };
+
 /**
  * Every hired mentor, for the portal's agreement list.
  *

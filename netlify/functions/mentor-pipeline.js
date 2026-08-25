@@ -103,6 +103,9 @@ function readableTime(iso) {
   }).format(new Date(iso));
 }
 
+// Exported so the email can be previewed without sending a real one.
+exports.preview = { inviteSubject, inviteHtml, inviteText, readableTime };
+
 async function sendInvite(apiKey, mentor, when) {
   const first = String(mentor.name || "").trim().split(/\s+/)[0] || "there";
   const res = await fetch("https://api.brevo.com/v3/smtp/email", {
