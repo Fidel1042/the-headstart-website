@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Confirm your interview – Headstart Mentoring</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+  <style>
+    :root {
+      --bg: #f6f6f4; --card: #ffffff; --line: rgba(0,0,0,0.12);
+      --text: #17170f; --muted: rgba(0,0,0,0.55);
+      --gold: #c79b3b; --gold-bright: #f0c75c;
+      --green: #2e7d52;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg); color: var(--text); line-height: 1.6;
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      padding: 2rem 1.1rem;
+    }
+    .card {
+      width: 100%; max-width: 420px; background: var(--card);
+      border: 1px solid var(--line); border-radius: 18px; overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08); text-align: center;
+    }
+    /* The wordmark is a pale gold gradient built for dark backgrounds, so it
+       gets its own black band rather than vanishing into a white page. */
+    .brand { background: #000; padding: 1.7rem 1.6rem; }
+    /* headstart-wordmark.png is the logo cropped to its own edges. The original
+       sits in the middle of a 1920x1080 canvas, so sizing that one by height
+       shrinks the actual mark to nothing. */
+    .brand img { width: 200px; max-width: 62%; height: auto; display: block; margin: 0 auto; }
+    .body { padding: 1.8rem 1.6rem 2rem; }
+    h1 { font-size: 1.2rem; font-weight: 800; margin-bottom: 1.4rem; }
+
+    .when {
+      border: 1px solid var(--line); border-radius: 12px; background: #faf8f3;
+      padding: 1rem 0.9rem; margin-bottom: 1.6rem;
+    }
+    .when__day { font-size: 1.05rem; font-weight: 800; color: #8a6210; }
+    .when__time { font-size: 1.5rem; font-weight: 800; margin: 0.1rem 0 0.25rem; }
+    .when__zone { font-size: 0.76rem; color: var(--muted); }
+
+    .btns { display: flex; gap: 0.7rem; }
+    .btn {
+      flex: 1; font: inherit; font-size: 0.86rem; font-weight: 800;
+      min-height: 48px; border-radius: 999px; cursor: pointer;
+      border: 1px solid var(--line); background: #fff; color: var(--text);
+      transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    }
+    .btn--yes { background: var(--gold); border-color: var(--gold); color: #17170f; }
+    .btn--yes:hover { background: var(--gold-bright); border-color: var(--gold-bright); }
+    .btn--no:hover { border-color: #17170f; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .cal {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 44px; margin-top: 1.1rem; font-size: 0.82rem; font-weight: 700;
+      color: var(--gold); text-decoration: none; border-bottom: 1px solid transparent;
+    }
+    .cal:hover { border-bottom-color: var(--gold); }
+
+    .done { display: none; }
+    .done__mark { font-size: 2rem; line-height: 1; margin-bottom: 0.6rem; }
+    .done__line { font-size: 0.95rem; margin-bottom: 0.3rem; }
+    .done__sub { font-size: 0.82rem; color: var(--muted); }
+    .is-done .ask { display: none; }
+    .is-done .done { display: block; }
+
+    .oops { font-size: 0.82rem; color: #c33; margin-top: 0.9rem; min-height: 1.2em; }
+
+    @media (prefers-reduced-motion: reduce) { .btn { transition: none; } }
+  </style>
+</head>
+<body>
+  <main class="card" id="card">
+    <div class="brand">
+      <img src="/images/headstart-wordmark.png" alt="Headstart Mentoring" />
+    </div>
+    <div class="body">
+
+    <div class="ask">
+      <h1 id="q">Can you still make your interview?</h1>
+
+      <div class="when">
+        <p class="when__day" id="day">Tuesday 1 September</p>
+        <p class="when__time" id="time">6:00 pm</p>
+        <p class="when__zone">Sydney time &middot; 30 minutes on Zoom</p>
+      </div>
+
+      <div class="btns">
+        <button class="btn btn--yes" type="button" data-a="Yes">Yes, I'll be there</button>
+        <button class="btn btn--no" type="button" data-a="No">Can't make it</button>
+      </div>
+
+      <p class="oops" id="oops"></p>
+    </div>
+
+    <div class="done">
+      <p class="done__mark" id="mark">&#10003;</p>
+      <p class="done__line" id="doneline">You're confirmed.</p>
+      <p class="done__sub" id="donesub">See you then.</p>
+      <a class="cal" id="cal" href="#" target="_blank" rel="noopener">Add to my calendar</a>
+    </div>
+    </div>
+  </main>
+
+  <script>
+    const p = new URLSearchParams(location.search);
+    const MENTOR = p.get("m") || "";
+    const MINUTES = 30;
+
+    // Lets the page be reviewed on its own, with no record behind it.
+    const DEMO = { name: "Palak", at: "2026-09-01T08:00:00.000Z",
+                   zoom: "https://us05web.zoom.us/j/2123046742", passcode: "cRsn5u" };
+    let DATA = null;
+
+    const fmt = (iso, opts) => new Intl.DateTimeFormat("en-AU",
+      { timeZone: "Australia/Sydney", ...opts }).format(new Date(iso));
+
+    function paint() {
+      document.getElementById("day").textContent =
+        fmt(DATA.at, { weekday: "long", day: "numeric", month: "long" });
+      document.getElementById("time").textContent =
+        fmt(DATA.at, { hour: "numeric", minute: "2-digit", hour12: true });
+      if (DATA.name) {
+        document.getElementById("q").textContent =
+          `${DATA.name}, can you still make your interview?`;
+      }
+      document.getElementById("cal").href = calLink();
+    }
+
+    function calLink() {
+      const s = new Date(DATA.at), e = new Date(s.getTime() + MINUTES * 60000);
+      const stamp = (d) => d.toISOString().replace(/[-:]|\.\d{3}/g, "");
+      const q = new URLSearchParams({
+        action: "TEMPLATE",
+        text: "Interview with Headstart Mentoring",
+        dates: `${stamp(s)}/${stamp(e)}`,
+        location: DATA.zoom || "",
+        details: DATA.passcode ? `Zoom passcode: ${DATA.passcode}` : "",
+      });
+      return `https://calendar.google.com/calendar/render?${q}`;
+    }
+
+    async function api(body) {
+      const res = await fetch("/.netlify/functions/interview-confirm", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mentorId: MENTOR, ...body }),
+      });
+      const text = await res.text();
+      if (text.trim().startsWith("<")) throw new Error("offline");
+      const data = JSON.parse(text);
+      if (!res.ok) throw new Error(data.error || "Something went wrong");
+      return data;
+    }
+
+    (async () => {
+      if (!MENTOR) { DATA = DEMO; paint(); return; }
+      try { DATA = await api({}); }
+      catch (e) { DATA = DEMO; }
+      paint();
+      // Somebody re-opening the link sees what they already said, rather than
+      // being asked again and wondering if the first answer counted.
+      if (DATA.answer) settle(DATA.answer, true);
+    })();
+
+    function settle(answer, already) {
+      const yes = answer === "Yes";
+      document.getElementById("mark").innerHTML = yes ? "&#10003;" : "&#9675;";
+      document.getElementById("mark").style.color = yes ? "var(--green)" : "var(--muted)";
+      document.getElementById("doneline").textContent = yes
+        ? "You're confirmed."
+        : "No problem, thanks for letting us know.";
+      // A "no" needs them to do one more thing, or the interview just stalls
+      // waiting on Fidel to notice and chase a new time.
+      document.getElementById("donesub").textContent = yes
+        ? "See you then."
+        : "Reply to the invitation email with a few times that suit you and we'll rebook.";
+      document.getElementById("cal").style.display = yes ? "inline-flex" : "none";
+      document.getElementById("card").classList.add("is-done");
+    }
+
+    document.querySelectorAll("[data-a]").forEach((b) => {
+      b.addEventListener("click", async () => {
+        const answer = b.dataset.a;
+        document.querySelectorAll("[data-a]").forEach((x) => { x.disabled = true; });
+        document.getElementById("oops").textContent = "";
+        if (!MENTOR) { settle(answer); return; }
+        try {
+          await api({ answer });
+          settle(answer);
+        } catch (e) {
+          document.getElementById("oops").textContent =
+            "Could not save that. Please reply to the email instead.";
+          document.querySelectorAll("[data-a]").forEach((x) => { x.disabled = false; });
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -15,8 +15,7 @@
   <link rel="stylesheet" href="/mentor-portal/polish.css" />
   <style>
     .ag-page { max-width: 860px; margin: 0 auto; padding: 1.6rem 1.2rem 4rem; }
-    .ag-head h1 { font-size: 1.4rem; font-weight: 800; margin: 0 0 0.2rem; }
-    .ag-head p { font-size: 0.85rem; color: var(--text-muted); margin: 0 0 1.6rem; max-width: 64ch; }
+    .ag-head h1 { font-size: 1.4rem; font-weight: 800; margin: 0 0 1.4rem; }
 
     .sec__title {
       font-size: 0.66rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
@@ -60,8 +59,6 @@
     }
     .legacy summary::before { content: "\25B8 "; }
     .legacy[open] summary::before { content: "\25BE "; }
-    .how { font-size: 0.78rem; color: var(--text-muted); margin-top: 2rem; line-height: 1.6; }
-    .how b { color: var(--text); }
   </style>
 </head>
 <body>
@@ -71,9 +68,6 @@
   <main class="ag-page">
     <div class="ag-head">
       <h1>Mentor agreements</h1>
-      <p>New mentors only. Set someone to Hired with a rate in Airtable and they
-        appear here with their own link. The rate on the agreement is read live, so
-        changing it never needs a new link or a deploy.</p>
     </div>
 
     <p class="state" id="loading">Loading&hellip;</p>
@@ -90,16 +84,6 @@
         <summary>On the old signed document <span id="legacy-count"></span></summary>
         <div id="legacy"></div>
       </details>
-
-      <p class="how">
-        <b>Sending one:</b> copy the link, send it to the mentor. It shows their name,
-        their rate and the agreement, and they sign at the bottom.<br />
-        <b>Changing a rate:</b> edit Rate in Airtable. The same link shows the new
-        number next time it is opened.<br />
-        <b>After they sign:</b> Netlify posts the submission to Make, which writes
-        Agreement Signed and Rate Agreed back to their mentor record. Those two fields
-        are what this page reads.
-      </p>
     </div>
   </main>
 

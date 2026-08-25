@@ -54,6 +54,7 @@ export const NAV_AREAS = [
     label: "Mentors",
     links: [
       { href: "/mentor-portal/pipeline.html", label: "Pipeline", page: "pipeline", group: "Hiring" },
+      { href: "/mentor-portal/second-interviews.html", label: "Second interviews", page: "second-interviews", group: "Hiring" },
       { href: "/mentor-portal/agreements.html", label: "Agreements", page: "agreements", group: "Hiring" },
       { href: "/mentor-portal/drafts.html", label: "Profiles", page: "drafts", group: "Hiring" },
       { href: "/mentor-portal/onboarding-plan.html", label: "Plan", page: "onboarding-plan", group: "Onboarding" },

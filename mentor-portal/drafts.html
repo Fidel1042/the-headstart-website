@@ -15,8 +15,7 @@
   <link rel="stylesheet" href="/mentor-portal/polish.css" />
   <style>
     .df-page { max-width: 940px; margin: 0 auto; padding: 1.6rem 1.2rem 4rem; }
-    .df-head h1 { font-size: 1.4rem; font-weight: 800; margin: 0 0 0.2rem; }
-    .df-head p { font-size: 0.85rem; color: var(--text-muted); margin: 0 0 1.6rem; max-width: 66ch; }
+    .df-head h1 { font-size: 1.4rem; font-weight: 800; margin: 0 0 1.4rem; }
 
     .grp__title {
       font-size: 0.66rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
@@ -79,11 +78,6 @@
   <main class="df-page">
     <div class="df-head">
       <h1>Mentor profiles</h1>
-      <p>The three drafts for every new mentor: the landing page card, the
-        mentors page card, and the internal profile used on consultation calls.
-        Claude writes them from the interview transcript. Edit the wording here,
-        then approve. Approving does not publish; it puts them in the queue to
-        be built into the site.</p>
     </div>
 
     <p class="state" id="loading">Loading&hellip;</p>
@@ -215,8 +209,7 @@
 
       document.getElementById("foot").textContent =
         `${DATA.waiting.length} waiting on you · ${DATA.approved.length} approved and queued · ` +
-        `${DATA.needsDrafts.length} with nothing written · ${DATA.shipped} already live. ` +
-        `Once approved, tell Claude to ship them and it writes the three files and pushes.`;
+        `${DATA.needsDrafts.length} with nothing written · ${DATA.shipped} already live. `;
     }
 
     function readRow(row) {

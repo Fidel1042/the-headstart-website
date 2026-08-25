@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <title>Second Interviews – The Headstart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+  <style id="auth-gate">
+    html:not(.auth-ok) body { visibility: hidden; }
+    html:not(.auth-ok) { background: #fff; }
+  </style>
+  <link rel="stylesheet" href="portal.css" />
+  <link rel="stylesheet" href="portal-nav.css" />
+  <link rel="stylesheet" href="/mentor-portal/polish.css" />
+  <style>
+    .si-page { max-width: 860px; margin: 0 auto; padding: 1.6rem 1.2rem 4rem; }
+    .si-head h1 { font-size: 1.4rem; font-weight: 800; margin: 0 0 1.4rem; }
+
+    .c { --c-line: rgba(255,255,255,0.18); }
+    [data-theme="light"] .c { --c-line: rgba(0,0,0,0.16); }
+    .c { border: 1px solid var(--c-line); border-radius: 14px; background: var(--bg-card);
+      box-shadow: var(--shadow-card); padding: 1.1rem 1.25rem; margin-bottom: 1rem; }
+
+    .c__top { display: flex; align-items: baseline; gap: 0.7rem; flex-wrap: wrap; }
+    .c__name { font-weight: 800; font-size: 1.05rem; }
+    .c__role { font-size: 0.82rem; color: var(--text-muted); }
+    .c__spacer { flex: 1; }
+    .c__when { font-size: 0.82rem; font-weight: 700; color: var(--accent); white-space: nowrap; }
+    .c__nodate { font-size: 0.8rem; color: #c33; }
+
+    .c__facts { display: flex; gap: 1.4rem; flex-wrap: wrap; margin-top: 0.7rem;
+      font-size: 0.8rem; color: var(--text-muted); }
+    .c__facts a { color: var(--accent); font-weight: 600; }
+    .c__facts b { color: var(--text); font-weight: 600; }
+
+    .c__sum {
+      margin-top: 0.9rem; padding-top: 0.9rem; border-top: 1px solid var(--line-soft);
+      font-size: 0.88rem; line-height: 1.62; white-space: pre-wrap;
+    }
+    .c__sum strong { font-weight: 700; }
+    .c__none { font-size: 0.85rem; color: #c33; margin-top: 0.9rem; }
+
+    .zoom { margin-top: 1.6rem; font-size: 0.82rem; color: var(--text-muted); }
+    .zoom a { color: var(--accent); font-weight: 600; }
+
+    .state { font-size: 0.9rem; color: var(--text-muted); padding: 2rem 0; text-align: center; }
+    .quiet { font-size: 0.85rem; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+
+  <div id="portal-nav"></div>
+
+  <main class="si-page">
+    <div class="si-head">
+      <h1>Second interviews</h1>
+    </div>
+
+    <p class="state" id="loading">Loading&hellip;</p>
+    <p class="state" id="error" hidden></p>
+
+    <div id="content" hidden>
+      <div id="list"></div>
+      <p class="zoom" id="zoom"></p>
+    </div>
+  </main>
+
+  <script type="module">
+    import { requireAuth } from "./auth.js";
+    import { mountPortalNav, initTheme } from "./portal-ui.js";
+
+    initTheme();
+
+    let ADMIN_EMAIL = "";
+
+    const esc = (v) => String(v == null ? "" : v)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+    const readable = (iso) => iso
+      ? new Date(iso).toLocaleString("en-AU",
+          { weekday: "long", day: "numeric", month: "long", hour: "numeric", minute: "2-digit" })
+      : "";
+
+    requireAuth((session) => {
+      const email = session?.user?.email || "";
+      const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com"];
+      if (!OWNERS.includes(email) && email !== "dev@localhost") {
+        window.location.replace("/mentor-portal/index.html");
+        return;
+      }
+      ADMIN_EMAIL = email;
+      mountPortalNav({ email, isOwner: true, active: "second-interviews" });
+      load();
+    });
+
+    async function load() {
+      const loading = document.getElementById("loading");
+      const errorEl = document.getElementById("error");
+      try {
+        const res = await fetch("/.netlify/functions/mentor-pipeline", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ adminEmail: ADMIN_EMAIL }),
+        });
+        const text = await res.text();
+        if (text.trim().startsWith("<")) throw new Error("This page needs the live site.");
+        const data = JSON.parse(text);
+        if (!res.ok) throw new Error(data.error || "Could not load");
+        loading.hidden = true;
+        render(data);
+        document.getElementById("content").hidden = false;
+      } catch (err) {
+        loading.hidden = true;
+        errorEl.textContent = err.message || "Could not load — refresh to try again.";
+        errorEl.hidden = false;
+      }
+    }
+
+    // The summary is written as markdown by the interview one automation. Only
+    // bold and line breaks are needed here, so nothing heavier is pulled in.
+    function light(md) {
+      return esc(md)
+        .replace(/^##\s*(.+)$/gm, "<strong>$1</strong>")
+        .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+    }
+
+    function card(m) {
+      const role = [m.role, m.company].filter(Boolean).join(" at ");
+      return `
+        <div class="c">
+          <div class="c__top">
+            <span class="c__name">${esc(m.name)}</span>
+            ${role ? `<span class="c__role">${esc(role)}</span>` : ""}
+            <span class="c__spacer"></span>
+            ${m.secondAt
+              ? `<span class="c__when">${esc(readable(m.secondAt))}</span>`
+              : `<span class="c__nodate">no time booked yet</span>`}
+          </div>
+          <div class="c__facts">
+            ${m.industry ? `<span><b>Industry</b> ${esc(m.industry)}</span>` : ""}
+            ${m.rateSet ? `<span><b>Rate</b> $${esc(m.rate)}</span>` : ""}
+            ${m.email ? `<span><b>Email</b> ${esc(m.email)}</span>` : ""}
+            ${m.phone ? `<span><b>Phone</b> ${esc(m.phone)}</span>` : ""}
+            ${m.linkedin
+              ? `<span><a href="${esc(m.linkedin)}" target="_blank" rel="noopener">LinkedIn</a></span>`
+              : `<span class="c__nodate">no LinkedIn on file</span>`}
+          </div>
+          ${m.summary
+            ? `<div class="c__sum">${light(m.summary)}</div>`
+            : `<p class="c__none">No interview one summary yet.</p>`}
+        </div>`;
+    }
+
+    function render(data) {
+      const list = data.secondRound || [];
+      document.getElementById("list").innerHTML = list.length
+        ? list.map(card).join("")
+        : `<p class="quiet">Nobody is waiting on a second interview.</p>`;
+
+      const z = data.zoom || {};
+      document.getElementById("zoom").innerHTML = list.length && z.link
+        ? `Zoom: <a href="${esc(z.link)}" target="_blank" rel="noopener">${esc(z.link)}</a> &nbsp;·&nbsp; passcode ${esc(z.passcode)}`
+        : "";
+    }
+  </script>
+</body>
+</html>

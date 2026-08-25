@@ -20,13 +20,13 @@ const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com", "dev@localho
 // The order somebody actually moves through. Hired is the far end and lives on
 // the Agreements page. Hold parks somebody without ending it; Dropped ends it.
 //
-// Second Interview was retired in August 2026. It is not offered as a choice
-// any more, but it is still recognised below so the people already sitting on
-// it stay visible instead of vanishing out of the portal.
-const STAGES = ["Screen", "First Interview",
+// Second Interview is optional, not a step everyone takes. After interview one
+// Fidel flips them to Hired, Dropped, or Second Interview when he is undecided,
+// and that round is run by Koko.
+const STAGES = ["Screen", "First Interview", "Second Interview",
                 "Waiting on signed contract", "Hold", "Hired", "Dropped"];
 
-const RETIRED = ["Second Interview"];
+const RETIRED = [];
 
 // Everyone still being worked on. Hired, Hold and Dropped have their own homes.
 const IN_PIPELINE = ["Screen", "First Interview", "Second Interview",
@@ -46,7 +46,8 @@ const NOTES_FIELD = {
 const FIELDS = ["Name", "Email", "Phone", "Status", "Rate", "First Interview Date",
                 "Industry", "Company", "Role", "LinkedIn", "Koko Notified",
                 "Agreement Signed", "Legacy Agreement", "Invite Sent",
-                "Int 1 transcript", "Interview 2 Transcript"];
+                "Int 1 transcript", "Int 1 summary", "Interview 2 Transcript",
+                "Second Interview Date"];
 
 const SENDER = { name: "Fidel @Headstart Mentoring", email: "fidel@theheadstartmentoring.com" };
 
@@ -66,7 +67,9 @@ const ZOOM = {
 // asterisks, with a plain-text copy for clients that refuse HTML.
 const inviteSubject = () => "Interview invitation — Headstart Mentoring";
 
-const inviteHtml = (firstName, when) => `
+const CONFIRM_URL = "https://theheadstartmentoring.com/interview-confirm";
+
+const inviteHtml = (firstName, when, mentorId) => `
 <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:#17170f;max-width:600px;">
   <p style="margin:0 0 16px;">Hi ${firstName},</p>
   <p style="margin:0 0 16px;">Thank you for your application, we&rsquo;re excited to let you know that you&rsquo;ve progressed to the next stage of our selection process.</p>
@@ -76,12 +79,14 @@ const inviteHtml = (firstName, when) => `
   <p style="margin:0 0 4px;"><strong>Platform</strong>: Zoom</p>
   <p style="margin:0 0 4px;"><strong>Meeting Link</strong>: <a href="${ZOOM.link}" style="color:#8a6210;">${ZOOM.link}</a></p>
   <p style="margin:0 0 16px;"><strong>Passcode</strong>: ${ZOOM.passcode}</p>
-  <p style="margin:0 0 16px;">Please reply to confirm your availability for this time. If it doesn&rsquo;t suit, feel free to suggest a few alternatives and we&rsquo;ll do our best to accommodate.</p>
+  <p style="margin:0 0 20px;">Please confirm you can make it:</p>
+  <p style="margin:0 0 20px;"><a href="${CONFIRM_URL}?m=${mentorId}" style="display:inline-block;background:#c79b3b;color:#17170f;font-weight:700;font-size:15px;text-decoration:none;padding:13px 26px;border-radius:999px;">Confirm my interview</a></p>
+  <p style="margin:0 0 16px;">If the time doesn&rsquo;t suit, hit the same link and let us know, then reply here with a few alternatives and we&rsquo;ll do our best to accommodate.</p>
   <p style="margin:0 0 16px;">Looking forward to speaking with you.</p>
   <p style="margin:0;">Best Regards,<br /><strong>Fidel Hon</strong><br /><em>Operations Manager</em><br />Headstart Mentoring</p>
 </div>`;
 
-const inviteText = (firstName, when) =>
+const inviteText = (firstName, when, mentorId) =>
   `Hi ${firstName},\n\n` +
   `Thank you for your application, we're excited to let you know that you've progressed to the next stage of our selection process.\n\n` +
   `We'd love to invite you to an online interview to learn more about your experience and explore how you might fit into our team of Mentors within Headstart Mentoring.\n\n` +
@@ -90,7 +95,8 @@ const inviteText = (firstName, when) =>
   `Platform: Zoom\n` +
   `Meeting Link: ${ZOOM.link}\n` +
   `Passcode: ${ZOOM.passcode}\n\n` +
-  `Please reply to confirm your availability for this time. If it doesn't suit, feel free to suggest a few alternatives and we'll do our best to accommodate.\n\n` +
+  `Please confirm you can make it: ${CONFIRM_URL}?m=${mentorId}\n\n` +
+  `If the time doesn't suit, use the same link to let us know, then reply here with a few alternatives and we'll do our best to accommodate.\n\n` +
   `Looking forward to speaking with you.\n\n` +
   `Best Regards,\nFidel Hon\nOperations Manager\nHeadstart Mentoring`;
 
@@ -116,8 +122,8 @@ async function sendInvite(apiKey, mentor, when) {
       to: [{ email: mentor.email, name: mentor.name }],
       replyTo: SENDER,
       subject: inviteSubject(),
-      htmlContent: inviteHtml(first, when),
-      textContent: inviteText(first, when),
+      htmlContent: inviteHtml(first, when, mentor.id),
+      textContent: inviteText(first, when, mentor.id),
     }),
   });
   if (res.ok) return { ok: true };
@@ -160,6 +166,10 @@ const shape = (r) => {
     status: f["Status"] || "",
     rate, rateSet: rate > 0,
     interviewAt: f["First Interview Date"] || "",
+    // Booked on the interview one call, so it is logged in the same sitting
+    // rather than chased afterwards.
+    secondAt: f["Second Interview Date"] || "",
+    summary: f["Int 1 summary"] || "",
     industry: f["Industry"] || "",
     company: f["Company"] || "",
     role: f["Role"] || "",
@@ -206,6 +216,14 @@ exports.handler = async (event) => {
           return json(400, { error: "A rate should be between 0 and 500" });
         }
         fields["Rate"] = rate;
+      }
+      if (p.secondAt !== undefined) {
+        if (!p.secondAt) fields["Second Interview Date"] = null;
+        else {
+          const d = new Date(p.secondAt);
+          if (Number.isNaN(d.getTime())) return json(400, { error: "That second interview date did not parse" });
+          fields["Second Interview Date"] = d.toISOString();
+        }
       }
       if (p.interviewAt !== undefined) {
         // Empty clears it. Anything else has to be a real instant, or Airtable
@@ -266,6 +284,11 @@ exports.handler = async (event) => {
       // source, so the two can never drift apart.
       zoom: ZOOM,
       retired: RETIRED,
+      // Everyone waiting on a round with Koko, with the interview one summary
+      // attached so she can prep without opening Airtable.
+      secondRound: all.filter((r) => (r.fields["Status"] || "") === "Second Interview")
+        .map(shape)
+        .sort((a, b) => String(a.secondAt || "9999").localeCompare(String(b.secondAt || "9999"))),
       // Parked, not finished. Kept out of the working list but still reachable,
       // because the whole point of Hold is coming back to them.
       onHold: all.filter((r) => (r.fields["Status"] || "") === "Hold")

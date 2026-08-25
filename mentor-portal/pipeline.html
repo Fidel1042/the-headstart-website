@@ -15,8 +15,7 @@
   <link rel="stylesheet" href="/mentor-portal/polish.css" />
   <style>
     .pl-page { max-width: 940px; margin: 0 auto; padding: 1.6rem 1.2rem 4rem; }
-    .pl-head h1 { font-size: 1.4rem; font-weight: 800; margin: 0 0 0.2rem; }
-    .pl-head p { font-size: 0.85rem; color: var(--text-muted); margin: 0 0 1.6rem; max-width: 66ch; }
+    .pl-head h1 { font-size: 1.4rem; font-weight: 800; margin: 0 0 1.4rem; }
 
     .stage__title {
       font-size: 0.66rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
@@ -43,6 +42,9 @@
     .m__sum:hover { background: var(--bg-card-hover); border-radius: 13px; }
     .m[open] .m__sum { border-bottom: 1px solid var(--line-soft); border-radius: 13px 13px 0 0; }
     .m__when { font-size: 0.78rem; font-weight: 700; color: var(--accent); }
+    /* An interview that has already run is waiting on a decision, so it reads
+       as done rather than as something still coming up. */
+    .m__when--done { color: var(--text-muted); font-weight: 600; text-decoration: line-through; }
     .m__body { padding: 0.2rem 1.05rem 0.95rem; }
     .m__name { font-weight: 700; font-size: 0.95rem; }
     .m__meta { font-size: 0.74rem; color: var(--text-muted); }
@@ -119,9 +121,6 @@
   <main class="pl-page">
     <div class="pl-head">
       <h1>Mentor pipeline</h1>
-      <p>Everyone being screened or interviewed. Move someone along, set their interview
-        time, and set their rate, all from here. Once they are Hired they move to
-        Agreements.</p>
     </div>
 
     <details class="qs">
@@ -253,16 +252,20 @@
 
     function card(m) {
       const where = [m.role, m.company].filter(Boolean).join(" at ");
-      // A booked interview is settled, so it collapses to one line. Anything
-      // without a time still needs a decision and stays open.
-      const settled = Boolean(m.interviewAt);
+      // Collapsed only while an interview is still ahead: booked, nothing to do.
+      // No time yet means it needs booking, and a time that has passed means it
+      // needs the flip to Hired, Second Interview or Dropped. Both stay open.
+      const upcoming = m.interviewAt && new Date(m.interviewAt) > new Date();
+      const settled = Boolean(upcoming);
       return `
         <details class="m" data-id="${m.id}"${settled ? "" : " open"}>
           <summary class="m__sum">
             <span class="m__name">${esc(m.name)}</span>
             ${where ? `<span class="m__meta">${esc(where)}</span>` : ""}
             <span class="m__spacer"></span>
-            ${m.interviewAt ? `<span class="m__when">${esc(readable(m.interviewAt))}</span>` : ""}
+            ${m.interviewAt
+              ? `<span class="m__when${upcoming ? "" : " m__when--done"}">${esc(readable(m.interviewAt))}</span>`
+              : ""}
             ${m.inviteSent ? `<span class="m__meta">invited</span>` : ""}
           </summary>
           <div class="m__body">
@@ -277,6 +280,10 @@
             <span class="fld">
               <label>Interview</label>
               <input type="datetime-local" data-f="interviewAt" value="${esc(forInput(m.interviewAt))}" />
+            </span>
+            <span class="fld" data-only="Second Interview"${m.status === "Second Interview" ? "" : " hidden"}>
+              <label>2nd with Koko</label>
+              <input type="datetime-local" data-f="secondAt" value="${esc(forInput(m.secondAt))}" />
             </span>
             <span class="fld">
               <label>Rate $</label>
@@ -330,9 +337,17 @@
         + holdBlock;
 
       document.getElementById("foot").textContent =
-        `${DATA.pipeline.length} in the pipeline · ${held.length} on hold · ${DATA.hired} hired. ` +
-        `Setting someone to Hired moves them to the Agreements page. Dropped removes them from here.`;
+        `${DATA.pipeline.length} in the pipeline · ${held.length} on hold · ${DATA.hired} hired. `;
     }
+
+    // The second interview date only applies to one stage, so it appears the
+    // moment that stage is chosen instead of after a save and a reload.
+    document.addEventListener("change", (e) => {
+      const sel = e.target.closest('[data-f="status"]');
+      if (!sel) return;
+      const slot = sel.closest(".m").querySelector('[data-only="Second Interview"]');
+      if (slot) slot.hidden = sel.value !== "Second Interview";
+    });
 
     document.addEventListener("click", async (e) => {
       const inv = e.target.closest("[data-invite]");
@@ -386,6 +401,11 @@
           // datetime-local has no zone, so it is read as this browser's local
           // time, which is the time Fidel just typed.
           interviewAt: get("interviewAt") ? new Date(get("interviewAt")).toISOString() : "",
+          // Only sent when it is actually in play. Otherwise moving somebody to
+          // Hired would blank the date their second interview happened on.
+          ...(get("secondAt")
+              ? { secondAt: new Date(get("secondAt")).toISOString() }
+              : get("status") === "Second Interview" ? { secondAt: "" } : {}),
         });
         note.className = "saved";
         const moved = { "Hired": "Hired — now on Agreements",
