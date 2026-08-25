@@ -73,15 +73,6 @@
     .qs__list { margin: 0.3rem 0 0.7rem; padding-left: 1.4rem; }
     .qs__list li { font-size: 0.85rem; line-height: 1.6; margin-bottom: 0.55rem; max-width: 70ch; }
 
-    .wr { display: block; margin-top: 0.75rem; }
-    .wr__label { display: block; font-size: 0.7rem; color: var(--text-muted); margin-bottom: 0.3rem; }
-    textarea[data-f="notes"] {
-      font-family: inherit; font-size: 0.8rem; line-height: 1.55; width: 100%;
-      box-sizing: border-box; padding: 0.5rem 0.6rem; border: 1px solid var(--line);
-      border-radius: 8px; background: var(--bg); color: var(--text); resize: vertical;
-    }
-    textarea[data-f="notes"]:focus { outline: none; border-color: var(--accent); }
-
     .held { margin-top: 1.8rem; }
     .held > summary {
       cursor: pointer; font-size: 0.66rem; font-weight: 800; letter-spacing: 0.1em;
@@ -274,11 +265,6 @@
             <span class="note" data-note="${m.id}">${m.inviteSent
               ? `<span class="m__meta">invited ${esc(readable(m.inviteSent))}</span>` : ""}</span>
           </div>
-          <label class="wr">
-            <span class="wr__label">Write-up &mdash; saves to ${esc(m.notesField)}</span>
-            <textarea data-f="notes" rows="3" data-stage="${esc(m.status)}"
-              placeholder="Paste the Fathom transcript or share link, and what you made of them.">${esc(m.notes)}</textarea>
-          </label>
         </div>`;
     }
 
@@ -344,19 +330,16 @@
       const row = btn.closest(".m");
       const note = row.querySelector("[data-note]");
       const get = (f) => row.querySelector(`[data-f="${f}"]`).value;
+      const was = DATA.pipeline.concat(DATA.onHold || [])
+        .find((x) => x.id === btn.dataset.save)?.status;
 
       btn.disabled = true;
       const original = btn.textContent;
       btn.textContent = "Saving…";
       note.textContent = "";
       try {
-        const box = row.querySelector('[data-f="notes"]');
         const res = await post({
           action: "update", mentorId: btn.dataset.save,
-          notes: box.value,
-          // The stage the box was labelled with, so the write-up lands where
-          // the label said even if the stage is being changed in the same Save.
-          notesStage: box.dataset.stage,
           status: get("status"),
           rate: get("rate") === "" ? 0 : get("rate"),
           // datetime-local has no zone, so it is read as this browser's local
@@ -369,8 +352,19 @@
                         "Hold": "On hold" };
         note.textContent = moved[res.mentor.status] || "Saved";
         // They no longer belong under the heading they are sitting under, so
-        // reload rather than leaving a row in the wrong place.
-        if (moved[res.mentor.status]) setTimeout(load, 900);
+        // reload rather than leaving a row in the wrong place. A stage change
+        // inside the pipeline moves them between headings too.
+        if (moved[res.mentor.status] || res.mentor.status !== was) {
+          setTimeout(load, 900);
+        } else {
+          // Rebuild this row from what came back, so Send invite and the
+          // calendar link pick up an interview time saved a moment ago.
+          const fresh = document.createElement("div");
+          fresh.innerHTML = card(res.mentor);
+          const el = fresh.firstElementChild;
+          el.querySelector("[data-note]").outerHTML = note.outerHTML;
+          row.replaceWith(el);
+        }
       } catch (err) {
         note.className = "oops";
         note.textContent = err.message;
