@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mentor Profiles – The Headstart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+  <style id="auth-gate">
+    html:not(.auth-ok) body { visibility: hidden; }
+    html:not(.auth-ok) { background: #fff; }
+  </style>
+  <link rel="stylesheet" href="portal.css" />
+  <link rel="stylesheet" href="portal-nav.css" />
+  <link rel="stylesheet" href="/mentor-portal/polish.css" />
+  <style>
+    .df-page { max-width: 940px; margin: 0 auto; padding: 1.6rem 1.2rem 4rem; }
+    .df-head h1 { font-size: 1.4rem; font-weight: 800; margin: 0 0 0.2rem; }
+    .df-head p { font-size: 0.85rem; color: var(--text-muted); margin: 0 0 1.6rem; max-width: 66ch; }
+
+    .grp__title {
+      font-size: 0.66rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--accent); margin: 1.8rem 0 0.7rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .grp__count { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+    .m { border: 1px solid var(--line); border-radius: 14px; background: var(--bg-card);
+      padding: 0.9rem 1.05rem; margin-bottom: 0.6rem; }
+    .m__top { display: flex; align-items: baseline; gap: 0.7rem; flex-wrap: wrap; }
+    .m__name { font-weight: 700; font-size: 0.95rem; }
+    .m__meta { font-size: 0.74rem; color: var(--text-muted); }
+    .m__spacer { flex: 1; }
+    .m__warn { font-size: 0.74rem; color: #c33; }
+
+    .d { margin-top: 0.85rem; }
+    .d__label { display: block; font-size: 0.7rem; color: var(--text-muted); margin-bottom: 0.3rem; }
+    textarea {
+      font-family: inherit; font-size: 0.8rem; line-height: 1.55; width: 100%;
+      box-sizing: border-box; padding: 0.5rem 0.6rem; border: 1px solid var(--line);
+      border-radius: 8px; background: var(--bg); color: var(--text); resize: vertical;
+    }
+    textarea:focus { outline: none; border-color: var(--accent); }
+
+    .checks { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.9rem; }
+    .chk { display: flex; align-items: center; gap: 0.35rem; font-size: 0.78rem; }
+    .chk input { width: 16px; height: 16px; accent-color: var(--accent); }
+    .chk.is-todo { color: #c33; }
+
+    .m__row { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.9rem; }
+    .act {
+      font-family: inherit; font-size: 0.68rem; font-weight: 800;
+      letter-spacing: 0.04em; text-transform: uppercase;
+      min-height: 36px; padding: 0 0.85rem; box-sizing: border-box;
+      border-radius: 999px; cursor: pointer; white-space: nowrap;
+      background: transparent; color: var(--accent); border: 1px solid var(--accent-line);
+    }
+    .act:hover:not(:disabled) { background: var(--accent-soft); }
+    .act:disabled { opacity: 0.45; cursor: not-allowed; }
+    .act--quiet { border-color: var(--line); color: var(--text-muted); }
+    .act--quiet:hover:not(:disabled) { border-color: var(--accent-line); color: var(--accent); }
+    .saved { font-size: 0.72rem; color: #2e7d52; }
+    [data-theme="dark"] .saved { color: #6fd39b; }
+    .oops { font-size: 0.72rem; color: #c33; }
+
+    .ask { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.6rem; }
+    .ask code { font-size: 0.76rem; background: var(--bg); border: 1px solid var(--line);
+      border-radius: 6px; padding: 0.1rem 0.35rem; }
+
+    .state { font-size: 0.9rem; color: var(--text-muted); padding: 2rem 0; text-align: center; }
+    .quiet { font-size: 0.8rem; color: var(--text-muted); }
+    .df-foot { font-size: 0.75rem; color: var(--text-muted); margin-top: 2rem; }
+  </style>
+</head>
+<body>
+
+  <div id="portal-nav"></div>
+
+  <main class="df-page">
+    <div class="df-head">
+      <h1>Mentor profiles</h1>
+      <p>The three drafts for every new mentor: the landing page card, the
+        mentors page card, and the internal profile used on consultation calls.
+        Claude writes them from the interview transcript. Edit the wording here,
+        then approve. Approving does not publish; it puts them in the queue to
+        be built into the site.</p>
+    </div>
+
+    <p class="state" id="loading">Loading&hellip;</p>
+    <p class="state" id="error" hidden></p>
+
+    <div id="content" hidden>
+      <div id="groups"></div>
+      <p class="df-foot" id="foot"></p>
+    </div>
+  </main>
+
+  <script type="module">
+    import { requireAuth } from "./auth.js";
+    import { mountPortalNav, initTheme } from "./portal-ui.js";
+
+    initTheme();
+
+    let ADMIN_EMAIL = "";
+    let DATA = null;
+
+    const esc = (v) => String(v == null ? "" : v)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+    const DRAFT_LABELS = {
+      landing: "Landing page card",
+      mentors: "Mentors page card",
+      internal: "Internal profile (consultation tool)",
+    };
+    const CHECK_LABELS = {
+      logo: "Company logo",
+      cardPhoto: "Card photo",
+      detailPhoto: "Detail photo",
+    };
+
+    requireAuth((session) => {
+      const email = session?.user?.email || "";
+      const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com"];
+      if (!OWNERS.includes(email) && email !== "dev@localhost") {
+        window.location.replace("/mentor-portal/index.html");
+        return;
+      }
+      ADMIN_EMAIL = email;
+      mountPortalNav({ email, isOwner: true, active: "drafts" });
+      load();
+    });
+
+    async function post(body) {
+      const res = await fetch("/.netlify/functions/mentor-drafts", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ adminEmail: ADMIN_EMAIL, ...body }),
+      });
+      const text = await res.text();
+      if (text.trim().startsWith("<")) {
+        throw new Error("This page needs the live site. Preview mode cannot run " +
+          "the data function, so there is nothing to show until it is pushed.");
+      }
+      const data = JSON.parse(text);
+      if (!res.ok) throw new Error(data.error || "Could not save");
+      return data;
+    }
+
+    async function load() {
+      const loading = document.getElementById("loading");
+      const errorEl = document.getElementById("error");
+      loading.hidden = false; errorEl.hidden = true;
+      try { DATA = await post({}); }
+      catch (err) {
+        loading.hidden = true;
+        errorEl.textContent = err.message || "Could not load — refresh to try again.";
+        errorEl.hidden = false;
+        return;
+      }
+      loading.hidden = true;
+      render();
+      document.getElementById("content").hidden = false;
+    }
+
+    function card(m, mode) {
+      const outstanding = Object.keys(CHECK_LABELS).filter((k) => !m.checks[k]);
+      return `
+        <div class="m" data-id="${m.id}">
+          <div class="m__top">
+            <span class="m__name">${esc(m.name)}</span>
+            ${m.role ? `<span class="m__meta">${esc(m.role)}</span>` : ""}
+            <span class="m__spacer"></span>
+            ${m.approved ? `<span class="m__meta">approved ${esc(m.approved)}</span>` : ""}
+            ${m.hasTranscript ? "" : `<span class="m__warn">no interview transcript</span>`}
+          </div>
+
+          ${mode === "todo" ? `
+            <p class="ask">Ask Claude: <code>write the profile drafts for ${esc(m.name)}</code></p>
+          ` : Object.entries(DRAFT_LABELS).map(([k, label]) => `
+            <label class="d">
+              <span class="d__label">${esc(label)}${m.drafts[k].trim() ? "" : " — empty"}</span>
+              <textarea data-d="${k}" rows="${k === "internal" ? 8 : 4}">${esc(m.drafts[k])}</textarea>
+            </label>`).join("")}
+
+          <div class="checks">
+            ${Object.entries(CHECK_LABELS).map(([k, label]) => `
+              <label class="chk${m.checks[k] ? "" : " is-todo"}">
+                <input type="checkbox" data-c="${k}"${m.checks[k] ? " checked" : ""} />
+                ${esc(label)}
+              </label>`).join("")}
+          </div>
+
+          <div class="m__row">
+            ${mode === "todo" ? "" : `<button type="button" class="act act--quiet" data-save="${m.id}">Save</button>`}
+            ${mode === "waiting" ? `<button type="button" class="act" data-approve="${m.id}">Approve</button>` : ""}
+            ${mode === "approved" ? `<button type="button" class="act act--quiet" data-unapprove="${m.id}">Reopen</button>` : ""}
+            <span class="m__spacer"></span>
+            ${outstanding.length
+              ? `<span class="m__warn">still to add: ${outstanding.map((k) => CHECK_LABELS[k].toLowerCase()).join(", ")}</span>`
+              : `<span class="saved">logo and photos done</span>`}
+          </div>
+        </div>`;
+    }
+
+    function render() {
+      const groups = [
+        ["Waiting on your approval", DATA.waiting, "waiting"],
+        ["Approved, waiting to go on the site", DATA.approved, "approved"],
+        ["Hired, nothing written yet", DATA.needsDrafts, "todo"],
+      ].filter(([, list]) => list.length);
+
+      document.getElementById("groups").innerHTML = groups.map(([title, list, mode]) => `
+          <p class="grp__title">${esc(title)} <span class="grp__count">${list.length}</span></p>
+          ${list.map((m) => card(m, mode)).join("")}`).join("")
+        || `<p class="quiet">Every hired mentor is on the site. Nothing waiting.</p>`;
+
+      document.getElementById("foot").textContent =
+        `${DATA.waiting.length} waiting on you · ${DATA.approved.length} approved and queued · ` +
+        `${DATA.needsDrafts.length} with nothing written · ${DATA.shipped} already live. ` +
+        `Once approved, tell Claude to ship them and it writes the three files and pushes.`;
+    }
+
+    function readRow(row) {
+      const drafts = {};
+      row.querySelectorAll("[data-d]").forEach((t) => { drafts[t.dataset.d] = t.value; });
+      const checks = {};
+      row.querySelectorAll("[data-c]").forEach((c) => { checks[c.dataset.c] = c.checked; });
+      return { drafts, checks };
+    }
+
+    async function run(btn, row, body, done) {
+      const original = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = "Saving…";
+      let note = row.querySelector(".note");
+      if (!note) {
+        note = document.createElement("span");
+        note.className = "note";
+        row.querySelector(".m__row").appendChild(note);
+      }
+      note.textContent = "";
+      try {
+        await post(body);
+        note.className = "note saved";
+        note.textContent = done;
+        setTimeout(load, 900);
+      } catch (err) {
+        note.className = "note oops";
+        note.textContent = err.message;
+        btn.disabled = false;
+        btn.textContent = original;
+      }
+    }
+
+    document.addEventListener("click", async (e) => {
+      const row = e.target.closest(".m");
+      if (!row) return;
+      const id = row.dataset.id;
+
+      const save = e.target.closest("[data-save]");
+      if (save) return run(save, row, { action: "save", mentorId: id, ...readRow(row) }, "Saved");
+
+      const ok = e.target.closest("[data-approve]");
+      if (ok) {
+        // Save the wording on screen first, or approving locks in the old text.
+        return run(ok, row, { action: "save", mentorId: id, ...readRow(row) }, "Approved")
+          .then(() => post({ action: "approve", mentorId: id }))
+          .catch(() => {});
+      }
+
+      const undo = e.target.closest("[data-unapprove]");
+      if (undo) return run(undo, row, { action: "unapprove", mentorId: id }, "Reopened");
+    });
+
+    // A tickbox is a reminder, not a form. Saving it the moment it is ticked
+    // means the logo never gets marked done and then lost on a refresh.
+    document.addEventListener("change", async (e) => {
+      const box = e.target.closest("[data-c]");
+      if (!box) return;
+      const row = box.closest(".m");
+      box.closest(".chk").classList.toggle("is-todo", !box.checked);
+      try { await post({ action: "save", mentorId: row.dataset.id, checks: readRow(row).checks }); }
+      catch (err) { box.checked = !box.checked; }
+    });
+  </script>
+</body>
+</html>

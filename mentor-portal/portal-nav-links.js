@@ -50,6 +50,7 @@ export const NAV_AREAS = [
       { href: "/mentor-portal/admin.html?view=calendar", label: "Calendar", page: "calendar" },
       { href: "/mentor-portal/pipeline.html", label: "Pipeline", page: "pipeline" },
       { href: "/mentor-portal/agreements.html", label: "Agreements", page: "agreements" },
+      { href: "/mentor-portal/drafts.html", label: "Profiles", page: "drafts" },
       { href: "/mentor-portal/onboarding-plan.html", label: "Onboarding plan", page: "onboarding-plan" },
       { href: "/mentor-portal/onboarding-call.html", label: "Onboarding call", page: "onboarding-call" },
       { href: "/mentor-portal/delivery-checks.html", label: "Delivery check-in", page: "delivery-checks" },
