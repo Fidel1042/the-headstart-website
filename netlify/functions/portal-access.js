@@ -23,6 +23,11 @@ const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com"];
 
 const ALLOWED_STATUS = "Hired";
 
+// Grandfathered: on the old hardcoded list and logging in fine, but the address
+// on their Airtable record is a different one, so the lookup would refuse them.
+// Samuel's record says sjhkember@gmail.com. Reconcile the two, then delete this.
+const LEGACY_LOGINS = ["samuelkember1@gmail.com"];
+
 exports.handler = async (event) => {
   if (event.httpMethod === "OPTIONS") return { statusCode: 204, headers, body: "" };
   if (event.httpMethod !== "POST") return json(405, { error: "Method not allowed" });
@@ -35,6 +40,7 @@ exports.handler = async (event) => {
   if (!email) return json(400, { error: "No email given" });
 
   if (OWNERS.includes(email)) return json(200, { allowed: true, reason: "owner" });
+  if (LEGACY_LOGINS.includes(email)) return json(200, { allowed: true, reason: "legacy login" });
 
   const { AIRTABLE_API_TOKEN: token, AIRTABLE_CORE_BASE_ID: base,
           AIRTABLE_MENTOR_TABLE_ID: table } = process.env;
