@@ -1,3 +1,6 @@
+const { activeMentors, syncActiveFlags, portalPrompt, nudgeHtml,
+        ACTIVE_DAYS, OWNERS } = require("../shared/mentor-activity");
+
 const headers = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -58,9 +61,12 @@ exports.handler = async (event) => {
   const data     = await res.json();
   const sessions = data.records || [];
 
-  if (sessions.length === 0) {
-    return { statusCode: 200, headers, body: JSON.stringify({ message: "No unpaid sessions outstanding." }) };
-  }
+  // Who is actually mentoring right now, independent of who is owed money.
+  // A mentor who forgot to log sessions has nothing owing and used to get
+  // silence, which is indistinguishable from a genuinely quiet week.
+  let active = {};
+  try { active = await activeMentors(process.env, ACTIVE_DAYS); }
+  catch (e) { active = {}; }
 
   // Group by mentor, collect record IDs per mentor
   const byMentor = {};
@@ -82,9 +88,6 @@ exports.handler = async (event) => {
   }
 
   const mentorEmails = Object.keys(byMentor);
-  if (mentorEmails.length === 0) {
-    return { statusCode: 200, headers, body: JSON.stringify({ message: "No mentor payouts to send." }) };
-  }
 
   // Send one email per mentor via Brevo
   const results = [];
@@ -130,6 +133,7 @@ exports.handler = async (event) => {
         </tfoot>
       </table>
       <p style="margin:24px 0 0;font-size:13px;color:#888;">Bank transfer is on its way. Reply to this email if anything looks off.</p>
+      ${portalPrompt("Missing a session from this list?")}
     </div>
     <div style="background:#f5f5f5;padding:16px 32px;">
       <p style="margin:0;font-size:12px;color:#aaa;">The Headstart Mentoring &nbsp;·&nbsp; Internal payslip</p>
@@ -164,6 +168,31 @@ exports.handler = async (event) => {
     }
     results.push({ email, success: brevoRes.ok, reason, recordIds: byMentor[email].recordIds });
   }
+
+  // Active, but nothing owing. Either they had a genuinely quiet week or they
+  // forgot to log. Only they can tell the difference, so ask them.
+  const nudged = [];
+  for (const [email, m] of Object.entries(active)) {
+    if (byMentor[email]) continue;
+    if (OWNERS.includes(email)) continue;
+    const lastReadable = formatDate(m.last);
+    const r = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: { "api-key": BREVO_API_KEY, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        sender: { name: "The Headstart", email: "fidel@theheadstartmentoring.com" },
+        to: [{ email, name: m.name }],
+        subject: `Nothing to pay you this week — check your log`,
+        htmlContent: nudgeHtml(m.name, weekLabel, lastReadable),
+      }),
+    });
+    nudged.push({ email, name: m.name, success: r.ok, last: m.last });
+  }
+
+  // Written after the emails so a failed run does not leave the flags claiming
+  // a state that nobody was told about.
+  let flags = { updated: 0 };
+  try { flags = await syncActiveFlags(process.env, active); } catch (e) { /* not worth failing a pay run */ }
 
   // Only mark sessions as Mentor Paid for mentors whose email actually succeeded
   const paidIds = results.filter((r) => r.success).flatMap((r) => r.recordIds);
@@ -226,7 +255,12 @@ exports.handler = async (event) => {
       <p style="margin:6px 0 0;font-size:22px;font-weight:700;color:#fff;">Payslip Run — ${weekLabel}</p>
     </div>
     <div style="padding:32px;">
-      <p style="margin:0 0 24px;font-size:14px;color:#555;">${results.length} mentor${results.length !== 1 ? "s" : ""} paid &nbsp;·&nbsp; ${results.filter(r => r.success).length} emails sent successfully</p>
+      <p style="margin:0 0 24px;font-size:14px;color:#555;">${results.length} mentor${results.length !== 1 ? "s" : ""} paid &nbsp;·&nbsp; ${results.filter(r => r.success).length} emails sent successfully &nbsp;·&nbsp; ${Object.keys(active).length} active in the last ${ACTIVE_DAYS} days</p>
+      ${nudged.length ? `
+      <p style="margin:0 0 8px;font-size:14px;color:#111;font-weight:700;">Active but nothing owing, asked to check their log</p>
+      <ul style="margin:0 0 24px;padding-left:20px;font-size:13px;color:#555;">
+        ${nudged.map((n) => `<li>${n.name} &nbsp;·&nbsp; last session ${formatDate(n.last)}${n.success ? "" : " &nbsp;·&nbsp; <strong>email failed</strong>"}</li>`).join("")}
+      </ul>` : ""}
       <table style="width:100%;border-collapse:collapse;font-size:13px;">
         <thead>
           <tr style="background:#f5f5f5;">
@@ -270,6 +304,10 @@ exports.handler = async (event) => {
     headers,
     body: JSON.stringify({
       sent: results,
+      nudged,
+      activeCount: Object.keys(active).length,
+      activeDays: ACTIVE_DAYS,
+      flagsUpdated: flags.updated,
       paidOn,
       transfer,
       transferTotal: parseFloat(transfer.reduce((a, t) => a + t.amount, 0).toFixed(2)),
