@@ -148,7 +148,20 @@ exports.handler = async (event) => {
     }
 
     calls.sort((a, b) => String(a.at).localeCompare(String(b.at)));
-    return json(200, { day, calls });
+
+    // The same person can hold two Client records: an old one that was dropped
+    // and a new one from when they rebooked. Both carry the booking, so the day
+    // would list them twice. Keyed on phone, since that is what stays the same
+    // across records, falling back to the name.
+    const seen = new Set();
+    const unique = calls.filter((c) => {
+      const key = `${c.kind}|${c.phone || c.name.toLowerCase().trim()}|${c.at}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+    return json(200, { day, calls: unique, duplicatesHidden: calls.length - unique.length });
   } catch (err) {
     return json(502, { error: err.message || "Could not load today's calls" });
   }

@@ -368,6 +368,13 @@
         </div>
 
         <div>
+          <label for="phone">Mobile number (required)</label>
+          <input type="tel" id="phone" name="phone" autocomplete="tel"
+                 inputmode="tel" required />
+          <p class="field-hint">The number we have for you, so we can match your agreement.</p>
+        </div>
+
+        <div>
           <label for="signature-typed">Signature (required)</label>
           <input type="text" id="signature-typed" autocomplete="off" placeholder="Type your full name as your signature" />
           <p class="field-error" id="signature-error" aria-live="polite"></p>
