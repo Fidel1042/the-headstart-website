@@ -14,38 +14,48 @@
   <link rel="stylesheet" href="portal-nav.css" />
   <link rel="stylesheet" href="/mentor-portal/polish.css" />
   <style>
-    .si-page { max-width: 860px; margin: 0 auto; padding: 1.6rem 1.2rem 4rem; }
-    .si-head h1 { font-size: 1.4rem; font-weight: 800; margin: 0 0 1.4rem; }
+    .si-page { max-width: 880px; margin: 0 auto; padding: 1.6rem 1.2rem 4rem; }
+    .si-head h1 { font-size: 1.55rem; font-weight: 800; margin: 0 0 1.4rem; }
 
     .c { --c-line: rgba(255,255,255,0.18); }
     [data-theme="light"] .c { --c-line: rgba(0,0,0,0.16); }
     .c { border: 1px solid var(--c-line); border-radius: 14px; background: var(--bg-card);
-      box-shadow: var(--shadow-card); padding: 1.1rem 1.25rem; margin-bottom: 1rem; }
+      box-shadow: var(--shadow-card); padding: 1.35rem 1.5rem; margin-bottom: 1.1rem; }
 
     .c__top { display: flex; align-items: baseline; gap: 0.7rem; flex-wrap: wrap; }
-    .c__name { font-weight: 800; font-size: 1.05rem; }
-    .c__role { font-size: 0.82rem; color: var(--text-muted); }
+    .c__name { font-weight: 800; font-size: 1.15rem; }
+    .c__role { font-size: 0.9rem; color: var(--text-muted); }
     .c__spacer { flex: 1; }
-    .c__when { font-size: 0.82rem; font-weight: 700; color: var(--accent); white-space: nowrap; }
-    .c__nodate { font-size: 0.8rem; color: #c33; }
+    .c__when { font-size: 0.95rem; font-weight: 700; color: var(--accent); white-space: nowrap; }
+    .c__nodate { font-size: 0.92rem; color: #c33; }
 
     .c__facts { display: flex; gap: 1.4rem; flex-wrap: wrap; margin-top: 0.7rem;
-      font-size: 0.8rem; color: var(--text-muted); }
+      font-size: 0.88rem; color: var(--text-muted); }
     .c__facts a { color: var(--accent); font-weight: 600; }
     .c__facts b { color: var(--text); font-weight: 600; }
 
     .c__sum {
-      margin-top: 0.9rem; padding-top: 0.9rem; border-top: 1px solid var(--line-soft);
-      font-size: 0.88rem; line-height: 1.62; white-space: pre-wrap;
+      margin-top: 1.1rem; padding-top: 1.1rem; border-top: 1px solid var(--line-soft);
+      font-size: 1rem; line-height: 1.6;
     }
+    .c__sum h3 {
+      font-size: 0.8rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase;
+      color: var(--accent); margin: 1.35rem 0 0.45rem;
+    }
+    .c__sum h3:first-child { margin-top: 0; }
+    /* Questions remaining to ask now leads the note, so it gets the emphasis. */
+    .c__sum h3:first-child + ul { font-weight: 600; }
+    .c__sum ul { margin: 0; padding-left: 1.3rem; }
+    .c__sum li { margin-bottom: 0.4rem; }
+    .c__sum p { margin: 0 0 0.5rem; }
     .c__sum strong { font-weight: 700; }
-    .c__none { font-size: 0.85rem; color: #c33; margin-top: 0.9rem; }
+    .c__none { font-size: 0.98rem; color: #c33; margin-top: 0.9rem; }
 
-    .zoom { margin-top: 1.6rem; font-size: 0.82rem; color: var(--text-muted); }
+    .zoom { margin-top: 1.8rem; font-size: 0.9rem; color: var(--text-muted); }
     .zoom a { color: var(--accent); font-weight: 600; }
 
     .state { font-size: 0.9rem; color: var(--text-muted); padding: 2rem 0; text-align: center; }
-    .quiet { font-size: 0.85rem; color: var(--text-muted); }
+    .quiet { font-size: 1rem; color: var(--text-muted); }
   </style>
 </head>
 <body>
@@ -116,12 +126,27 @@
       }
     }
 
-    // The summary is written as markdown by the interview one automation. Only
-    // bold and line breaks are needed here, so nothing heavier is pulled in.
+    // The summary is markdown from the interview one automation. It only ever
+    // uses ## headings, - bullets and **bold**, so a full parser would be
+    // overkill. Bullets become a real list rather than lines starting with a
+    // dash, which is what they looked like before.
     function light(md) {
-      return esc(md)
-        .replace(/^##\s*(.+)$/gm, "<strong>$1</strong>")
-        .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+      const out = [];
+      let open = false;
+      for (const raw of esc(md).split("\n")) {
+        const line = raw.trim();
+        const bold = (x) => x.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+        if (/^[-*]\s+/.test(line)) {
+          if (!open) { out.push("<ul>"); open = true; }
+          out.push(`<li>${bold(line.replace(/^[-*]\s+/, ""))}</li>`);
+          continue;
+        }
+        if (open) { out.push("</ul>"); open = false; }
+        if (/^##\s*/.test(line)) out.push(`<h3>${bold(line.replace(/^##\s*/, ""))}</h3>`);
+        else if (line) out.push(`<p>${bold(line)}</p>`);
+      }
+      if (open) out.push("</ul>");
+      return out.join("");
     }
 
     function card(m) {
@@ -157,9 +182,12 @@
         ? list.map(card).join("")
         : `<p class="quiet">Nobody is waiting on a second interview.</p>`;
 
-      const z = data.zoom || {};
+      // Koko's room, not Fidel's. These are her interviews.
+      const z = data.zoomFinal || {};
       document.getElementById("zoom").innerHTML = list.length && z.link
-        ? `Zoom: <a href="${esc(z.link)}" target="_blank" rel="noopener">${esc(z.link)}</a> &nbsp;·&nbsp; passcode ${esc(z.passcode)}`
+        ? `Zoom: <a href="${esc(z.link)}" target="_blank" rel="noopener">${esc(z.link)}</a>` +
+          `${z.meetingId ? ` &nbsp;·&nbsp; ID ${esc(z.meetingId)}` : ""}` +
+          ` &nbsp;·&nbsp; passcode ${esc(z.passcode)}`
         : "";
     }
   </script>

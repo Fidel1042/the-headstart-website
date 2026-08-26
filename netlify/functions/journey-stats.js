@@ -14,6 +14,45 @@ function channelStats() {
   catch (e) { return { linkedin: {}, instagram: {} }; }
 }
 
+/**
+ * Instagram reach, live from the Graph API, keyed by the Monday of each week so
+ * it drops straight into the same shape as the static file.
+ *
+ * The static channel-stats.json is only written by a script Fidel runs by hand,
+ * so Instagram sat as stale as LinkedIn even though it has an API. LinkedIn has
+ * no equivalent, which is why that half stays manual.
+ */
+async function instagramWeeks(fromYmd, toYmd) {
+  const token = process.env.IG_TOKEN;
+  if (!token) return null;
+  // The API caps a single insights query at 30 days, and only serves the last
+  // two years, so ask for the window plus a little slack and no more.
+  const since = Math.floor(new Date(`${fromYmd}T00:00:00Z`).getTime() / 1000);
+  const until = Math.floor(new Date(`${toYmd}T00:00:00Z`).getTime() / 1000);
+  const span = (until - since) / 86400;
+  if (span <= 0 || span > 30) return null;
+
+  try {
+    const url = `https://graph.instagram.com/v21.0/me/insights` +
+      `?metric=reach&period=day&since=${since}&until=${until}&access_token=${token}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.error) return null;
+    const values = ((data.data || [])[0] || {}).values || [];
+
+    const weeks = {};
+    for (const v of values) {
+      const d = new Date(v.end_time);
+      // Monday of that day's week, matching how the static file is keyed.
+      const day = (d.getUTCDay() + 6) % 7;
+      const monday = new Date(d.getTime() - day * 86400000).toISOString().slice(0, 10);
+      weeks[monday] = weeks[monday] || { impressions: 0 };
+      weeks[monday].impressions += v.value || 0;
+    }
+    return weeks;
+  } catch (e) { return null; }
+}
+
 function instagramPosts() {
   try { return require("../data/instagram-posts.json").posts || {}; }
   catch (e) { return {}; }
@@ -261,8 +300,15 @@ exports.handler = async (event) => {
     const to = ymd(Date.now() - offsetDays * 86400000);
     const from = ymd(Date.now() - (offsetDays + windowDays) * 86400000);
 
+    // Live Instagram where the API can answer, the stored file where it cannot.
+    const stats = channelStats();
+    const igLive = await instagramWeeks(from, to);
+    const merged = igLive
+      ? { ...stats, instagram: { ...(stats.instagram || {}), ...igLive } }
+      : stats;
+
     const stages = [
-      reach(channelStats(), ga, instagramPosts(), from, to),
+      reach(merged, ga, instagramPosts(), from, to),
       ga ? traffic(ga) : {
         key: "traffic", label: "Traffic", headline: "Not connected",
         sub: "GA4 env vars missing", stats: [], unavailable: true,

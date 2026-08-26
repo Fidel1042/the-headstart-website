@@ -135,6 +135,11 @@
       font-size: 0.82rem;
     }
 
+    .field-hint {
+      font-size: 0.82rem;
+      color: rgba(255, 255, 255, 0.6);
+      margin: 0.35rem 0 0;
+    }
     .agreement-check {
       display: flex;
       align-items: flex-start;
@@ -359,6 +364,7 @@
         <div>
           <label for="email">Email (required)</label>
           <input type="email" id="email" name="email" autocomplete="email" required />
+          <p class="field-hint">Please use the same email you signed up with.</p>
         </div>
 
         <div>
@@ -380,14 +386,6 @@
         <div>
           <p class="card-section-title">Payment option (required)</p>
           <div class="payment-options">
-            <label class="payment-option">
-              <input type="radio" name="payment_option" value="prepayment_5_sessions" required />
-              <span class="payment-option__name">Prepayment (5 sessions)</span>
-              <span class="payment-option__right">
-                <span class="payment-option__price">$245</span>
-                <span class="payment-option__save">(Save 11%)</span>
-              </span>
-            </label>
             <label class="payment-option">
               <input type="radio" name="payment_option" value="pay_as_you_go" required />
               <span class="payment-option__name">Pay as you go</span>

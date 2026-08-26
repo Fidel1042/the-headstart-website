@@ -7,6 +7,28 @@
   <title>Recommended mentors — Headstart</title>
   <link rel="stylesheet" href="css/base.css" />
   <link rel="stylesheet" href="css/mentors.css" />
+  <style>
+    /* base.css went light when the rest of the consultation tool did. The
+       recommendation screens stay dark, so they pin the original tokens back.
+       Kept here rather than in base.css so one page's look cannot drift when
+       the shared file changes again. */
+    :root {
+      --bg: #000000;
+      --text: #ffffff;
+      --accent: #c79b3b;
+      --accent-bright: #f0c75c;
+      --accent-soft: rgba(199, 155, 59, 0.22);
+      --card-bg: rgba(255, 255, 255, 0.02);
+      --card-border: rgba(255, 255, 255, 0.08);
+    }
+    .eyebrow { color: #f7d879; }
+    .btn { background: linear-gradient(135deg, rgba(199, 155, 59, 0.18), rgba(0, 0, 0, 0.9)); color: #fff; }
+    .btn:hover { border-color: rgba(199, 155, 59, 0.85); box-shadow: 0 0 24px rgba(199, 155, 59, 0.45); }
+    .btn--gold {
+      border: none; color: #2b1b09;
+      background: linear-gradient(135deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 70%, #ffeb9f 100%);
+    }
+  </style>
   <link rel="stylesheet" href="/mentor-portal/portal.css" />
   <link rel="stylesheet" href="/mentor-portal/portal-nav.css" />
   <link rel="stylesheet" href="css/chrome.css" />

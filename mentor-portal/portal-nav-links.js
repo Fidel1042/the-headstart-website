@@ -29,6 +29,15 @@ export const NAV_AREAS = [
     ],
   },
   {
+    // The day's work. First area in the row because it is the first thing
+    // opened each morning, and the only page that mixes sales and recruitment.
+    key: "calls",
+    label: "Calls",
+    links: [
+      { href: "/mentor-portal/calls.html", label: "Today", page: "calls" },
+    ],
+  },
+  {
     // Top of the funnel: where leads come from and what they turn into.
     key: "leads",
     label: "Leads",

@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="css/chrome.css" />
   <style id="auth-gate">
     html:not(.auth-ok) body { visibility: hidden; }
-    html:not(.auth-ok) { background: #000; }
+    html:not(.auth-ok) { background: #fff; }
     html:not(.auth-ok)::after {
       content: ""; position: fixed; top: 50%; left: 50%;
       width: 30px; height: 30px; margin: -15px 0 0 -15px;
@@ -30,7 +30,7 @@
       if (!r.classList.contains("auth-ok")) {
         r.classList.add("auth-ok");
         if (document.body) document.body.innerHTML =
-          '<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;text-align:center;background:#000;color:#fff;font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif">' +
+          '<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;text-align:center;background:#fff;color:#17170f;font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif">' +
           '<p style="font-size:1.05rem;max-width:340px;line-height:1.5">This page is taking too long to load. Check your internet, then reload.</p>' +
           '<button onclick="location.reload()" style="padding:12px 26px;border-radius:999px;border:1px solid #c79b3b;background:transparent;color:#f0c75c;font-weight:700;font-size:0.9rem;cursor:pointer">Reload</button>' +
           '</div>';
@@ -94,7 +94,7 @@
             Mentorship investment
             <span class="roi-line__sub" id="roiInvestSub">5 x $49</span>
           </span>
-          <span class="roi-line__val roi-line__val--out" id="roiInvestVal">-$245</span>
+          <span class="roi-line__val roi-line__val--out" id="roiInvestVal">-$275</span>
         </div>
         <div class="roi-line">
           <span class="roi-line__label">
@@ -125,7 +125,7 @@
   <script src="js/roi.js"></script>
   <script type="module">
     import { mountConsultNav } from "./js/chrome.js";
-    mountConsultNav("consult-roi", "dark");
+    mountConsultNav("consult-roi", "light");
   </script>
 </body>
 </html>

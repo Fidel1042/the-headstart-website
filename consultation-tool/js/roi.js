@@ -1,10 +1,8 @@
 // ROI calculator — pure arithmetic on the mentee's own numbers.
-// Investment uses live pricing: $55 a session, or the $245 five-session
-// prepay rate ($49 a session) once they take 5 or more.
+// Investment uses live pricing: $55 a session. The five-session prepay was
+// retired in August 2026, so there is only one rate.
 
 const SINGLE_RATE = 55;
-const PREPAY_RATE = 49;
-const PREPAY_FROM = 5;
 // Gains are counted on take-home pay, not gross, so the return is defensible.
 const TAX_RATE = 0.18;
 
@@ -27,7 +25,7 @@ function render(els) {
   const months = +els.months.value;
   const sessions = +els.sessions.value;
 
-  const rate = sessions >= PREPAY_FROM ? PREPAY_RATE : SINGLE_RATE;
+  const rate = SINGLE_RATE;
   const investment = sessions * rate;
   const perMonth = (salary * (1 - TAX_RATE)) / 12;
   const gained = perMonth * months;

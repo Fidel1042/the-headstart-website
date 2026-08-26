@@ -79,3 +79,11 @@
 # charge run reaches Fidel first thing the next morning.
 [functions."payment-reminders"]
   schedule = "0 * * * *"
+
+# Unconfirmed interviews. Runs hourly and looks at the hour-wide slice that is
+# five hours away, so each interview is considered exactly once. UTC is fine
+# here because the window is relative to now, not to a wall-clock time, so
+# daylight saving cannot shift it. "Interview Chased" is stamped after the
+# email, which makes a double send impossible.
+[functions."interview-chase"]
+  schedule = "7 * * * *"

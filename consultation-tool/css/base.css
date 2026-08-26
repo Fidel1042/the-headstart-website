@@ -1,12 +1,13 @@
 /* Consultation tool — shared base. Mirrors the Headstart design system. */
 
 :root {
-  --bg: #000000;
-  --text: #ffffff;
-  --accent: #c79b3b;
-  --accent-soft: rgba(199, 155, 59, 0.22);
-  --card-bg: rgba(255, 255, 255, 0.02);
-  --card-border: rgba(255, 255, 255, 0.08);
+  --bg: #ffffff;
+  --text: #17170f;
+  --accent: #8a6210;
+  --accent-bright: #c79b3b;
+  --accent-soft: rgba(199, 155, 59, 0.16);
+  --card-bg: #ffffff;
+  --card-border: rgba(0, 0, 0, 0.14);
   --gold-grad: linear-gradient(90deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 68%, #ffeb9f 100%);
   --gold-frame: linear-gradient(160deg, #ffe066 0%, #daa520 40%, #7a5500 100%);
 }
@@ -40,7 +41,7 @@ a { color: inherit; text-decoration: none; }
   font-weight: 650;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #f7d879;
+  color: var(--accent);
   margin-bottom: 0.7rem;
 }
 .page-title {
@@ -52,7 +53,7 @@ a { color: inherit; text-decoration: none; }
 .page-sub {
   margin-top: 0.9rem;
   max-width: 640px;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(0, 0, 0, 0.70);
   font-size: 1.02rem;
 }
 
@@ -69,27 +70,28 @@ a { color: inherit; text-decoration: none; }
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  background: linear-gradient(135deg, rgba(199, 155, 59, 0.18), rgba(0, 0, 0, 0.9));
-  color: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.22);
+  background: #ffffff;
+  color: #17170f;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 .btn:hover {
-  border-color: rgba(199, 155, 59, 0.85);
-  box-shadow: 0 0 24px rgba(199, 155, 59, 0.45);
-  transform: translateY(-2px);
+  border-color: var(--accent);
+  color: var(--accent);
 }
+/* Flat, not a gradient. A gold sheen reads as a button on black and as
+   novelty on white. */
 .btn--gold {
-  border: none;
-  color: #2b1b09;
-  background: linear-gradient(135deg, #fdf5c4 0%, #f7d37d 35%, #c08a2d 70%, #ffeb9f 100%);
+  border: 1px solid var(--accent);
+  color: #ffffff;
+  background: var(--accent);
 }
-.btn--gold:hover { box-shadow: 0 0 28px rgba(247, 211, 125, 0.55); }
+.btn--gold:hover { background: #6f4e0c; border-color: #6f4e0c; }
 .btn--ghost {
   background: transparent;
   border-style: dashed;
-  border-color: rgba(255, 255, 255, 0.25);
+  border-color: rgba(0, 0, 0, 0.60);
 }
 @media (max-width: 600px) { .btn { min-height: 44px; width: 100%; } }
 
@@ -98,13 +100,13 @@ a { color: inherit; text-decoration: none; }
   align-items: center;
   gap: 0.4rem;
   font-size: 0.82rem;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(0, 0, 0, 0.60);
   margin-top: 2.4rem;
 }
-.back-link:hover { color: #f7d879; }
+.back-link:hover { color: var(--accent); }
 
 footer.tool-foot {
   padding: 3rem 0 2.4rem;
-  color: rgba(255, 255, 255, 0.32);
+  color: rgba(0, 0, 0, 0.60);
   font-size: 0.78rem;
 }

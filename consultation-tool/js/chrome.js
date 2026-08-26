@@ -56,10 +56,10 @@ function addExitHandle() {
 
 /**
  * @param {string} active page key from portal-nav-links.js
- * @param {string} theme  "dark" for the screens shown on a call, "light" for
+ * @param {string} theme  the theme to pin. The call screens are light, matching
  *                        the call flow, which is Fidel's own script
  */
-export async function mountConsultNav(active, theme = "dark", present = true) {
+export async function mountConsultNav(active, theme = "light", present = true) {
   const local = location.hostname === "localhost" || location.hostname === "127.0.0.1";
   const session = local ? null : await getSession();
   const email = local ? "dev@localhost" : (session?.user?.email || "").toLowerCase().trim();

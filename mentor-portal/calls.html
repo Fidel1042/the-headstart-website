@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <title>Today's Calls – The Headstart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+  <link rel="manifest" href="/mentor-portal/manifest.webmanifest" />
+  <style id="auth-gate">
+    html:not(.auth-ok) body { visibility: hidden; }
+    html:not(.auth-ok) { background: #fff; }
+  </style>
+  <link rel="stylesheet" href="portal.css" />
+  <link rel="stylesheet" href="portal-nav.css" />
+  <link rel="stylesheet" href="/mentor-portal/polish.css" />
+  <style>
+    .cl-page { max-width: 720px; margin: 0 auto; padding: 1.6rem 1.2rem 4rem; }
+    .cl-head { display: flex; align-items: baseline; gap: 0.8rem; flex-wrap: wrap; margin-bottom: 1.2rem; }
+    .cl-head h1 { font-size: 1.5rem; font-weight: 800; margin: 0; }
+    .cl-head__day { font-size: 0.9rem; color: var(--text-muted); }
+    .cl-nav { display: flex; gap: 0.4rem; margin-left: auto; }
+    .cl-nav button {
+      font: inherit; font-size: 0.78rem; font-weight: 700; min-height: 36px;
+      padding: 0 0.75rem; border-radius: 999px; cursor: pointer;
+      border: 1px solid var(--line); background: transparent; color: var(--text-muted);
+    }
+    .cl-nav button:hover { border-color: var(--accent-line); color: var(--accent); }
+
+    .c { --c-line: rgba(255,255,255,0.18); }
+    [data-theme="light"] .c { --c-line: rgba(0,0,0,0.16); }
+    .c {
+      border: 1px solid var(--c-line); border-left-width: 1px; border-radius: 14px;
+      background: var(--bg-card); box-shadow: var(--shadow-card);
+      padding: 1rem 1.15rem; margin-bottom: 0.8rem;
+    }
+    .c__top { display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
+    .c__time { font-size: 1.25rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .c__name { font-size: 1.05rem; font-weight: 700; }
+    .c__spacer { flex: 1; }
+    .c__kind {
+      font-size: 0.64rem; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase;
+      padding: 0.2rem 0.5rem; border-radius: 999px; white-space: nowrap;
+    }
+    .c__kind--consultation { background: var(--accent-soft); color: var(--accent); }
+    .c__kind--interview { background: rgba(0,0,0,0.06); color: var(--text-muted); }
+    [data-theme="dark"] .c__kind--interview { background: rgba(255,255,255,0.08); }
+
+    .c__note { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem; }
+    .c__flag { font-size: 0.8rem; color: #c33; margin-top: 0.3rem; }
+    .c__ok { font-size: 0.8rem; color: #2e7d52; margin-top: 0.3rem; }
+    [data-theme="dark"] .c__ok { color: #6fd39b; }
+
+    .acts { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.85rem; }
+    .act {
+      display: inline-flex; align-items: center; justify-content: center;
+      font: inherit; font-size: 0.8rem; font-weight: 800; text-decoration: none;
+      min-height: 44px; padding: 0 1rem; border-radius: 999px; white-space: nowrap;
+      border: 1px solid var(--line); color: var(--text-muted); background: transparent;
+    }
+    .act:hover { border-color: var(--accent-line); color: var(--accent); }
+    .act--call { background: var(--accent); color: #17170f; border-color: var(--accent); }
+    .act--call:hover { background: var(--accent-bright); color: #17170f; }
+    .act--join { border-color: var(--accent-line); color: var(--accent); }
+
+    .state { font-size: 0.95rem; color: var(--text-muted); padding: 2.5rem 0; text-align: center; }
+    .cl-foot { font-size: 0.8rem; color: var(--text-muted); margin-top: 1.6rem; }
+
+    @media (max-width: 480px) {
+      .cl-page { padding: 1.2rem 0.85rem 3rem; }
+      .acts .act { flex: 1 1 auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="portal-nav"></div>
+
+  <main class="cl-page">
+    <div class="cl-head">
+      <h1>Calls</h1>
+      <span class="cl-head__day" id="day"></span>
+      <span class="cl-nav">
+        <button type="button" id="prev">&larr;</button>
+        <button type="button" id="today">Today</button>
+        <button type="button" id="next">&rarr;</button>
+      </span>
+    </div>
+
+    <p class="state" id="loading">Loading&hellip;</p>
+    <p class="state" id="error" hidden></p>
+    <div id="list"></div>
+    <p class="cl-foot" id="foot"></p>
+  </main>
+
+  <script type="module">
+    import { requireAuth } from "./auth.js";
+    import { mountPortalNav, initTheme } from "./portal-ui.js";
+
+    initTheme();
+
+    let ADMIN_EMAIL = "";
+    let DAY = "";
+
+    const esc = (v) => String(v == null ? "" : v)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+    const time = (iso) => new Intl.DateTimeFormat("en-AU", {
+      timeZone: "Australia/Sydney", hour: "numeric", minute: "2-digit", hour12: true,
+    }).format(new Date(iso));
+
+    const dayLabel = (d) => new Intl.DateTimeFormat("en-AU", {
+      timeZone: "Australia/Sydney", weekday: "long", day: "numeric", month: "long",
+    }).format(new Date(`${d}T02:00:00Z`));
+
+    const sydneyToday = () => new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Australia/Sydney", year: "numeric", month: "2-digit", day: "2-digit",
+    }).format(new Date());
+
+    requireAuth((session) => {
+      const email = session?.user?.email || "";
+      const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com"];
+      if (!OWNERS.includes(email) && email !== "dev@localhost") {
+        window.location.replace("/mentor-portal/index.html");
+        return;
+      }
+      ADMIN_EMAIL = email;
+      mountPortalNav({ email, isOwner: true, active: "calls" });
+      DAY = sydneyToday();
+      load();
+    });
+
+    async function load() {
+      const loading = document.getElementById("loading");
+      const errorEl = document.getElementById("error");
+      loading.hidden = false; errorEl.hidden = true;
+      document.getElementById("day").textContent = dayLabel(DAY);
+      try {
+        const res = await fetch("/.netlify/functions/todays-calls", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ adminEmail: ADMIN_EMAIL, day: DAY }),
+        });
+        const text = await res.text();
+        if (text.trim().startsWith("<")) throw new Error("This page needs the live site.");
+        const data = JSON.parse(text);
+        if (!res.ok) throw new Error(data.error || "Could not load");
+        loading.hidden = true;
+        render(data.calls || []);
+      } catch (err) {
+        loading.hidden = true;
+        errorEl.textContent = err.message || "Could not load — refresh to try again.";
+        errorEl.hidden = false;
+      }
+    }
+
+    function card(c) {
+      const kind = c.kind === "consultation" ? "consultation" : "interview";
+      return `
+        <div class="c">
+          <div class="c__top">
+            <span class="c__time">${esc(time(c.at))}</span>
+            <span class="c__name">${esc(c.name)}</span>
+            <span class="c__spacer"></span>
+            <span class="c__kind c__kind--${kind}">${esc(c.kind)}</span>
+          </div>
+          ${c.note ? `<p class="c__note">${esc(c.note)}</p>` : ""}
+          ${c.confirmed === "Yes" ? `<p class="c__ok">confirmed</p>` : ""}
+          ${c.confirmed === "No" ? `<p class="c__flag">said they cannot make it</p>` : ""}
+          ${c.kind !== "consultation" && !c.confirmed ? `<p class="c__flag">not confirmed</p>` : ""}
+          <div class="acts">
+            ${c.phone
+              ? `<a class="act act--call" href="tel:${esc(c.phone)}">Call ${esc(c.phone)}</a>`
+              : `<span class="c__flag">no phone number</span>`}
+            ${c.link ? `<a class="act act--join" href="${esc(c.link)}" target="_blank" rel="noopener">Join Zoom</a>` : ""}
+            ${c.linkedin ? `<a class="act" href="${esc(c.linkedin)}" target="_blank" rel="noopener">LinkedIn</a>` : ""}
+            ${c.email ? `<a class="act" href="mailto:${esc(c.email)}">Email</a>` : ""}
+            ${c.reschedule ? `<a class="act" href="${esc(c.reschedule)}" target="_blank" rel="noopener">Reschedule</a>` : ""}
+          </div>
+        </div>`;
+    }
+
+    function render(calls) {
+      document.getElementById("list").innerHTML = calls.length
+        ? calls.map(card).join("")
+        : `<p class="state">No calls on this day.</p>`;
+      const consults = calls.filter((c) => c.kind === "consultation").length;
+      document.getElementById("foot").textContent = calls.length
+        ? `${calls.length} call${calls.length > 1 ? "s" : ""} · ${consults} consultation${consults === 1 ? "" : "s"} · ${calls.length - consults} interview${calls.length - consults === 1 ? "" : "s"}`
+        : "";
+    }
+
+    function shift(days) {
+      const d = new Date(`${DAY}T02:00:00Z`);
+      d.setUTCDate(d.getUTCDate() + days);
+      DAY = d.toISOString().slice(0, 10);
+      load();
+    }
+    document.getElementById("prev").addEventListener("click", () => shift(-1));
+    document.getElementById("next").addEventListener("click", () => shift(1));
+    document.getElementById("today").addEventListener("click", () => { DAY = sydneyToday(); load(); });
+  </script>
+</body>
+</html>

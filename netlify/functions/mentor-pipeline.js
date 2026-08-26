@@ -44,10 +44,11 @@ const NOTES_FIELD = {
 };
 
 const FIELDS = ["Name", "Email", "Phone", "Status", "Rate", "First Interview Date",
-                "Industry", "Company", "Role", "LinkedIn", "Koko Notified",
+                "Industry", "Field", "Company", "Role", "LinkedIn", "Koko Notified",
                 "Agreement Signed", "Legacy Agreement", "Invite Sent",
                 "Int 1 transcript", "Int 1 summary", "Interview 2 Transcript",
-                "Second Interview Date"];
+                "Second Interview Date", "Second Invite Sent",
+                "Interview Response", "Interview Responded At"];
 
 const SENDER = { name: "Fidel @Headstart Mentoring", email: "fidel@theheadstartmentoring.com" };
 
@@ -58,9 +59,15 @@ const SENDER = { name: "Fidel @Headstart Mentoring", email: "fidel@theheadstartm
  * changed without leaving the codebase, and so a failure is visible instead of
  * silent. Edit the two functions below and every future invite follows.
  */
+// One room per round. Round two is run by Koko, so it is her room, not Fidel's.
 const ZOOM = {
   link: "https://us05web.zoom.us/j/2123046742?pwd=yjlZs0E8tBH3CEkLVuH4txJUoYnabe.1&omn=84465105461",
   passcode: "cRsn5u",
+};
+const ZOOM_FINAL = {
+  link: "https://us05web.zoom.us/j/5621268756?pwd=j2kvxFvi6QOXQhD4b9GdNZNBUjFzYg.1",
+  meetingId: "562 126 8756",
+  passcode: "1234",
 };
 
 // Fidel's wording. Sent as HTML so the bold renders instead of showing as
@@ -100,6 +107,44 @@ const inviteText = (firstName, when, mentorId) =>
   `Looking forward to speaking with you.\n\n` +
   `Best Regards,\nFidel Hon\nOperations Manager\nHeadstart Mentoring`;
 
+
+// Round two. Same register as the first invitation on purpose, so the two read
+// as one process rather than two different companies writing.
+const finalSubject = () => "Final interview — Headstart Mentoring";
+
+const finalHtml = (firstName, when, mentorId) => `
+<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:#17170f;max-width:600px;">
+  <p style="margin:0 0 16px;">Hi ${firstName},</p>
+  <p style="margin:0 0 16px;">Thank you for taking the time to speak with me. We&rsquo;d like to progress you to a final interview with my co-founder, Koko.</p>
+  <p style="margin:0 0 16px;">This is the last stage of our process. It is a chance for Koko to learn more about how you would work with a mentee, and for you to ask anything you still want to know about mentoring with us.</p>
+  <p style="margin:0 0 8px;"><strong>Final Interview Details</strong></p>
+  <p style="margin:0 0 4px;"><strong>Date and Time</strong>: ${when} (Sydney Time)</p>
+  <p style="margin:0 0 4px;"><strong>Platform</strong>: Zoom</p>
+  <p style="margin:0 0 4px;"><strong>Meeting Link</strong>: <a href="${ZOOM_FINAL.link}" style="color:#8a6210;">${ZOOM_FINAL.link}</a></p>
+  <p style="margin:0 0 4px;"><strong>Meeting ID</strong>: ${ZOOM_FINAL.meetingId}</p>
+  <p style="margin:0 0 20px;"><strong>Passcode</strong>: ${ZOOM_FINAL.passcode}</p>
+  <p style="margin:0 0 20px;">Please confirm you can make it:</p>
+  <p style="margin:0 0 20px;"><a href="${CONFIRM_URL}?m=${mentorId}" style="display:inline-block;background:#c79b3b;color:#17170f;font-weight:700;font-size:15px;text-decoration:none;padding:13px 26px;border-radius:999px;">Confirm my interview</a></p>
+  <p style="margin:0 0 16px;">If the time doesn&rsquo;t suit, hit the same link and let us know, then reply here with a few alternatives and we&rsquo;ll do our best to accommodate.</p>
+  <p style="margin:0 0 16px;">Looking forward to hearing how it goes.</p>
+  <p style="margin:0;">Best Regards,<br /><strong>Fidel Hon</strong><br /><em>Operations Manager</em><br />Headstart Mentoring</p>
+</div>`;
+
+const finalText = (firstName, when, mentorId) =>
+  `Hi ${firstName},\n\n` +
+  `Thank you for taking the time to speak with me. We'd like to progress you to a final interview with my co-founder, Koko.\n\n` +
+  `This is the last stage of our process. It is a chance for Koko to learn more about how you would work with a mentee, and for you to ask anything you still want to know about mentoring with us.\n\n` +
+  `Final Interview Details\n` +
+  `Date and Time: ${when} (Sydney Time)\n` +
+  `Platform: Zoom\n` +
+  `Meeting Link: ${ZOOM_FINAL.link}\n` +
+  `Meeting ID: ${ZOOM_FINAL.meetingId}\n` +
+  `Passcode: ${ZOOM_FINAL.passcode}\n\n` +
+  `Please confirm you can make it: ${CONFIRM_URL}?m=${mentorId}\n\n` +
+  `If the time doesn't suit, use the same link to let us know, then reply here with a few alternatives and we'll do our best to accommodate.\n\n` +
+  `Looking forward to hearing how it goes.\n\n` +
+  `Best Regards,\nFidel Hon\nOperations Manager\nHeadstart Mentoring`;
+
 /** The interview time as a person would read it, in Sydney. */
 function readableTime(iso) {
   if (!iso) return "";
@@ -110,10 +155,15 @@ function readableTime(iso) {
 }
 
 // Exported so the email can be previewed without sending a real one.
-exports.preview = { inviteSubject, inviteHtml, inviteText, readableTime };
+exports.preview = { inviteSubject, inviteHtml, inviteText,
+                    finalSubject, finalHtml, finalText, readableTime };
 
-async function sendInvite(apiKey, mentor, when) {
+// Which round to send is decided by the stage, never by a second button.
+// A mentor sitting at Second Interview cannot be sent the first invitation by
+// accident, which is what would have happened before.
+async function sendInvite(apiKey, mentor, when, round) {
   const first = String(mentor.name || "").trim().split(/\s+/)[0] || "there";
+  const isFinal = round === "final";
   const res = await fetch("https://api.brevo.com/v3/smtp/email", {
     method: "POST",
     headers: { "api-key": apiKey, "Content-Type": "application/json" },
@@ -121,9 +171,9 @@ async function sendInvite(apiKey, mentor, when) {
       sender: SENDER,
       to: [{ email: mentor.email, name: mentor.name }],
       replyTo: SENDER,
-      subject: inviteSubject(),
-      htmlContent: inviteHtml(first, when, mentor.id),
-      textContent: inviteText(first, when, mentor.id),
+      subject: isFinal ? finalSubject() : inviteSubject(),
+      htmlContent: isFinal ? finalHtml(first, when, mentor.id) : inviteHtml(first, when, mentor.id),
+      textContent: isFinal ? finalText(first, when, mentor.id) : inviteText(first, when, mentor.id),
     }),
   });
   if (res.ok) return { ok: true };
@@ -170,13 +220,18 @@ const shape = (r) => {
     // rather than chased afterwards.
     secondAt: f["Second Interview Date"] || "",
     summary: f["Int 1 summary"] || "",
-    industry: f["Industry"] || "",
+    // Field is what actually gets filled during screening. Industry is added
+    // later, on hired mentors, so it is the fallback rather than the source.
+    industry: f["Field"] || f["Industry"] || "",
     company: f["Company"] || "",
     role: f["Role"] || "",
     linkedin: f["LinkedIn"] || "",
     signed: (f["Agreement Signed"] || "").slice(0, 10),
     legacy: Boolean(f["Legacy Agreement"]),
     inviteSent: f["Invite Sent"] || "",
+    secondInviteSent: f["Second Invite Sent"] || "",
+    response: f["Interview Response"] || "",
+    respondedAt: f["Interview Responded At"] || "",
     // The write-up for whichever interview they are up to, so the page shows
     // and saves one box rather than four.
     notes: f[NOTES_FIELD[f["Status"]] || "Int 1 transcript"] || "",
@@ -255,19 +310,37 @@ exports.handler = async (event) => {
       if (!rec || !rec.fields) return json(404, { error: "No such mentor" });
       const m = shape(rec);
       if (!m.email) return json(400, { error: `${m.name} has no email on their record` });
-      if (!m.interviewAt) return json(400, { error: "Set an interview time first, then save." });
       if (!process.env.BREVO_API_KEY) return json(500, { error: "BREVO_API_KEY missing" });
 
-      const when = readableTime(m.interviewAt);
-      const sent = await sendInvite(process.env.BREVO_API_KEY, m, when);
+      const final = m.status === "Second Interview";
+      const at_ = final ? m.secondAt : m.interviewAt;
+      if (!at_) {
+        return json(400, { error: final
+          ? "Set a second interview time first, then save."
+          : "Set an interview time first, then save." });
+      }
+
+      const when = readableTime(at_);
+      const sent = await sendInvite(process.env.BREVO_API_KEY, m, when, final ? "final" : "first");
       if (!sent.ok) return json(502, { error: `Brevo refused it: ${sent.reason}` });
 
       // Stamped only after Brevo accepted it, so a failure never looks sent.
+      // Separate fields per round, so "invited" always means the round they are
+      // actually on rather than something from weeks ago.
+      const stamp = final ? "Second Invite Sent" : "Invite Sent";
       const saved = await at(`${base}/${table}/${p.mentorId}`, {
         method: "PATCH",
-        body: JSON.stringify({ fields: { "Invite Sent": new Date().toISOString() } }),
+        body: JSON.stringify({ fields: {
+          [stamp]: new Date().toISOString(),
+          // A fresh invitation asks a fresh question. Clearing the answer means
+          // the response fields always describe the round they are on now, and
+          // a yes to the first interview never masks silence about the second.
+          "Interview Response": "",
+          "Interview Responded At": null,
+          "Interview Chased": null,
+        } }),
       }, token);
-      return json(200, { mentor: shape(saved), when });
+      return json(200, { mentor: shape(saved), when, round: final ? "final" : "first" });
     }
 
     const all = await fetchAll(base, table, token);
@@ -283,6 +356,9 @@ exports.handler = async (event) => {
       // details in the calendar event as the invitation email does. One
       // source, so the two can never drift apart.
       zoom: ZOOM,
+      // Round two happens in Koko's room, so her page must not be handed
+      // Fidel's link.
+      zoomFinal: ZOOM_FINAL,
       retired: RETIRED,
       // Everyone waiting on a round with Koko, with the interview one summary
       // attached so she can prep without opening Airtable.

@@ -42,6 +42,14 @@
     .m__sum:hover { background: var(--bg-card-hover); border-radius: 13px; }
     .m[open] .m__sum { border-bottom: 1px solid var(--line-soft); border-radius: 13px 13px 0 0; }
     .m__when { font-size: 0.78rem; font-weight: 700; color: var(--accent); }
+    .m__tag {
+      font-size: 0.68rem; font-weight: 800; letter-spacing: 0.04em;
+      padding: 0.12rem 0.45rem; border-radius: 999px;
+      background: var(--accent-soft); color: var(--accent); white-space: nowrap;
+      max-width: 16ch; overflow: hidden; text-overflow: ellipsis;
+    }
+    .m__li { font-size: 0.74rem; font-weight: 700; color: var(--accent); text-decoration: none; }
+    .m__li:hover { text-decoration: underline; }
     /* An interview that has already run is waiting on a decision, so it reads
        as done rather than as something still coming up. */
     .m__when--done { color: var(--text-muted); font-weight: 600; text-decoration: line-through; }
@@ -227,7 +235,7 @@
     const CALENDAR_ACCOUNT = "fidelhon@gmail.com";
 
     function calendarLink(m) {
-      const start = new Date(m.interviewAt);
+      const start = new Date(m.status === "Second Interview" ? m.secondAt : m.interviewAt);
       const end = new Date(start.getTime() + INTERVIEW_MINUTES * 60000);
       const stamp = (d) => d.toISOString().replace(/[-:]|\.\d{3}/g, "");
       const z = DATA.zoom || {};
@@ -255,18 +263,24 @@
       // Collapsed only while an interview is still ahead: booked, nothing to do.
       // No time yet means it needs booking, and a time that has passed means it
       // needs the flip to Hired, Second Interview or Dropped. Both stay open.
-      const upcoming = m.interviewAt && new Date(m.interviewAt) > new Date();
+      // Everything on the row follows the round they are actually on.
+      const isFinal = m.status === "Second Interview";
+      const roundAt = isFinal ? m.secondAt : m.interviewAt;
+      const roundSent = isFinal ? m.secondInviteSent : m.inviteSent;
+      const upcoming = roundAt && new Date(roundAt) > new Date();
       const settled = Boolean(upcoming);
       return `
         <details class="m" data-id="${m.id}"${settled ? "" : " open"}>
           <summary class="m__sum">
             <span class="m__name">${esc(m.name)}</span>
+            ${m.industry ? `<span class="m__tag">${esc(m.industry)}</span>` : ""}
             ${where ? `<span class="m__meta">${esc(where)}</span>` : ""}
+            ${m.linkedin ? `<a class="m__li" href="${esc(m.linkedin)}" target="_blank" rel="noopener">LinkedIn</a>` : ""}
             <span class="m__spacer"></span>
-            ${m.interviewAt
-              ? `<span class="m__when${upcoming ? "" : " m__when--done"}">${esc(readable(m.interviewAt))}</span>`
+            ${roundAt
+              ? `<span class="m__when${upcoming ? "" : " m__when--done"}">${esc(readable(roundAt))}</span>`
               : ""}
-            ${m.inviteSent ? `<span class="m__meta">invited</span>` : ""}
+            ${roundSent ? `<span class="m__meta">invited</span>` : ""}
           </summary>
           <div class="m__body">
           <div class="m__row">
@@ -291,17 +305,19 @@
                      value="${m.rateSet ? m.rate : ""}" placeholder="—" />
             </span>
             <span class="m__spacer"></span>
-            ${m.interviewAt ? `<a class="act act--cal" target="_blank" rel="noopener"
+            ${roundAt ? `<a class="act act--cal" target="_blank" rel="noopener"
               href="${esc(calendarLink(m))}"
               title="Blocks the time in your own calendar. It does not invite them.">Add to calendar</a>` : ""}
             <button type="button" class="act" data-save="${m.id}">Save</button>
             <button type="button" class="act act--send" data-invite="${m.id}"
-                    ${m.interviewAt ? "" : "disabled"}
-                    title="${m.interviewAt ? "Emails the interview time" : "Set and save an interview time first"}">
-              ${m.inviteSent ? "Resend invite" : "Send invite"}
+                    ${roundAt ? "" : "disabled"}
+                    title="${roundAt
+                      ? (isFinal ? "Emails the final interview with Koko" : "Emails the interview time")
+                      : "Set and save a time first"}">
+              ${roundSent ? "Resend" : "Send"} ${isFinal ? "final invite" : "invite"}
             </button>
-            <span class="note" data-note="${m.id}">${m.inviteSent
-              ? `<span class="m__meta">invited ${esc(readable(m.inviteSent))}</span>` : ""}</span>
+            <span class="note" data-note="${m.id}">${roundSent
+              ? `<span class="m__meta">invited ${esc(readable(roundSent))}</span>` : ""}</span>
           </div>
           <label class="wr">
             <span class="wr__label">Write-up &mdash; saves to ${esc(m.notesField)}. Fathom fills this in on its own.</span>
@@ -348,6 +364,10 @@
       const slot = sel.closest(".m").querySelector('[data-only="Second Interview"]');
       if (slot) slot.hidden = sel.value !== "Second Interview";
     });
+
+    document.addEventListener("click", (e) => {
+      if (e.target.closest(".m__sum a")) e.stopPropagation();
+    }, true);
 
     document.addEventListener("click", async (e) => {
       const inv = e.target.closest("[data-invite]");

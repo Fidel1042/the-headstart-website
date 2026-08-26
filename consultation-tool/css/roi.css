@@ -27,7 +27,7 @@
   gap: 1rem;
   margin-bottom: 0.7rem;
 }
-.roi-field__label { font-size: 0.95rem; color: rgba(255,255,255,0.78); }
+.roi-field__label { font-size: 0.95rem; color: rgba(0, 0, 0, 0.78); }
 .roi-field__val {
   font-size: 1.05rem;
   font-weight: 700;
@@ -46,7 +46,7 @@
   cursor: pointer;
   background: linear-gradient(90deg,
     var(--accent) var(--fill, 30%),
-    rgba(255,255,255,0.12) var(--fill, 30%));
+    rgba(0, 0, 0, 0.12) var(--fill, 30%));
 }
 .roi-range::-webkit-slider-thumb {
   -webkit-appearance: none;
@@ -73,17 +73,17 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 0.75rem 0;
-  border-bottom: 1px solid rgba(255,255,255,0.07);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.07);
 }
-.roi-line__label { font-size: 0.95rem; color: rgba(255,255,255,0.78); }
-.roi-line__sub { display: block; font-size: 0.8rem; color: rgba(255,255,255,0.5); }
+.roi-line__label { font-size: 0.95rem; color: rgba(0, 0, 0, 0.78); }
+.roi-line__sub { display: block; font-size: 0.8rem; color: rgba(0, 0, 0, 0.60); }
 .roi-line__val {
   font-size: 1.02rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
-.roi-line__val--out { color: rgba(255,255,255,0.62); }
+.roi-line__val--out { color: rgba(0, 0, 0, 0.62); }
 .roi-line__val--in { color: var(--text); }
 
 .roi-net {
@@ -122,7 +122,7 @@
 .roi-note {
   margin-top: 0.9rem;
   font-size: 0.9rem;
-  color: rgba(255,255,255,0.62);
+  color: rgba(0, 0, 0, 0.62);
 }
 
 @media (prefers-reduced-motion: no-preference) {
