@@ -41,10 +41,40 @@
     }
     textarea:focus { outline: none; border-color: var(--accent); }
 
-    .checks { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.9rem; }
-    .chk { display: flex; align-items: center; gap: 0.35rem; font-size: 0.78rem; }
-    .chk input { width: 16px; height: 16px; accent-color: var(--accent); }
-    .chk.is-todo { color: #c33; }
+    /* Three equal slots. Stretch keeps them the same height whether a slot is
+       showing a thumbnail or an empty picker. */
+    .slots {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.6rem; margin-top: 0.9rem; align-items: stretch;
+    }
+    .slot {
+      display: flex; flex-direction: column; align-items: flex-start; gap: 0.4rem;
+      padding: 0.6rem; border: 1px dashed var(--line); border-radius: 10px;
+      background: var(--bg); min-height: 104px; box-sizing: border-box;
+    }
+    .slot.is-done { border-style: solid; border-color: var(--accent-line); }
+    .slot__label { font-size: 0.7rem; color: var(--text-muted); }
+    .slot__thumb {
+      width: 44px; height: 44px; object-fit: contain; border-radius: 6px;
+      background: var(--surface);
+    }
+    .slot__file {
+      font-size: 0.68rem; color: var(--text); word-break: break-all; line-height: 1.35;
+    }
+    /* Pushes the action to the bottom so all three sit on one baseline. */
+    .slot__pick, .slot__x { margin-top: auto; }
+    .slot__pick, .slot__x {
+      font-family: inherit; font-size: 0.68rem; font-weight: 800;
+      letter-spacing: 0.04em; text-transform: uppercase;
+      min-height: 32px; padding: 0 0.7rem; display: inline-flex; align-items: center;
+      border-radius: 999px; cursor: pointer; white-space: nowrap;
+      background: transparent; color: var(--accent);
+      border: 1px solid var(--accent-line);
+    }
+    .slot__x { border-color: var(--line); color: var(--text-muted); }
+    .slot__pick:hover { background: var(--accent-soft); }
+    .slot__x:hover { border-color: var(--accent-line); color: var(--accent); }
+    .slot.is-busy { opacity: 0.55; pointer-events: none; }
 
     .m__row { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.9rem; }
     .act {
@@ -111,6 +141,9 @@
       cardPhoto: "Card photo",
       detailPhoto: "Detail photo",
     };
+    // Mirrors REQUIRED in mentor-assets.js. Only the card photo appears on the
+    // public site; the logo and detail photo are for the consultation tool.
+    const REQUIRED = ["cardPhoto"];
 
     requireAuth((session) => {
       const email = session?.user?.email || "";
@@ -156,7 +189,12 @@
     }
 
     function card(m, mode) {
-      const outstanding = Object.keys(CHECK_LABELS).filter((k) => !m.checks[k]);
+      // Judged on the file being there, not on the box being ticked. A tick
+      // with nothing attached is the exact failure this page is meant to stop.
+      const outstanding = Object.keys(CHECK_LABELS).filter((k) => !(m.assets || {})[k]);
+      // Only the card photo goes on the public site, so it is the only one that
+      // holds a mentor back. The other two are for the internal profile.
+      const blocking = outstanding.filter((k) => REQUIRED.includes(k));
       return `
         <div class="m" data-id="${m.id}">
           <div class="m__top">
@@ -175,22 +213,40 @@
               <textarea data-d="${k}" rows="${k === "internal" ? 8 : 4}">${esc(m.drafts[k])}</textarea>
             </label>`).join("")}
 
-          <div class="checks">
-            ${Object.entries(CHECK_LABELS).map(([k, label]) => `
-              <label class="chk${m.checks[k] ? "" : " is-todo"}">
-                <input type="checkbox" data-c="${k}"${m.checks[k] ? " checked" : ""} />
-                ${esc(label)}
-              </label>`).join("")}
+          <div class="slots">
+            ${Object.entries(CHECK_LABELS).map(([k, label]) => {
+              const a = (m.assets || {})[k];
+              return `
+              <div class="slot${a ? " is-done" : ""}">
+                <span class="slot__label">${esc(label)}</span>
+                ${a
+                  ? `<img class="slot__thumb" src="${esc(a.url)}" alt="" />
+                     <span class="slot__file">${esc(a.filename)}</span>
+                     <button type="button" class="slot__x" data-clear="${k}">Replace</button>`
+                  : `<label class="slot__pick">
+                       Choose file
+                       <input type="file" accept="image/*" data-up="${k}" hidden />
+                     </label>`}
+              </div>`;
+            }).join("")}
           </div>
 
           <div class="m__row">
             ${mode === "todo" ? "" : `<button type="button" class="act act--quiet" data-save="${m.id}">Save</button>`}
             ${mode === "waiting" ? `<button type="button" class="act" data-approve="${m.id}">Approve</button>` : ""}
             ${mode === "approved" ? `<button type="button" class="act act--quiet" data-unapprove="${m.id}">Reopen</button>` : ""}
+            ${mode === "approved" && !m.ready
+              ? `<button type="button" class="act" data-ready="${m.id}"${blocking.length ? " disabled" : ""}>Ready to ship</button>`
+              : ""}
+            ${m.ready ? `<button type="button" class="act act--quiet" data-unready="${m.id}">Undo ready</button>` : ""}
             <span class="m__spacer"></span>
-            ${outstanding.length
-              ? `<span class="m__warn">still to add: ${outstanding.map((k) => CHECK_LABELS[k].toLowerCase()).join(", ")}</span>`
-              : `<span class="saved">logo and photos done</span>`}
+            ${m.ready
+              ? `<span class="saved">ready since ${esc(m.ready)} — ask Claude to ship</span>`
+              : blocking.length
+                ? `<span class="m__warn">still to add: ${blocking.map((k) => CHECK_LABELS[k].toLowerCase()).join(", ")}</span>`
+                : outstanding.length
+                  ? `<span class="m__meta">optional, not on the public site: ${outstanding.map((k) => CHECK_LABELS[k].toLowerCase()).join(", ")}</span>`
+                  : `<span class="saved">logo and photos done</span>`}
           </div>
         </div>`;
     }
@@ -212,12 +268,34 @@
         `${DATA.needsDrafts.length} with nothing written · ${DATA.shipped} already live. `;
     }
 
+    async function postAssets(body) {
+      const res = await fetch("/.netlify/functions/mentor-assets", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ adminEmail: ADMIN_EMAIL, ...body }),
+      });
+      const text = await res.text();
+      if (text.trim().startsWith("<")) {
+        throw new Error("This page needs the live site. Preview mode cannot run " +
+          "the data function, so uploading does nothing until it is pushed.");
+      }
+      const data = JSON.parse(text);
+      if (!res.ok) throw new Error(data.error || "Could not upload");
+      return data;
+    }
+
+    // Airtable takes the bytes as base64, so the file never needs hosting
+    // anywhere public first.
+    const readFile = (file) => new Promise((resolve, reject) => {
+      const fr = new FileReader();
+      fr.onerror = () => reject(new Error("Could not read that file"));
+      fr.onload = () => resolve(String(fr.result).split(",")[1] || "");
+      fr.readAsDataURL(file);
+    });
+
     function readRow(row) {
       const drafts = {};
       row.querySelectorAll("[data-d]").forEach((t) => { drafts[t.dataset.d] = t.value; });
-      const checks = {};
-      row.querySelectorAll("[data-c]").forEach((c) => { checks[c.dataset.c] = c.checked; });
-      return { drafts, checks };
+      return { drafts };
     }
 
     async function run(btn, row, body, done) {
@@ -262,17 +340,69 @@
 
       const undo = e.target.closest("[data-unapprove]");
       if (undo) return run(undo, row, { action: "unapprove", mentorId: id }, "Reopened");
+
+      const clear = e.target.closest("[data-clear]");
+      if (clear) {
+        const slot = clear.closest(".slot");
+        slot.classList.add("is-busy");
+        try { await postAssets({ action: "clear", mentorId: id, slot: clear.dataset.clear }); load(); }
+        catch (err) { slot.classList.remove("is-busy"); alert(err.message); }
+        return;
+      }
+
+      const ready = e.target.closest("[data-ready]");
+      if (ready) return runAssets(ready, row, { action: "ready", mentorId: id }, "Ready");
+
+      const unready = e.target.closest("[data-unready]");
+      if (unready) return runAssets(unready, row, { action: "unready", mentorId: id }, "Reopened");
     });
 
-    // A tickbox is a reminder, not a form. Saving it the moment it is ticked
-    // means the logo never gets marked done and then lost on a refresh.
+    // Same shape as run(), but against the assets function.
+    async function runAssets(btn, row, body, done) {
+      const original = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = "Saving…";
+      let note = row.querySelector(".note");
+      if (!note) {
+        note = document.createElement("span");
+        note.className = "note";
+        row.querySelector(".m__row").appendChild(note);
+      }
+      note.textContent = "";
+      try {
+        await postAssets(body);
+        note.className = "note saved";
+        note.textContent = done;
+        setTimeout(load, 900);
+      } catch (err) {
+        note.className = "note oops";
+        note.textContent = err.message;
+        btn.disabled = false;
+        btn.textContent = original;
+      }
+    }
+
+    // Picking a file uploads it straight away. A file sitting in an input that
+    // was never submitted is the same as no file at all.
     document.addEventListener("change", async (e) => {
-      const box = e.target.closest("[data-c]");
-      if (!box) return;
-      const row = box.closest(".m");
-      box.closest(".chk").classList.toggle("is-todo", !box.checked);
-      try { await post({ action: "save", mentorId: row.dataset.id, checks: readRow(row).checks }); }
-      catch (err) { box.checked = !box.checked; }
+      const input = e.target.closest("[data-up]");
+      if (!input || !input.files || !input.files[0]) return;
+      const row = input.closest(".m");
+      const slot = input.closest(".slot");
+      const file = input.files[0];
+      slot.classList.add("is-busy");
+      try {
+        const data = await readFile(file);
+        await postAssets({
+          action: "upload", mentorId: row.dataset.id, slot: input.dataset.up,
+          file: { name: file.name, type: file.type, data },
+        });
+        load();
+      } catch (err) {
+        slot.classList.remove("is-busy");
+        input.value = "";
+        alert(err.message);
+      }
     });
   </script>
 </body>

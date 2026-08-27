@@ -14,7 +14,7 @@
   <title>Book a Free Internship &amp; Career Mentoring Call | Headstart Mentoring</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
-  <meta name="description" content="Book a free 30-minute discovery call with Headstart Mentoring. We map your goals, your blockers, and the mentor profile that fits you, with no obligation to sign up." />
+  <meta name="description" content="Book a free 15-minute discovery call with Headstart Mentoring. We map your goals, your blockers, and the mentor profile that fits you, with no obligation to sign up." />
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
   <link rel="canonical" href="https://theheadstartmentoring.com/discovery-call" />
 
@@ -23,14 +23,14 @@
   <meta property="og:site_name" content="Headstart Mentoring" />
   <meta property="og:url" content="https://theheadstartmentoring.com/discovery-call" />
   <meta property="og:title" content="Book a Free Discovery Call | Headstart Mentoring" />
-  <meta property="og:description" content="A free 30-minute call to map your goals, your blockers, and the mentor profile that fits. No obligation to sign up." />
+  <meta property="og:description" content="A free 15-minute call to map your goals, your blockers, and the mentor profile that fits. No obligation to sign up." />
   <meta property="og:image" content="https://theheadstartmentoring.com/images/website-logo.png" />
   <meta property="og:locale" content="en_AU" />
 
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Book a Free Discovery Call | Headstart Mentoring" />
-  <meta name="twitter:description" content="Free 30-minute discovery call with Headstart Mentoring. Map your goals, blockers, and mentor fit. No obligation." />
+  <meta name="twitter:description" content="Free 15-minute discovery call with Headstart Mentoring. Map your goals, blockers, and mentor fit. No obligation." />
   <meta name="twitter:image" content="https://theheadstartmentoring.com/images/website-logo.png" />
 
   <!-- Schema: contact / booking page -->
@@ -40,7 +40,7 @@
     "@type": "ContactPage",
     "url": "https://theheadstartmentoring.com/discovery-call",
     "name": "Book a Free Discovery Call",
-    "description": "Free 30-minute discovery call with Headstart Mentoring for international students in Australia. Goal mapping, mentor fit, and a no-obligation conversation.",
+    "description": "Free 15-minute discovery call with Headstart Mentoring for international students in Australia. Goal mapping, mentor fit, and a no-obligation conversation.",
     "isPartOf": { "@id": "https://theheadstartmentoring.com/#website" },
     "mainEntity": {
       "@type": "Service",
@@ -104,6 +104,47 @@
     .form-nav {
       opacity: 0;
       transform: translateY(16px);
+    }
+
+    .hero-lede {
+      margin: 1rem 0 0.5rem;
+      font-size: 1.05rem;
+      line-height: 1.6;
+      color: rgba(255,255,255,0.82);
+    }
+    .hero-points {
+      margin: 0;
+      padding-left: 1.15rem;
+      display: grid;
+      gap: 0.35rem;
+      font-size: 1.05rem;
+      line-height: 1.6;
+      color: rgba(255,255,255,0.82);
+      /* Long enough to read comfortably, short enough that neither point
+         wraps into a single trailing word. */
+      max-width: 46ch;
+    }
+    .hero-points li::marker { color: #f5e7b2; }
+
+    /* Two deliberate columns rather than auto-fit, which would fit three
+       cramped ones in this container. Short answers pair up; anything that
+       holds a long value keeps the whole row. Collapses to one column on
+       mobile, where side-by-side inputs are worse than stacked ones. */
+    @media (min-width: 700px) {
+      /* .multi-step .signup-grid forces a single flex column, which is right
+         for a real multi-step form and wrong for this one-step one. Beaten on
+         specificity rather than by dropping the class, which the field styling
+         and the step's own visibility both hang off. */
+      .signup-form.multi-step .signup-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.1rem 1.4rem;
+        align-items: start;
+      }
+      .signup-form.multi-step .signup-grid > .form-group.phone-field,
+      .signup-form.multi-step .signup-grid > .form-group.span-row {
+        grid-column: 1 / -1;
+      }
     }
 
     /* Phone field unified-box on mobile (inline so cascade order is guaranteed) */
@@ -197,8 +238,12 @@
       <div class="section-inner">
         <div class="page-hero">
           <div class="page-hero-text">
-            <h1>Congratulations on taking the first step towards your first role!</h1>
-    
+            <h1>Answer these 5 questions to change your career for the next 5 years.</h1>
+            <p class="hero-lede">A free 15 minute call to:</p>
+            <ul class="hero-points">
+              <li>Understand where you stand</li>
+              <li>Match with a professional mentor who can 100% relate to your journey</li>
+            </ul>
           </div>
         </div>
       </div>
@@ -213,7 +258,10 @@
             <label>Donât fill this out if you're human: <input name="bot-field" /></label>
           </p>
 
-          <div class="form-step is-active" data-step="1">
+          <!-- is-visible is normally added by multi-step-form.js. Hard-coded as well so
+               the form still renders if that module fails to load: .form-step is
+               display:none by default, so without it the page shows an empty card. -->
+          <div class="form-step is-active is-visible" data-step="1">
             <div class="signup-grid">
               <div class="form-group">
                 <label for="contact-name">Name</label>
@@ -248,39 +296,7 @@
                   <input type="tel" inputmode="tel" autocomplete="tel" pattern="[0-9+()\s-]*" id="contact-phone" name="phone" required placeholder="123 456 789" />
                 </div>
               </div>
-              <div class="form-group">
-                <label>International student?</label>
-                <div class="inline-radio-group">
-                  <label>
-                    <input type="radio" name="international_student" value="yes" required />
-                    <span>Yes</span>
-                  </label>
-                  <label>
-                    <input type="radio" name="international_student" value="no" />
-                    <span>No</span>
-                  </label>
-                </div>
-              </div>
-              <div class="form-group search-select" data-search-source="universities">
-                <label for="university">University</label>
-                <div class="search-select-field">
-                  <input
-                    type="text"
-                    id="university"
-                    name="university"
-                    data-search-input
-                    autocomplete="off"
-                    placeholder="Start typing to search"
-                    required
-                  />
-                  <div class="search-select-dropdown" hidden></div>
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="major">Major</label>
-                <input type="text" id="major" name="major" required />
-              </div>
-              <div class="form-group">
+              <div class="form-group span-row">
                 <label for="linkedin">LinkedIn Profile URL</label>
                 <input type="url" id="linkedin" name="linkedin" placeholder="https://www.linkedin.com/in/yourname" required />
               </div>
@@ -319,6 +335,17 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script type="module" src="../js/main.js"></script>
   <script src="../js/nav-hamburger.js" defer></script>
+  <script>
+    // Every animated element on this page starts at opacity 0 and is revealed by
+    // the block below. If the GSAP CDN fails, that block throws on its first
+    // line and the entire form stays invisible, which reads as a broken page and
+    // loses the signup silently. Reveal everything instead.
+    if (typeof gsap === 'undefined') {
+      document.querySelectorAll('.section-alt, .form-group, .form-nav, .word')
+        .forEach(function (el) { el.style.opacity = '1'; el.style.transform = 'none'; });
+    }
+  </script>
+
   <script>
     gsap.registerPlugin(ScrollTrigger);
 

@@ -33,9 +33,18 @@ const CHECKS = {
   detailPhoto: "Detail Photo",
 };
 
+// The files behind those checkboxes, uploaded by mentor-assets.js. Kept here so
+// the page can show what is actually attached rather than only what was ticked.
+const ASSETS = {
+  logo: "Company Logo File",
+  cardPhoto: "Card Photo File",
+  detailPhoto: "Detail Photo File",
+};
+
 const FIELDS = ["Name", "Email", "Status", "Company", "Role", "Industry", "Rate",
                 "Int 1 transcript", "Int 1 summary", "Drafts Approved",
-                "Profile Shipped", ...Object.values(DRAFTS), ...Object.values(CHECKS)];
+                "Profile Shipped", "Ready To Ship",
+                ...Object.values(DRAFTS), ...Object.values(CHECKS), ...Object.values(ASSETS)];
 
 async function at(path, opts, token) {
   const res = await fetch(`https://api.airtable.com/v0/${path}`, {
@@ -66,6 +75,11 @@ const shape = (r) => {
   for (const [k, name] of Object.entries(DRAFTS)) drafts[k] = f[name] || "";
   const checks = {};
   for (const [k, name] of Object.entries(CHECKS)) checks[k] = Boolean(f[name]);
+  const assets = {};
+  for (const [k, name] of Object.entries(ASSETS)) {
+    const files = f[name] || [];
+    assets[k] = files.length ? { filename: files[0].filename, url: files[0].url } : null;
+  }
   return {
     id: r.id,
     name: f["Name"] || "Unnamed",
@@ -77,7 +91,9 @@ const shape = (r) => {
     summary: f["Int 1 summary"] || "",
     drafts,
     checks,
+    assets,
     approved: (f["Drafts Approved"] || "").slice(0, 10),
+    ready: (f["Ready To Ship"] || "").slice(0, 10),
     shipped: (f["Profile Shipped"] || "").slice(0, 10),
   };
 };

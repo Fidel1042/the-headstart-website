@@ -172,15 +172,31 @@ exports.handler = async (event) => {
     }
 
     if (p.action === "send") {
+      // Assign as part of sending, so there is no half-done state where
+      // somebody has a mentor who has never been told about them.
+      if (p.mentorId) {
+        await at(`${base}/${clientTable}/${p.menteeId}`, {
+          method: "PATCH",
+          body: JSON.stringify({ fields: { "Mentor": [p.mentorId] } }),
+        }, token);
+      }
       const rec = await at(`${base}/${clientTable}/${p.menteeId}`, {}, token).catch(() => null);
       if (!rec || !rec.fields) return json(404, { error: "No such mentee" });
       const mentee = shapeMentee(rec);
-      if (!mentee.mentorId) return json(400, { error: "Assign a mentor first, then save." });
+      if (!mentee.mentorId) return json(400, { error: "Pick a mentor first." });
       // The plan is the whole body. Sending without it mails a greeting and a
       // sign-off and nothing in between.
-      if (!mentee.plan.trim()) {
-        return json(400, { error: `${mentee.name} has no Suggested Plan yet. Write it in Airtable first.` });
+      const plan = (p.plan !== undefined ? String(p.plan) : mentee.plan).trim();
+      if (!plan) {
+        return json(400, { error: `Nothing to send. Write the plan first.` });
       }
+      // Save any edit back, so the record matches what the mentor received.
+      if (p.plan !== undefined && p.plan !== mentee.plan) {
+        await at(`${base}/${clientTable}/${p.menteeId}`, {
+          method: "PATCH", body: JSON.stringify({ fields: { "Suggested Plan": plan } }),
+        }, token);
+      }
+      mentee.plan = plan;
 
       const mRec = await at(`${base}/${mentorTable}/${mentee.mentorId}`, {}, token).catch(() => null);
       if (!mRec || !mRec.fields) return json(404, { error: "That mentor record is gone" });

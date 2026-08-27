@@ -72,6 +72,15 @@
     }
     .older > summary:hover { color: var(--accent); }
 
+    .wr { display: block; margin-top: 0.8rem; }
+    .wr__label { display: block; font-size: 0.72rem; color: var(--text-muted); margin-bottom: 0.3rem; }
+    textarea[data-f="plan"] {
+      font-family: inherit; font-size: 0.88rem; line-height: 1.55; width: 100%;
+      box-sizing: border-box; padding: 0.6rem 0.7rem; border: 1px solid var(--line);
+      border-radius: 8px; background: var(--bg); color: var(--text); resize: vertical;
+    }
+    textarea[data-f="plan"]:focus { outline: none; border-color: var(--accent); }
+
     .state { font-size: 0.9rem; color: var(--text-muted); padding: 2rem 0; text-align: center; }
     .quiet { font-size: 0.8rem; color: var(--text-muted); }
     .as-foot { font-size: 0.75rem; color: var(--text-muted); margin-top: 2rem; }
@@ -157,7 +166,6 @@
 
     function card(m) {
       const where = [m.university, m.major].filter(Boolean).join(", ");
-      const hasPlan = Boolean((m.plan || "").trim());
       return `
         <div class="m" data-id="${m.id}">
           <div class="m__top">
@@ -168,45 +176,41 @@
             ${m.linkedin ? "" : `<span class="m__warn">no LinkedIn on file</span>`}
             ${m.staleMentor ? `<span class="m__warn">mentor is no longer hired</span>` : ""}
           </div>
+
+          <label class="wr">
+            <span class="wr__label">What the mentor gets. Edit before sending.</span>
+            <textarea data-f="plan" rows="8"
+              placeholder="Nothing written yet.">${esc(m.plan)}</textarea>
+          </label>
+
           <div class="m__row">
             <span class="fld">
               <label>Mentor</label>
               <select data-f="mentor">
-                <option value="">Nobody yet</option>
+                <option value="">Pick a mentor</option>
                 ${DATA.mentors.map((x) =>
                   `<option value="${esc(x.id)}"${x.id === m.mentorId ? " selected" : ""}>${esc(x.name)}${x.industry ? ` (${esc(x.industry)})` : ""}</option>`).join("")}
               </select>
             </span>
             <span class="m__spacer"></span>
-            <button type="button" class="act" data-save="${m.id}">Save</button>
-            <button type="button" class="act act--send" data-send="${m.id}"
-                    ${m.mentorId && hasPlan ? "" : "disabled"}
-                    title="${!m.mentorId ? "Assign a mentor and save first"
-                            : !hasPlan ? "Write a Suggested Plan in Airtable first"
-                            : "Emails the mentor this mentee's plan and LinkedIn"}">
-              ${m.sent ? "Resend info" : "Send info"}
-            </button>
-            <span class="note" data-note="${m.id}">${m.sent
-              ? `<span class="m__meta">sent ${esc(readable(m.sent))}</span>` : ""}</span>
+            <button type="button" class="act" data-send="${m.id}">Assign and send</button>
+            <span class="note" data-note="${m.id}"></span>
           </div>
-          <div class="plan${hasPlan ? "" : " plan--missing"}">${hasPlan
-            ? esc(m.plan) : "No Suggested Plan yet. That field is the whole email body."}</div>
         </div>`;
     }
 
     function render() {
-      const groups = [
-        ["Waiting on a mentor", DATA.waiting],
-        ["Assigned", DATA.assigned],
-      ].filter(([, list]) => list.length);
+      // One list of work. Anything already sent drops out of it.
+      const todo = [...DATA.waiting, ...DATA.assigned.filter((m) => !m.sent)];
+      const groups = [["To assign", todo]].filter(([, list]) => list.length);
 
-      const settled = DATA.settled || [];
+      const settled = [...(DATA.settled || []), ...DATA.assigned.filter((m) => m.sent)];
       // Everyone paired before this page existed. Their mentor was emailed by
       // the old Airtable automation, so they are out of the way by default and
       // only there to be reassigned.
       const older = settled.length
         ? `<details class="older">
-             <summary>Already with a mentor from before (${settled.length})</summary>
+             <summary>Already with a mentor (${settled.length})</summary>
              ${settled.map(card).join("")}
            </details>`
         : "";
@@ -225,56 +229,43 @@
 
     document.addEventListener("click", async (e) => {
       const send = e.target.closest("[data-send]");
-      if (send) {
-        const row = send.closest(".m");
-        const note = row.querySelector("[data-note]");
-        const name = row.querySelector(".m__name").textContent;
-        const mentor = row.querySelector('[data-f="mentor"]');
-        const to = mentor.options[mentor.selectedIndex].textContent;
-        // An email to a real person, so it asks. It uses the saved mentor, not
-        // whatever the dropdown shows right now.
-        if (!confirm(`Email ${to.split(" (")[0]} the details for ${name}?\n\n` +
-            `It uses the mentor that is saved, so hit Save first if you just changed it.`)) return;
-        send.disabled = true;
-        const was = send.textContent;
-        send.textContent = "Sending…";
-        note.textContent = "";
-        try {
-          const res = await post({ action: "send", menteeId: send.dataset.send });
-          note.className = "saved";
-          note.textContent = `Sent to ${res.to}`;
-          send.textContent = "Resend info";
-        } catch (err) {
-          note.className = "oops";
-          note.textContent = err.message;
-          send.textContent = was;
-        } finally { send.disabled = false; }
+      if (!send) return;
+      const row = send.closest(".m");
+      const note = row.querySelector("[data-note]");
+      const name = row.querySelector(".m__name").textContent;
+      const sel = row.querySelector('[data-f="mentor"]');
+      const plan = row.querySelector('[data-f="plan"]').value;
+
+      if (!sel.value) {
+        note.className = "note oops";
+        note.textContent = "Pick a mentor first.";
         return;
       }
+      if (!plan.trim()) {
+        note.className = "note oops";
+        note.textContent = "Nothing to send.";
+        return;
+      }
+      const to = sel.options[sel.selectedIndex].textContent.split(" (")[0];
+      // An email to a real person, so it asks once.
+      if (!confirm(`Assign ${name} to ${to} and email them the details?`)) return;
 
-      const btn = e.target.closest("[data-save]");
-      if (!btn) return;
-      const row = btn.closest(".m");
-      const note = row.querySelector("[data-note]");
-      const picked = row.querySelector('[data-f="mentor"]').value;
-
-      btn.disabled = true;
-      const original = btn.textContent;
-      btn.textContent = "Saving…";
+      send.disabled = true;
+      const was = send.textContent;
+      send.textContent = "Sending…";
       note.textContent = "";
       try {
-        const res = await post({ action: "assign", menteeId: btn.dataset.save, mentorId: picked });
-        note.className = "saved";
-        note.textContent = res.mentee.mentorId ? "Saved" : "Mentor cleared";
-        // The row belongs in the other group now, so reload rather than leaving
-        // it under a heading that no longer describes it.
+        const res = await post({ action: "send", menteeId: send.dataset.send,
+                                 mentorId: sel.value, plan });
+        note.className = "note saved";
+        note.textContent = `Sent to ${res.to}`;
+        // Done means gone from the list.
         setTimeout(load, 900);
       } catch (err) {
-        note.className = "oops";
+        note.className = "note oops";
         note.textContent = err.message;
-      } finally {
-        btn.disabled = false;
-        btn.textContent = original;
+        send.textContent = was;
+        send.disabled = false;
       }
     });
   </script>

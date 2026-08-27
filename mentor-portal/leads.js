@@ -269,6 +269,53 @@ function renderReach(d) {
   }
 }
 
+// ── Google search ─────────────────────────────────────────────────────────
+// Impressions and position come only from here. GA4 can count the visit but
+// never the query behind it.
+function renderSearch(d) {
+  const kpis = document.getElementById("search-kpis");
+  const qEl = document.getElementById("search-queries");
+  const pEl = document.getElementById("search-pages");
+  if (!kpis || !qEl || !pEl) return;
+
+  const s = d.search;
+  if (!s) {
+    kpis.innerHTML = "";
+    qEl.innerHTML = `<tbody><tr><td class="dim">Search Console did not answer for this window.</td></tr></tbody>`;
+    pEl.innerHTML = "";
+    return;
+  }
+
+  kpis.innerHTML = [
+    ["Clicks", num(s.clicks), "opened the site"],
+    ["Impressions", num(s.impressions), "saw you in results"],
+    ["Click rate", `${(s.ctr * 100).toFixed(1)}%`, "of those who saw you"],
+    ["Avg position", s.position.toFixed(1), "across every query"],
+  ].map(([label, value, sub]) => `
+    <div class="kpi">
+      <p class="kpi__label">${esc(label)}</p>
+      <p class="kpi__value">${esc(value)}</p>
+      <p class="kpi__sub">${esc(sub)}</p>
+    </div>`).join("");
+
+  const rows = (list, first) => list.length
+    ? list.slice(0, 12).map((r) => `
+        <tr>
+          <td>${esc(r.key)}</td>
+          <td>${num(r.clicks)}</td>
+          <td>${num(r.impressions)}</td>
+          <td>${(r.ctr * 100).toFixed(1)}%</td>
+          <td>${r.position.toFixed(1)}</td>
+        </tr>`).join("")
+    : `<tr><td class="dim" colspan="5">Nothing in this window.</td></tr>`;
+
+  const head = (first) => `
+    <thead><tr><th>${first}</th><th>Clicks</th><th>Impressions</th><th>CTR</th><th>Position</th></tr></thead>`;
+
+  qEl.innerHTML = head("Query") + `<tbody>${rows(s.queries)}</tbody>`;
+  pEl.innerHTML = head("Page") + `<tbody>${rows(s.pages)}</tbody>`;
+}
+
 function renderPosts(d) {
   const groups = d.topPosts || {};
   const rows = [...(groups.linkedin || []), ...(groups.instagram || [])];
@@ -440,6 +487,7 @@ async function load() {
   renderLinks(data);
   renderReach(data);
   renderPosts(data);
+  renderSearch(data);
   renderTrend(data);
   renderCampaigns(data);
 

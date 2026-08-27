@@ -1,3 +1,4 @@
+const { searchStats } = require("../shared/search-console");
 // journey-stats.js — every number in the customer journey, in one call.
 //
 // Four stages, one per circle on the journey page: traffic, consultation,
@@ -6,8 +7,9 @@
 // needs its key, Airtable is the only hard requirement.
 
 const {
-  sessionsByMentee, traffic, consultation, close, continuity, midpoints, ymd, reach,
+  sessionsByMentee, traffic, signup, consultation, close, continuity, midpoints, ymd, reach,
 } = require("../shared/journey-stages");
+const { signupFunnel } = require("../shared/signup-funnel");
 
 function channelStats() {
   try { return require("../data/channel-stats.json"); }
@@ -277,9 +279,12 @@ exports.handler = async (event) => {
     // GA4 and Brevo are each allowed to fail on their own. A missing key
     // should grey out one circle, not break the page.
     const notes = [];
-    const [ga, email] = await Promise.all([
+    const [ga, email, funnel] = await Promise.all([
       ga4Block(process.env, windowDays, offsetDays).catch((e) => { notes.push(`GA4: ${e.message}`); return null; }),
       emailBlock(BREVO_API_KEY, windowDays, offsetDays).catch((e) => { notes.push(`Brevo: ${e.message}`); return []; }),
+      // Returns null rather than throwing, so a GA4 outage greys this circle
+      // out instead of taking the page down.
+      signupFunnel(process.env, windowDays, offsetDays),
     ]);
 
     const clients = clientRecs.map((r) => ({
@@ -302,17 +307,24 @@ exports.handler = async (event) => {
 
     // Live Instagram where the API can answer, the stored file where it cannot.
     const stats = channelStats();
-    const igLive = await instagramWeeks(from, to);
+    const [igLive, search] = await Promise.all([
+      instagramWeeks(from, to),
+      // Search impressions are reach in the same sense as a LinkedIn view:
+      // somebody saw Headstart. Clicks are traffic, and GA4 already counts
+      // those, so only impressions are added here.
+      searchStats(process.env, windowDays, offsetDays),
+    ]);
     const merged = igLive
       ? { ...stats, instagram: { ...(stats.instagram || {}), ...igLive } }
       : stats;
 
     const stages = [
-      reach(merged, ga, instagramPosts(), from, to),
+      reach(merged, ga, instagramPosts(), from, to, search),
       ga ? traffic(ga) : {
         key: "traffic", label: "Traffic", headline: "Not connected",
         sub: "GA4 env vars missing", stats: [], unavailable: true,
       },
+      signup(funnel),
       consultation(clients, email, to, from),
       close(clients, byMentee, to, from),
       continuity(byMentee, `${TARGET_GAP_DAYS} days`, from, to),

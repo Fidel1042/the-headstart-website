@@ -104,7 +104,11 @@
       }
 
       initSessionForm(mentorEmail);
-      renderMentorStats(mentorEmail);   // shown under the log form
+      // Earnings, cadence and upside are written for a mentor deciding how to
+      // fill their week. An owner logging their own session does not need a
+      // dashboard about their own $40, so it is skipped unless they are
+      // deliberately viewing as somebody.
+      if (!isOwner || asParam) renderMentorStats(mentorEmail);
     });
 
     async function initSessionForm(mentorEmail) {

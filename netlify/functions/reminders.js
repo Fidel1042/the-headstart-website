@@ -155,7 +155,119 @@ async function channelStats(days) {
   return out;
 }
 
+/* -------------------------------------------------- consultations --- */
+
+async function consultRows() {
+  const fields = ["Name", "Meeting Time", "Raw Notes", "Client Pipeline", "Meeting Link"];
+  const out = [];
+  let offset = null;
+  do {
+    const q = `?${fields.map((f) => `fields[]=${encodeURIComponent(f)}`).join("&")}` +
+      `&pageSize=100${offset ? `&offset=${offset}` : ""}`;
+    const res = await fetch(
+      `https://api.airtable.com/v0/${process.env.AIRTABLE_CORE_BASE_ID}/${process.env.AIRTABLE_MENTEE_TABLE_ID}${q}`,
+      { headers: { Authorization: `Bearer ${process.env.AIRTABLE_API_TOKEN}` } });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message || "Airtable failed");
+    out.push(...(data.records || []));
+    offset = data.offset || null;
+  } while (offset);
+  return out.map((r) => r.fields).filter((f) => f["Meeting Time"]);
+}
+
+// A show-up is a record that moved off "Initial Consultation Booked", or has
+// notes. Airtable's own Showed Up Rate formula reads notes alone, which
+// under-reads whenever the transcript automation missed a call.
+const MOVED = ["Waiting on Contract", "Acquired", "Dropped"];
+const isTest = (f) => ["test", "testing"].includes(String(f["Name"] || "").trim().toLowerCase());
+
+function showUp(rows, fromISO, toISO) {
+  const now = new Date();
+  const s = rows.filter((f) => {
+    const d = new Date(f["Meeting Time"]);
+    return d <= now && d >= new Date(fromISO) && (!toISO || d < new Date(toISO)) && !isTest(f);
+  });
+  const showed = s.filter((f) => (f["Raw Notes"] || "").trim() || MOVED.includes(f["Client Pipeline"])).length;
+  return { n: s.length, showed, rate: s.length ? (showed / s.length) * 100 : 0 };
+}
+
+// Did the link actually reach people? At three weeks this matters more than
+// the outcome, because a link nobody received cannot have moved anything.
+function linkFill(rows, fromISO) {
+  const s = rows.filter((f) => new Date(f["Meeting Time"]) >= new Date(fromISO) && !isTest(f));
+  const withLink = s.filter((f) => String(f["Meeting Link"] || "").includes("zoom.us")).length;
+  return { n: s.length, withLink, rate: s.length ? (withLink / s.length) * 100 : 0 };
+}
+
+const SHIPPED = "2026-08-27";      // join link went into both reminder emails
+const BASE_RATE = 75.0;            // 51/68 since 2026-07-09, frozen 27 Aug
+const pct1 = (n) => `${n.toFixed(1)}%`;
+
 const REMINDERS = [
+  {
+    // The join link went into the day-of and 2-hour emails on 27 Aug. Three
+    // weeks is ~30 calls, far too few to read the outcome, so this email asks
+    // the question that IS answerable: is the link reaching anyone?
+    id: "join-link-early",
+    date: "2026-09-17",
+    subject: "Join link: three-week check",
+    async build() {
+      const rows = await consultRows();
+      const fill = linkFill(rows, SHIPPED);
+      const su = showUp(rows, SHIPPED);
+      const broken = fill.rate < 80;
+      return shell("Early look", "Is the join link actually reaching people?",
+        "The link went into the morning-of and 2-hour emails on 27 August. This is a " +
+        "three-week check, not a verdict. The show-up number below is on too few calls to " +
+        "mean anything yet.",
+        callout(broken ? "Fill rate is below 80%, fix this first" : "Fill rate looks healthy",
+          `<b>${fill.withLink} of ${fill.n}</b> bookings since 27 August have a real Zoom link ` +
+          `on the record (<b>${pct1(fill.rate)}</b>). The link only renders when one is present, ` +
+          `so this is the ceiling on how many people could have received it.` +
+          (broken ? " The Meeting Time scenario scrapes it off Google Calendar; check module 14's " +
+            "<i>parameters</i>, not its mapper." : "")) +
+        tbl(["Metric", "Since 27 Aug", "Baseline"], [
+          ["Consultations held", su.n, "—"],
+          ["Showed up", `<b>${su.showed}</b>`, "—"],
+          ["Show-up rate", `<b>${pct1(su.rate)}</b>`, `${BASE_RATE}%`],
+        ]) +
+        callout("Do not act on that show-up number",
+          `At ~10 calls a week this window holds about 30 consultations. That gives a 34% chance ` +
+          `of detecting even a +15 point improvement. Anything between <b>60% and 88%</b> is noise. ` +
+          `Below 60% means something broke and is worth investigating today. The real read is ` +
+          `19 November.`));
+    },
+  },
+  {
+    // Twelve weeks, ~120 calls. This is the one that can actually be read.
+    id: "join-link-read",
+    date: "2026-11-19",
+    subject: "Join link: did show-up rate move?",
+    async build() {
+      const rows = await consultRows();
+      const su = showUp(rows, SHIPPED);
+      const fill = linkFill(rows, SHIPPED);
+      const delta = su.rate - BASE_RATE;
+      return shell("The real read", "Twelve weeks of the join link",
+        "The Zoom link went into the morning-of and 2-hour reminder emails on 27 August. " +
+        "This window is large enough to read.",
+        tbl(["Metric", "Since 27 Aug", "Baseline (9 Jul to 27 Aug)"], [
+          ["Consultations held", su.n, "68"],
+          ["Show-up rate", `<b>${pct1(su.rate)}</b>`, `${BASE_RATE}%`],
+          ["Change", `<b>${delta >= 0 ? "+" : ""}${delta.toFixed(1)} pts</b>`, "—"],
+          ["Bookings with a link on file", `${fill.withLink} of ${fill.n} (${pct1(fill.rate)})`, "15 of 124"],
+        ]) +
+        callout("Read it against the power, not against zero",
+          `At this volume a +10 point move has roughly a 50% chance of showing up as significant, ` +
+          `and +15 points about 88%. A small positive that is not significant is still probably ` +
+          `real; the test simply cannot prove it. If show-up has dropped below 65%, that is worth ` +
+          `taking seriously.`) +
+        callout("The confound you agreed to accept",
+          "The consultation dropped from 20 minutes to 15 on the same day the link shipped. A " +
+          "shorter, lower-commitment call could lift show-up on its own. These two cannot be " +
+          "separated after the fact, so treat any gain as the pair of them together."));
+    },
+  },
   {
     // Price came off the site 2026-08-24. Fidel stayed on $55 for a month on
     // purpose, so the close rate has one cause instead of two: a drop in the

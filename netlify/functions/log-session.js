@@ -18,6 +18,33 @@
 
 const { isPrepaid } = require("../shared/charge-engine");
 
+/**
+ * Price schedule, keyed on the day a mentee JOINED, not on the day a session
+ * happens. Their rates are fixed at the moment they came in and never move
+ * again, so raising prices can never reprice somebody who was quoted a
+ * different number on their consultation call.
+ *
+ * To raise prices, ADD a row. Never edit an old one: that would retroactively
+ * change what an existing mentee is charged, which is the exact thing this is
+ * built to prevent.
+ *
+ * `trial` is the mentee's first ever session, `ongoing` is every one after it.
+ * A mentee who joined before the earliest row has no row at all and keeps their
+ * own `Session Price`, which the consultation scenario wrote from the rate
+ * actually quoted to them. That is how all 37 existing mentees stay untouched.
+ */
+const PRICE_SCHEDULE = [
+  { from: "2026-08-28", trial: 55, ongoing: 70 },
+];
+
+/** The schedule row in force on a given YYYY-MM-DD join date, or null. */
+function rateOn(dateISO) {
+  const live = PRICE_SCHEDULE
+    .filter((r) => r.from <= String(dateISO))
+    .sort((a, b) => a.from.localeCompare(b.from));
+  return live.length ? live[live.length - 1] : null;
+}
+
 const headers = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -172,6 +199,8 @@ exports.handler = async (event) => {
 
   // ── Step 1: pull mentee + mentor details in parallel ──
   let menteeName, isPackage, sessionPriceAUD, mentorName, mentorRate;
+  let priorSessions = 0;
+  let menteeJoined = "";
   try {
     const mentorLookupUrl =
       `https://api.airtable.com/v0/${AIRTABLE_CORE_BASE_ID}/${AIRTABLE_MENTOR_TABLE_ID}` +
@@ -197,6 +226,31 @@ exports.handler = async (event) => {
     // weekly run only charges "Pending" rows), it just lets the P&L value each
     // package session instead of showing $0.
     sessionPriceAUD = parseFloat(menteeRecord.fields["Session Price"]) || 30;
+    // When they came in. Immutable, always present, and the thing the price
+    // schedule is keyed on.
+    menteeJoined    = String(menteeRecord.fields["Created"] || "").slice(0, 10);
+
+    // How many sessions this mentee has already had, so the schedule can tell
+    // whether the one being logged is their trial. Package mentees are skipped:
+    // their Session Price is the recognised value of a session already paid for
+    // inside a package, and repricing it would break the P&L.
+    if (!isPackage) {
+      try {
+        const priorRes = await fetch(
+          `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_SESSION_TABLE_ID}` +
+          `?filterByFormula=${encodeURIComponent(`{Mentee Record ID}="${menteeRecordId}"`)}` +
+          `&fields[]=Date`,
+          { headers: airtableHeaders }
+        );
+        const priorData = await priorRes.json();
+        priorSessions = (priorData.records || []).length;
+      } catch {
+        // Cannot tell whether this is their first. Charging the ongoing rate is
+        // the safe way to be wrong: it never gives a session away at the trial
+        // price, and a genuine first session is easy to correct in Airtable.
+        priorSessions = 1;
+      }
+    }
     mentorName      = mentorData.records?.[0]?.fields?.["Name"] || mentorEmail;
     mentorRate      = parseFloat(mentorData.records?.[0]?.fields?.["Rate"]) || 0;
   } catch (err) {
@@ -211,6 +265,13 @@ exports.handler = async (event) => {
   // reported back so Fidel can fix the schema, but the mentor never sees an error.
   const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_SESSION_TABLE_ID}`;
 
+  // The rate this mentee was locked into when they joined. Null for anyone who
+  // joined before the schedule began, and they keep their own Session Price.
+  const tier = isPackage ? null : rateOn(menteeJoined);
+
+  /** What the mentee's Nth session costs. N is zero-based across their history. */
+  const amountFor = (n) => (tier ? (n === 0 ? tier.trial : tier.ongoing) : sessionPriceAUD);
+
   let fields = {
     "Mentor Email":     mentorEmail,
     "Mentor Name":      mentorName,
@@ -218,7 +279,7 @@ exports.handler = async (event) => {
     "Mentee Record ID": menteeRecordId,
     "Date":             sessionDate,
     "Extra Notes":      notes || "",
-    "Amount Due":       sessionPriceAUD,
+    "Amount Due":       amountFor(priorSessions),
     "Mentor Payout":    mentorRate,
     "Payment Status":   isPackage ? "Package" : "Pending",
   };
@@ -248,7 +309,16 @@ exports.handler = async (event) => {
         // balance and the P&L each count it once. One row with a quantity would
         // have needed all four of those to learn about quantities.
         body: JSON.stringify({
-          records: Array.from({ length: count }, () => ({ fields })),
+          records: Array.from({ length: count }, (_, i) => ({
+            // Priced per row, not per request: logging a double lesson as a
+            // mentee's very first must charge one trial and one ongoing, not
+            // two trials. Spread so a dropped field on retry still applies.
+            // Respect the retry loop: if "Amount Due" was dropped because
+            // Airtable rejected it, re-adding it here would loop forever.
+            fields: Object.prototype.hasOwnProperty.call(fields, "Amount Due")
+              ? { ...fields, "Amount Due": amountFor(priorSessions + i) }
+              : fields,
+          })),
         }),
       });
 

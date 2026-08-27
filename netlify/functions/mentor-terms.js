@@ -73,7 +73,7 @@ async function listMentors(env) {
   let offset = null;
   do {
     const fields = ["Name", "Email", "Status", "Rate", "Agreement Signed", "Rate Agreed",
-                    "Legacy Agreement"]
+                    "Legacy Agreement", "Contract Sent"]
       .map((f) => `fields[]=${encodeURIComponent(f)}`).join("&");
     const url = `https://api.airtable.com/v0/${AIRTABLE_CORE_BASE_ID}/${AIRTABLE_MENTOR_TABLE_ID}` +
       `?${fields}${offset ? `&offset=${offset}` : ""}`;
@@ -95,10 +95,11 @@ async function listMentors(env) {
         name: r.fields["Name"] || "Unnamed",
         email: (r.fields["Email"] || "").toLowerCase().trim(),
         rate, rateSet: rate > 0, signed,
+        contractSent: r.fields["Contract Sent"] || "",
         // Already signed the old paper version. They are done, and listing
         // them as outstanding would make this page a to-do list of 14 things
         // nobody needs to do.
-        legacy: Boolean(r.fields["Legacy Agreement"]),
+        legacy: Boolean(r.fields["Legacy Agreement", "Contract Sent"]),
         // Signed at one rate, being paid at another. Worth seeing, because it
         // means somebody changed the rate after the agreement went out.
         rateChanged: Boolean(signed && agreed && agreed !== rate),
@@ -168,6 +169,13 @@ exports.handler = async (event) => {
         try { const e = await res.json(); reason = e.message || e.code || reason; } catch { /* keep */ }
         return json(502, { error: `Brevo refused it: ${reason}` });
       }
+      // Stamped only after Brevo accepted it, so a failure never looks sent.
+      await fetch(
+        `https://api.airtable.com/v0/${AIRTABLE_CORE_BASE_ID}/${AIRTABLE_MENTOR_TABLE_ID}/${id}`,
+        { method: "PATCH",
+          headers: { Authorization: `Bearer ${AIRTABLE_API_TOKEN}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ fields: { "Contract Sent": new Date().toISOString() } }) });
+
       return json(200, { sent: true, to: email, name });
     } catch (err) {
       return json(502, { error: err.message || "Could not send the offer" });

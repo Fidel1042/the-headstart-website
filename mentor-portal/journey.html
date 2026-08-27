@@ -14,7 +14,11 @@
   <link rel="stylesheet" href="portal-nav.css" />
   <link rel="stylesheet" href="/mentor-portal/polish.css" />
   <style>
-    .jr-page { max-width: 1100px; margin: 0 auto; padding: 1.6rem 1.2rem 4rem; }
+    .jr-page { max-width: 1180px; margin: 0 auto; padding: 1.6rem 1.2rem 4rem; }
+    /* 1100px fitted five stages. Sign-up made six, and six nodes plus four
+       arrows plus the reminder-email midpoint need ~1101px of run, so the row
+       was scrolling inside the column and the last circle sat half off screen.
+       The .flow overflow rule below is still the fallback for narrow screens. */
     .jr-head h1 { font-size: 1.4rem; font-weight: 800; margin: 0 0 0.9rem; }
 
     .win { display: flex; gap: 0.35rem; margin-bottom: 2rem; }
@@ -101,7 +105,7 @@
       min-height: 2.6em; line-height: 1.3; padding: 0 0.2rem; }
     .node.is-off .node__dot { background: var(--text-muted); box-shadow: none; }
 
-    .link { flex: 0 0 auto; display: flex; align-items: center; padding: 0 0.35rem; margin-top: 3.1rem; }
+    .link { flex: 0 0 auto; display: flex; align-items: center; padding: 0 0.3rem; margin-top: 3.1rem; }
     .link__arrow { font-size: 1rem; color: var(--accent-line); line-height: 1; }
 
     /* A midpoint: a small circle between two arrows, opening a panel like the

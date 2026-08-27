@@ -1,3 +1,4 @@
+const { searchStats } = require("../shared/search-console");
 // leads-attribution.js
 // Owner-only feed for the portal's Leads page. Joins two sources:
 //   GA4      - where traffic comes from and what it does on the site
@@ -633,6 +634,12 @@ async function gather(days, offset = 0) {
   if (out.channels && out.sales) {
     out.channels = confidence(out.channels, out.sales.bySource);
   }
+
+  /* ---- Search Console ----
+     GA4 counts the visit; only this knows what was typed to cause it. Failure
+     is silent on purpose: a search outage should not blank the whole page. */
+  out.search = await searchStats(process.env, days, offset);
+  if (!out.search) out.errors.push("Search Console: no data returned");
 
   return out;
 }

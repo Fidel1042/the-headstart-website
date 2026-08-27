@@ -63,7 +63,7 @@ function groupSource(raw) {
  * reach week with a tiny click rate usually means there was no link in the
  * caption, which is a choice rather than a failure.
  */
-function reach(stats, ga, igPosts, from, to) {
+function reach(stats, ga, igPosts, from, to, search) {
   // Both bounds, not just a start: without an upper bound "the previous 28
   // days" would return exactly the same impressions as the current 28.
   const inWindow = (d) => d && d >= from && (!to || d < to);
@@ -75,7 +75,9 @@ function reach(stats, ga, igPosts, from, to) {
   };
   const li = sum("linkedin");
   const ig = sum("instagram");
-  const total = li + ig;
+  // Search is the third channel and the only one nobody was counting.
+  const se = search ? (search.impressions || 0) : 0;
+  const total = li + ig + se;
 
   // Visits for the same channels, so the click rate compares like with like.
   const visitsFor = (names) => (ga && ga.sources ? ga.sources : [])
@@ -115,6 +117,9 @@ function reach(stats, ga, igPosts, from, to) {
         rows: [
           li ? ["LinkedIn", li, liVisits, rate(liVisits, li)] : null,
           ig ? ["Instagram", ig, igVisits, rate(igVisits, ig)] : null,
+          // Search reports its own clicks, so this rate is Google's, not a
+          // guess made by matching a GA4 source name.
+          se ? ["Search", se, search.clicks || 0, rate(search.clicks || 0, se)] : null,
         ].filter(Boolean),
       },
       // What actually earned the reach, five per platform. Merging them would
@@ -135,7 +140,7 @@ function reach(stats, ga, igPosts, from, to) {
       }] : []),
     ] : [],
     notes: total ? [
-      "Impressions are imported from the platform export, not live. Re-run the importer for fresh numbers.",
+      "LinkedIn impressions are imported by hand. Instagram and Search are live.",
       "A low click rate with high reach usually means no link in the caption.",
     ] : [],
   };
@@ -329,6 +334,68 @@ function consultation(clients, email, today, from) {
 }
 
 /**
+ * 2. The sign-up page.
+ *
+ * The only step in the whole journey the website itself controls. Everything
+ * before it is a channel question and everything after it is Calendly and the
+ * sales call, so this is where a site change proves itself or does not.
+ *
+ * Baseline frozen 2026-08-27 over the preceding 60 days: 106 of 323.
+ */
+const SIGNUP_BASELINE = 32.8;
+
+function signup(funnel) {
+  if (!funnel) {
+    return {
+      key: "signup", label: "Sign-up page",
+      raw: {}, headline: "No GA4 data", sub: "the discovery call page did not report",
+      stats: [], tables: [],
+    };
+  }
+  const delta = funnel.rate - SIGNUP_BASELINE;
+  const sign = delta >= 0 ? "+" : "";
+  // The baseline is a 60-day figure. A rate is still a rate on a shorter
+  // window, but at 7 days this page shows about 40 visitors, where a swing of
+  // ten points is pure noise. Show the comparison, flag it only when there is
+  // enough traffic behind it to mean something.
+  const solid = funnel.users >= 150;
+  return {
+    key: "signup",
+    label: "Sign-up page",
+    raw: { users: funnel.users, submits: funnel.submits },
+    headline: `${funnel.rate.toFixed(1)}% sign up`,
+    sub: `${funnel.submits} of ${funnel.users} who opened the discovery call page`,
+    stats: [
+      { label: "Opened the page", value: funnel.users },
+      { label: "Filled the form", value: funnel.submits },
+      { label: "vs baseline", value: `${sign}${delta.toFixed(1)} pts`,
+        note: solid ? `baseline ${SIGNUP_BASELINE}% over 60 days`
+                    : `baseline ${SIGNUP_BASELINE}%, too few visitors here to read`,
+        warn: solid && delta <= -5 },
+    ],
+    tables: [
+      {
+        title: "By where they first landed",
+        head: ["First landed on", "Reached the form", "Signed up", "Rate"],
+        rows: (funnel.landing || []).map((l) => [
+          l.page, l.views, l.submits, l.views ? `${pct(l.submits, l.views)}%` : "\u2014",
+        ]),
+        note: "Someone who saw the homepage first arrives warm. Someone dropped straight " +
+          "onto the booking page has to be sold by that page alone, and converts about ten " +
+          "points worse.",
+      },
+      {
+        title: "By device",
+        head: ["Device", "Signed up"],
+        rows: (funnel.devices || []).map((d) => [d.device, d.submits]),
+        note: "Mobile and desktop convert within a point of each other, so a layout problem " +
+          "is not what is holding this page back.",
+      },
+    ],
+  };
+}
+
+/**
  * 3. The close.
  *
  * A close is dated from when the mentee's label became "Acquired", not from
@@ -465,14 +532,14 @@ function emailCheckpoints(email) {
  * Midpoints sit IN the gaps between circles: links[i - 1] is drawn before
  * stage i. So the array is positional and must be padded to line up.
  *
- * Stages are: 0 Reach, 1 Traffic, 2 Consultation, 3 Close, 4 Continuity.
+ * Stages are: 0 Reach, 1 Traffic, 2 Sign-up, 3 Consultation, 4 Close, 5 Continuity.
  * The reminder emails go out after someone books and before the call, so the
- * checkpoint belongs in the gap before Consultation, which is index 1.
+ * checkpoint belongs in the gap before Consultation, which is index 2.
  * A null leaves that gap as a plain arrow.
  *
  * If a stage is ever added or reordered, this padding has to move with it.
  */
-const EMAIL_GAP_INDEX = 1;   // gap between Traffic and Consultation
+const EMAIL_GAP_INDEX = 2;   // gap between Sign-up and Consultation
 
 function midpoints(email) {
   const out = [];
@@ -483,6 +550,6 @@ function midpoints(email) {
 }
 
 module.exports = {
-  sessionsByMentee, reach, traffic, consultation, close, continuity, midpoints, ymd, pct,
+  sessionsByMentee, reach, traffic, signup, consultation, close, continuity, midpoints, ymd, pct,
   TRANSCRIPT_ERA_START,
 };
