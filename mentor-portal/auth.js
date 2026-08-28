@@ -33,19 +33,66 @@ export const ALLOWED_MENTOR_EMAILS = [
 // Owners who see a reduced portal. Koko runs mentee support, not money, so the
 // billing (charging mentees) and payslips (paying mentors) pages are hidden
 // from her nav and blocked if she reaches the URL directly. Keyed by page id.
+/**
+ * Owners who only see part of the portal.
+ *
+ * `only` is an allowlist of page keys. Everything else disappears from the nav
+ * AND is bounced on a direct visit. An allowlist rather than a denylist on
+ * purpose: a denylist silently exposes every page added later, which is the
+ * wrong default for someone who should be looking at one screen.
+ *
+ * `home` is where they land, and where any other portal URL sends them.
+ */
 export const LIMITED_OWNERS = {
-  // "leads" is Fidel's attribution dashboard, hidden from Koko by request.
-  "kokoro.araki1015@gmail.com": ["billing", "payslips", "leads"],
+  "kokoro.araki1015@gmail.com": {
+    // Finance is fine for a co-founder. Everything else in Mentors, and the
+    // whole of Consultation, Calls, Leads and Mentees, stays hidden.
+    only: ["second-interviews", "billing", "payslips", "pl", "ltv"],
+    home: "/mentor-portal/second-interviews.html",
+  },
 };
+
+const limitFor = (email) => LIMITED_OWNERS[String(email || "").toLowerCase().trim()] || null;
 
 /** Whether an owner is allowed to see a given owner page. */
 export function ownerCanSee(email, page) {
-  const hidden = LIMITED_OWNERS[String(email || "").toLowerCase().trim()] || [];
-  return !hidden.includes(page);
+  const rule = limitFor(email);
+  if (!rule) return true;
+  if (rule.only) return rule.only.includes(page);
+  return !(rule.hidden || []).includes(page);
+}
+
+/**
+ * The page key a portal path belongs to, or null if it is not a nav page.
+ * admin.html carries several keys behind ?view=, so it deliberately resolves
+ * to whichever comes first: a limited owner has none of them either way, and
+ * failing closed is the right way to be wrong here.
+ */
+function pageForPath(path) {
+  for (const area of NAV_AREAS) {
+    for (const link of area.links) {
+      if (link.href.split("?")[0] === path) return link.page;
+    }
+  }
+  return null;
+}
+
+/** Whether this owner may open this path at all. */
+export function ownerCanOpen(email, path) {
+  const rule = limitFor(email);
+  if (!rule) return true;
+  return ownerCanSee(email, pageForPath(path));
+}
+
+/** Where a limited owner lands, or null if they are a full owner. */
+export function ownerHome(email) {
+  const rule = limitFor(email);
+  return rule && rule.home ? rule.home : null;
 }
 
 // ─── CLIENT ───────────────────────────────────────────────────────────────────
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { NAV_AREAS } from "./portal-nav-links.js";
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
@@ -163,6 +210,14 @@ export async function requireAuth(onAuth) {
     );
     return;
   }
+  // A limited owner gets exactly one page. Enforced here rather than per page,
+  // so anything added later is closed to them by default instead of open.
+  const home = ownerHome(email);
+  if (home && !ownerCanOpen(email, window.location.pathname)) {
+    window.location.replace(home);
+    return;
+  }
+
   document.documentElement.classList.add("auth-ok");
   if (typeof onAuth === "function") onAuth(session);
 }

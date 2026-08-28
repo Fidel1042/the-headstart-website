@@ -78,7 +78,8 @@ exports.handler = async (event) => {
       fetchAll(AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTEE_TABLE_ID,
         ["Name", "Mentor Email Plain", "Billing type", "Client Pipeline",
          "Last Followed Up", "Next Session", "Admin Notes", "On Hold Until",
-         "Lapse Count", "Last Chased", "Created", "Pipeline Changed"], AIRTABLE_API_TOKEN),
+         "Lapse Count", "Last Chased", "Created", "Pipeline Changed",
+         "Retention Excluded", "Retention Exclude Reason"], AIRTABLE_API_TOKEN),
       fetchAll(AIRTABLE_BASE_ID, AIRTABLE_SESSION_TABLE_ID,
         ["Date", "Mentor Email", "Mentor Name", "Mentee Name", "Mentee Record ID", "Mentor Payout",
          "Amount Due", "Amount Charged", "Payment Status", "Mentor Paid", "Next Session"],
@@ -97,6 +98,17 @@ exports.handler = async (event) => {
         // Normalised here so the portal can build a WhatsApp link. Mentor phone
         // numbers are hand-typed and arrive in five different shapes.
         phone: auPhone(r.fields["Phone"]),
+      }));
+
+    // Retention exclusions come from EVERY client record, not from the filtered
+    // list below. Somebody worth setting aside has usually been marked Dropped,
+    // and the "Acquired only" filter would drop the flag before the page saw it.
+    const retentionExclusions = menteeRecs
+      .filter((r) => r.fields["Retention Excluded"])
+      .map((r) => ({
+        id: r.id,
+        name: r.fields["Name"] || "",
+        reason: r.fields["Retention Exclude Reason"] || "",
       }));
 
     // Only paying clients count as mentees (leads/consults stay out).
@@ -166,7 +178,7 @@ exports.handler = async (event) => {
       };
     });
 
-    return { statusCode: 200, headers, body: JSON.stringify({ mentors, mentees: withState, sessions }) };
+    return { statusCode: 200, headers, body: JSON.stringify({ mentors, mentees: withState, sessions, retentionExclusions }) };
   } catch (err) {
     return { statusCode: 502, headers, body: JSON.stringify({ error: err.message || "Could not reach Airtable" }) };
   }

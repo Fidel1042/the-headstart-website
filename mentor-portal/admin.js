@@ -6,7 +6,8 @@ import { initCalendar } from "./admin-calendar.js";
 import { renderStatus } from "./admin-status.js";
 import { renderChart } from "./admin-chart.js";
 import { renderTable } from "./admin-table.js";
-import { renderPerformance } from "./admin-performance.js";
+import { renderPerformance, setExclusions } from "./admin-performance.js";
+import { initRetention } from "./admin-retention-modal.js";
 import { fmtMoney, daysSince, isPurchase, daysAgoISO } from "./admin-utils.js";
 
 initTheme();
@@ -58,6 +59,10 @@ async function load(ownerEmail) {
     return;
   }
   loading.hidden = true;
+  // Must run before aggregate/renderPerformance, which is where retention is
+  // worked out.
+  setExclusions(data.retentionExclusions);
+  initRetention({ ownerEmail, onChanged: () => load(ownerEmail) });
   const agg = aggregate(data);
   renderOverview(agg);
   renderStatus({ ...agg, ownerEmail: OWNER_EMAIL, onChanged: () => load(ownerEmail) });

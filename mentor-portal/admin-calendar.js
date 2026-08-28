@@ -15,7 +15,12 @@ let menteeColors = new Map(); // mentee key -> colour, when a mentor is selected
 // Key by the displayed name, not the record id: some session rows carry a
 // Mentee Record ID and some are blank, so keying by id would give one person
 // two colours. The chip shows the name, so same name must mean same colour.
-const menteeKey = (s) => (s.mentee || "").trim().toLowerCase() || s.menteeId;
+// Identity is the Airtable record id. The typed name is only a fallback for
+// rows old enough to predate the id, because a mentor typing "Saksha" one
+// week and "Sakshi Khatter" the next used to split one person into two and
+// quietly halve that mentor's retention. admin-overview.js already keys
+// this way; these two files had it the wrong way round.
+const menteeKey = (s) => s.menteeId || (s.mentee || "").trim().toLowerCase();
 
 // When one mentor is selected, each of their mentees gets its own colour so
 // the month reads as "who this mentor is seeing", not "which mentor".

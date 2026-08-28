@@ -14,7 +14,25 @@ const GRACE_DAYS = 30;           // a mentee inside their first month is exclude
 let rows = [];
 let sort = { key: "retention", dir: "desc" };
 
-const menteeKey = (s) => (s.mentee || "").trim().toLowerCase() || s.menteeId;
+// Identity is the Airtable record id. The typed name is only a fallback for
+// rows old enough to predate the id, because a mentor typing "Saksha" one
+// week and "Sakshi Khatter" the next used to split one person into two and
+// quietly halve that mentor's retention. admin-overview.js already keys
+// this way; these two files had it the wrong way round.
+// mentee key -> { reason }. Filled by setExclusions() before perf() runs.
+const EXCLUDED = new Map();
+
+export function setExclusions(list) {
+  EXCLUDED.clear();
+  (list || []).forEach((m) => {
+    EXCLUDED.set(m.id, { reason: m.reason || "" });
+    // Sessions old enough to predate the record id key on the lower-cased name,
+    // so both forms are registered.
+    if (m.name) EXCLUDED.set(String(m.name).trim().toLowerCase(), { reason: m.reason || "" });
+  });
+}
+
+const menteeKey = (s) => s.menteeId || (s.mentee || "").trim().toLowerCase();
 const todayISO = () => new Date().toISOString().slice(0, 10);
 const daysBetween = (a, b) => Math.round((new Date(b) - new Date(a)) / DAY_MS);
 
@@ -49,11 +67,17 @@ function perf(m) {
   // Per-mentee working, so the number can be opened up and questioned rather
   // than taken on trust. This is what the retention popup lists.
   const detail = [];
+  let excluded = 0;
   byMentee.forEach((dates, key) => {
     const first = dates[0];
     const age = daysBetween(first, today);
-    const isEligible = age >= GRACE_DAYS;
+    const ex = EXCLUDED.get(key);
+    // Excluded mentees leave the sum entirely, the same way a mentee inside
+    // their first month does. They are still returned and still listed, so the
+    // count on the tile can say how many were set aside.
+    const isEligible = age >= GRACE_DAYS && !ex;
     const isRetained = dates.length >= RETENTION_THRESHOLD;
+    if (ex) excluded += 1;
     if (isEligible) {
       eligible += 1;
       if (isRetained) retained += 1;
@@ -61,6 +85,7 @@ function perf(m) {
     const gap = avgGapDays(dates);
     if (gap !== null) menteeGaps.push(gap);
     detail.push({
+      id: key,
       name: nameFor.get(key) || key,
       sessions: dates.length,
       first,
@@ -69,12 +94,16 @@ function perf(m) {
       eligible: isEligible,
       retained: isEligible && isRetained,
       frequency: gap,
+      excluded: Boolean(ex),
+      excludeReason: ex ? ex.reason : "",
     });
   });
   // Worst first: the ones dragging the number down are the ones worth reading.
-  detail.sort((a, b) => (a.eligible === b.eligible)
-    ? a.sessions - b.sessions
-    : (a.eligible ? -1 : 1));
+  detail.sort((a, b) => {
+    if (a.excluded !== b.excluded) return a.excluded ? 1 : -1;
+    if (a.eligible !== b.eligible) return a.eligible ? -1 : 1;
+    return a.sessions - b.sessions;
+  });
 
   return {
     name: m.name,
@@ -85,6 +114,7 @@ function perf(m) {
     retention: eligible ? retained / eligible : null,
     retained,
     eligible,
+    excluded,
     frequency: menteeGaps.length ? menteeGaps.reduce((a, g) => a + g, 0) / menteeGaps.length : null,
     active: recent,
     detail,

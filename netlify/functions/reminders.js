@@ -148,9 +148,54 @@ async function channelStats(days) {
   const out = {};
   rows.forEach(({ dims, mets }) => {
     const k = norm(dims[0]);
-    const c = (out[k] = out[k] || { visitors: 0, booked: 0 });
+    const c = (out[k] = out[k] || { visitors: 0, booked: 0, forms: 0 });
     if (dims[1] === "page_view") c.visitors += mets[0];
     if (dims[1] === "invitee_meeting_scheduled") c.booked += mets[0];
+    if (dims[1] === "discovery_form_submit") c.forms += mets[0];
+  });
+  return out;
+}
+
+// People who opened the discovery-call page and people who submitted its form,
+// over an explicit date window. pagePath rather than landingPage, because the
+// question is "of everyone who reached the page", not "of everyone who arrived
+// on the site there". The legacy /html/ path is folded in so the denominator
+// matches the frozen baseline of 323.
+async function discoveryPageStats(startDate, endDate) {
+  const rows = await ga4({
+    dateRanges: [{ startDate, endDate }],
+    dimensions: [{ name: "pagePath" }, { name: "eventName" }],
+    metrics: [{ name: "totalUsers" }],
+    dimensionFilter: { filter: { fieldName: "eventName",
+      inListFilter: { values: ["page_view", "discovery_form_submit"] } } },
+    limit: 500,
+  });
+  let opened = 0, forms = 0;
+  rows.forEach(({ dims, mets }) => {
+    const [path, ev] = dims;
+    if (!String(path).includes("discovery-call")) return;
+    if (ev === "page_view") opened += mets[0];
+    if (ev === "discovery_form_submit") forms += mets[0];
+  });
+  return { opened, forms, rate: opened ? (forms / opened) * 100 : 0 };
+}
+
+// LinkedIn visitors / form submits / bookings between two dates.
+async function linkedinWindow(startDate, endDate) {
+  const rows = await ga4({
+    dateRanges: [{ startDate, endDate }],
+    dimensions: [{ name: "sessionSource" }, { name: "eventName" }],
+    metrics: [{ name: "totalUsers" }],
+    dimensionFilter: { filter: { fieldName: "eventName", inListFilter: { values: EVENTS } } },
+    limit: 400,
+  });
+  const out = { visitors: 0, forms: 0, booked: 0 };
+  rows.forEach(({ dims, mets }) => {
+    const s = String(dims[0] || "").toLowerCase();
+    if (!(s.includes("linkedin") || s.includes("lnkd"))) return;
+    if (dims[1] === "page_view") out.visitors += mets[0];
+    if (dims[1] === "discovery_form_submit") out.forms += mets[0];
+    if (dims[1] === "invitee_meeting_scheduled") out.booked += mets[0];
   });
   return out;
 }
@@ -202,6 +247,26 @@ function linkFill(rows, fromISO) {
 const SHIPPED = "2026-08-27";      // join link went into both reminder emails
 const BASE_RATE = 75.0;            // 51/68 since 2026-07-09, frozen 27 Aug
 const pct1 = (n) => `${n.toFixed(1)}%`;
+
+/* ---- A/B test constants, all frozen 2026-08-27, do not recompute ---- */
+
+// LinkedIn cadence test: 3 posts/week -> 5 posts/week from Mon 31 Aug.
+// Detail in Operations/analytics/linkedin-cadence-test.md.
+const LI_START = "2026-08-31";
+// Measured as ONE aggregate window (27 Jul - 23 Aug), not as summed weeks.
+// GA4 totalUsers dedupes inside whatever window you ask for, so summing the
+// weekly rows gives 314 while the same span queried whole gives 295. The
+// reminders below query one whole window, so the baseline must match that.
+const LI_BASE_4WK = { visitors: 295, forms: 5, booked: 5 };
+const LI_BASE_RATE = 3.32;         // 51 forms / 1,536 visitors, 15 Jun - 27 Aug
+const LI_WIN = 440;                // +50% on 295, the "it worked" line
+const LI_LOSS = 235;               // -20% on 295, the "it backfired" line
+const LI_MEDIAN_IMPRESSIONS = 5371; // last 20 logged posts, weeks 17-20
+
+// Discovery-call form: 8 required fields -> 5, plus copy, shipped 27 Aug.
+// Detail in Operations/analytics/discovery-form-test.md.
+const FORM_BASE_RATE = 32.8;       // 106 of 323 over the 60 days to 27 Aug
+const FORM_BAND = [25.5, 40.1];    // 95% noise band at n ~ 320 per side
 
 const REMINDERS = [
   {
@@ -404,6 +469,195 @@ const REMINDERS = [
         later will not show here, so treat a close call as a reason to wait rather than to switch.</p>`);
     },
   },
+  {
+    // Two weeks into the shorter discovery-call form. Far too early to read a
+    // rate, but a form that silently stopped submitting would cost eight weeks
+    // of the test, so this checks the plumbing and nothing else.
+    id: "discovery-form-sanity",
+    date: "2026-09-10",
+    subject: "Discovery form: is it still submitting?",
+    async build() {
+      const now = await discoveryPageStats(SHIPPED, "today");
+      const dead = now.forms === 0 && now.opened > 20;
+      return shell("Plumbing check", "Two weeks on the shorter form",
+        "You cut the form from 8 required fields to 5 on 27 August and changed the page copy " +
+        "at the same time. This is not a result, it is a check that submissions are still " +
+        "reaching Netlify and Airtable.",
+        callout(dead ? "Nothing has submitted, go and test the form yourself today"
+                     : "Submissions are coming through",
+          `<b>${now.forms}</b> submits from <b>${now.opened}</b> people who opened the page ` +
+          `since 27 August.` + (dead
+            ? " People are opening the page and nobody is getting through. Fill the form in " +
+              "yourself and check the Netlify form log before anything else."
+            : " That is enough to say the form works. It is nowhere near enough to say " +
+              "whether it works <i>better</i>.")) +
+        callout("Do not read the rate below",
+          `It will say something like <b>${pct1(now.rate)}</b> against a ${FORM_BASE_RATE}% ` +
+          `baseline. On two weeks of traffic that number swings by 10 points on chance alone. ` +
+          `The real read is <b>26 October</b>, at roughly 320 page opens.`) +
+        `<p style="font-size:14px;line-height:1.65;color:#4a453c;margin:0 0 8px">
+        Also worth remembering: <b>LinkedIn profile URL</b> and <b>where did you find out about
+        us</b> are both still required. Those were ranked #1 and #2 for expected effect and
+        neither was touched. They are the next change if October comes back flat.</p>`);
+    },
+  },
+  {
+    // Midpoint of the 5x/week month. The only honest questions at two weeks are
+    // "did the cadence actually happen" and "did per-post reach collapse".
+    id: "linkedin-cadence-midpoint",
+    date: "2026-09-14",
+    subject: "5x/week: are you actually doing it?",
+    async build() {
+      const li = await linkedinWindow(LI_START, "today");
+      return shell("Midpoint", "Two weeks of 5 posts a week",
+        "You moved from ~3 posts a week to 5 on 31 August. This is a compliance check, not a " +
+        "verdict. Nothing about client numbers can be read for another ten weeks.",
+        callout("Question 1: have you published 10 posts since 31 August?",
+          "Only you can answer this, it is not in GA4. A cadence test where the cadence never " +
+          "happened is the single most likely way this dies. If you are behind, the honest move " +
+          "is to reset the start date rather than pretend.") +
+        callout("Question 2: did per-post reach collapse?",
+          `Baseline median is <b>${LI_MEDIAN_IMPRESSIONS.toLocaleString()} impressions per post</b> ` +
+          `across your last 20 posts. Open LinkedIn analytics and take the median of the posts ` +
+          `since 31 August. <b>Below ~2,700</b> means the extra posts are cannibalising each ` +
+          `other and total reach will not move however many you publish. Use the median, not the ` +
+          `average, or one viral post will hide the problem.`) +
+        tbl(["LinkedIn traffic", "Since 31 Aug", "Same length before"], [
+          ["Visitors", `<b>${li.visitors}</b>`, `${LI_BASE_4WK.visitors} over 4 weeks`],
+          ["Discovery form submits", `<b>${li.forms}</b>`, LI_BASE_4WK.forms],
+          ["Calendly bookings", `<b>${li.booked}</b>`, LI_BASE_4WK.booked],
+        ]) +
+        `<p style="font-size:13px;color:#8a8a8a;line-height:1.6">Those traffic numbers are here
+        for early warning only. Two weeks against a four-week baseline is not a comparison. The
+        verdict email is 28 September.</p>`);
+    },
+  },
+  {
+    // Four weeks, ~20 posts. Traffic is readable at this volume. Sign-ups are
+    // not, and clients are nowhere close, so the email says so loudly.
+    id: "linkedin-cadence-verdict",
+    date: "2026-09-28",
+    subject: "5x/week: the four-week verdict",
+    async build() {
+      const li = await linkedinWindow(LI_START, "today");
+      const v = li.visitors;
+      const verdict = v > LI_WIN ? "Cadence is working on reach, keep going"
+        : v < LI_LOSS ? "Posting more made it worse, go back to 3x"
+        : "Inside the noise band, no signal, keep going";
+      const delta = v - LI_BASE_4WK.visitors;
+      return shell("Verdict", "Four weeks at 5 posts a week",
+        "Bands were set on 27 August, before you started, so this cannot be rationalised now. " +
+        "Traffic is the only thing four weeks can settle.",
+        callout(verdict,
+          `<b>${v}</b> LinkedIn visitors against a matched four-week baseline of ` +
+          `<b>${LI_BASE_4WK.visitors}</b> (${delta >= 0 ? "+" : ""}${delta}). ` +
+          `Bands: above ${LI_WIN} is a win, below ${LI_LOSS} is a loss, ` +
+          `anything between is noise.`) +
+        tbl(["Metric", "31 Aug to 27 Sep", "Baseline (27 Jul to 23 Aug)"], [
+          ["LinkedIn visitors", `<b>${v}</b>`, LI_BASE_4WK.visitors],
+          ["Discovery form submits", `<b>${li.forms}</b>`, LI_BASE_4WK.forms],
+          ["Calendly bookings", `<b>${li.booked}</b>`, LI_BASE_4WK.booked],
+          ["Visitor to form rate", `<b>${pctStr(li.forms, v)}</b>`, `${LI_BASE_RATE}% over 11 wks`],
+        ]) +
+        callout("Do not call the sign-up question today",
+          `Your baseline is <b>${LI_BASE_4WK.forms} form submits in four weeks</b>. Even a ` +
+          `doubling of that sits around p = 0.15, which is not a result. And at roughly one ` +
+          `LinkedIn client a fortnight, four weeks is two clients. There is no arithmetic that ` +
+          `makes "did it bring more clients" answerable in September. That read is ` +
+          `<b>23 November</b>.`) +
+        callout("Two things that could be faking this number",
+          "LinkedIn traffic was already falling ~4x, from ~290/week in late June to ~76/week in " +
+          "August. A rebound towards June levels is just as easily regression to the mean as it " +
+          "is your cadence. And the discovery-call form changed on 27 August, so form submits " +
+          "carry both changes. Visitors is the clean metric; submits is not.") +
+        `<p style="font-size:14px;line-height:1.65;color:#4a453c;margin:0 0 8px">
+        <b>Also take the median impressions per post</b> from LinkedIn analytics and write it
+        down. Baseline is ${LI_MEDIAN_IMPRESSIONS.toLocaleString()}. If total traffic rose but the
+        median halved, you are buying reach with volume and that does not scale past 5.</p>`);
+    },
+  },
+  {
+    // Twelve weeks, ~60 posts. The only read that touches the real question.
+    id: "linkedin-cadence-clients",
+    date: "2026-11-23",
+    subject: "5x/week: did it actually bring clients?",
+    async build() {
+      const li = await linkedinWindow(LI_START, "today");
+      const rows = await consultRows();
+      const su = showUp(rows, LI_START);
+      const weeks = 12;
+      return shell("The real read", "Twelve weeks of 5 posts a week",
+        "This is the question you actually asked in August: more posts, more clients. Twelve " +
+        "weeks and roughly 60 posts is the first window where it means anything.",
+        tbl(["Metric", "Since 31 Aug (12 wks)", "Baseline rate"], [
+          ["LinkedIn visitors", `<b>${li.visitors}</b>`, "~74/week"],
+          ["Per week", `<b>${(li.visitors / weeks).toFixed(0)}</b>`, "74"],
+          ["Discovery form submits", `<b>${li.forms}</b>`, "~1.3/week (15 expected)"],
+          ["Visitor to form rate", `<b>${pctStr(li.forms, li.visitors)}</b>`, `${LI_BASE_RATE}%`],
+          ["Calendly bookings", `<b>${li.booked}</b>`, "—"],
+        ]) +
+        callout("Judge it on form submits per week, not on signed clients",
+          `At baseline twelve weeks gives about 15 submits, so a doubling to 30 is readable and ` +
+          `anything smaller is not. Signed clients will still be too few to test, which is why ` +
+          `submits is the decision metric and clients is the sanity check.`) +
+        callout("The sanity check that stops you celebrating junk",
+          `LinkedIn consultations closed at <b>44.4%</b> before this test. Pull the current ` +
+          `LinkedIn close rate from Airtable at 14 days matured. If volume went up and close ` +
+          `rate fell below ~35%, the extra posts bought worse leads and the win is fake. ` +
+          `${su.n} consultations have been held since 31 August in total, across all channels.`) +
+        callout("What you agreed to accept back in August",
+          "The form changed on 27 August, pricing came off the site on 24 August and the price " +
+          "was free to move from 24 September. Any sign-up move over this window carries all of " +
+          "those. You took that trade knowingly because running them separately would have cost " +
+          "a year. Do not relitigate it now, just do not claim cadence caused it on its own."));
+    },
+  },
+  {
+    // Sixty days and ~320 page opens on the shorter form. This one is readable.
+    id: "discovery-form-read",
+    date: "2026-10-26",
+    subject: "Shorter form: did sign-up rate move?",
+    async build() {
+      const now = await discoveryPageStats(SHIPPED, "today");
+      const chans = await channelStats(60);
+      const [lo, hi] = FORM_BAND;
+      const thin = now.opened < 200;
+      const verdict = thin ? "Not enough traffic to call it, leave it and check again in a month"
+        : now.rate > hi ? "The shorter form worked, keep it"
+        : now.rate < lo ? "It got worse, roll the copy back first, not the form"
+        : "Inside the noise band, no signal";
+      const total = Object.values(chans).reduce((s, c) => s + c.visitors, 0);
+      const chanRows = ["LinkedIn", "Instagram", "Direct", "Other"]
+        .filter((k) => chans[k])
+        .map((k) => [k, chans[k].visitors, pctStr(chans[k].visitors, total)]);
+
+      return shell("Decision", "Sixty days on the shorter discovery-call form",
+        "On 27 August the form went from 8 required fields to 5 and the page copy changed. " +
+        "Bands below were set that day.",
+        callout(verdict,
+          `<b>${now.forms}</b> submits from <b>${now.opened}</b> page opens, ` +
+          `<b>${pct1(now.rate)}</b>, against a <b>${FORM_BASE_RATE}%</b> baseline. ` +
+          `The 95% noise band is <b>${lo}% to ${hi}%</b>.`) +
+        tbl(["Metric", "Since 27 Aug", "Baseline (60 days to 27 Aug)"], [
+          ["Opened the page", now.opened, "323"],
+          ["Submitted", `<b>${now.forms}</b>`, "106"],
+          ["Sign-up rate", `<b>${pct1(now.rate)}</b>`, `${FORM_BASE_RATE}%`],
+          ["Change", `<b>${now.rate >= FORM_BASE_RATE ? "+" : ""}${(now.rate - FORM_BASE_RATE).toFixed(1)} pts</b>`, "—"],
+        ]) +
+        callout("If this came back flat, here is the next change",
+          "<b>LinkedIn profile URL</b> and <b>where did you find out about us</b> are both still " +
+          "required. They were ranked #1 and #2 for expected effect and neither was touched in " +
+          "August. The LinkedIn URL makes a mobile user leave the page mid-form, and 60% of this " +
+          "traffic is mobile. Drop that one on its own so the result is attributable.") +
+        `<h2 style="font-size:13px;letter-spacing:.05em;text-transform:uppercase;color:#6b6455;margin:0 0 10px">Check the mix before believing it</h2>` +
+        tbl(["Channel", "Visitors", "Share"], chanRows) +
+        callout("Two reasons this could be lying to you",
+          "Cold arrivals straight onto the page converted at 26.2%, homepage-warmed at 36.6%. " +
+          "The 5x/week LinkedIn test ran over this exact window and changes that mix. Second, " +
+          "cross-check against Airtable record creation, since the job-alerts modal also creates " +
+          "records and GA4 alone has undercounted before."));
+    },
+  },
 ];
 
 /* ---------------------------------------------------------- handler --- */
@@ -418,23 +672,37 @@ exports.handler = async (event) => {
   }).formatToParts(new Date()).map((p) => [p.type, p.value]));
   const today = `${parts.year}-${parts.month}-${parts.day}`;
 
+  // All reminders due today, not just the first. Two tests landing on the same
+  // date is a normal thing to happen, and a silently dropped reminder is the
+  // worst possible failure here: nobody finds out until the window has closed.
   const due = force
-    ? REMINDERS.find((r) => r.id === force)
-    : (Number(parts.hour) === 6 ? REMINDERS.find((r) => r.date === today) : null);
+    ? REMINDERS.filter((r) => r.id === force)
+    : (Number(parts.hour) === 6 ? REMINDERS.filter((r) => r.date === today) : []);
 
-  if (!due) return { statusCode: 200, body: `Nothing due (${today}, hour ${parts.hour}).` };
+  if (!due.length) return { statusCode: 200, body: `Nothing due (${today}, hour ${parts.hour}).` };
   if (!process.env.BREVO_API_KEY) return { statusCode: 500, body: "BREVO_API_KEY missing" };
 
-  try {
-    const html = await due.build();
-    const res = await fetch("https://api.brevo.com/v3/smtp/email", {
-      method: "POST",
-      headers: { "api-key": process.env.BREVO_API_KEY, "Content-Type": "application/json" },
-      body: JSON.stringify({ sender: SENDER, to: TO, subject: due.subject, htmlContent: html }),
-    });
-    if (!res.ok) return { statusCode: 502, body: "Brevo rejected: " + (await res.text()).slice(0, 200) };
-    return { statusCode: 200, body: `Sent reminder: ${due.id}` };
-  } catch (err) {
-    return { statusCode: 500, body: `Failed (${due.id}): ${err.message}` };
+  const sent = [], failed = [];
+  for (const r of due) {
+    try {
+      const html = await r.build();
+      const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+        method: "POST",
+        headers: { "api-key": process.env.BREVO_API_KEY, "Content-Type": "application/json" },
+        body: JSON.stringify({ sender: SENDER, to: TO, subject: r.subject, htmlContent: html }),
+      });
+      if (!res.ok) failed.push(`${r.id}: Brevo rejected ${(await res.text()).slice(0, 120)}`);
+      else sent.push(r.id);
+    } catch (err) {
+      failed.push(`${r.id}: ${err.message}`);
+    }
   }
+
+  // One reminder failing must not stop the others, but it still has to be a
+  // visible failure so a broken GA4 query does not pass as a quiet success.
+  return {
+    statusCode: failed.length ? 502 : 200,
+    body: `Sent: ${sent.join(", ") || "none"}.` +
+      (failed.length ? ` Failed: ${failed.join(" | ")}` : ""),
+  };
 };

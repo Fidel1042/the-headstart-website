@@ -122,8 +122,6 @@ function card(c, kind) {
              title="${esc(m.when || "")}">Copy ${esc(m.label)}</button>`).join("")}
         ${c.mentorId ? `<button type="button" class="c-btn" data-act="copyavail" data-id="${c.id}"
           title="Send this to the mentor">Mentor availability link</button>` : ""}
-        <button type="button" class="c-btn" data-act="copybook" data-id="${c.id}"
-          title="Send this to the mentee">Mentee booking link</button>
         <a class="c-btn c-btn--msg${hasPhone ? "" : " is-disabled"}" ${hasPhone ? `href="https://wa.me/${c.phone}" target="_blank" rel="noopener"` : 'aria-disabled="true"'}>Message</a>
         <button type="button" class="c-btn c-btn--done" data-act="done" data-id="${c.id}" data-kind="${kind}">Mark done</button>
       </div>

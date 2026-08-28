@@ -10,7 +10,12 @@ const HEADING = /^\s*#*\s*(whatsapp|gmail|email)\s+(follow-?up|nudge)\s*:?\s*$/i
 // Each is a separate message sent on a different day, so they are split apart
 // and returned as a list rather than one blob. Older records used
 // "WhatsApp follow-up:" style headings, so both shapes are handled.
-const BANNER = /^\s*=+\s*(.+?)\s*=+\s*$/;
+// The closing "===" is optional: the model writes "=== NUDGE 1 ===" most of the
+// time and "=== NUDGE 1" the rest, and when the trailing markers were required
+// a whole record collapsed into one unlabelled message with no nudge buttons.
+// The label must start with something other than "=" so a bare "======" rule
+// line is not mistaken for a heading.
+const BANNER = /^\s*={2,}\s*([^=\s].*?)\s*=*\s*$/;
 
 // "FOLLOW-UP (send now)" → { label: "Follow-up", when: "send now" }, so the
 // buttons can be short and the timing still shown.

@@ -350,6 +350,7 @@
         <input type="hidden" name="form-name" value="mentee-agreement" />
         <input type="hidden" name="agreement_version" value="v1.1 (27/05/2026)" />
         <input type="hidden" name="signature" id="signature-value" />
+        <input type="hidden" name="mentee_record_id" id="mentee-record-id" />
 
         <p class="honeypot">
           <label>Don’t fill this out if you're human: <input name="bot-field" /></label>
@@ -421,6 +422,20 @@
   <script>
     (function () {
       const STRIPE_PUBLISHABLE_KEY = "pk_live_51TbWp6FRghgIGbjs0S6iTSuAWLcYALlUhfpmO6gJpqUIpBlz2JQ97k6diZjKopq8DGySNDPDRD8zIZMXs2OLi0HO00zDKvk0pD";
+
+      // Read mentee record ID from URL (?mentee=recABC123) and stash it in the
+      // hidden form field. This is what ties the agreement submission to the
+      // right Airtable record even if the mentee types a different email here
+      // than the one on file. Only accepts a shape that looks like an Airtable
+      // record ID (safety belt against arbitrary values in the URL).
+      try {
+        const url = new URL(window.location.href);
+        const menteeParam = (url.searchParams.get("mentee") || "").trim();
+        if (/^rec[A-Za-z0-9]{10,20}$/.test(menteeParam)) {
+          const field = document.getElementById("mentee-record-id");
+          if (field) field.value = menteeParam;
+        }
+      } catch { /* URL parsing failed, nothing to do */ }
 
       const popupTrigger = document.getElementById("open-agreement-popup");
       const agreementOpenError = document.getElementById("agreement-open-error");
@@ -547,10 +562,13 @@
         }
 
         try {
+          const menteeRecordIdField = document.getElementById("mentee-record-id");
+          const menteeRecordId = menteeRecordIdField ? menteeRecordIdField.value.trim() : "";
+
           const setupRes = await fetch("/.netlify/functions/create-stripe-setup", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name: fullName, email: emailValue }),
+            body: JSON.stringify({ name: fullName, email: emailValue, menteeRecordId }),
           });
 
           const setupData = await setupRes.json();

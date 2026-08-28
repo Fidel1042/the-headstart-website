@@ -95,3 +95,25 @@
 .ret-tag--new  { color: var(--text-muted); border: 1px solid var(--line); }
 .ret-note { font-size: 0.7rem; color: var(--text-muted); }
 .ret-foot { display: block; margin-top: 0.8rem; }
+
+/* ── Retention exclusions ───────────────────────────────────────────────── */
+/* An excluded mentee stays on screen, greyed but readable, so the figure can
+   always be argued with. Hiding them would make the number unfalsifiable. */
+.ret-row--out td { opacity: 0.62; }
+.ret-tag--out {
+  display: inline-block; padding: 0.1rem 0.5rem; border-radius: 999px;
+  font-size: 0.72rem; font-weight: 700;
+  border: 1px solid var(--line); color: var(--text-muted);
+}
+.ret-act { text-align: right; white-space: nowrap; }
+.ret-btn {
+  font-family: inherit; font-size: 0.68rem; font-weight: 800;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  min-height: 30px; padding: 0 0.7rem; box-sizing: border-box;
+  border-radius: 999px; cursor: pointer; white-space: nowrap;
+  background: transparent; color: var(--text-muted);
+  border: 1px solid var(--line);
+}
+.ret-btn:hover:not(:disabled) { border-color: var(--accent-line); color: var(--accent); }
+.ret-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.ret-btn--undo { color: var(--accent); border-color: var(--accent-line); }
