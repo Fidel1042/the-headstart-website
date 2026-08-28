@@ -29,7 +29,7 @@ function row(d, threshold) {
       <tr class="ret-row ret-row--out">
         <td>${esc(d.name)}</td>
         <td class="num">${d.sessions}</td>
-        <td>${fmtDate(d.first)}</td>
+        <td class="ret-date">${fmtDate(d.first)}</td>
         <td><span class="ret-tag ret-tag--out">Excluded</span>
             <span class="ret-note">${esc(d.excludeReason || "no reason given")}</span></td>
         <td class="ret-act">${control(d)}</td>
@@ -40,7 +40,7 @@ function row(d, threshold) {
       <tr class="ret-row ret-row--new">
         <td>${esc(d.name)}</td>
         <td class="num">${d.sessions}</td>
-        <td>${fmtDate(d.first)}</td>
+        <td class="ret-date">${fmtDate(d.first)}</td>
         <td><span class="ret-tag ret-tag--new">Too new</span> <span class="ret-note">${d.age}d in, needs 30</span></td>
         <td class="ret-act">${control(d)}</td>
       </tr>`;
@@ -55,7 +55,7 @@ function row(d, threshold) {
     <tr class="ret-row">
       <td>${esc(d.name)}</td>
       <td class="num">${d.sessions}</td>
-      <td>${fmtDate(d.first)}</td>
+      <td class="ret-date">${fmtDate(d.first)}</td>
       <td>${tag} <span class="ret-note">${note}</span></td>
       <td class="ret-act">${control(d)}</td>
     </tr>`;

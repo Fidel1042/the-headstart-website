@@ -62,7 +62,7 @@
 /* Own table styling rather than borrowing the financials one, which this page
    does not load. */
 .ret-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-.ret-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; min-width: 420px; }
+.ret-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; min-width: 540px; }
 .ret-table th {
   text-align: left;
   font-size: 0.66rem;
@@ -77,7 +77,13 @@
   border-bottom: 1px solid var(--line-soft);
   color: var(--text);
 }
-.ret-table .num { text-align: right; font-variant-numeric: tabular-nums; padding-right: 0; }
+/* The cell rule above sets left padding to 0, so zeroing the right padding as
+   well left the session count touching the date beside it: "2" + "22 July 2026"
+   read as "222 July 2026". The gap has to live on this side because the date
+   column has no left padding of its own. */
+.ret-table .num { text-align: right; font-variant-numeric: tabular-nums; padding-right: 1.1rem; }
+/* A date should never wrap mid-value; the modal scrolls instead. */
+.ret-table .ret-date { white-space: nowrap; }
 .ret-table th.num { text-align: right; }
 .ret-row--new td { color: var(--text-muted); }
 
