@@ -62,6 +62,13 @@
     .act--call { background: var(--accent); color: #17170f; border-color: var(--accent); }
     .act--call:hover { background: var(--accent-bright); color: #17170f; }
     .act--join { border-color: var(--accent-line); color: var(--accent); }
+    /* Muted until hover, so it never competes with Call and Join on the day. */
+    .act--noshow { cursor: pointer; }
+    .act--noshow:hover:not(:disabled) { border-color: #d13b3b; color: #d13b3b; }
+    .act--noshow:disabled { opacity: 0.55; cursor: default; }
+
+    .c__result { font-size: 0.8rem; color: var(--text-muted); margin: 0.6rem 0 0; }
+    .c__result--bad { color: #d13b3b; }
 
     .state { font-size: 0.95rem; color: var(--text-muted); padding: 2.5rem 0; text-align: center; }
     .cl-foot { font-size: 0.8rem; color: var(--text-muted); margin-top: 1.6rem; }
@@ -175,9 +182,49 @@
             ${c.linkedin ? `<a class="act" href="${esc(c.linkedin)}" target="_blank" rel="noopener">LinkedIn</a>` : ""}
             ${c.email ? `<a class="act" href="mailto:${esc(c.email)}">Email</a>` : ""}
             ${c.reschedule ? `<a class="act" href="${esc(c.reschedule)}" target="_blank" rel="noopener">Reschedule</a>` : ""}
+            ${c.kind === "consultation"
+              ? `<button class="act act--noshow" type="button" data-noshow="${esc(c.id)}">Mark no-show</button>`
+              : ""}
           </div>
+          <p class="c__result" data-result="${esc(c.id)}" hidden></p>
         </div>`;
     }
+
+    // Sends the follow-up too, so it is not undoable here. A mis-click emails a
+    // real person, which is worth one confirm.
+    document.getElementById("list").addEventListener("click", async (e) => {
+      const btn = e.target.closest("[data-noshow]");
+      if (!btn) return;
+      const id = btn.dataset.noshow;
+      const out = document.querySelector(`[data-result="${id}"]`);
+      if (!confirm("Mark as no-show and send them the follow-up email?")) return;
+
+      btn.disabled = true;
+      const label = btn.textContent;
+      btn.textContent = "Marking…";
+      out.hidden = false;
+      out.className = "c__result";
+      out.textContent = "";
+      try {
+        const res = await fetch("/.netlify/functions/mark-no-show", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ recordId: id }),
+        });
+        const text = await res.text();
+        if (text.trim().startsWith("<")) throw new Error("This page needs the live site.");
+        const data = JSON.parse(text);
+        if (!res.ok) throw new Error(data.error || "Could not mark as no-show");
+        btn.textContent = "No-show";
+        out.textContent = data.already
+          ? "Already marked, no second email sent."
+          : data.emailed ? `Marked. Follow-up sent to ${data.to}.` : (data.note || "Marked.");
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = label;
+        out.className = "c__result c__result--bad";
+        out.textContent = err.message || "Could not mark as no-show";
+      }
+    });
 
     function render(calls) {
       document.getElementById("list").innerHTML = calls.length
