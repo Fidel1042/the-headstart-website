@@ -1,4 +1,5 @@
 const { searchStats } = require("../shared/search-console");
+const { requireOwner } = require("../shared/require-owner");
 // leads-attribution.js
 // Owner-only feed for the portal's Leads page. Joins two sources:
 //   GA4      - where traffic comes from and what it does on the site
@@ -660,7 +661,8 @@ exports.handler = async (event) => {
   catch { return { statusCode: 400, headers, body: JSON.stringify({ error: "Invalid JSON" }) }; }
 
   const ownerEmail = (payload.ownerEmail || "").toLowerCase().trim();
-  if (!OWNERS.includes(ownerEmail)) {
+  const auth = await requireOwner(event, OWNERS);
+  if (!auth.ok) {
     return { statusCode: 403, headers, body: JSON.stringify({ error: "Owners only" }) };
   }
 

@@ -1,3 +1,4 @@
+const { requireOwner } = require("../shared/require-owner");
 // mentor-assets.js — the logo and the two photos, uploaded from the portal
 // instead of emailed around.
 //
@@ -85,7 +86,8 @@ exports.handler = async (event) => {
   let p;
   try { p = JSON.parse(event.body || "{}"); }
   catch { return json(400, { error: "Invalid JSON" }); }
-  if (!OWNERS.includes((p.adminEmail || "").toLowerCase().trim())) {
+  const auth = await requireOwner(event, OWNERS);
+  if (!auth.ok) {
     return json(403, { error: "Not authorised" });
   }
 

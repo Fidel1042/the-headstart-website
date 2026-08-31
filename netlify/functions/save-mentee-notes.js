@@ -1,3 +1,4 @@
+const { requireUser } = require("../shared/require-owner");
 // save-mentee-notes.js
 // Writes a mentor's free-flow remarks to the mentee's "Mentor Notes" field.
 // Verifies the mentee actually belongs to the requesting mentor before writing.
@@ -33,7 +34,13 @@ exports.handler = async (event) => {
   try {
     // Ownership check: only the assigned mentor (or an owner) may write.
     const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com"];
-    const requester = mentorEmail.toLowerCase().trim();
+    // Was read from the request body, so anyone could claim to be the assigned
+    // mentor or an owner. Comes from the verified session now.
+    const who = await requireUser(event);
+    if (!who.ok) {
+      return { statusCode: 403, headers, body: JSON.stringify({ error: who.error }) };
+    }
+    const requester = who.email;
     const getRes = await fetch(recordUrl, { headers: airtableHeaders });
     const record = await getRes.json();
     if (!record.fields) {

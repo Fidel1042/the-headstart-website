@@ -63,6 +63,46 @@ async function fetchByStatus(status) {
 }
 
 /** One combined charge per mentee, so nobody gets several card hits at once. */
+/**
+ * Charged once per retry run, on top of the sessions being re-attempted. A
+ * decline costs a bank fee and a round of chasing, and the fee is what stops
+ * the same few mentees bouncing every week.
+ *
+ * Deliberately NOT part of "Amount Charged": that field is recognised
+ * mentoring revenue and feeds the P&L, so a fee sitting inside it would
+ * overstate what the mentoring earned. It is recorded in its own field.
+ */
+const ADMIN_FEE = 10;
+
+/**
+ * Mentees were told on 31 Aug that this starts on 15 Sep. Charging it earlier
+ * would be billing people under terms they had not been given, so the date is
+ * enforced in code rather than left to whoever clicks retry.
+ */
+const ADMIN_FEE_FROM = "2026-09-15";
+
+/** Today in Sydney, as YYYY-MM-DD. Billing decisions follow Fidel's clock. */
+function sydneyToday() {
+  const p = Object.fromEntries(new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Australia/Sydney", year: "numeric", month: "2-digit", day: "2-digit",
+  }).formatToParts(new Date()).map((x) => [x.type, x.value]));
+  return `${p.year}-${p.month}-${p.day}`;
+}
+
+/** Whether the fee is live yet. */
+const adminFeeActive = (today = sydneyToday()) => today >= ADMIN_FEE_FROM;
+
+/**
+ * Add the retry fee to every group. Only the retry path calls this, and only
+ * from ADMIN_FEE_FROM onwards. Before that every group gets a fee of 0, so the
+ * preview and the charge agree and nobody is surcharged early.
+ */
+function applyAdminFee(groups, amount = ADMIN_FEE) {
+  const fee = adminFeeActive() ? amount : 0;
+  groups.forEach((g) => { g.adminFee = fee; });
+  return groups;
+}
+
 function groupByMentee(records) {
   const byMentee = {};
   for (const s of records) {
@@ -115,38 +155,49 @@ function normalizePhone(raw, aussie) {
   return s.replace(/\D/g, "");
 }
 
+// A card saved through Stripe Link is wrapped in a wallet. Link can refuse an
+// off-session charge and demand the customer verify at link.com, which a weekly
+// batch run cannot do anything about.
+const isLinkBacked = (pm) => pm?.card?.wallet?.type === "link";
+
 /**
- * The card to charge: the most recently added one.
+ * The card to charge: the most recently added one, full stop.
  *
- * Nothing in this codebase ever sets invoice_settings.default_payment_method.
- * The agreement flow creates a SetupIntent and the card link uses a Checkout
- * setup session, and neither writes a default. So the old code fell through to
- * paymentMethods.list()[0] and trusted Stripe's list ordering, which is not a
- * documented guarantee. When a mentee replaces a dead card, that is exactly the
- * case where guessing wrong means charging the card that already failed.
+ * Nothing in this codebase ever sets invoice_settings.default_payment_method at
+ * the point a card is saved. The agreement flow creates a SetupIntent and the
+ * card link uses a Checkout setup session, and neither writes a default. So the
+ * choice has to be made here, at charge time.
  *
- * Newest-first is chosen deliberately: Fidel only ever sends a card link when
- * the card on file has stopped working, so the newest card is always the one
+ * Recency is the whole rule, because a card link only ever goes out when the
+ * card on file has stopped working. The newest card is therefore always the one
  * the mentee intends to be charged.
+ *
+ * This used to rank non-Link cards above Link ones, on the reasoning that Link
+ * can block an off-session charge while a directly entered card cannot. That
+ * inverted the rule in the exact case it existed to serve. On 31 Aug 2026 a
+ * mentee replaced a dead Mastercard using Link; the filter kept the dead direct
+ * card, charged it, it declined, and the "agree with Stripe" write below then
+ * re-pinned the dead card as the customer's default. A Link card that might
+ * refuse still beats a card that is already known to be dead.
+ *
+ * Link is now only a tie-breaker between cards saved in the same second, where
+ * one setup session stored both and recency cannot separate them.
  *
  * The winner is written back as the customer's default, so Stripe agrees with
  * us from then on and the next run does no extra work.
  */
-// A card saved through Stripe Link is wrapped in a wallet. Link can refuse an
-// off-session charge and demand the customer verify at link.com, which is not
-// something a weekly batch run can do anything about. A directly entered card
-// has no such gate, so those are always preferred. Link is used only when it is
-// the only thing on file, where a Link charge that might work still beats a
-// guaranteed "no card".
-const isLinkBacked = (pm) => pm?.card?.wallet?.type === "link";
+function pickCard(methods) {
+  if (!methods.length) return null;
+  return methods.slice().sort((a, b) =>
+    (b.created || 0) - (a.created || 0) ||
+    (isLinkBacked(a) ? 1 : 0) - (isLinkBacked(b) ? 1 : 0)
+  )[0];
+}
 
 async function activeCard(stripe, customerId) {
   const methods = await stripe.paymentMethods.list({ customer: customerId, type: "card", limit: 100 });
-  if (!methods.data.length) return null;
-
-  const byNewest = (a, b) => (b.created || 0) - (a.created || 0);
-  const plain = methods.data.filter((pm) => !isLinkBacked(pm)).sort(byNewest);
-  const newest = (plain.length ? plain : methods.data.slice().sort(byNewest))[0];
+  const newest = pickCard(methods.data);
+  if (!newest) return null;
 
   const customer = await stripe.customers.retrieve(customerId);
   if (customer?.invoice_settings?.default_payment_method !== newest.id) {
@@ -164,12 +215,11 @@ async function cardSummary(stripe, customerId) {
   try {
     const methods = await stripe.paymentMethods.list({ customer: customerId, type: "card", limit: 100 });
     if (!methods.data.length) return null;
-    // Mirror activeCard's choice exactly, so the portal shows the card that
-    // will actually be charged rather than merely the newest one.
-    const byNewest = (a, b) => (b.created || 0) - (a.created || 0);
-    const plain = methods.data.filter((pm) => !isLinkBacked(pm)).sort(byNewest);
-    const sorted = plain.length ? plain : methods.data.slice().sort(byNewest);
-    const c = sorted[0];
+    // Same picker as activeCard, so the portal shows the card that will
+    // actually be charged. Sharing the function is the point: when these were
+    // two copies of the same sort they were free to drift apart.
+    const c = pickCard(methods.data);
+    if (!c) return null;
     return {
       brand: c.card?.brand || "card",
       // Link cards can block an off-session charge, so this has to be visible
@@ -181,8 +231,10 @@ async function cardSummary(stripe, customerId) {
       country: c.card?.country || "",
       addedAt: c.created ? new Date(c.created * 1000).toISOString().slice(0, 10) : "",
       // More than one means older cards are still attached. Harmless, but worth
-      // showing so a replaced card is visibly a replacement.
-      total: sorted.length,
+      // showing so a replaced card is visibly a replacement. Counts every card
+      // on file; it used to count only the filtered subset, which hid exactly
+      // the Link replacements this needs to make visible.
+      total: methods.data.length,
     };
   } catch {
     return null;
@@ -197,7 +249,9 @@ async function chargeGroups(groups, stripe, label = "weekly") {
   const results = [];
 
   for (const m of groups) {
-    const amountCents = Math.round(m.total * 100);
+    // The fee rides on the same charge, so a retry is one transaction rather
+    // than two, and one decline rather than two if it fails again.
+    const amountCents = Math.round((m.total + (m.adminFee || 0)) * 100);
 
     // Nothing to charge (e.g. all zero-priced): settle without hitting Stripe.
     if (amountCents <= 0) {
@@ -256,6 +310,10 @@ async function writeResults(results) {
           "Failure Reason": r.reason || "",
           "Amount Charged": r.status === "Charged" ? (r.total / r.sessionIds.length) : 0,
           "Stripe Payment ID": r.paymentIntentId || "",
+          // On the first row only, and only once the charge succeeded. A fee
+          // written against a failed retry would be money never collected.
+          ...(r.adminFee && r.status === "Charged" && id === r.sessionIds[0]
+            ? { "Admin Fee": r.adminFee } : {}),
         },
       });
     }
@@ -281,6 +339,7 @@ const summarise = (results) => {
 module.exports = {
   OWNERS, authorise, airtableHeaders, menteeRecord, normalizePhone,
   PREPAID_TYPES, isPrepaid, PREPAID_FORMULA,
-  fetchByStatus, groupByMentee, chargeGroups, writeResults, summarise,
+  fetchByStatus, groupByMentee, applyAdminFee, ADMIN_FEE, ADMIN_FEE_FROM, adminFeeActive,
+  chargeGroups, writeResults, summarise,
   activeCard, cardSummary,
 };

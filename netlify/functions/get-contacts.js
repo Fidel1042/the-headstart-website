@@ -10,6 +10,7 @@ const headers = {
 };
 
 const { draftMessages } = require("../shared/drafts");
+const { requireOwner } = require("../shared/require-owner");
 const { shortIndustry } = require("../shared/followups");
 
 const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com"];
@@ -66,7 +67,8 @@ exports.handler = async (event) => {
   catch { return { statusCode: 400, headers, body: JSON.stringify({ error: "Invalid JSON" }) }; }
 
   const ownerEmail = (payload.ownerEmail || "").toLowerCase().trim();
-  if (!OWNERS.includes(ownerEmail)) {
+  const auth = await requireOwner(event, OWNERS);
+  if (!auth.ok) {
     return { statusCode: 403, headers, body: JSON.stringify({ error: "Owners only" }) };
   }
 

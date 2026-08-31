@@ -1,3 +1,4 @@
+const { requireOwner } = require("../shared/require-owner");
 // ltv.js — what every mentee has been worth, and the averages behind it.
 //
 // LTV is every dollar charged to that mentee, which deliberately includes a
@@ -95,7 +96,8 @@ exports.handler = async (event) => {
   let payload;
   try { payload = JSON.parse(event.body || "{}"); }
   catch { return json(400, { error: "Invalid JSON" }); }
-  if (!OWNERS.includes((payload.adminEmail || "").toLowerCase().trim())) {
+  const auth = await requireOwner(event, OWNERS);
+  if (!auth.ok) {
     return json(403, { error: "Not authorised" });
   }
 

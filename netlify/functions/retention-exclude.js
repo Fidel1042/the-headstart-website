@@ -1,3 +1,4 @@
+const { requireOwner } = require("../shared/require-owner");
 // retention-exclude.js — take one mentee out of a mentor's retention figure,
 // or put them back.
 //
@@ -33,7 +34,8 @@ exports.handler = async (event) => {
   let p;
   try { p = JSON.parse(event.body || "{}"); }
   catch { return json(400, { error: "Invalid JSON" }); }
-  if (!OWNERS.includes((p.adminEmail || "").toLowerCase().trim())) {
+  const auth = await requireOwner(event, OWNERS);
+  if (!auth.ok) {
     return json(403, { error: "Not authorised" });
   }
   if (!p.menteeId) return json(400, { error: "No mentee" });

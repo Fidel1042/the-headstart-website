@@ -28,6 +28,8 @@ export const ALLOWED_MENTOR_EMAILS = [
   "luischua18@gmail.com",
   "shriyanssh@gmail.com",
   "shifatrahman@gmail.com",
+  "palakbedi2004@gmail.com",
+  "abeshek1997@gmail.com",
 ];
 
 // Owners who see a reduced portal. Koko runs mentee support, not money, so the
@@ -101,6 +103,46 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     detectSessionInUrl: true, // handles OAuth callback in the URL hash
   },
 });
+
+/**
+ * Attach the session token to every portal call to a Netlify function.
+ *
+ * The functions used to decide access from an email in the request body, which
+ * the caller wrote, so anyone could claim to be an owner. They now verify a
+ * Supabase token instead. Rather than edit two dozen call sites and risk
+ * missing one, the header is added here, in the one module every portal page
+ * already imports.
+ *
+ * Only requests to /.netlify/functions/ are touched. Supabase's own calls go to
+ * a different origin and fall straight through, so getSession() cannot recurse
+ * into this.
+ *
+ * portal-access is the exception by nature: checkAccess() runs during login,
+ * before a session exists, so it simply goes without a token.
+ */
+(function attachToken() {
+  if (typeof window === "undefined" || window.__hsFetchPatched) return;
+  window.__hsFetchPatched = true;
+  const nativeFetch = window.fetch.bind(window);
+
+  window.fetch = async (input, init) => {
+    const url = typeof input === "string" ? input : (input && input.url) || "";
+    if (!url.startsWith("/.netlify/functions/")) return nativeFetch(input, init);
+
+    const opts = { ...(init || {}) };
+    const headers = new Headers(opts.headers || {});
+    if (!headers.has("Authorization")) {
+      try {
+        const { data } = await supabase.auth.getSession();
+        const token = data && data.session ? data.session.access_token : "";
+        if (token) headers.set("Authorization", `Bearer ${token}`);
+      } catch { /* no session, let the function decide */ }
+    }
+    opts.headers = headers;
+    return nativeFetch(input, opts);
+  };
+})();
+
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
 

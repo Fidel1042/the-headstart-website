@@ -1,4 +1,5 @@
 const { searchStats } = require("../shared/search-console");
+const { requireOwner } = require("../shared/require-owner");
 // journey-stats.js — every number in the customer journey, in one call.
 //
 // Four stages, one per circle on the journey page: traffic, consultation,
@@ -250,7 +251,8 @@ exports.handler = async (event) => {
   let payload;
   try { payload = JSON.parse(event.body || "{}"); }
   catch { return json(400, { error: "Invalid JSON" }); }
-  if (!OWNERS.includes((payload.adminEmail || "").toLowerCase().trim())) {
+  const auth = await requireOwner(event, OWNERS);
+  if (!auth.ok) {
     return json(403, { error: "Not authorised" });
   }
   // Only the offered windows, so a hand-edited request cannot ask GA4 for two

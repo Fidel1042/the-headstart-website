@@ -12,9 +12,10 @@
 // recognised revenue and marking it optimistically would invent income.
 
 const Stripe = require("stripe");
+const { requireOwner } = require("../shared/require-owner");
 const {
-  OWNERS, authorise, fetchByStatus, groupByMentee, menteeRecord, normalizePhone,
-  chargeGroups, writeResults, summarise,
+  OWNERS, authorise, fetchByStatus, groupByMentee, applyAdminFee, ADMIN_FEE,
+  menteeRecord, normalizePhone, chargeGroups, writeResults, summarise,
 } = require("../shared/charge-engine");
 const { chaseMessage } = require("../shared/chase-message");
 
@@ -36,11 +37,15 @@ exports.handler = async (event) => {
   catch { return json(400, { error: "Invalid JSON" }); }
 
   const adminEmail = (payload.adminEmail || "").toLowerCase().trim();
-  if (!OWNERS.includes(adminEmail)) return json(403, { error: "Not authorised" });
+  const auth = await requireOwner(event, OWNERS);
+  if (!auth.ok) return json(403, { error: "Not authorised" });
 
   let groups;
   try {
-    groups = groupByMentee(await fetchByStatus("Failed"));
+    // Every one of these already declined once, which is what the fee is for.
+    // Applied here rather than in the weekly run, so a first-time charge is
+    // never surcharged.
+    groups = applyAdminFee(groupByMentee(await fetchByStatus("Failed")));
   } catch (err) {
     return json(502, { error: err.message || "Could not reach Airtable" });
   }
@@ -57,6 +62,8 @@ exports.handler = async (event) => {
         name: g.name,
         sessions: g.sessionIds.length,
         total: parseFloat(g.total.toFixed(2)),
+        adminFee: g.adminFee || 0,
+        totalWithFee: parseFloat(((g.total || 0) + (g.adminFee || 0)).toFixed(2)),
         reason: g.reason || "",
         phone: normalizePhone(rec?.fields?.["Phone Number"] || "", rec?.fields?.["Aussie Number"] || ""),
         message: chaseMessage(g.name, g.total, g.reason),

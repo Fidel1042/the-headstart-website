@@ -74,6 +74,13 @@
 [functions."session-reminders"]
   schedule = "0,15 * * * *"
 
+# Lead pipeline watchdog. Every 2 hours, and it only sends an email when
+# something is actually broken, so silence means the chain is healthy.
+# Two-hourly rather than hourly because the thing it catches is an outage that
+# costs leads, and a repeat every two hours until it is fixed is about right.
+[functions."pipeline-watchdog"]
+  schedule = "40 */2 * * *"
+
 # Declined-card chase list. Runs hourly on the hour; the function itself only
 # sends in the Melbourne 9am window, so a failure from yesterday's 5:15pm
 # charge run reaches Fidel first thing the next morning.

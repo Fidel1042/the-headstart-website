@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
-  <title>Call Flow — Headstart</title>
+  <title>Call Flow, Headstart</title>
   <link rel="stylesheet" href="css/base.css" />
   <link rel="stylesheet" href="/mentor-portal/portal.css" />
   <link rel="stylesheet" href="/mentor-portal/portal-nav.css" />
@@ -76,7 +76,7 @@
     .stage__name { font-size: 1.24rem; font-weight: 700; margin: 0.25rem 0 0.15rem; }
     .stage__goal { font-size: 0.85rem; color: #6d6d5f; margin: 0 0 0.95rem; line-height: 1.45; }
 
-    /* Say block — the lines to actually say */
+    /* Say block: the lines to actually say */
     .say {
       background: #fff; border: 1px solid #e7e5d8;
       border-radius: 9px; padding: 0.85rem 1.05rem; margin-bottom: 0.7rem;
@@ -91,7 +91,7 @@
     .say__do { font-size: 0.85rem; color: #6d6d5f; font-style: italic; }
     .ph { color: #b07d0a; font-weight: 600; }
 
-    /* Objection callout — amber */
+    /* Objection callout, amber */
     .obj {
       background: #fbf2e2; border: 1px solid #eeddbd;
       border-radius: 9px; padding: 0.8rem 1.05rem; margin-bottom: 0.7rem;
@@ -100,13 +100,41 @@
     .obj__then { font-size: 1.02rem; line-height: 1.5; margin: 0; color: #17170f; }
 
     .never { font-size: 0.85rem; color: #a23b3b; font-weight: 600; margin: 0.35rem 0 0; }
+
+    /* Conditional stage: the test is a lever, not a fixed step */
+    .stage--lever::before { background: #d9dfd4; border-left: 2px dashed #cbd4c5; width: 0; }
+    .stage--lever .stage__num { background: #5c7550; box-shadow: 0 2px 6px rgba(92,117,80,0.32); }
+    .stage__tag {
+      display: inline-block; font-size: 0.6rem; letter-spacing: 0.1em;
+      text-transform: uppercase; font-weight: 700; color: #4a6340;
+      background: #e7efe3; border: 1px solid #d3e0cc;
+      border-radius: 999px; padding: 0.2rem 0.6rem; margin: 0.3rem 0 0.4rem;
+    }
+
+    /* Pull / holster decision pair */
+    .lever-grid { display: grid; gap: 0.7rem; margin-bottom: 0.7rem; }
+    @media (min-width: 560px) { .lever-grid { grid-template-columns: 1fr 1fr; } }
+    .lever {
+      background: #f2f6f0; border: 1px solid #d9e3d4;
+      border-radius: 9px; padding: 0.8rem 1rem;
+    }
+    .lever--no { background: #f6f5f1; border-color: #e2e0d6; }
+    .lever__label {
+      font-size: 0.61rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: #4a6340; font-weight: 700; display: block; margin-bottom: 0.5rem;
+      min-height: 1.2em;
+    }
+    .lever--no .lever__label { color: #82806f; }
+    .lever ul { margin: 0; padding-left: 1.05rem; }
+    .lever li { font-size: 0.92rem; line-height: 1.45; margin-bottom: 0.35rem; }
+    .lever li:last-child { margin-bottom: 0; }
   </style>
 </head>
 <body>
   <div id="portal-nav"></div>
 
   <main class="flow-shell">
-    <p class="flow-head">Sales call &middot; 6 stages &middot; questions, objections, what to say</p>
+    <p class="flow-head">Sales call &middot; 6 stages &middot; 5 questions, then the test only if you need it</p>
 
     <!-- 1 OPEN -->
     <section class="stage">
@@ -116,77 +144,154 @@
       <div class="say">
         <span class="say__label">Say</span>
         <p class="say__line">"Hey <span class="ph">[name]</span>, how are you? Whereabouts are you based?"</p>
-        <p class="say__line">"I'll ask you a few things to understand where you're at, then show you exactly how we'd help. Sound good?"</p>
+        <p class="say__line">"I'll ask you a few things so I can work out where you're at and match you with the right mentor. Then I'll take anything you want to ask me. Sound good?"</p>
         <p class="say__line say__do">Get the little "yeah" before you start asking. That's your permission.</p>
       </div>
+      <p class="never">Do not describe the service here. Do not tell your own story yet.</p>
     </section>
 
     <!-- 2 DIAGNOSE -->
     <section class="stage">
       <div class="stage__num">2</div>
-      <h2 class="stage__name">Diagnose</h2>
-      <p class="stage__goal">Understand their goal, situation and pain. They talk, you listen. Take notes, do not pitch yet.</p>
+      <h2 class="stage__name">Diagnose: the 5 questions</h2>
+      <p class="stage__goal">They talk, you listen. Take notes, do not pitch. This is most of the call.</p>
       <div class="say">
-        <span class="say__label">Ask, in order</span>
-        <p class="say__line">"What are you aiming for, role and industry?"</p>
-        <p class="say__line">"Where are you at with study and your visa?"</p>
-        <p class="say__line">"What have you tried so far, and what actually happens when you apply?"</p>
-        <p class="say__line">"How are you feeling about it all right now?"</p>
-        <p class="say__line say__do">After each question, go quiet. Let them fill the silence.</p>
+        <span class="say__label">1 &middot; Industry</span>
+        <p class="say__line">"What industry are you trying to get into?"</p>
+        <p class="say__line say__do">If vague, probe once: "Any particular function? Analyst, consulting, marketing?" Vagueness here is itself the diagnosis, and it's a signal to run the test later.</p>
+      </div>
+      <div class="say">
+        <span class="say__label">2 &middot; Free help so far, the big one</span>
+        <p class="say__line">"What have you tried so far in terms of getting help? Not applications, help. Career centre, networking events, societies, anyone giving you advice?"</p>
+        <p class="say__line">"And what came of it? Did it change anything?"</p>
+        <p class="say__line">"Why do you think it didn't work for you?"</p>
+        <p class="say__line say__do">They have to say it out loud. Thinking it is not the same. Do not answer for them and do not rescue the silence.</p>
+      </div>
+      <div class="say">
+        <span class="say__label">If they say "I don't know why it didn't work"</span>
+        <p class="say__line">"What did they actually tell you to do?" then "And who gave you that advice?"</p>
+        <p class="say__line">"That person has never sat the grad interview you're sitting, or they sat it fifteen years ago in a different market. They can tell you what a good candidate looks like from across the table. They can't tell you what's specifically wrong with <em>you</em>."</p>
+        <p class="say__line say__do">Two points, then stop and let them agree: the advice wasn't personalised, and it wasn't relevant. "Yeah, that's exactly it" is the micro-yes that makes the rest of the call easy.</p>
+      </div>
+      <div class="say">
+        <span class="say__label">3 &middot; Timeline</span>
+        <p class="say__line">"When do you need this job by? And where are you at with study and your visa?"</p>
+        <p class="say__line">If vague: "Grad applications for a February start are open now and most close around November. So to start next year, you need to be interviewing in the next couple of months."</p>
+        <p class="say__line say__do">Get a date, not a vibe. This is your lever on every delay objection later.</p>
+      </div>
+      <div class="say">
+        <span class="say__label">4 &middot; Barrier, this decides the test</span>
+        <p class="say__line">"What would you say is your biggest barrier right now?"</p>
+        <p class="say__line">Softer version if they've been guarded: "How are you feeling about the whole thing at the moment?"</p>
+        <p class="say__line say__do">Barrier version for someone already venting, feelings version for someone clipped and factual.</p>
+      </div>
+      <div class="say">
+        <span class="say__label">5 &middot; Type of mentoring</span>
+        <p class="say__line">"What kind of mentoring do you actually need? Someone hands-on and tactical who'll sit there and work through the material with you, or someone more advice-based who points you in the right direction and you run with it?"</p>
+        <p class="say__line say__do">This presupposes the purchase, and it's the real brief for the mentor. Log the answer. Tactical means the work happens inside the session with no homework.</p>
       </div>
       <div class="obj">
-        <p class="obj__if">If they fish for tactics — "what did you do to get your offers?"</p>
+        <p class="obj__if">If they say "same industry" or "someone who was international"</p>
+        <p class="obj__then">"That's the bare minimum, that's what the guarantee covers. Everyone you'd get has worked in your industry and landed a role here as an international student. I'm asking beyond that."</p>
+      </div>
+      <div class="obj">
+        <p class="obj__if">If they fish for tactics, "what did you do to get your offers?"</p>
         <p class="obj__then">"I'll show you exactly, but first I want to get your full picture." Do not give the playbook away for free here.</p>
       </div>
+      <p class="never">After each question, go quiet. Let them fill the silence.</p>
     </section>
 
-    <!-- 3 VERDICT -->
-    <section class="stage">
+    <!-- 3 THE TEST (conditional) -->
+    <section class="stage stage--lever">
       <div class="stage__num">3</div>
-      <h2 class="stage__name">Verdict</h2>
-      <p class="stage__goal">Make them feel understood, then give one honest diagnosis. Understand fully before you challenge anything.</p>
-      <div class="say">
-        <span class="say__label">Say — mirror first</span>
-        <p class="say__line">"So I see you want to get into <span class="ph">[industry]</span>, right now you're <span class="ph">[current situation]</span>, and you're feeling <span class="ph">[how they feel]</span>."</p>
+      <span class="stage__tag">Only if you need it</span>
+      <h2 class="stage__name">The test</h2>
+      <p class="stage__goal">A lever, not a step. Some people already know they need help. Making them perform wastes three minutes and can sour a warm buyer.</p>
+      <div class="lever-grid">
+        <div class="lever">
+          <span class="lever__label">Pull it when</span>
+          <ul>
+            <li>They can't name a real barrier</li>
+            <li>They blame the market, luck, or not applying enough</li>
+            <li>They frame it as a small fix, "just need my resume tidied"</li>
+            <li>They were vague on industry</li>
+            <li>They go soft at the close, "let me think about it"</li>
+          </ul>
+        </div>
+        <div class="lever lever--no">
+          <span class="lever__label">Leave it holstered when</span>
+          <ul>
+            <li>They named a specific painful gap already</li>
+            <li>They're asking how soon they can start</li>
+            <li>They've been rejected at interview or assessment centre and know it</li>
+            <li>They're visibly ready to buy</li>
+          </ul>
+        </div>
       </div>
       <div class="say">
-        <span class="say__label">Then name the gap</span>
-        <p class="say__line">"Here's what I think is really going on. You're competing through the front door everyone uses. That's almost never an effort problem. The gap is <span class="ph">[their barrier]</span>, and it's fixable."</p>
+        <span class="say__label">Say, ask permission first</span>
+        <p class="say__line">"Can I try something quick with you? It takes two minutes and it'll tell me more than anything else I could ask."</p>
+        <p class="say__line">"I'll give you a minute to prep, plan it however you want, then answer it like it's the real thing: tell me a little bit about yourself."</p>
+        <p class="say__line say__do">Give the real minute and stay silent through it. The prep window does the work, and it makes the failure fair so they can't say "I wasn't prepared".</p>
+      </div>
+      <div class="say">
+        <span class="say__label">Then give no feedback. Hardest rule on the call</span>
+        <p class="say__line">"Okay. I understand where you're at."</p>
+        <p class="say__line say__do">Move straight on, no pause. A pause invites "wait, what did I do wrong?" The critique is the paid product.</p>
       </div>
       <div class="obj">
-        <p class="obj__if">If they have big or unrealistic aims, or argue back (e.g. "only top-tier")</p>
-        <p class="obj__then">Hear them out fully first. Then: "I hear you. Here's the realistic way in..." Never half-disqualify them on the spot.</p>
+        <p class="obj__if">If they ask for feedback on their answer</p>
+        <p class="obj__then">"That's exactly what your mentor takes you through properly. I just needed to see where you're starting from."</p>
       </div>
+      <p class="never">Never coach here. Never run this on someone who is already sold.</p>
     </section>
 
-    <!-- 4 PITCH -->
+    <!-- 4 VERDICT + PITCH -->
     <section class="stage">
       <div class="stage__num">4</div>
-      <h2 class="stage__name">Pitch — proof, then mentor</h2>
-      <p class="stage__goal">This is exactly what we fix, and here is who fixes it.</p>
+      <h2 class="stage__name">Verdict, then pitch when asked</h2>
+      <p class="stage__goal">Mirror them back, name the gap, then hand over: "That's everything from me. What have you got for me?"</p>
       <div class="say">
-        <span class="say__label">Say — bridge and proof</span>
-        <p class="say__line">"That's exactly what we fix. We started in February and have already placed 12 students into internships and grad roles, six of them international like you. Koko and I were international students stuck for months too, that's why we get it."</p>
+        <span class="say__label">Say, mirror first</span>
+        <p class="say__line">"So you want to get into <span class="ph">[industry]</span>, right now you're <span class="ph">[current situation]</span>, and the thing in the way is <span class="ph">[their barrier]</span>."</p>
+        <p class="say__line">"You're competing through the front door everyone uses. That's almost never an effort problem, and it's fixable."</p>
       </div>
       <div class="say">
-        <span class="say__label">Then the mentor — one name, full conviction</span>
-        <p class="say__line">"The person for you is <span class="ph">[mentor]</span>. <span class="ph">[One-line story tied to their field]</span>. He's especially strong on <span class="ph">[their gap]</span>."</p>
-        <p class="say__line">"Most people in your spot take around 12 to 15 sessions to land a role."</p>
+        <span class="say__label">If they ask "how does this work?" open Session structure</span>
+        <p class="say__line">Name their quadrant, walk the stages, and name the one that gets the <strong>weight</strong> because it's their gap. "For you we camp on <span class="ph">[stage]</span>." Then: "Does that path make sense?"</p>
+        <p class="say__line say__do">Never say you skip a stage. Weight, not removal.</p>
+      </div>
+      <div class="say">
+        <span class="say__label">If they ask "how would the mentor help me?" mirror question 2 back</span>
+        <p class="say__line">"You said the advice you got was generic and you never found out what was actually wrong. That's the whole job. Your mentor sits with your interview answers, your resume, your LinkedIn, and tells you exactly what to change, before and after, based on what hiring managers in that industry actually screen for and what your strengths are."</p>
+      </div>
+      <div class="say">
+        <span class="say__label">Proof anchor, every call, company number first</span>
+        <p class="say__line">"We started in February and have already placed 12 students into internships and grad roles, six of them international like you. Koko and I were international students stuck for months too, that's why we get it."</p>
+      </div>
+      <div class="say">
+        <span class="say__label">Then the mentor, one name, full conviction</span>
+        <p class="say__line">"The person for you is <span class="ph">[mentor]</span>. <span class="ph">[One-line story tied to their field]</span>. Especially strong on <span class="ph">[their gap]</span>."</p>
       </div>
       <div class="obj">
         <p class="obj__if">If "does networking actually work?"</p>
         <p class="obj__then">"It's how I got my first two offers. Around half of roles go through referrals, not the front door."</p>
       </div>
-      <p class="never">Never offer two mentors. Never say "I'm torn."</p>
+      <div class="obj">
+        <p class="obj__if">If they have big or unrealistic aims, or argue back (e.g. "only top-tier")</p>
+        <p class="obj__then">Hear them out fully first. Then: "I hear you. Here's the realistic way in..." Never half-disqualify them on the spot.</p>
+      </div>
+      <p class="never">Never pitch before they ask. Never offer two mentors. Never say "I'm torn."</p>
     </section>
 
     <!-- 5 PRICE -->
     <section class="stage">
       <div class="stage__num">5</div>
       <h2 class="stage__name">Price</h2>
-      <p class="stage__goal">State it flat and confident, then stop talking.</p>
+      <p class="stage__goal">Anchor the session count first, then state the number flat and stop talking.</p>
       <div class="say">
-        <span class="say__label">Say</span>
+        <span class="say__label">Say, count before price, always</span>
+        <p class="say__line">"For someone in your spot, most people take around 12 to 15 sessions to land a role."</p>
         <p class="say__line">"It's $55 a session, only charged after each one, no lock-in."</p>
         <p class="say__line say__do">Then go silent. Let them react first.</p>
       </div>
@@ -207,21 +312,33 @@
       <h2 class="stage__name">Close</h2>
       <p class="stage__goal">Get the commitment on the call.</p>
       <div class="say">
-        <span class="say__label">Say — authority first, then close</span>
+        <span class="say__label">Say, authority first, then close</span>
         <p class="say__line">"Quick one, are you the one who decides on this, or is it a chat with your parents?"</p>
         <p class="say__line">"Any reason we couldn't get you started with <span class="ph">[mentor]</span> next week?"</p>
         <p class="say__line say__do">Then stay silent. Do not fill it with more value.</p>
       </div>
       <div class="obj">
-        <p class="obj__if">If "let me think"</p>
-        <p class="obj__then">"Totally fair. Is it the price, the timing, or are you unsure it'll work?" Then handle the real one.</p>
+        <p class="obj__if">If "let me think" or "can I tell you next week?"</p>
+        <p class="obj__then">"How about tomorrow?" Then: "Is this something you're looking to sort now, or still weighing up? What's making you want to wait, the money, the time, or whether it'll actually work?" Then handle the real one.</p>
+      </div>
+      <div class="obj">
+        <p class="obj__if">If they go soft and you never ran the test</p>
+        <p class="obj__then">This is the signal. Run it now (stage 3), then re-close off the back of it: "Based on what I just heard, waiting doesn't put you in a better spot."</p>
+      </div>
+      <div class="obj">
+        <p class="obj__if">If it's time or busyness</p>
+        <p class="obj__then">Use their date from question 3. "You're not close to ready, and that's fine, that's what this is for. But the mentor gives you the answers, you're the one executing them, and that takes reps. Waiting just means more sessions to get to the same place." Then the visa frame: "Plenty of things can wait. With a two-year visa, this one has a hard deadline on it."</p>
+      </div>
+      <div class="obj">
+        <p class="obj__if">Only if they ask "why is it paid?"</p>
+        <p class="obj__then">"We started free and people didn't do the work, because nothing was on the line." Never volunteer this. It spotlights the price and cheapens the value.</p>
       </div>
       <div class="obj">
         <p class="obj__if">If parents pay</p>
         <p class="obj__then">"Love that. Let me give you what you need to make it an easy yes for them. I'll send the parent resources." Set a firm deadline.</p>
       </div>
       <div class="obj">
-        <p class="obj__if">If buying signal — "when can I start?"</p>
+        <p class="obj__if">If buying signal, "when can I start?"</p>
         <p class="obj__then">Stop selling. "Great, I'll send the agreement now, takes 30 seconds, and I'll lock <span class="ph">[mentor]</span> in for you."</p>
       </div>
       <div class="say">

@@ -1,3 +1,4 @@
+const { requireOwner } = require("../shared/require-owner");
 // todays-calls.js — every call Fidel has to take today, sales and recruitment
 // in one list.
 //
@@ -69,7 +70,8 @@ exports.handler = async (event) => {
   let p;
   try { p = JSON.parse(event.body || "{}"); }
   catch { return json(400, { error: "Invalid JSON" }); }
-  if (!OWNERS.includes((p.adminEmail || "").toLowerCase().trim())) {
+  const auth = await requireOwner(event, OWNERS);
+  if (!auth.ok) {
     return json(403, { error: "Not authorised" });
   }
 

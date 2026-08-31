@@ -10,6 +10,7 @@ const headers = {
 };
 
 const { menteeState } = require("../shared/mentee-state");
+const { requireOwner } = require("../shared/require-owner");
 
 // A "Package" row carrying money is the purchase itself, not a lesson.
 /**
@@ -58,7 +59,8 @@ exports.handler = async (event) => {
   catch { return { statusCode: 400, headers, body: JSON.stringify({ error: "Invalid JSON" }) }; }
 
   const ownerEmail = (payload.ownerEmail || "").toLowerCase().trim();
-  if (!OWNERS.includes(ownerEmail)) {
+  const auth = await requireOwner(event, OWNERS);
+  if (!auth.ok) {
     return { statusCode: 403, headers, body: JSON.stringify({ error: "Owners only" }) };
   }
 

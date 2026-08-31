@@ -18,6 +18,7 @@
 // score, so the stage is an index into that lead's own plan, not a global one.
 
 const { draftMessages } = require("../shared/drafts");
+const { requireOwner } = require("../shared/require-owner");
 const {
   TOUCHES, FINAL_TOUCH_MIN_PCT, CHECKIN_SUBJECT, checkinBody,
   scoreOf, nextTouch, ymd, daysBetween,
@@ -76,7 +77,8 @@ exports.handler = async (event) => {
   try { payload = JSON.parse(event.body || "{}"); }
   catch { return json(400, { error: "Invalid JSON" }); }
 
-  if (!OWNERS.includes((payload.adminEmail || "").toLowerCase().trim())) {
+  const auth = await requireOwner(event, OWNERS);
+  if (!auth.ok) {
     return json(403, { error: "Not authorised" });
   }
 

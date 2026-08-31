@@ -15,6 +15,7 @@
 // was not used invents a cost; omitting one when it was hides a real one.
 
 const { OWNERS, airtableHeaders, PREPAID_TYPES } = require("../shared/charge-engine");
+const { requireOwner } = require("../shared/require-owner");
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -121,7 +122,8 @@ exports.handler = async (event) => {
   // Owner-only, but no billing passcode: nothing is charged, and requiring the
   // passcode to record a payment that already landed would just mean it never
   // gets recorded.
-  if (!OWNERS.includes((payload.adminEmail || "").toLowerCase().trim())) {
+  const auth = await requireOwner(event, OWNERS);
+  if (!auth.ok) {
     return json(403, { error: "Not authorised" });
   }
 

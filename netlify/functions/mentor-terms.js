@@ -1,3 +1,4 @@
+const { requireOwner } = require("../shared/require-owner");
 // mentor-terms.js — the per-mentor bits of the mentor agreement.
 //
 // Everything in the agreement is the same for everyone except what they are
@@ -119,7 +120,8 @@ exports.handler = async (event) => {
   catch { return json(400, { error: "Invalid JSON" }); }
 
   if (p.action === "list") {
-    if (!OWNERS.includes((p.adminEmail || "").toLowerCase().trim())) {
+    const auth = await requireOwner(event, OWNERS);
+    if (!auth.ok) {
       return json(403, { error: "Not authorised" });
     }
     try { return json(200, { mentors: await listMentors(process.env) }); }
@@ -136,7 +138,8 @@ exports.handler = async (event) => {
   // Emailing the offer. Owner only, and it refuses to send an agreement that
   // would show no rate.
   if (p.action === "offer") {
-    if (!OWNERS.includes((p.adminEmail || "").toLowerCase().trim())) {
+    const auth = await requireOwner(event, OWNERS);
+    if (!auth.ok) {
       return json(403, { error: "Not authorised" });
     }
     try {

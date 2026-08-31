@@ -1,3 +1,4 @@
+const { requireOwner } = require("../shared/require-owner");
 // mentor-pipeline.js — every mentor who is not yet mentoring, and the two
 // things that move them: their status and their rate.
 //
@@ -246,7 +247,8 @@ exports.handler = async (event) => {
   let p;
   try { p = JSON.parse(event.body || "{}"); }
   catch { return json(400, { error: "Invalid JSON" }); }
-  if (!OWNERS.includes((p.adminEmail || "").toLowerCase().trim())) {
+  const auth = await requireOwner(event, OWNERS);
+  if (!auth.ok) {
     return json(403, { error: "Not authorised" });
   }
 

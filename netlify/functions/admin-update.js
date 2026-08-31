@@ -1,3 +1,4 @@
+const { requireOwner } = require("../shared/require-owner");
 // admin-update.js
 // Owner-only writes from the admin portal:
 //   kind "mentee-followup" → sets "Last Followed Up" (date) on a Client record
@@ -21,7 +22,8 @@ exports.handler = async (event) => {
   catch { return { statusCode: 400, headers, body: JSON.stringify({ error: "Invalid JSON" }) }; }
 
   const ownerEmail = (payload.ownerEmail || "").toLowerCase().trim();
-  if (!OWNERS.includes(ownerEmail)) {
+  const auth = await requireOwner(event, OWNERS);
+  if (!auth.ok) {
     return { statusCode: 403, headers, body: JSON.stringify({ error: "Owners only" }) };
   }
 

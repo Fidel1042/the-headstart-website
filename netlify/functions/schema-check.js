@@ -1,3 +1,4 @@
+const { requireOwner } = require("../shared/require-owner");
 // schema-check.js
 // Owner-only. Reads the Airtable schema (via the Meta API) and verifies every
 // field and single-select option the portal depends on actually exists and is
@@ -24,7 +25,8 @@ exports.handler = async (event) => {
   catch { return { statusCode: 400, headers, body: JSON.stringify({ error: "Invalid JSON" }) }; }
 
   const adminEmail = (payload.adminEmail || "").toLowerCase().trim();
-  if (!OWNERS.includes(adminEmail)) {
+  const auth = await requireOwner(event, OWNERS);
+  if (!auth.ok) {
     return { statusCode: 403, headers, body: JSON.stringify({ error: "Not authorised" }) };
   }
 

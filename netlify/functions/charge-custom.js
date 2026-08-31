@@ -15,6 +15,7 @@
 //   { adminEmail, recordId, kind, ... , passcode, expectedAmount } → charges
 
 const Stripe = require("stripe");
+const { requireOwner } = require("../shared/require-owner");
 const { OWNERS, authorise, airtableHeaders, menteeRecord, PREPAID_TYPES, activeCard } = require("../shared/charge-engine");
 
 const headers = {
@@ -127,7 +128,8 @@ exports.handler = async (event) => {
   try { payload = JSON.parse(event.body || "{}"); }
   catch { return json(400, { error: "Invalid JSON" }); }
 
-  if (!OWNERS.includes((payload.adminEmail || "").toLowerCase().trim())) {
+  const auth = await requireOwner(event, OWNERS);
+  if (!auth.ok) {
     return json(403, { error: "Not authorised" });
   }
 

@@ -1,3 +1,5 @@
+const { requireOwner } = require("../shared/require-owner");
+const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com"];
 const headers = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -9,6 +11,13 @@ const headers = {
 exports.handler = async (event) => {
   if (event.httpMethod === "OPTIONS") return { statusCode: 204, headers, body: "" };
   if (event.httpMethod !== "POST")    return { statusCode: 405, headers, body: JSON.stringify({ error: "Method not allowed" }) };
+
+  // Returns every unpaid session for every mentor, which is whole-business
+  // payout data. It had no auth check at all.
+  const auth = await requireOwner(event, OWNERS);
+  if (!auth.ok) {
+    return { statusCode: 403, headers, body: JSON.stringify({ error: auth.error }) };
+  }
 
   const { AIRTABLE_API_TOKEN, AIRTABLE_BASE_ID, AIRTABLE_SESSION_TABLE_ID } = process.env;
 

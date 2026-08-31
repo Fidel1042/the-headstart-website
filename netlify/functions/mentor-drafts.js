@@ -1,3 +1,4 @@
+const { requireOwner } = require("../shared/require-owner");
 // mentor-drafts.js — the three profile drafts for a new mentor, waiting to be
 // approved.
 //
@@ -105,7 +106,8 @@ exports.handler = async (event) => {
   let p;
   try { p = JSON.parse(event.body || "{}"); }
   catch { return json(400, { error: "Invalid JSON" }); }
-  if (!OWNERS.includes((p.adminEmail || "").toLowerCase().trim())) {
+  const auth = await requireOwner(event, OWNERS);
+  if (!auth.ok) {
     return json(403, { error: "Not authorised" });
   }
 

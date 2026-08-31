@@ -8,6 +8,7 @@
 // Read-only against money: this never charges anything.
 
 const { OWNERS, airtableHeaders, menteeRecord } = require("../shared/charge-engine");
+const { requireOwner } = require("../shared/require-owner");
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -110,7 +111,8 @@ exports.handler = async (event) => {
   try { payload = JSON.parse(event.body || "{}"); }
   catch { return json(400, { error: "Invalid JSON" }); }
 
-  if (!OWNERS.includes((payload.adminEmail || "").toLowerCase().trim())) {
+  const auth = await requireOwner(event, OWNERS);
+  if (!auth.ok) {
     return json(403, { error: "Not authorised" });
   }
 

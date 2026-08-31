@@ -1,5 +1,6 @@
 const { activeMentors, syncActiveFlags, portalPrompt, nudgeHtml,
         ACTIVE_DAYS, OWNERS } = require("../shared/mentor-activity");
+const { requireOwner } = require("../shared/require-owner");
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -15,6 +16,13 @@ exports.handler = async (event) => {
 
   let payload = {};
   try { payload = JSON.parse(event.body || "{}"); } catch { payload = {}; }
+
+  // This sends real email to every mentor and had no auth check at all, so an
+  // unauthenticated POST could fire payslips at will.
+  const auth = await requireOwner(event, OWNERS);
+  if (!auth.ok) {
+    return { statusCode: 403, headers, body: JSON.stringify({ error: auth.error }) };
+  }
 
   const {
     AIRTABLE_API_TOKEN,

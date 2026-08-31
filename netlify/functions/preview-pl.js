@@ -1,4 +1,5 @@
 const { TOTAL_OPEX, OPEX_LINES, FOUNDER_SESSION_COST, isFounder } = require("../shared/pl-costs");
+const { requireOwner } = require("../shared/require-owner");
 
 const headers = {
   "Access-Control-Allow-Origin":  "*",
@@ -16,7 +17,8 @@ exports.handler = async (event) => {
   // Owners only: this returns revenue, which would reveal mentee pricing.
   let ownerEmail = "";
   try { ownerEmail = (JSON.parse(event.body || "{}").ownerEmail || "").toLowerCase().trim(); } catch {}
-  if (!OWNERS.includes(ownerEmail)) {
+  const auth = await requireOwner(event, OWNERS);
+  if (!auth.ok) {
     return { statusCode: 403, headers, body: JSON.stringify({ error: "Owners only" }) };
   }
 
