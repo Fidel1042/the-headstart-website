@@ -133,7 +133,8 @@
 
     const DRAFT_LABELS = {
       landing: "Landing page card",
-      mentors: "Mentors page card",
+      mentors: "Mentors page card (front)",
+      bio: "Mentors page card (back, what they read)",
       internal: "Internal profile (consultation tool)",
     };
     const CHECK_LABELS = {
@@ -210,7 +211,7 @@
           ` : Object.entries(DRAFT_LABELS).map(([k, label]) => `
             <label class="d">
               <span class="d__label">${esc(label)}${m.drafts[k].trim() ? "" : " — empty"}</span>
-              <textarea data-d="${k}" rows="${k === "internal" ? 8 : 4}">${esc(m.drafts[k])}</textarea>
+              <textarea data-d="${k}" rows="${k === "internal" ? 8 : k === "bio" ? 6 : 4}">${esc(m.drafts[k])}</textarea>
             </label>`).join("")}
 
           <div class="slots">

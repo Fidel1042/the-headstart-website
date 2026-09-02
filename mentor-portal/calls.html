@@ -182,22 +182,22 @@
             ${c.linkedin ? `<a class="act" href="${esc(c.linkedin)}" target="_blank" rel="noopener">LinkedIn</a>` : ""}
             ${c.email ? `<a class="act" href="mailto:${esc(c.email)}">Email</a>` : ""}
             ${c.reschedule ? `<a class="act" href="${esc(c.reschedule)}" target="_blank" rel="noopener">Reschedule</a>` : ""}
-            ${c.kind === "consultation"
-              ? `<button class="act act--noshow" type="button" data-noshow="${esc(c.id)}">Mark no-show</button>`
-              : ""}
+            <button class="act act--noshow" type="button"
+                    data-noshow="${esc(c.id)}" data-kind="${esc(c.kind)}">Mark no-show</button>
           </div>
           <p class="c__result" data-result="${esc(c.id)}" hidden></p>
         </div>`;
     }
 
-    // Sends the follow-up too, so it is not undoable here. A mis-click emails a
-    // real person, which is worth one confirm.
+    // Sends the follow-up too, so a mis-click emails a real person.
     document.getElementById("list").addEventListener("click", async (e) => {
       const btn = e.target.closest("[data-noshow]");
       if (!btn) return;
       const id = btn.dataset.noshow;
+      const kind = btn.dataset.kind;
       const out = document.querySelector(`[data-result="${id}"]`);
-      if (!confirm("Mark as no-show and send them the follow-up email?")) return;
+      const who = kind === "consultation" ? "them" : "the candidate";
+      if (!confirm(`Mark as no-show and send ${who} the follow-up email?`)) return;
 
       btn.disabled = true;
       const label = btn.textContent;
@@ -208,7 +208,7 @@
       try {
         const res = await fetch("/.netlify/functions/mark-no-show", {
           method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ recordId: id }),
+          body: JSON.stringify({ recordId: id, kind }),
         });
         const text = await res.text();
         if (text.trim().startsWith("<")) throw new Error("This page needs the live site.");

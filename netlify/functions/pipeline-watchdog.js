@@ -15,7 +15,7 @@
 // If one does not, something in the chain is broken and it does not matter
 // which link it was.
 //
-// Four checks, cheapest first:
+// Five checks, cheapest first:
 //
 //   A  Netlify form webhooks that Netlify has disabled or marked failing.
 //      This is the exact failure above, caught directly.
@@ -24,6 +24,7 @@
 //      chain, including ones nobody has thought of yet.
 //   C  Make scenarios that have been deactivated or are invalid.
 //   D  Make executions that errored in the last 24 hours.
+//   E  Mentors marked as a no-show whose follow-up email never went out.
 //
 // Costs no Make operations. Reading the Make API is not an operation, and
 // nothing here runs inside Make.
@@ -160,6 +161,35 @@ async function checkSignupRecon() {
   }];
 }
 
+/**
+ * E: a mentor marked as a no-show who never got the follow-up.
+ *
+ * `No Show Email Sent` is written only after Brevo accepts, so the marking
+ * without the send means the email failed. Nothing retries it on its own, and
+ * the person who clicked has already moved on, so it has to be surfaced.
+ */
+async function checkNoShowEmails() {
+  const formula = 'AND({Interview No Show}, {No Show Email Sent}=BLANK())';
+  const url = `https://api.airtable.com/v0/${process.env.AIRTABLE_CORE_BASE_ID}/` +
+    `${process.env.AIRTABLE_MENTOR_TABLE_ID}?pageSize=50` +
+    `&fields%5B%5D=Name&fields%5B%5D=Email&fields%5B%5D=Interview%20No%20Show` +
+    `&filterByFormula=${encodeURIComponent(formula)}`;
+  const data = await getJson(url, { Authorization: `Bearer ${process.env.AIRTABLE_API_TOKEN}` });
+  const stuck = (data.records || []).filter((r) => r.fields["Email"]);
+  if (!stuck.length) return [];
+
+  return [{
+    title: `${stuck.length} mentor no-show follow-up${stuck.length > 1 ? "s" : ""} never sent`,
+    detail:
+      `Marked as a no-show on the Calls page, but the email did not go out:<br><br>` +
+      stuck.map((r) =>
+        `&nbsp;&nbsp;• <strong>${esc(r.fields["Name"] || "(no name)")}</strong> — ${esc(r.fields["Email"])} ` +
+        `<span style="color:#777">(marked ${esc(String(r.fields["Interview No Show"]).slice(0, 10))})</span>`
+      ).join("<br>") +
+      `<br><br>Open the Calls page for that day and click Mark no-show again to retry the send.`,
+  }];
+}
+
 /** C: scenarios switched off or broken. */
 async function checkScenarios() {
   const data = await make(`/scenarios?teamId=${MAKE_TEAM_ID}&pg%5Blimit%5D=100`);
@@ -248,6 +278,7 @@ exports.handler = async (event) => {
     ["signup reconciliation", checkSignupRecon],
     ["scenario status", checkScenarios],
     ["scenario errors", checkErrors],
+    ["unsent no-show emails", checkNoShowEmails],
   ];
   for (const [name, fn] of checks) {
     try {

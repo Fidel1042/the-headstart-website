@@ -37,6 +37,17 @@ const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com", "dev@localho
 const SENDER = { name: "Fidel @Headstart Mentoring", email: "fidel@theheadstartmentoring.com" };
 const REBOOK = "https://calendly.com/fidelhon/30min";
 
+// A mentor candidate has no self-serve booking link: interviews are scheduled
+// by hand on the pipeline page, which then emails the invite. So their
+// follow-up asks for a reply instead of pointing at a calendar.
+//
+// Their Status is deliberately left alone. "No show" is not one of its options,
+// and adding it would drop them out of IN_PIPELINE in mentor-pipeline.js and
+// hide them from the page Fidel would use to re-invite them. The date field
+// records the miss without moving them out of the funnel.
+const MENTOR_NO_SHOW_FIELD = "Interview No Show";
+const MENTOR_EMAIL_FIELD = "No Show Email Sent";
+
 /** "Monday 1 September, 2:15 PM" in Sydney, matching the Make formatDate. */
 function sydneyWhen(iso) {
   if (!iso) return "";
@@ -57,13 +68,26 @@ function body(firstName, when) {
   const slot = when ? ` set for ${esc(when)}` : "";
   return `Hi ${esc(firstName || "there")},
 <br><br>
-We had your consultation${slot}, but I didn't manage to catch you. Life gets busy, completely understand.
+We had your consultation${slot}, but I didn't manage to catch you.
 <br><br>
 If you're still keen to get a clear read on what's holding your job search back, you can reschedule here:
 <br><br>
 ${REBOOK}
 <br><br>
 Genuinely would love to help you get your first job in Australia.
+<br><br>
+Cheers,<br>
+<strong>Fidel</strong>`;
+}
+
+function mentorBody(firstName, when) {
+  const slot = when ? ` set for ${esc(when)}` : "";
+  return `Hi ${esc(firstName || "there")},
+<br><br>
+We had your interview${slot}, but I didn't manage to catch you.
+<br><br>
+If you're still interested in mentoring with us, just reply to this email and I'll send
+over a new time.
 <br><br>
 Cheers,<br>
 <strong>Fidel</strong>`;
@@ -77,6 +101,74 @@ async function airtable(path, opts, token) {
   const data = await res.json();
   if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
   return data;
+}
+
+/**
+ * Mentor candidate who missed their interview.
+ *
+ * Two fields, mirroring the mentee path, because one cannot express the state
+ * that matters. `Interview No Show` records the miss and is written first.
+ * `No Show Email Sent` is written only after Brevo accepts.
+ *
+ * The duplicate guard therefore hangs off the EMAIL field, not the marking:
+ *
+ *   both set        -> already done, do nothing
+ *   marked, no send -> the email failed, clicking again retries it
+ *   neither         -> first click
+ *
+ * So a Brevo outage never strands somebody as "marked but silently never
+ * contacted", and pipeline-watchdog reports that pair every two hours in case
+ * nobody clicks again.
+ */
+async function markMentor({ target, token, brevo, f }) {
+  const name = f["Name"] || "";
+  if (f[MENTOR_NO_SHOW_FIELD] && f[MENTOR_EMAIL_FIELD]) {
+    return json(200, { ok: true, already: true, name, emailed: false });
+  }
+
+  const retry = Boolean(f[MENTOR_NO_SHOW_FIELD]);
+  if (!retry) {
+    await airtable(target, {
+      method: "PATCH",
+      body: JSON.stringify({ fields: { [MENTOR_NO_SHOW_FIELD]: new Date().toISOString() } }),
+    }, token);
+  }
+
+  const to = String(f["Email"] || "").trim();
+  if (!to) {
+    return json(200, { ok: true, name, emailed: false,
+                       note: "Marked as no-show. No email address on the record." });
+  }
+  if (!brevo) {
+    return json(200, { ok: true, name, emailed: false,
+                       note: "Marked as no-show. BREVO_API_KEY is not set, so no email." });
+  }
+
+  const when = sydneyWhen(f["Status"] === "Second Interview"
+    ? f["Second Interview Date"] : f["First Interview Date"]);
+  const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: { "api-key": brevo, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      sender: SENDER, replyTo: SENDER,
+      to: [{ email: to, name }],
+      subject: "Missed you on the interview",
+      htmlContent: mentorBody(String(name).trim().split(/\s+/)[0], when),
+    }),
+  });
+  if (!res.ok) {
+    // Marking stands, email flag stays blank. Clicking again retries just the
+    // send, and the watchdog will report it in the meantime.
+    return json(200, { ok: true, name, emailed: false,
+                       note: "Marked as no-show. The email failed, click again to retry it." });
+  }
+
+  await airtable(target, {
+    method: "PATCH",
+    body: JSON.stringify({ fields: { [MENTOR_EMAIL_FIELD]: new Date().toISOString() } }),
+  }, token);
+
+  return json(200, { ok: true, name, emailed: true, to, retry });
 }
 
 exports.handler = async (event) => {
@@ -95,8 +187,14 @@ exports.handler = async (event) => {
     return json(400, { error: "A valid record id is required" });
   }
 
+  // The Calls page lists consultations from the Client table and interviews
+  // from the Mentors table, so the caller has to say which one this id is.
+  const isMentor = p.kind === "interview" || p.kind === "final interview";
+
   const { AIRTABLE_API_TOKEN: token, AIRTABLE_CORE_BASE_ID: base,
-          AIRTABLE_MENTEE_TABLE_ID: table, BREVO_API_KEY: brevo } = process.env;
+          AIRTABLE_MENTEE_TABLE_ID: menteeTable, AIRTABLE_MENTOR_TABLE_ID: mentorTable,
+          BREVO_API_KEY: brevo } = process.env;
+  const table = isMentor ? mentorTable : menteeTable;
   if (!token || !base || !table) return json(500, { error: "Airtable env vars are not set" });
 
   const target = `${base}/${table}/${recordId}`;
@@ -104,6 +202,8 @@ exports.handler = async (event) => {
   try {
     const before = await airtable(target, {}, token);
     const f = before.fields || {};
+
+    if (isMentor) return markMentor({ target, token, brevo, f });
 
     // Already done. Say so rather than sending a second email.
     if ((f["Client Pipeline"] || "") === "No show" && (f["No Show Email Sent"] || "") === "Yes") {

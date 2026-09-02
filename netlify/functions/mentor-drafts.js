@@ -23,6 +23,11 @@ const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com", "dev@localho
 const DRAFTS = {
   landing: "Landing Draft",
   mentors: "Mentors Page Draft",
+  // The front of the mentors-page card is just role, name and a headline. This
+  // is the first-person paragraph on the BACK, the part a student actually
+  // reads once they tap. It used to be written by hand at ship time, which put
+  // the most-read copy on the site outside the approval loop.
+  bio: "Mentors Page Bio Draft",
   internal: "Internal Profile Draft",
 };
 
@@ -137,7 +142,9 @@ exports.handler = async (event) => {
         const missing = Object.entries(DRAFTS)
           .filter(([, name]) => !(rec.fields[name] || "").trim())
           .map(([k]) => k);
-        if (missing.length === 3) {
+        // Counted against DRAFTS rather than a literal, so adding a fourth
+        // draft field cannot silently turn this guard off.
+        if (missing.length === Object.keys(DRAFTS).length) {
           return json(400, { error: "There are no drafts on this mentor yet." });
         }
       }
