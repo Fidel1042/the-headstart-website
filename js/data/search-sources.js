@@ -91,6 +91,12 @@ export const searchSources = {
   ],
   "uni-years": ["Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6+"],
   "highschool-years": ["Year 10", "Year 11", "Year 12"],
+  // Mentors listed on the website — used for the "Mentor Referral" autocomplete.
+  mentors: [
+    "Abeshek", "Aidan", "Angelica", "Brendon", "Deepika", "Fidel",
+    "Jai", "Khaleel", "Koda", "Koko", "Luis", "Palak",
+    "Raunaq", "Shifat", "Shriyansh", "Wohee",
+  ],
 };
 
 searchSources["dial-codes"] = Array.from(

@@ -313,8 +313,16 @@
                 </select>
               </div>
               <div class="form-group" id="referral-name-group" style="display:none;">
-                <label for="referral-name" id="referral-name-label">Who referred you?</label>
-                <input type="text" id="referral-name" name="referral_name" placeholder="Name" />
+                <label id="referral-name-label">Who referred you?</label>
+                <!-- Mentee referral: free-text name -->
+                <input type="text" id="referral-name" name="referral_name" placeholder="Name" disabled />
+                <!-- Mentor referral: autocomplete from the mentors listed on the website -->
+                <div class="search-select" id="referral-mentor-select" data-search-source="mentors" style="display:none;">
+                  <div class="search-select-field">
+                    <input type="text" id="referral-mentor" name="referral_name" data-search-input autocomplete="off" placeholder="Start typing or pick a mentor" disabled />
+                    <div class="search-select-dropdown" hidden></div>
+                  </div>
+                </div>
               </div>
             </div>
             <div class="form-nav align-right">
@@ -431,28 +439,45 @@
     });
 
     // ── Referral source: reveal a "who referred you" field for mentee/mentor referrals ──
+    // Mentee = free-text name; Mentor = autocomplete from the website mentor list.
+    // The inactive field is disabled so only one referral_name value is ever submitted.
     (function () {
-      var sourceSel  = document.getElementById('referral-source');
-      var nameGroup  = document.getElementById('referral-name-group');
-      var nameInput  = document.getElementById('referral-name');
-      var nameLabel  = document.getElementById('referral-name-label');
-      if (!sourceSel || !nameGroup || !nameInput) return;
+      var sourceSel    = document.getElementById('referral-source');
+      var nameGroup    = document.getElementById('referral-name-group');
+      var nameLabel    = document.getElementById('referral-name-label');
+      var menteeInput  = document.getElementById('referral-name');
+      var mentorSelect = document.getElementById('referral-mentor-select');
+      var mentorInput  = document.getElementById('referral-mentor');
+      if (!sourceSel || !nameGroup || !menteeInput || !mentorInput) return;
+
+      function setMode(mode) {
+        var isMentee = mode === 'mentee';
+        var isMentor = mode === 'mentor';
+        // Mentee free-text field
+        menteeInput.style.display = isMentee ? '' : 'none';
+        menteeInput.disabled = !isMentee;
+        if (isMentee) { menteeInput.setAttribute('required', 'required'); }
+        else { menteeInput.removeAttribute('required'); menteeInput.value = ''; }
+        // Mentor autocomplete field
+        mentorSelect.style.display = isMentor ? '' : 'none';
+        mentorInput.disabled = !isMentor;
+        if (isMentor) { mentorInput.setAttribute('required', 'required'); }
+        else { mentorInput.removeAttribute('required'); mentorInput.value = ''; }
+        // Group + label
+        if (mode === 'none') {
+          nameGroup.style.display = 'none';
+        } else {
+          nameGroup.style.display = '';
+          nameLabel.textContent = isMentor ? 'Which mentor referred you?' : 'Who referred you?';
+        }
+        syncPulse();
+      }
 
       sourceSel.addEventListener('change', function () {
         var v = sourceSel.value;
-        var show = (v === 'Mentee Referral' || v === 'Mentor Referral');
-        if (show) {
-          nameLabel.textContent = (v === 'Mentor Referral')
-            ? 'Which mentor referred you?'
-            : 'Who referred you?';
-          nameGroup.style.display = '';
-          nameInput.setAttribute('required', 'required');
-        } else {
-          nameGroup.style.display = 'none';
-          nameInput.removeAttribute('required');
-          nameInput.value = '';
-        }
-        syncPulse();
+        if (v === 'Mentor Referral') setMode('mentor');
+        else if (v === 'Mentee Referral') setMode('mentee');
+        else setMode('none');
       });
     })();
 

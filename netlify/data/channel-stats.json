@@ -375,16 +375,22 @@
    "partial": false
   },
   "2026-08-17": {
-   "days": 3,
-   "engagements": 224,
-   "impressions": 45012,
-   "partial": true
+   "days": 7,
+   "engagements": 545,
+   "impressions": 88203,
+   "partial": false
   },
   "2026-08-24": {
    "days": 7,
-   "engagements": 87,
-   "impressions": 14815,
+   "engagements": 320,
+   "impressions": 32149,
    "partial": false
+  },
+  "2026-08-31": {
+   "days": 1,
+   "engagements": 44,
+   "impressions": 2917,
+   "partial": true
   }
  },
  "posts_linkedin": {
@@ -406,19 +412,37 @@
    "title_approx": true,
    "week": "2026-06-22"
   },
+  "https://www.linkedin.com/posts/fidel-hon-353b4326a_a-hard-pill-to-swallow-for-job-searching-share-7488020978212491264-Hbq8": {
+   "date": "2026-07-29",
+   "engagements": 16,
+   "impressions": 1466,
+   "permalink": "https://www.linkedin.com/posts/fidel-hon-353b4326a_a-hard-pill-to-swallow-for-job-searching-share-7488020978212491264-Hbq8",
+   "title": "External Factors / Emotional Validation",
+   "title_approx": true,
+   "week": "2026-07-27"
+  },
   "https://www.linkedin.com/posts/fidel-hon-353b4326a_a-recruiter-working-in-elite-finance-firms-share-7480054895874596864-Jvoa": {
    "date": "2026-07-07",
    "engagements": 42,
-   "impressions": 5285,
+   "impressions": 5292,
    "permalink": "https://www.linkedin.com/posts/fidel-hon-353b4326a_a-recruiter-working-in-elite-finance-firms-share-7480054895874596864-Jvoa",
    "title": "70% Prepared / What Made Me Stand Out",
    "title_approx": true,
    "week": "2026-07-06"
   },
+  "https://www.linkedin.com/posts/fidel-hon-353b4326a_a-stacked-lineup-of-headstart-mentors-showing-ugcPost-7492362300264390656-aved": {
+   "date": "2026-08-10",
+   "engagements": 3,
+   "impressions": 450,
+   "permalink": "https://www.linkedin.com/posts/fidel-hon-353b4326a_a-stacked-lineup-of-headstart-mentors-showing-ugcPost-7492362300264390656-aved",
+   "title": "One-Way Interview Repost",
+   "title_approx": true,
+   "week": "2026-08-10"
+  },
   "https://www.linkedin.com/posts/fidel-hon-353b4326a_after-reviewing-80-resumes-for-mentees-share-7494896637199196160-HRd5": {
    "date": "2026-08-17",
-   "engagements": 54,
-   "impressions": 26767,
+   "engagements": 67,
+   "impressions": 38406,
    "permalink": "https://www.linkedin.com/posts/fidel-hon-353b4326a_after-reviewing-80-resumes-for-mentees-share-7494896637199196160-HRd5",
    "title": "Going Back",
    "title_approx": true,
@@ -427,7 +451,7 @@
   "https://www.linkedin.com/posts/fidel-hon-353b4326a_as-international-students-job-searching-in-share-7486209353457266688-RW2J": {
    "date": "2026-07-24",
    "engagements": 396,
-   "impressions": 22416,
+   "impressions": 22460,
    "permalink": "https://www.linkedin.com/posts/fidel-hon-353b4326a_as-international-students-job-searching-in-share-7486209353457266688-RW2J",
    "title": "$4k Unemployment Cost Repost",
    "title_approx": true,
@@ -442,12 +466,30 @@
    "title_approx": true,
    "week": "2026-04-27"
   },
+  "https://www.linkedin.com/posts/fidel-hon-353b4326a_ever-been-rejected-after-an-interview-heres-share-7499975940559667200-9-QO": {
+   "date": "2026-08-31",
+   "engagements": 23,
+   "impressions": 866,
+   "permalink": "https://www.linkedin.com/posts/fidel-hon-353b4326a_ever-been-rejected-after-an-interview-heres-share-7499975940559667200-9-QO",
+   "title": "Aidan / Networking Events Aren't a Waste",
+   "title_approx": true,
+   "week": "2026-08-31"
+  },
+  "https://www.linkedin.com/posts/fidel-hon-353b4326a_for-all-grads-that-secured-a-gradjunior-share-7498971782192721920-fNhw": {
+   "date": "2026-08-28",
+   "engagements": 37,
+   "impressions": 1665,
+   "permalink": "https://www.linkedin.com/posts/fidel-hon-353b4326a_for-all-grads-that-secured-a-gradjunior-share-7498971782192721920-fNhw",
+   "title": "Team Role",
+   "title_approx": true,
+   "week": "2026-08-24"
+  },
   "https://www.linkedin.com/posts/fidel-hon-353b4326a_here-are-3-ways-you-can-use-your-retail-experience-share-7492722824663523328-BQK4": {
    "date": "2026-08-11",
-   "engagements": 68,
-   "impressions": 12998,
+   "engagements": 70,
+   "impressions": 13527,
    "permalink": "https://www.linkedin.com/posts/fidel-hon-353b4326a_here-are-3-ways-you-can-use-your-retail-experience-share-7492722824663523328-BQK4",
-   "title": "One-Way Interview Repost",
+   "title": "3 Ways Your Retail Job Boosts Your Job Search",
    "title_approx": true,
    "week": "2026-08-10"
   },
@@ -517,7 +559,7 @@
   "https://www.linkedin.com/posts/fidel-hon-353b4326a_i-got-my-first-grad-offer-after-173-applications-share-7490546421503324160-gCIA": {
    "date": "2026-08-05",
    "engagements": 34,
-   "impressions": 2813,
+   "impressions": 2923,
    "permalink": "https://www.linkedin.com/posts/fidel-hon-353b4326a_i-got-my-first-grad-offer-after-173-applications-share-7490546421503324160-gCIA",
    "title": "Feel Behind",
    "title_approx": true,
@@ -526,7 +568,7 @@
   "https://www.linkedin.com/posts/fidel-hon-353b4326a_i-got-my-first-grad-offer-at-a-global-market-share-7482214826635616256-VKSN": {
    "date": "2026-07-13",
    "engagements": 72,
-   "impressions": 17738,
+   "impressions": 17748,
    "permalink": "https://www.linkedin.com/posts/fidel-hon-353b4326a_i-got-my-first-grad-offer-at-a-global-market-share-7482214826635616256-VKSN",
    "title": "Numbers Game Repost",
    "title_approx": true,
@@ -537,7 +579,7 @@
    "engagements": 128,
    "impressions": 20293,
    "permalink": "https://www.linkedin.com/posts/fidel-hon-353b4326a_i-met-an-international-student-who-got-a-share-7473517279364882432-Q-AU",
-   "title": "LinkedIn Message Under 150 Words",
+   "title": "Grad Job Market Debunk",
    "title_approx": true,
    "week": "2026-06-15"
   },
@@ -577,6 +619,15 @@
    "title_approx": true,
    "week": "2026-05-11"
   },
+  "https://www.linkedin.com/posts/fidel-hon-353b4326a_i-still-remember-counting-the-exact-amount-share-7498163742799663104-iaF6": {
+   "date": "2026-08-26",
+   "engagements": 54,
+   "impressions": 2949,
+   "permalink": "https://www.linkedin.com/posts/fidel-hon-353b4326a_i-still-remember-counting-the-exact-amount-share-7498163742799663104-iaF6",
+   "title": "Star Wars Keychain",
+   "title_approx": true,
+   "week": "2026-08-24"
+  },
   "https://www.linkedin.com/posts/fidel-hon-353b4326a_i-used-to-close-linkedin-job-tabs-when-i-share-7464459312233463808-dOCu": {
    "date": "2026-05-25",
    "engagements": 23,
@@ -585,6 +636,15 @@
    "title": "100+ Applicants / Unique Edge",
    "title_approx": true,
    "week": "2026-05-25"
+  },
+  "https://www.linkedin.com/posts/fidel-hon-353b4326a_i-used-to-cringe-when-i-saw-linkedin-posts-share-7476430714826059776-6BHw": {
+   "date": "2026-06-27",
+   "engagements": 5,
+   "impressions": 492,
+   "permalink": "https://www.linkedin.com/posts/fidel-hon-353b4326a_i-used-to-cringe-when-i-saw-linkedin-posts-share-7476430714826059776-6BHw",
+   "title": "Passion and Stories Not CV",
+   "title_approx": true,
+   "week": "2026-06-22"
   },
   "https://www.linkedin.com/posts/fidel-hon-353b4326a_i-used-to-think-no-one-would-ever-get-jobs-share-7459448222080487425-Kpyx": {
    "date": "2026-05-11",
@@ -607,7 +667,7 @@
   "https://www.linkedin.com/posts/fidel-hon-353b4326a_if-i-apply-to-jobs-every-single-day-eventually-share-7482952693406248961-sxdG": {
    "date": "2026-07-15",
    "engagements": 472,
-   "impressions": 39811,
+   "impressions": 39824,
    "permalink": "https://www.linkedin.com/posts/fidel-hon-353b4326a_if-i-apply-to-jobs-every-single-day-eventually-share-7482952693406248961-sxdG",
    "title": "Retail Grad Encouragement v2",
    "title_approx": true,
@@ -616,7 +676,7 @@
   "https://www.linkedin.com/posts/fidel-hon-353b4326a_if-you-are-an-international-student-graduated-share-7483697960346636288-MTjf": {
    "date": "2026-07-17",
    "engagements": 175,
-   "impressions": 33795,
+   "impressions": 33817,
    "permalink": "https://www.linkedin.com/posts/fidel-hon-353b4326a_if-you-are-an-international-student-graduated-share-7483697960346636288-MTjf",
    "title": "CEO Networking Repost",
    "title_approx": true,
@@ -631,10 +691,19 @@
    "title_approx": true,
    "week": "2026-06-08"
   },
+  "https://www.linkedin.com/posts/fidel-hon-353b4326a_if-youre-an-international-student-trying-share-7491274941993222145-kRqE": {
+   "date": "2026-08-07",
+   "engagements": 26,
+   "impressions": 1404,
+   "permalink": "https://www.linkedin.com/posts/fidel-hon-353b4326a_if-youre-an-international-student-trying-share-7491274941993222145-kRqE",
+   "title": "173 Applications / Opening Up",
+   "title_approx": true,
+   "week": "2026-08-03"
+  },
   "https://www.linkedin.com/posts/fidel-hon-353b4326a_im-missing-out-on-4000-every-month-i-share-7484761138367340544-3rwf": {
    "date": "2026-07-20",
    "engagements": 137,
-   "impressions": 14804,
+   "impressions": 14814,
    "permalink": "https://www.linkedin.com/posts/fidel-hon-353b4326a_im-missing-out-on-4000-every-month-i-share-7484761138367340544-3rwf",
    "title": "Screening Call Tip",
    "title_approx": true,
@@ -645,23 +714,32 @@
    "engagements": 166,
    "impressions": 54598,
    "permalink": "https://www.linkedin.com/posts/fidel-hon-353b4326a_im-missing-out-on-4k-every-month-im-share-7468835786218618880-Ry_N",
-   "title": "Conversations > Mass Applications",
+   "title": "$4k Unemployment Cost / Urgency",
    "title_approx": true,
    "week": "2026-06-01"
   },
+  "https://www.linkedin.com/posts/fidel-hon-353b4326a_im-scared-of-wasting-my-parents-200k-share-7473157285490479104-__zN": {
+   "date": "2026-06-18",
+   "engagements": 5,
+   "impressions": 199,
+   "permalink": "https://www.linkedin.com/posts/fidel-hon-353b4326a_im-scared-of-wasting-my-parents-200k-share-7473157285490479104-__zN",
+   "title": "LinkedIn Message Under 150 Words",
+   "title_approx": true,
+   "week": "2026-06-15"
+  },
   "https://www.linkedin.com/posts/fidel-hon-353b4326a_in-australia-80-of-the-jobs-dont-care-share-7488735772808740864-WoaE": {
    "date": "2026-07-31",
-   "engagements": 24,
-   "impressions": 2695,
+   "engagements": 30,
+   "impressions": 2861,
    "permalink": "https://www.linkedin.com/posts/fidel-hon-353b4326a_in-australia-80-of-the-jobs-dont-care-share-7488735772808740864-WoaE",
-   "title": "External Factors / Emotional Validation",
+   "title": "85 WAM vs 70 WAM / Passion Project",
    "title_approx": true,
    "week": "2026-07-27"
   },
   "https://www.linkedin.com/posts/fidel-hon-353b4326a_in-the-4-grad-roles-ive-been-offered-ive-share-7480782391876407296-in6v": {
    "date": "2026-07-09",
    "engagements": 82,
-   "impressions": 43146,
+   "impressions": 43157,
    "permalink": "https://www.linkedin.com/posts/fidel-hon-353b4326a_in-the-4-grad-roles-ive-been-offered-ive-share-7480782391876407296-in6v",
    "title": "LinkedIn URL Trick / Apply Early",
    "title_approx": true,
@@ -670,11 +748,20 @@
   "https://www.linkedin.com/posts/fidel-hon-353b4326a_interview-coming-up-copy-my-exact-structure-share-7487292783758741504-MxHR": {
    "date": "2026-07-27",
    "engagements": 42,
-   "impressions": 2519,
+   "impressions": 2559,
    "permalink": "https://www.linkedin.com/posts/fidel-hon-353b4326a_interview-coming-up-copy-my-exact-structure-share-7487292783758741504-MxHR",
    "title": "Weakness Question Repost",
    "title_approx": true,
    "week": "2026-07-27"
+  },
+  "https://www.linkedin.com/posts/fidel-hon-353b4326a_ive-analysed-50-grads-in-au-that-got-share-7496357580521238528-L_Jd": {
+   "date": "2026-08-21",
+   "engagements": 75,
+   "impressions": 10046,
+   "permalink": "https://www.linkedin.com/posts/fidel-hon-353b4326a_ive-analysed-50-grads-in-au-that-got-share-7496357580521238528-L_Jd",
+   "title": "3 Interesting Interview Stories",
+   "title_approx": true,
+   "week": "2026-08-17"
   },
   "https://www.linkedin.com/posts/fidel-hon-353b4326a_ive-failed-5-final-interviews-before-landing-share-7469892156879593473-6aX1": {
    "date": "2026-06-09",
@@ -696,17 +783,26 @@
   },
   "https://www.linkedin.com/posts/fidel-hon-353b4326a_ive-gotten-4-grad-offers-as-an-international-share-7479733569905532928-mcas": {
    "date": "2026-07-06",
-   "engagements": 72,
-   "impressions": 12038,
+   "engagements": 82,
+   "impressions": 12047,
    "permalink": "https://www.linkedin.com/posts/fidel-hon-353b4326a_ive-gotten-4-grad-offers-as-an-international-share-7479733569905532928-mcas",
    "title": "Retail Grad Encouragement",
    "title_approx": true,
    "week": "2026-07-06"
   },
+  "https://www.linkedin.com/posts/fidel-hon-353b4326a_ive-gotten-4-grad-offers-in-au-and-share-7497436302896840704-zVBY": {
+   "date": "2026-08-24",
+   "engagements": 62,
+   "impressions": 10905,
+   "permalink": "https://www.linkedin.com/posts/fidel-hon-353b4326a_ive-gotten-4-grad-offers-in-au-and-share-7497436302896840704-zVBY",
+   "title": "Counting Days Until Unemployed v2",
+   "title_approx": true,
+   "week": "2026-08-24"
+  },
   "https://www.linkedin.com/posts/fidel-hon-353b4326a_ive-landed-4-grad-offers-and-coached-15-share-7478625368351113216-B_gk": {
    "date": "2026-07-03",
    "engagements": 24,
-   "impressions": 3428,
+   "impressions": 3435,
    "permalink": "https://www.linkedin.com/posts/fidel-hon-353b4326a_ive-landed-4-grad-offers-and-coached-15-share-7478625368351113216-B_gk",
    "title": "$51k Dropout Repost",
    "title_approx": true,
@@ -714,8 +810,8 @@
   },
   "https://www.linkedin.com/posts/fidel-hon-353b4326a_ive-spoken-to-50-grads-who-got-offers-as-share-7494187177568944128-s-5B": {
    "date": "2026-08-15",
-   "engagements": 112,
-   "impressions": 13492,
+   "engagements": 159,
+   "impressions": 15798,
    "permalink": "https://www.linkedin.com/posts/fidel-hon-353b4326a_ive-spoken-to-50-grads-who-got-offers-as-share-7494187177568944128-s-5B",
    "title": "6 Things Checklist",
    "title_approx": true,
@@ -724,7 +820,7 @@
   "https://www.linkedin.com/posts/fidel-hon-353b4326a_ive-taken-20-screening-calls-while-i-failed-share-7485489457798860800-24-I": {
    "date": "2026-07-22",
    "engagements": 27,
-   "impressions": 2349,
+   "impressions": 2362,
    "permalink": "https://www.linkedin.com/posts/fidel-hon-353b4326a_ive-taken-20-screening-calls-while-i-failed-share-7485489457798860800-24-I",
    "title": "Visa Excuse Hot Take",
    "title_approx": true,
@@ -741,8 +837,8 @@
   },
   "https://www.linkedin.com/posts/fidel-hon-353b4326a_my-first-2-grad-offers-as-an-international-share-7489837363683028992-vrb9": {
    "date": "2026-08-03",
-   "engagements": 33,
-   "impressions": 2996,
+   "engagements": 34,
+   "impressions": 3072,
    "permalink": "https://www.linkedin.com/posts/fidel-hon-353b4326a_my-first-2-grad-offers-as-an-international-share-7489837363683028992-vrb9",
    "title": "LinkedIn Cold Outreach Keys",
    "title_approx": true,
@@ -750,10 +846,10 @@
   },
   "https://www.linkedin.com/posts/fidel-hon-353b4326a_oh-youre-an-international-student-if-you-share-7495627572999806978-MmPs": {
    "date": "2026-08-19",
-   "engagements": 136,
-   "impressions": 12720,
+   "engagements": 447,
+   "impressions": 44278,
    "permalink": "https://www.linkedin.com/posts/fidel-hon-353b4326a_oh-youre-an-international-student-if-you-share-7495627572999806978-MmPs",
-   "title": "Team Role",
+   "title": "Irrelevant Experience on Resume",
    "title_approx": true,
    "week": "2026-08-17"
   },
@@ -768,10 +864,10 @@
   },
   "https://www.linkedin.com/posts/fidel-hon-353b4326a_one-way-video-interviews-the-worst-invention-share-7493449367371112449-VQMr": {
    "date": "2026-08-13",
-   "engagements": 20,
-   "impressions": 2628,
+   "engagements": 21,
+   "impressions": 2972,
    "permalink": "https://www.linkedin.com/posts/fidel-hon-353b4326a_one-way-video-interviews-the-worst-invention-share-7493449367371112449-VQMr",
-   "title": "3 Ways Your Retail Job Boosts Your Job Search",
+   "title": "6 Things Checklist",
    "title_approx": true,
    "week": "2026-08-10"
   },
@@ -816,9 +912,16 @@
    "engagements": 289,
    "impressions": 5085,
    "permalink": "https://www.linkedin.com/posts/fidel-hon-353b4326a_tired-of-seeing-your-favourite-grad-roles-share-7465905103682670592-7nGY",
-   "title": "Website Promo / PR-Citizen Only Frustration",
+   "title": "100+ Applicants / Unique Edge",
    "title_approx": true,
    "week": "2026-05-25"
+  },
+  "https://www.linkedin.com/posts/fidel-hon-353b4326a_we-are-hiring-check-this-out-if-you-are-share-7497095882601967616-d7Dr": {
+   "date": "2026-08-23",
+   "engagements": 47,
+   "impressions": 3935,
+   "permalink": "https://www.linkedin.com/posts/fidel-hon-353b4326a_we-are-hiring-check-this-out-if-you-are-share-7497095882601967616-d7Dr",
+   "week": "2026-08-17"
   },
   "https://www.linkedin.com/posts/fidel-hon-353b4326a_youre-an-international-student-if-you-share-7470621726792642560-BX4F": {
    "date": "2026-06-11",
@@ -832,7 +935,7 @@
  },
  "source": {
   "instagram": "Meta Graph API (grad_headstart (135 posts))",
-  "linkedin": "Post analytics screenshots, logged manually per week (LinkedIn xlsx export no longer used). Historic weeks to 2026-08-19 came from Content Analysis_Fidel Hon_2025-08-20_2026-08-19 copy.xlsx"
+  "linkedin": "AggregateAnalytics_Fidel Hon_2026-07-01_2026-08-31.xlsx"
  },
- "updated": "2026-08-30T23:07:39.898164+00:00"
+ "updated": "2026-09-01T21:40:57.581588+00:00"
 }

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <title>Earnings – The Headstart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+  <style id="auth-gate">
+    html:not(.auth-ok) body { visibility: hidden; }
+    html:not(.auth-ok) { background: #fff; }
+  </style>
+  <link rel="stylesheet" href="portal.css" />
+  <link rel="stylesheet" href="portal-nav.css" />
+  <link rel="stylesheet" href="/mentor-portal/polish.css" />
+  <style>
+    .er-page { max-width: 1000px; margin: 0 auto; padding: 1.6rem 1.2rem 4rem; }
+    .er-head h1 { font-size: 1.4rem; font-weight: 800; margin: 0 0 1.4rem; }
+
+    .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.7rem; margin-bottom: 1.8rem; }
+    .tile { border: 1px solid var(--line); border-radius: 12px; padding: 0.8rem 0.95rem; }
+    .tile__v { font-size: 1.35rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .tile__l { font-size: 0.73rem; color: var(--text-muted); margin-top: 0.15rem; }
+    /* Delta is text ink plus an arrow, never colour alone. */
+    .tile__d { font-size: 0.73rem; font-variant-numeric: tabular-nums; margin-top: 0.3rem;
+      color: var(--text-muted); }
+    .tile__d--up { color: #1baf7a; }
+    .tile__d--down { color: #e34948; }
+
+    .chart-card { border: 1px solid var(--line); border-radius: 14px; padding: 1.1rem 1.1rem 0.9rem;
+      margin-bottom: 1.6rem; }
+    .chart-card h2 { font-size: 0.95rem; font-weight: 700; margin: 0 0 0.15rem; }
+    .chart-card__sub { font-size: 0.73rem; color: var(--text-muted); margin: 0 0 0.9rem; }
+
+    /* Legend: always present at two series, so identity is never colour alone. */
+    .legend { display: flex; gap: 1rem; flex-wrap: wrap; margin: 0 0 0.9rem; }
+    .legend span { display: inline-flex; align-items: center; gap: 0.4rem;
+      font-size: 0.75rem; color: var(--text-muted); }
+    .legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+    .chart { width: 100%; height: auto; display: block; overflow: visible; }
+    .chart .grid { stroke: var(--line-soft); stroke-width: 1; }
+    .chart .axis { fill: var(--text-muted); font-size: 10px; }
+    .chart .vlabel { fill: var(--text); font-size: 10px; font-weight: 700;
+      font-variant-numeric: tabular-nums; }
+    .chart .bar { cursor: pointer; }
+    .chart .bar:hover { opacity: 0.82; }
+
+    .tip { position: fixed; pointer-events: none; z-index: 60; opacity: 0; transition: opacity 0.1s;
+      background: var(--bg); border: 1px solid var(--line); border-radius: 9px;
+      padding: 0.5rem 0.65rem; font-size: 0.75rem; white-space: nowrap;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.28); }
+    .tip.on { opacity: 1; }
+    .tip b { font-variant-numeric: tabular-nums; }
+
+    .tbl-wrap { overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.83rem; }
+    th, td { text-align: right; padding: 0.5rem 0.8rem 0.5rem 0;
+      border-bottom: 1px solid var(--line-soft); font-variant-numeric: tabular-nums; }
+    th:first-child, td:first-child { text-align: left; }
+    th { font-size: 0.67rem; text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--text-muted); white-space: nowrap; }
+
+    .state { font-size: 0.95rem; color: var(--text-muted); padding: 2.5rem 0; text-align: center; }
+
+    @media (max-width: 480px) {
+      .er-page { padding: 1.2rem 0.85rem 3rem; }
+      .tiles { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div data-portal-nav></div>
+
+  <main class="er-page">
+    <div class="er-head">
+      <h1>Earnings</h1>
+    </div>
+
+    <p class="state" id="loading">Loading&hellip;</p>
+    <p class="state" id="error" hidden></p>
+
+    <div id="content" hidden>
+      <div class="tiles" id="tiles"></div>
+
+      <div class="chart-card">
+        <h2>Month on month</h2>
+        <p class="chart-card__sub" id="chart-sub"></p>
+        <div class="legend" id="legend"></div>
+        <svg class="chart" id="chart" role="img" aria-labelledby="chart-desc"></svg>
+        <p id="chart-desc" class="sr-only" hidden></p>
+      </div>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th>Month</th>
+            <th>Sessions</th>
+            <th>Gross revenue</th>
+            <th>Mentor payouts</th>
+            <th>Opex</th>
+            <th>Net profit</th>
+            <th>Net margin</th>
+          </tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <div class="tip" id="tip"></div>
+  <script type="module" src="./earnings.js"></script>
+</body>
+</html>

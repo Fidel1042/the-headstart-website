@@ -4,6 +4,12 @@
 // in Sydney matches a reminder below and sends that one. Everything else is a
 // no-op, so adding a future reminder means adding one entry to REMINDERS.
 //
+// The cron fires twice, at 23:00 and 00:00 UTC, because 10:00 in Sydney is one
+// or the other depending on daylight saving. This hour guard is what makes the
+// second firing a no-op, so it and the cron in netlify.toml must agree: change
+// one and you must change the other.
+const SEND_HOUR = 10;   // Sydney local
+//
 // Deliberately one function rather than one per reminder: the schedule, the
 // timezone guard and the Brevo call are identical every time.
 
@@ -268,7 +274,24 @@ const LI_MEDIAN_IMPRESSIONS = 5371; // last 20 logged posts, weeks 17-20
 const FORM_BASE_RATE = 32.8;       // 106 of 323 over the 60 days to 27 Aug
 const FORM_BAND = [25.5, 40.1];    // 95% noise band at n ~ 320 per side
 
+// /links page: job alerts button removed, LinkedIn promoted to slot two.
+// Baseline and bands in Operations/analytics/links-page-test.md. The email
+// bodies live in shared/links-test-emails.js to keep this file from growing.
+const { gather, buildLinksTestEmail } = require("../shared/links-test-emails");
+
+const LINKS_TEST = (id, date, subject, from, days, verdict) => ({
+  id, date, subject,
+  async build() {
+    const now = await gather(ga4, from, date);
+    return buildLinksTestEmail({ verdict, now, days, t: { shell, callout, tbl } });
+  },
+});
+
 const REMINDERS = [
+  LINKS_TEST("links-test-early", "2026-09-15",
+    "/links: two-week check after dropping job alerts", "2026-09-01", 14, false),
+  LINKS_TEST("links-test-verdict", "2026-09-29",
+    "/links verdict: keep or revert", "2026-09-01", 28, true),
   {
     // The join link went into the day-of and 2-hour emails on 27 Aug. Three
     // weeks is ~30 calls, far too few to read the outcome, so this email asks
@@ -665,6 +688,7 @@ const REMINDERS = [
 exports.handler = async (event) => {
   const q = (event && event.queryStringParameters) || {};
   const force = q.force;   // pass ?force=<id> to send one immediately
+  const dry = q.dry === "1"; // build the email and return it, send nothing
 
   const parts = Object.fromEntries(new Intl.DateTimeFormat("en-CA", {
     timeZone: "Australia/Sydney", year: "numeric", month: "2-digit",
@@ -677,10 +701,21 @@ exports.handler = async (event) => {
   // worst possible failure here: nobody finds out until the window has closed.
   const due = force
     ? REMINDERS.filter((r) => r.id === force)
-    : (Number(parts.hour) === 6 ? REMINDERS.filter((r) => r.date === today) : []);
+    : (Number(parts.hour) === SEND_HOUR ? REMINDERS.filter((r) => r.date === today) : []);
 
   if (!due.length) return { statusCode: 200, body: `Nothing due (${today}, hour ${parts.hour}).` };
   if (!process.env.BREVO_API_KEY) return { statusCode: 500, body: "BREVO_API_KEY missing" };
+
+  // ?force=<id>&dry=1 renders the email and returns it without sending, so a
+  // new reminder can be proof-read against live data before its date arrives.
+  if (dry) {
+    const r = due[0];
+    try {
+      return { statusCode: 200, headers: { "Content-Type": "text/html" }, body: await r.build() };
+    } catch (err) {
+      return { statusCode: 500, body: `${r.id} failed to build: ${err.message}` };
+    }
+  }
 
   const sent = [], failed = [];
   for (const r of due) {

@@ -83,6 +83,7 @@ export const NAV_AREAS = [
       { href: "/mentor-portal/billing.html", label: "Billing", page: "billing", group: "Money" },
       { href: "/mentor-portal/payslips.html", label: "Payslips", page: "payslips", group: "Money" },
       { href: "/mentor-portal/pl.html", label: "P&amp;L", page: "pl", group: "Reporting" },
+      { href: "/mentor-portal/earnings.html", label: "Earnings", page: "earnings", group: "Reporting" },
       { href: "/mentor-portal/ltv.html", label: "LTV", page: "ltv", group: "Reporting" },
     ],
   },

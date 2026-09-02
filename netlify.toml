@@ -62,11 +62,11 @@
   schedule = "15 19,20 * * 0"
 
 # Dated one-off reminders (see the REMINDERS list in reminders.js).
-# Fires daily at both 19:15 and 20:15 UTC so one of them is always 06:15 in
-# Sydney across daylight saving; the function checks the local date and hour
-# and no-ops unless a reminder is due that morning.
+# Fires daily at both 23:00 and 00:00 UTC so one of them is always 10:00 in
+# Sydney across daylight saving (AEST is UTC+10, AEDT UTC+11); the function
+# checks the local date and hour and no-ops unless a reminder is due that day.
 [functions."reminders"]
-  schedule = "15 19,20 * * *"
+  schedule = "0 23,0 * * *"
 
 # Mentor reminders. Runs hourly at :00 and :15; the function only sends at the
 # right Melbourne local time (weekdays 5:15pm, weekends 10am) and exits fast

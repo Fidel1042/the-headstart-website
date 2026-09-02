@@ -406,12 +406,16 @@
         hex = hex.replace('#','');
         return [parseInt(hex.slice(0,2),16)/255, parseInt(hex.slice(2,4),16)/255, parseInt(hex.slice(4,6),16)/255];
       }
-      var rgb = hexRgb('#57535B');
+      // Softened 1 Sep 2026. The silk was competing with the buttons: this
+      // colour is what sets the pattern's contrast against the black page, so
+      // darkening it is the single biggest lever on how loud the texture reads.
+      // The motion and shape are unchanged, only the strength.
+      var rgb = hexRgb('#332F36');
       gl.uniform3f(uColor, rgb[0], rgb[1], rgb[2]);
       gl.uniform1f(uSpeed, 5);
       gl.uniform1f(uScale, 1);
       gl.uniform1f(uRotation, 0);
-      gl.uniform1f(uNoise, 1.5);
+      gl.uniform1f(uNoise, 0.8);
 
       function resize() {
         var dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -439,7 +443,7 @@
   <script>
     window.addEventListener('load', () => {
       gsap.to('.bg-glow', { opacity: 1, duration: 1.5, ease: 'power2.out' });
-      gsap.to('.grain',   { opacity: 0.04, duration: 1.5, ease: 'power2.out' });
+      gsap.to('.grain',   { opacity: 0.025, duration: 1.5, ease: 'power2.out' });
 
       gsap.fromTo('.brand-logo',
         { opacity: 0, filter: 'blur(18px)' },
