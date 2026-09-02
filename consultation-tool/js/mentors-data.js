@@ -297,7 +297,7 @@ export const mentors = [
     different: "Abeshek treats sales as a universal skill that travels into healthcare, automotive and IT, so he starts by finding the industry that actually fits you rather than pushing you at whatever is open. He drills you on saying less and making every word land, then keeps you getting the reps in.",
   },
   {
-    id: "vinh", name: "Vinh", intl: "International",
+    id: "vinh", name: "Kevin", intl: "Non Citizen",
     role: "Program Manager", company: "Microsoft",
     uni: "University of Melbourne", degree: "Commerce",
     major: "Commerce", industry: "Technology", rate: "$20",
@@ -309,9 +309,9 @@ export const mentors = [
     tags: ["program manager", "program management", "product", "product operations", "project management", "tech", "technology", "big tech", "microsoft", "salesforce", "aws", "amazon web services", "tech sales", "marketing", "m&a", "internship", "internships", "graduate", "commerce", "international"],
     bestFor: "Tech and program management, and anyone trying to build a run of internships from nothing. He did six across product operations, marketing, tech sales and M&A before Big Tech.",
     detailed: true,
-    lead: "Vinh is a Program Manager at Microsoft in Sydney, a role sitting between project and product management. He studied a Bachelor of Commerce at the University of Melbourne, moved to Sydney, took a gap year in 2021 to stack internships, and found his way into AWS as one of his final six before a graduate role at Salesforce.",
+    lead: "Kevin is a Program Manager at Microsoft in Sydney, a role sitting between project and product management. He studied a Bachelor of Commerce at the University of Melbourne, moved to Sydney, took a gap year in 2021 to stack internships, and found his way into AWS as one of his final six before a graduate role at Salesforce.",
     why: "He thinks international students play the career game on hard mode, and wants them treated fairly and getting the opportunities they currently miss.",
-    different: "Vinh took every interview he could get, KFC or Microsoft, on the reasoning that he had to be ready before the one he wanted came along. He teaches that snowball directly: how to turn small startup roles into the experience Big Tech will actually look at.",
+    different: "Kevin took every interview he could get, KFC or Microsoft, on the reasoning that he had to be ready before the one he wanted came along. He teaches that snowball directly: how to turn small startup roles into the experience Big Tech will actually look at.",
   },
   {
     id: "abdur", name: "Abdur", intl: "International",
