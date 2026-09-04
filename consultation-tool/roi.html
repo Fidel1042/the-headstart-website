@@ -66,9 +66,25 @@
         <div class="roi-field">
           <div class="roi-field__top">
             <label class="roi-field__label" for="roiSalary">Expected starting salary</label>
-            <span class="roi-field__val" id="roiSalaryVal">$70,000</span>
+            <span class="roi-field__val" id="roiSalaryVal">$65,000</span>
           </div>
-          <input class="roi-range" type="range" id="roiSalary" min="45000" max="140000" step="1000" value="70000" />
+          <input class="roi-range" type="range" id="roiSalary" min="45000" max="140000" step="1000" value="65000" />
+        </div>
+
+        <div class="roi-field">
+          <div class="roi-field__top">
+            <label class="roi-field__label" for="roiPtHours">Part-time hours a week</label>
+            <span class="roi-field__val" id="roiPtHoursVal">20 hours</span>
+          </div>
+          <input class="roi-range" type="range" id="roiPtHours" min="0" max="38" step="1" value="20" />
+        </div>
+
+        <div class="roi-field">
+          <div class="roi-field__top">
+            <label class="roi-field__label" for="roiPtRate">Part-time hourly rate</label>
+            <span class="roi-field__val" id="roiPtRateVal">$26 / hr</span>
+          </div>
+          <input class="roi-range" type="range" id="roiPtRate" min="18" max="50" step="1" value="26" />
         </div>
 
         <div class="roi-field">
@@ -82,9 +98,9 @@
         <div class="roi-field">
           <div class="roi-field__top">
             <label class="roi-field__label" for="roiSessions">Sessions</label>
-            <span class="roi-field__val" id="roiSessionsVal">5 sessions</span>
+            <span class="roi-field__val" id="roiSessionsVal">12 sessions</span>
           </div>
-          <input class="roi-range" type="range" id="roiSessions" min="1" max="12" step="1" value="5" />
+          <input class="roi-range" type="range" id="roiSessions" min="1" max="15" step="1" value="12" />
         </div>
       </section>
 
@@ -92,26 +108,25 @@
         <div class="roi-line">
           <span class="roi-line__label">
             Mentorship investment
-            <span class="roi-line__sub" id="roiInvestSub">5 x $49</span>
+            <span class="roi-line__sub" id="roiInvestSub">$55 trial + 11 x $70</span>
           </span>
-          <span class="roi-line__val roi-line__val--out" id="roiInvestVal">-$275</span>
+          <span class="roi-line__val roi-line__val--out" id="roiInvestVal">-$825</span>
         </div>
         <div class="roi-line">
           <span class="roi-line__label">
             <span id="roiGainedLabel">Take-home gained (3 months)</span>
-            <span class="roi-line__sub">after 18% tax</span>
           </span>
-          <span class="roi-line__val roi-line__val--in" id="roiGainedVal">+$14,350</span>
+          <span class="roi-line__val roi-line__val--in" id="roiGainedVal">+$7,272</span>
         </div>
         <div class="roi-net">
           <span class="roi-net__label">Net gain</span>
-          <span class="roi-net__val" id="roiNetVal">$14,105</span>
+          <span class="roi-net__val" id="roiNetVal">$6,447</span>
         </div>
         <div class="roi-return">
           <span class="roi-return__label">Return</span>
-          <span class="roi-return__val" id="roiReturnVal">59x</span>
+          <span class="roi-return__val" id="roiReturnVal">9x</span>
         </div>
-        <p class="roi-note" id="roiNote">Covered after about 2 days of earning.</p>
+        <p class="roi-note" id="roiNote">Covered after about 10 days of earning.</p>
       </section>
     </div>
 
@@ -119,10 +134,10 @@
   </main>
 
   <footer class="tool-foot">
-    <div class="shell">Headstart Mentoring — internal consultation resource.</div>
+    <div class="shell">Headstart Mentoring, internal consultation resource.</div>
   </footer>
 
-  <script src="js/roi.js"></script>
+  <script src="js/roi.js?v=1788400034"></script>
   <script type="module">
     import { mountConsultNav } from "./js/chrome.js";
     mountConsultNav("consult-roi", "light");

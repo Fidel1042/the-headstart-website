@@ -316,9 +316,9 @@ export const mentors = [
   {
     id: "abdur", name: "Abdur", intl: "International",
     role: "AI & Electrical Engineer", company: "MyModular",
-    uni: "", degree: "Artificial Intelligence",
-    major: "Artificial Intelligence", industry: "Engineering", rate: "$20",
-    visa: "485 - Temporary Graduate Visa", gradYear: "",
+    uni: "Deakin University", degree: "Artificial Intelligence",
+    major: "Artificial Intelligence", industry: "Engineering", rate: "$22",
+    visa: "485 - Temporary Graduate Visa", gradYear: "2025",
     specialiseIn: ["AI", "Electrical Engineering", "Data"],
     photo: IMG + "Abdur.png",
     detailPhoto: DIMG + "Abdur.png",

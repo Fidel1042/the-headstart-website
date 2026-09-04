@@ -868,16 +868,46 @@
   <script>
 const JOBS = [
   // ── Finance · Sydney · Intern ──
+  { title: "Summer Internship – Finance",                            company: "Munich Re",                    city: "Sydney",    cat: "finance", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4462096759/", posted: "2026-08-31" },
+  { title: "M&A Advisory Summer Internship Program 2026/27",           company: "xceeda",                       city: "Sydney",    cat: "finance", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4460202439/", posted: "2026-08-31" },
+  { title: "Finance Intern (Unpaid)",                                  company: "Marriott International",       city: "Sydney",    cat: "finance", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4462178363/", posted: "2026-08-31" },
+  { title: "Finance Intern (Unpaid)",                                  company: "Christian Dior Couture",       city: "Sydney",    cat: "finance", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4442952390/", posted: "2026-08-31" },
+  { title: "Corporate Advisory Intern",                                company: "Morgans Financial Limited",    city: "Sydney",    cat: "finance", type: "intern",   source: "Seek",     url: "https://au.seek.com/job/94407825", posted: "2026-08-31" },
+  { title: "Finance Sales Intern",                                     company: "Bacera Co Pty Ltd",            city: "Sydney",    cat: "finance", type: "intern",   source: "Seek",     url: "https://au.seek.com/job/94307622", posted: "2026-08-31" },
 
   // ── Finance · Sydney · Graduate ──
+  { title: "Junior Financial Analyst",                                 company: "Argon & Co",                   city: "Sydney",    cat: "finance", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4459112716/", posted: "2026-08-31" },
+  { title: "Graduate – Financial Services",                            company: "William Buck",                 city: "Sydney",    cat: "finance", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4455067138/", posted: "2026-08-31" },
+  { title: "Finance Administrator (Entry-Level / Junior)",             company: "Inclusive Postsecondary Education Association", city: "Sydney", cat: "finance", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4460754903/", posted: "2026-08-31" },
+  { title: "Financial Operations Analyst",                             company: "ALDI Stores",                  city: "Sydney",    cat: "finance", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=a133436044f97e0e", posted: "2026-08-31" },
+  { title: "Finance & Administration Officer",                         company: "Department of Education",      city: "Sydney",    cat: "finance", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=b935d252a97a65ae", posted: "2026-08-31" },
 
   // ── Finance · Melbourne · Intern ──
+  { title: "Finance Intern",                                           company: "Boeing",                       city: "Melbourne", cat: "finance", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4460750626/", posted: "2026-08-31" },
+  { title: "Financial Product Sales Intern (Mandarin Speaking)",       company: "TMGM",                         city: "Melbourne", cat: "finance", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4455836537/", posted: "2026-08-31" },
 
   // ── Finance · Melbourne · Graduate ──
+  { title: "Junior Finance Officer",                                   company: "Orikan",                       city: "Melbourne", cat: "finance", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4454628516/", posted: "2026-08-31" },
+  { title: "Graduate Lending Associate",                               company: "BlueRock",                     city: "Melbourne", cat: "finance", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4462085262/", posted: "2026-08-31" },
+  { title: "Financial Client Coordinator",                             company: "Grant Help",                   city: "Melbourne", cat: "finance", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4460202292/", posted: "2026-08-31" },
+  { title: "Investment Associate",                                     company: "Kennedy Consolidated",         city: "Melbourne", cat: "finance", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4461657665/", posted: "2026-08-31" },
+  { title: "Finance Officer",                                          company: "Zeekr Waverley",               city: "Melbourne", cat: "finance", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4444878142/", posted: "2026-08-31" },
+  { title: "Business Developer / FX Sales Associate",                  company: "Ebury",                        city: "Melbourne", cat: "finance", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4458739291/", posted: "2026-08-31" },
+  { title: "Junior Business Development Representative – Fintech B2B",  company: "Omipay Pty Ltd",               city: "Melbourne", cat: "finance", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/93714167", posted: "2026-08-31" },
+  { title: "Financial Support Specialist – Mortgages (Entry Level)",    company: "Liberty Financial",            city: "Melbourne", cat: "finance", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/94193387", posted: "2026-08-31" },
+  { title: "Junior Finance Analyst – 12 Month Contract",                company: "TaylorMade Golf",              city: "Melbourne", cat: "finance", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/94204692", posted: "2026-08-31" },
+  { title: "Junior Finance Officer",                                   company: "Orikan",                       city: "Melbourne", cat: "finance", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=435ac563dc72a42b", posted: "2026-08-31" },
+  { title: "Finance Operations Analyst – 12 Month Contract",            company: "MYOB",                         city: "Melbourne", cat: "finance", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=8bbe09be52a97983", posted: "2026-08-31" },
 
   // ── Finance · Brisbane · Intern ──
+  { title: "Summer Internship Program – Business",                      company: "Powerlink Queensland",         city: "Brisbane",  cat: "finance", type: "intern",   source: "Seek",     url: "https://au.seek.com/job/94161855", posted: "2026-08-31" },
 
   // ── Finance · Brisbane · Graduate ──
+  { title: "Finance Graduate",                                         company: "Urban Utilities",              city: "Brisbane",  cat: "finance", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4458386273/", posted: "2026-08-31" },
+  { title: "Financial Viability Analyst",                              company: "Equifax",                      city: "Brisbane",  cat: "finance", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4458950678/", posted: "2026-08-31" },
+  { title: "Finance Administrator",                                    company: "ACCIONA",                      city: "Brisbane",  cat: "finance", type: "graduate", source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4461571603/", posted: "2026-08-31" },
+  { title: "Bookkeeper / Finance Assistant",                           company: "Solutions IE Pty Ltd",         city: "Brisbane",  cat: "finance", type: "graduate", source: "Seek",     url: "https://au.seek.com/job/94130244", posted: "2026-08-31" },
+  { title: "Finance Analyst",                                          company: "Thiess",                       city: "Brisbane",  cat: "finance", type: "graduate", source: "Indeed",   url: "https://au.indeed.com/viewjob?jk=6d13251e28e4550c", posted: "2026-08-31" },
   // ── Marketing · Sydney · Intern ──
   { title: "Marketing, Community Engagement & Content Creation Interns", company: "Carparkly",         city: "Sydney",    cat: "marketing", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4452386416/", posted: "2026-08-20" },
   { title: "Commercial Intern",                                      company: "Reckitt",                      city: "Sydney",    cat: "marketing", type: "intern",   source: "LinkedIn", url: "https://www.linkedin.com/jobs/view/4456448458/", posted: "2026-08-20" },
@@ -1137,7 +1167,7 @@ function isFresh(j) {
 // The most recently refreshed category, updated by hand whenever a new batch
 // is uploaded (see CHECK 7C in Skills/job-alerts-data-checker.md). initialCat()
 // uses this so the freshest content always lands users on its tab first.
-const LAST_UPDATED_CAT = "accounting";
+const LAST_UPDATED_CAT = "finance";
 
 // Default category, can be overridden by ?cat= URL parameter so email links
 // like /job-alerts?cat=marketing land users directly on that tab.

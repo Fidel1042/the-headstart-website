@@ -274,6 +274,42 @@ const LI_MEDIAN_IMPRESSIONS = 5371; // last 20 logged posts, weeks 17-20
 const FORM_BASE_RATE = 32.8;       // 106 of 323 over the 60 days to 27 Aug
 const FORM_BAND = [25.5, 40.1];    // 95% noise band at n ~ 320 per side
 
+
+// Morning-of consultation email, 10:00 -> 11:30, shipped 19 Aug.
+const MORNING_BASE = 39;           // proxy-corrected, 37 sends to 17 Aug
+const MORNING_BAND = [29, 49];
+
+// The Make cap is read live from the API (used + unused), so it is not hardcoded.
+
+
+// Operations used so far this billing period, from the Make API.
+//
+// Deliberately the organization endpoint, not /usage: /usage returns one row
+// per DAY, so reading its last row gives yesterday's operations and would
+// silently understate the month by ~30x. The organization object carries the
+// running total and the remainder, and the two add up to the plan's cap, so
+// the cap does not have to be hardcoded and cannot drift if the plan changes.
+//
+// Returns null when Make cannot be reached; the caller treats that as "stay
+// quiet" rather than inventing a number.
+const MAKE_ORG_ID = process.env.MAKE_ORG_ID || "5933217";
+
+async function makeOps() {
+  try {
+    const res = await fetch(
+      `https://eu1.make.com/api/v2/organizations/${MAKE_ORG_ID}`,
+      { headers: { Authorization: `Token ${process.env.MAKE_API_TOKEN}` } });
+    if (!res.ok) return null;
+    const org = (await res.json()).organization || {};
+    const used = Number(org.operations);
+    const left = Number(org.unusedOperations);
+    if (!Number.isFinite(used) || !Number.isFinite(left)) return null;
+    return { used, cap: used + left };
+  } catch (err) {
+    return null;
+  }
+}
+
 // /links page: job alerts button removed, LinkedIn promoted to slot two.
 // Baseline and bands in Operations/analytics/links-page-test.md. The email
 // bodies live in shared/links-test-emails.js to keep this file from growing.
@@ -288,8 +324,6 @@ const LINKS_TEST = (id, date, subject, from, days, verdict) => ({
 });
 
 const REMINDERS = [
-  LINKS_TEST("links-test-early", "2026-09-15",
-    "/links: two-week check after dropping job alerts", "2026-09-01", 14, false),
   LINKS_TEST("links-test-verdict", "2026-09-29",
     "/links verdict: keep or revert", "2026-09-01", 28, true),
   {
@@ -357,40 +391,6 @@ const REMINDERS = [
     },
   },
   {
-    // Price came off the site 2026-08-24. Fidel stayed on $55 for a month on
-    // purpose, so the close rate has one cause instead of two: a drop in the
-    // same window as both changes could not be blamed on either.
-    id: "price-55-hold-ends",
-    date: "2026-09-24",
-    subject: "Your month on $55 is done",
-    async build() {
-      const pages = await landingStats(28);
-      const home = pages["/"] || {};
-      const landed = home.page_view || 0;
-      const forms = home.discovery_form_submit || 0;
-
-      return shell("Hold expired", "You held $55 for the month, that month is done",
-        "Pricing came off the site on 24 August and you stayed on $55 so the close rate would " +
-        "have one cause, not two. You are now free to move the price if you want to.",
-        callout("Baseline to beat, frozen 24 August",
-          "Sign-up rate <b>3.69%</b> of homepage visitors. Close rate <b>38.7%</b> at $55. " +
-          "Combined, <b>1.34 to 1.43 signed clients per 100 homepage visitors</b>.") +
-        tbl(["Metric", "Since the price came off", ""], [
-          ["Homepage visitors", landed, ""],
-          ["Discovery form submits", `<b>${forms}</b>`, ""],
-          ["Sign-up rate", `<b>${pctStr(forms, landed)}</b>`, "was 3.69%"],
-        ]) +
-        callout("Before you move off $55",
-          "The sign-up number above is the clean one, since a hidden price cannot be affected " +
-          "by the level you charge. Read it now and write it down, because the moment you leave " +
-          "$55 the close rate carries both changes and stops being readable on its own.") +
-        `<p style="font-size:14px;line-height:1.65;color:#4a453c;margin:0 0 8px">
-        Close rate is in Airtable, not here, and it needs a maturity cutoff. Anyone consulted in
-        the last fortnight has not had time to sign, so counting them drags the recent cohort
-        down. Compare at 14 days matured or you will scare yourself with a fake drop.</p>`);
-    },
-  },
-  {
     id: "price-hide-review",
     date: "2026-10-19",
     subject: "Eight weeks without a price on the site",
@@ -441,162 +441,26 @@ const REMINDERS = [
     },
   },
   {
-    id: "lead-magnet-review",
-    date: "2026-09-07",
-    subject: "Decision: keep the lead magnet on your Featured slot?",
-    async build() {
-      const mediums = await mediumStats(24);
-      const pages = await landingStats(24);
-      const featured = mediums.featured || { visitors: 0, audit: 0, booked: 0 };
-      const profile = mediums.profile || { visitors: 0, audit: 0, booked: 0 };
-      const home = pages["/"] || {};
-      const homeV = home.page_view || 0, homeB = home.invitee_meeting_scheduled || 0;
-
-      const fRate = featured.visitors ? featured.booked / featured.visitors : null;
-      const hRate = homeV ? homeB / homeV : null;
-
-      let verdict, why;
-      if (featured.visitors < 25) {
-        verdict = "Not enough data yet — leave it alone";
-        why = `Only ${featured.visitors} people clicked the Featured link since it was tagged. ` +
-          "Any conclusion off that is noise. Give it another month, or check the link is actually tagged.";
-      } else if (featured.audit === 0) {
-        verdict = "Switch it to the discovery call";
-        why = `${featured.visitors} clicked through and nobody took the roadmap. The offer is not landing.`;
-      } else if (fRate != null && hRate != null && fRate >= hRate) {
-        verdict = "Keep it on the lead magnet";
-        why = `It books at ${pctStr(featured.booked, featured.visitors)} against the homepage's ` +
-          `${pctStr(homeB, homeV)}. The roadmap is feeding calls.`;
-      } else if (featured.booked === 0) {
-        verdict = "Switch it to the discovery call";
-        why = `${featured.audit} people took the roadmap and none booked. You are collecting emails ` +
-          "from your best channel instead of conversations.";
-      } else {
-        verdict = "Lean towards switching to the discovery call";
-        why = `Featured books at ${pctStr(featured.booked, featured.visitors)}, homepage at ` +
-          `${pctStr(homeB, homeV)}.`;
-      }
-
-      return shell("Decision due", "Is the lead magnet earning your Featured slot?",
-        "You asked me to check back. Last 24 days since the Featured link was tagged.",
-        callout(verdict, esc(why)) +
-        tbl(["Source", "Clicked", "Took roadmap", "Booked"], [
-          ["Featured section", featured.visitors, featured.audit, `<b>${featured.booked}</b>`],
-          ["Profile link", profile.visitors, profile.audit, `<b>${profile.booked}</b>`],
-          ["Homepage (all)", homeV, "—", `<b>${homeB}</b>`],
-        ]) +
-        `<p style="font-size:14px;line-height:1.65;color:#4a453c;margin:0 0 8px">If you switch:<br>
-        <code style="background:#efece4;padding:3px 6px;border-radius:4px;font-size:12px">
-        https://theheadstartmentoring.com/discovery-call?utm_source=linkedin&amp;utm_medium=featured&amp;utm_campaign=book-call</code></p>
-        <p style="font-size:13px;color:#8a8a8a;line-height:1.6">Anyone who took the roadmap and books
-        later will not show here, so treat a close call as a reason to wait rather than to switch.</p>`);
-    },
-  },
-  {
     // Two weeks into the shorter discovery-call form. Far too early to read a
-    // rate, but a form that silently stopped submitting would cost eight weeks
-    // of the test, so this checks the plumbing and nothing else.
+    // rate, so this checks the plumbing and nothing else. Silent unless the
+    // form is actually broken: Fidel only wants to hear about a failure, and a
+    // reassuring "all fine" email every time trains him to ignore the sender.
     id: "discovery-form-sanity",
     date: "2026-09-10",
-    subject: "Discovery form: is it still submitting?",
+    subject: "Discovery form has stopped submitting",
     async build() {
       const now = await discoveryPageStats(SHIPPED, "today");
-      const dead = now.forms === 0 && now.opened > 20;
-      return shell("Plumbing check", "Two weeks on the shorter form",
-        "You cut the form from 8 required fields to 5 on 27 August and changed the page copy " +
-        "at the same time. This is not a result, it is a check that submissions are still " +
-        "reaching Netlify and Airtable.",
-        callout(dead ? "Nothing has submitted, go and test the form yourself today"
-                     : "Submissions are coming through",
-          `<b>${now.forms}</b> submits from <b>${now.opened}</b> people who opened the page ` +
-          `since 27 August.` + (dead
-            ? " People are opening the page and nobody is getting through. Fill the form in " +
-              "yourself and check the Netlify form log before anything else."
-            : " That is enough to say the form works. It is nowhere near enough to say " +
-              "whether it works <i>better</i>.")) +
-        callout("Do not read the rate below",
-          `It will say something like <b>${pct1(now.rate)}</b> against a ${FORM_BASE_RATE}% ` +
-          `baseline. On two weeks of traffic that number swings by 10 points on chance alone. ` +
-          `The real read is <b>26 October</b>, at roughly 320 page opens.`) +
-        `<p style="font-size:14px;line-height:1.65;color:#4a453c;margin:0 0 8px">
-        Also worth remembering: <b>LinkedIn profile URL</b> and <b>where did you find out about
-        us</b> are both still required. Those were ranked #1 and #2 for expected effect and
-        neither was touched. They are the next change if October comes back flat.</p>`);
-    },
-  },
-  {
-    // Midpoint of the 5x/week month. The only honest questions at two weeks are
-    // "did the cadence actually happen" and "did per-post reach collapse".
-    id: "linkedin-cadence-midpoint",
-    date: "2026-09-14",
-    subject: "5x/week: are you actually doing it?",
-    async build() {
-      const li = await linkedinWindow(LI_START, "today");
-      return shell("Midpoint", "Two weeks of 5 posts a week",
-        "You moved from ~3 posts a week to 5 on 31 August. This is a compliance check, not a " +
-        "verdict. Nothing about client numbers can be read for another ten weeks.",
-        callout("Question 1: have you published 10 posts since 31 August?",
-          "Only you can answer this, it is not in GA4. A cadence test where the cadence never " +
-          "happened is the single most likely way this dies. If you are behind, the honest move " +
-          "is to reset the start date rather than pretend.") +
-        callout("Question 2: did per-post reach collapse?",
-          `Baseline median is <b>${LI_MEDIAN_IMPRESSIONS.toLocaleString()} impressions per post</b> ` +
-          `across your last 20 posts. Open LinkedIn analytics and take the median of the posts ` +
-          `since 31 August. <b>Below ~2,700</b> means the extra posts are cannibalising each ` +
-          `other and total reach will not move however many you publish. Use the median, not the ` +
-          `average, or one viral post will hide the problem.`) +
-        tbl(["LinkedIn traffic", "Since 31 Aug", "Same length before"], [
-          ["Visitors", `<b>${li.visitors}</b>`, `${LI_BASE_4WK.visitors} over 4 weeks`],
-          ["Discovery form submits", `<b>${li.forms}</b>`, LI_BASE_4WK.forms],
-          ["Calendly bookings", `<b>${li.booked}</b>`, LI_BASE_4WK.booked],
-        ]) +
-        `<p style="font-size:13px;color:#8a8a8a;line-height:1.6">Those traffic numbers are here
-        for early warning only. Two weeks against a four-week baseline is not a comparison. The
-        verdict email is 28 September.</p>`);
-    },
-  },
-  {
-    // Four weeks, ~20 posts. Traffic is readable at this volume. Sign-ups are
-    // not, and clients are nowhere close, so the email says so loudly.
-    id: "linkedin-cadence-verdict",
-    date: "2026-09-28",
-    subject: "5x/week: the four-week verdict",
-    async build() {
-      const li = await linkedinWindow(LI_START, "today");
-      const v = li.visitors;
-      const verdict = v > LI_WIN ? "Cadence is working on reach, keep going"
-        : v < LI_LOSS ? "Posting more made it worse, go back to 3x"
-        : "Inside the noise band, no signal, keep going";
-      const delta = v - LI_BASE_4WK.visitors;
-      return shell("Verdict", "Four weeks at 5 posts a week",
-        "Bands were set on 27 August, before you started, so this cannot be rationalised now. " +
-        "Traffic is the only thing four weeks can settle.",
-        callout(verdict,
-          `<b>${v}</b> LinkedIn visitors against a matched four-week baseline of ` +
-          `<b>${LI_BASE_4WK.visitors}</b> (${delta >= 0 ? "+" : ""}${delta}). ` +
-          `Bands: above ${LI_WIN} is a win, below ${LI_LOSS} is a loss, ` +
-          `anything between is noise.`) +
-        tbl(["Metric", "31 Aug to 27 Sep", "Baseline (27 Jul to 23 Aug)"], [
-          ["LinkedIn visitors", `<b>${v}</b>`, LI_BASE_4WK.visitors],
-          ["Discovery form submits", `<b>${li.forms}</b>`, LI_BASE_4WK.forms],
-          ["Calendly bookings", `<b>${li.booked}</b>`, LI_BASE_4WK.booked],
-          ["Visitor to form rate", `<b>${pctStr(li.forms, v)}</b>`, `${LI_BASE_RATE}% over 11 wks`],
-        ]) +
-        callout("Do not call the sign-up question today",
-          `Your baseline is <b>${LI_BASE_4WK.forms} form submits in four weeks</b>. Even a ` +
-          `doubling of that sits around p = 0.15, which is not a result. And at roughly one ` +
-          `LinkedIn client a fortnight, four weeks is two clients. There is no arithmetic that ` +
-          `makes "did it bring more clients" answerable in September. That read is ` +
-          `<b>23 November</b>.`) +
-        callout("Two things that could be faking this number",
-          "LinkedIn traffic was already falling ~4x, from ~290/week in late June to ~76/week in " +
-          "August. A rebound towards June levels is just as easily regression to the mean as it " +
-          "is your cadence. And the discovery-call form changed on 27 August, so form submits " +
-          "carry both changes. Visitors is the clean metric; submits is not.") +
-        `<p style="font-size:14px;line-height:1.65;color:#4a453c;margin:0 0 8px">
-        <b>Also take the median impressions per post</b> from LinkedIn analytics and write it
-        down. Baseline is ${LI_MEDIAN_IMPRESSIONS.toLocaleString()}. If total traffic rose but the
-        median halved, you are buying reach with volume and that does not scale past 5.</p>`);
+      // Only a real failure sends. People arriving and nobody getting through
+      // is the one thing worth interrupting him for; 20 opens is enough that
+      // zero submits cannot be explained by a quiet fortnight.
+      if (!(now.forms === 0 && now.opened > 20)) return null;
+      return shell("Something is broken", "Nobody has submitted the form in two weeks",
+        "You cut the form from 8 required fields to 5 on 27 August. Since then people have " +
+        "been opening the page and none of them have got through it.",
+        callout("Test the form yourself today",
+          `<b>${now.opened}</b> people have opened the page since 27 August and <b>zero</b> ` +
+          `have submitted. Fill it in yourself, then check the Netlify form log and the ` +
+          `Airtable record it should create. Until this is fixed the 26 October read is dead.`));
     },
   },
   {
@@ -681,6 +545,192 @@ const REMINDERS = [
           "records and GA4 alone has undercounted before."));
     },
   },
+  {
+    // Only speaks up if the month is tracking to blow the 10,000 cap. Fidel
+    // asked not to be emailed otherwise, so a healthy month is silent.
+    id: "make-credits",
+    date: "2026-09-24",
+    subject: "Make credits are tracking over the cap",
+    async build() {
+      if (!process.env.MAKE_API_TOKEN) {
+        return shell("Cannot check", "Make credits need a manual look this month",
+          "This check is meant to stay silent unless you are heading over the cap, but it " +
+          "cannot reach Make.",
+          callout("Add MAKE_API_TOKEN to the Netlify environment",
+            "The token is in <code>~/.headstart/make-api-token.txt</code>. Until it is set, " +
+            "open Make and check the operations counter yourself. The cap is 10,000."));
+      }
+      const usage = await makeOps();
+      if (!usage) return null;
+      const { used, cap } = usage;
+      // Straight-line the month. The period resets on the 1st, so day-of-month
+      // is the fraction of the window already consumed.
+      const now = new Date();
+      const day = now.getUTCDate();
+      const inMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0)).getUTCDate();
+      const projected = Math.round((used / day) * inMonth);
+      if (projected <= cap) return null;   // healthy, stay quiet
+
+      return shell("Heading over", "Make is tracking past its operations cap",
+        "You asked only to hear about this when it is going to be a problem. It is.",
+        callout(`Projected ${projected.toLocaleString()} operations this month`,
+          `<b>${used.toLocaleString()}</b> used by day ${day} of ${inMonth}, which straight-lines ` +
+          `to <b>${projected.toLocaleString()}</b> against a cap of ` +
+          `<b>${cap.toLocaleString()}</b>.`) +
+        callout("What worked last time",
+          "In August this hit 10,179 and came down to ~8,260 by lengthening polling intervals " +
+          "on the scenarios that poll most often. That is the first place to look again."));
+    },
+  },
+  {
+    // Two months of the 11:30 send. One month is +/- 14 points at this volume,
+    // wide enough that a real improvement and no change look identical.
+    id: "morning-email-review",
+    date: "2026-10-19",
+    subject: "Morning email at 11:30: did opens move?",
+    async build() {
+      return shell("Decision", "Two months of the 11:30 morning email",
+        "The day-of consultation email moved from 10:00 to 11:30 on 19 August, on the theory " +
+        "that 10am lands in a pile of overnight mail students skim and forget.",
+        callout("Baseline to beat, frozen 19 August",
+          `<b>${MORNING_BASE}% open rate</b>, proxy-corrected, over 37 sends from 24 July to ` +
+          `17 August. Raw opened/delivered was 33%. Verdict band is ` +
+          `<b>${MORNING_BAND[0]}% to ${MORNING_BAND[1]}%</b>; inside it means no signal.`) +
+        tbl(["Email", "Open rate", "Note"], [
+          ["Consultation: 2 hours before", "88%", "for scale"],
+          ["Consultation: booking confirmation", "62%", "for scale"],
+          ["<b>Consultation: morning of</b>", `<b>${MORNING_BASE}%</b>`, "the one being tested"],
+        ]) +
+        callout("Pull the number the same way it was frozen",
+          "Use the proxy-corrected figure from the Brevo snapshot tool, not Brevo's headline " +
+          "open rate. Apple and corporate scanners open mail nobody read, and the baseline " +
+          "excluded them. Comparing a proxy-inflated number against a proxy-excluded baseline " +
+          "manufactures a win.") +
+        `<p style="font-size:14px;line-height:1.65;color:#4a453c;margin:0 0 8px">
+        Detail and the raw events are in <code>Operations/brevo/morning-email-test.md</code>.
+        At ~44 sends a month, two months is the first window where a real move is separable
+        from noise, so this is a genuine read rather than an early look.</p>`);
+    },
+  },
+  {
+    // Six weeks of the "2 posts must cross a top-5 topic with a top-5 hook"
+    // rule. Compliance first: a rule nobody followed cannot be judged.
+    id: "content-rule-review",
+    date: "2026-10-19",
+    subject: "LinkedIn content rule: the six-week report",
+    async build() {
+      return shell("Report", "Six weeks of the two-on-list rule",
+        "From Week 23, at least 2 posts a week had to cross a top-5 topic with a top-5 hook. " +
+        "This is the review of Weeks 23 to 28.",
+        callout("Answer compliance before anything else",
+          "Of the 6 weeks, how many actually shipped 2 on-list posts? If the answer is fewer " +
+          "than 4, the rule was not tested and the only finding is that it was not followed. " +
+          "Do not read performance into a rule that was not run.") +
+        tbl(["Frozen baseline", "Value"], [
+          ["Median profile views per post", "<b>84</b>"],
+          ["Posts in the baseline", "62"],
+          ["Mindset + applications + networking share", "<b>58%</b>"],
+          ["Target for that share", "under 40%"],
+        ]) +
+        callout("The three questions this report answers",
+          "<b>1.</b> Did the on-list posts beat the 84-view median, and by how much? " +
+          "<b>2.</b> Did the topic mix actually move, or is it still 58% concentrated in three " +
+          "topics? <b>3.</b> What gets promoted onto the list, and what drops off it?") +
+        callout("The caveat that applies to the whole thing",
+          "62 posts split across 10 topics and 8 hooks leaves very few posts per cell. Treat a " +
+          "topic or hook ranking as a working hypothesis, not a finding, and never kill a topic " +
+          "on a single bad week.") +
+        `<p style="font-size:14px;line-height:1.65;color:#4a453c;margin:0 0 8px">
+        Lists, evidence and the full rule are in
+        <code>LinkedIn post execution/weekly-content-rule.md</code>.</p>`);
+    },
+  },
+  {
+    // A quarter of mentor-side posts. Deliberately not a page A/B: 5 clicks
+    // has no power and the posts differ in everything, not just destination.
+    id: "mentor-recruitment-read",
+    date: "2026-11-30",
+    subject: "Mentor recruitment: the quarter read",
+    async build() {
+      return shell("Quarter read", "Did mentor posts bring mentors?",
+        "First quarter of mentor-side LinkedIn content, measured the only way it can be: " +
+        "applications submitted across the quarter against how many mentor posts ran.",
+        callout("Count applications, never page against page",
+          "Week 21 pointed at <code>/mentor-application</code> and Week 22 at " +
+          "<code>/mentor-role</code>, which looks like an A/B and is not one. The posts differ " +
+          "in hook, image, copy, week and CTA as well as destination, and the first produced " +
+          "5 link clicks. No arrangement of two posts at that volume separates a landing-page " +
+          "effect from noise.") +
+        tbl(["Baseline, first mentor post ever", "Value"], [
+          ["Impressions", "1,497"],
+          ["Members reached", "868"],
+          ["Link clicks", "<b>5</b>"],
+          ["Click rate on reached", "0.58%"],
+          ["Followers gained", "0"],
+        ]) +
+        callout("What a good answer looks like",
+          "Applications per post run, across the whole quarter, from any linkedin/post UTM. If " +
+          "that number is still near zero after a quarter, the problem is the offer to mentors " +
+          "rather than which page they land on."));
+    },
+  },
+  {
+    // Three months of /links traffic quality. Underpowered on purpose: this
+    // is a baseline that gets watched, not a test with a verdict.
+    id: "links-quality-read",
+    date: "2026-12-01",
+    subject: "/links traffic: is it any good?",
+    async build() {
+      return shell("Observation", "Three months of /links traffic quality",
+        "Not a test and it has no verdict band. Detecting a move from 6.7% to 9% needs about " +
+        "three months, which is exactly how long this has run, so this is the first look worth " +
+        "taking.",
+        callout("Baseline: 6.7% of /links visitors sign up",
+          "Anything between roughly 4% and 10% is consistent with no change at all. Resist " +
+          "reading a number inside that range as a result, in either direction.") +
+        callout("The question underneath it",
+          "Instagram converts at 20% against LinkedIn's 44%, and the mix of who arrives " +
+          "explains only 3% of that gap. The other 97% is that the same student converts worse " +
+          "when they came from Instagram. If /links quality has not moved, that is the finding: " +
+          "routing changes do not fix a trust problem."));
+    },
+  },
+  {
+    // Fortnightly, not dated: the sales review is a standing habit rather
+    // than a one-off decision, and the log has one row per fortnight.
+    id: "sales-review",
+    every: 14,
+    from: "2026-09-17",
+    subject: "Sales review: your fortnight is up",
+    async build() {
+      return shell("Fortnightly", "Time to review the last fortnight of calls",
+        "Run the review on Opus. It needs judgement over long transcripts and Sonnet is not " +
+        "reliable on them.",
+        callout("Start here",
+          "<code>python3 \"Operations/sales/pull-consults.py\" --days 14</code><br>" +
+          "Then say <b>\"sales review\"</b> in Claude Code and it will follow " +
+          "<code>Skills/sales-call-review.md</code>.") +
+        callout("Check last fortnight's one change before anything else",
+          "The log sets exactly one change each time and the next review's first job is to ask " +
+          "whether it actually happened. The baseline change, set on 3 September, was: " +
+          "<b>ask for the commitment out loud before any logistics</b>.") +
+        tbl(["Baseline, fortnight to 3 Sep", "Value"], [
+          ["Consultations held", "15"],
+          ["Closed", "4"],
+          ["Close rate", "<b>27%</b>"],
+          ["Talk time, converted", "52%"],
+          ["Talk time, not converted", "65%"],
+          ["Target talk time", "<b>30%</b>"],
+        ]) +
+        callout("The finding the baseline turned up",
+          "No assumptive close in any of 15 calls. Every one ended with logistics narrated as a " +
+          "fact, so the prospect never had to say yes or no and the decision drifted to " +
+          "WhatsApp. 11 of 15 sat in Waiting on Contract.") +
+        `<p style="font-size:14px;line-height:1.65;color:#4a453c;margin:0 0 8px">
+        Append one row to <code>Operations/sales/review-log.md</code> when you are done. One row
+        per fortnight, appended, never rewritten.</p>`);
+    },
+  },
 ];
 
 /* ---------------------------------------------------------- handler --- */
@@ -696,12 +746,23 @@ exports.handler = async (event) => {
   }).formatToParts(new Date()).map((p) => [p.type, p.value]));
   const today = `${parts.year}-${parts.month}-${parts.day}`;
 
+  // A reminder is due either on a fixed `date`, or every `every` days counting
+  // from `from` (the fortnightly sales review). Recurrence is computed in whole
+  // Sydney days so daylight saving cannot shift it by one.
+  const DAY = 86400000;
+  const isDue = (r) => {
+    if (r.date) return r.date === today;
+    if (!r.every || !r.from) return false;
+    const days = Math.round((Date.parse(today) - Date.parse(r.from)) / DAY);
+    return days >= 0 && days % r.every === 0;
+  };
+
   // All reminders due today, not just the first. Two tests landing on the same
   // date is a normal thing to happen, and a silently dropped reminder is the
   // worst possible failure here: nobody finds out until the window has closed.
   const due = force
     ? REMINDERS.filter((r) => r.id === force)
-    : (Number(parts.hour) === SEND_HOUR ? REMINDERS.filter((r) => r.date === today) : []);
+    : (Number(parts.hour) === SEND_HOUR ? REMINDERS.filter(isDue) : []);
 
   if (!due.length) return { statusCode: 200, body: `Nothing due (${today}, hour ${parts.hour}).` };
   if (!process.env.BREVO_API_KEY) return { statusCode: 500, body: "BREVO_API_KEY missing" };
@@ -717,10 +778,14 @@ exports.handler = async (event) => {
     }
   }
 
-  const sent = [], failed = [];
+  const sent = [], failed = [], quiet = [];
   for (const r of due) {
     try {
       const html = await r.build();
+      // A build() may return null to mean "checked, nothing worth an email".
+      // Used by the checks Fidel only wants to hear about when they fail, so
+      // silence is the healthy state and the inbox stays worth reading.
+      if (!html) { quiet.push(r.id); continue; }
       const res = await fetch("https://api.brevo.com/v3/smtp/email", {
         method: "POST",
         headers: { "api-key": process.env.BREVO_API_KEY, "Content-Type": "application/json" },
@@ -738,6 +803,7 @@ exports.handler = async (event) => {
   return {
     statusCode: failed.length ? 502 : 200,
     body: `Sent: ${sent.join(", ") || "none"}.` +
+      (quiet.length ? ` Checked, nothing to report: ${quiet.join(", ")}.` : "") +
       (failed.length ? ` Failed: ${failed.join(" | ")}` : ""),
   };
 };

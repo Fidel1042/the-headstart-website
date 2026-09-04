@@ -1,6 +1,6 @@
-// weekly-report.js — Monday morning pilot report.
+// weekly-report.js — Tuesday morning pilot report.
 //
-// Scheduled in netlify.toml to fire at 19:15 AND 20:15 UTC every Sunday.
+// Scheduled in netlify.toml to fire at 19:15 AND 20:15 UTC every Monday.
 // One of those is 06:15 in Sydney depending on daylight saving; the guard
 // below sends on the matching one and exits quietly on the other. That keeps
 // the email at 6:15am Sydney all year with no seasonal edits.

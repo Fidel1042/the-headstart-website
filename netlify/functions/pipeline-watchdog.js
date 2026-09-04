@@ -86,21 +86,47 @@ const make = (path) =>
  * going nowhere.
  *
  * A form can legitimately carry a dead hook alongside a live replacement, so a
- * broken one is only reported when no healthy hook covers the same form.
+ * broken one is only reported when no healthy hook covers the same DESTINATION.
+ *
+ * Destination, not form. One form often feeds several places at once:
+ * job-alerts-signup posts to Make and to brevo-sync, and both are needed. Keying
+ * this on the form alone let the live Make hook vouch for the dead Brevo one, so
+ * the job alert list quietly took no new subscribers between 23 July and 4
+ * September 2026 while this check reported all clear. Only a healthy hook aimed
+ * at the same place is evidence that a dead one was replaced.
  */
+
+/**
+ * Two hook URLs describe the same destination when they agree on path and, for
+ * anything off our own site, host. The apex and the netlify.app domain are the
+ * same function, so recreating a hook on the other domain still counts as the
+ * replacement it is.
+ */
+function destinationOf(url) {
+  try {
+    const u = new URL(url);
+    const ours = /(^|\.)theheadstartmentoring\.(com|netlify\.app)$/i.test(u.hostname);
+    return `${ours ? "site" : u.hostname}${u.pathname.replace(/\/+$/, "")}`;
+  } catch {
+    return String(url || "");
+  }
+}
+
 async function checkWebhooks() {
   const hooks = await netlify(`/hooks?site_id=${SITE_ID}`);
   const formHooks = hooks.filter(
     (h) => h.event === "submission_created" && h.type === "url");
 
-  const healthyForms = new Set(
+  const key = (h) =>
+    `${h.form_id || "all"}|${destinationOf(h.data && h.data.url)}`;
+
+  const healthy = new Set(
     formHooks
       .filter((h) => !h.disabled && h.success !== false)
-      .map((h) => h.form_id || "all"));
+      .map(key));
 
   return formHooks
-    .filter((h) => (h.disabled || h.success === false) &&
-                   !healthyForms.has(h.form_id || "all"))
+    .filter((h) => (h.disabled || h.success === false) && !healthy.has(key(h)))
     .map((h) => ({
       title: `Form webhook dead: ${h.form_name || h.form_id || "all forms"}`,
       detail: `Netlify ${h.disabled ? "disabled" : "is failing to deliver"} this hook` +

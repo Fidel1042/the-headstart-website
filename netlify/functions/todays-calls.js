@@ -93,9 +93,29 @@ exports.handler = async (event) => {
                 "Interview Response"];
 
     const q = (fields) => fields.map((f) => `fields[]=${encodeURIComponent(f)}`).join("&");
+
+    // A Sydney day is not a UTC day. Sydney runs 10 or 11 hours ahead, so
+    // 9am Sydney on the 7th is 23:00 UTC on the 6th. Filtering on
+    // IS_AFTER("<day>T00:00:00Z") therefore threw away every consultation
+    // before 10am Sydney before the code ever saw it, and the call simply did
+    // not appear. Every booking so far has been afternoon, which is the only
+    // reason nobody noticed.
+    //
+    // This is only a cheap pre-filter to keep the row count down. The exact
+    // sydneyDay() check below is what actually decides the day, so the window
+    // is deliberately wider than needed on both sides.
+    const shift = (d, days) => {
+      const t = new Date(`${d}T00:00:00Z`);
+      t.setUTCDate(t.getUTCDate() + days);
+      return t.toISOString().slice(0, 10);
+    };
+    const from = shift(day, -1);
+    const to = shift(day, 1);
+
     const [clients, mentors] = await Promise.all([
       at(`${base}/${clientTable}?${q(cf)}&pageSize=100&filterByFormula=${
-        encodeURIComponent(`AND({Meeting Time}, IS_AFTER({Meeting Time}, "${day}T00:00:00Z"))`)}`, {}, token),
+        encodeURIComponent(`AND({Meeting Time}, IS_AFTER({Meeting Time}, "${from}T00:00:00Z"), ` +
+                           `IS_BEFORE({Meeting Time}, "${to}T23:59:59Z"))`)}`, {}, token),
       at(`${base}/${mentorTable}?${q(mf)}&pageSize=100`, {}, token),
     ]);
 
