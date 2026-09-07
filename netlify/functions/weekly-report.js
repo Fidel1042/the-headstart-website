@@ -325,7 +325,7 @@ function auditNumbers(now, prev, sales, airtableBookings) {
   return issues;
 }
 
-function buildHtml(now, prev, when, sales, audit) {
+function buildHtml(now, prev, when, sales, audit, check) {
   // Headline numbers come from the undimensioned totals, never from summing
   // the channel rows: a person who arrives from two channels is counted in
   // both, which nearly doubled the booking figure.
@@ -394,6 +394,18 @@ function buildHtml(now, prev, when, sales, audit) {
   const salesRows = (sales.bySource || [])
     .map((s) => [esc(s.source), s.leads, s.consulted, `<b>${s.signed}</b>`, rate(s.closeRate)]);
 
+  // Newest first, and the stage is what tells the story: anyone not still on
+  // "Waiting on Contract" came back because of the check-in.
+  const checkRows = ((check && check.recent) || []).slice(0, 20).map((c) => [
+    esc(c.name),
+    esc(c.sent),
+    c.stage === "Waiting on Contract"
+      ? `<span style="color:#8a8a8a">${esc(c.stage)}</span>`
+      : `<b style="color:#2e7d52">${esc(c.stage)}</b>`,
+  ]);
+  const checkReplied = ((check && check.replied) || []).length;
+  const checkTotal = ((check && check.recent) || []).length;
+
   const linkTotal = (now.linksPage || []).reduce((s, r) => s + r.total, 0);
   const linkRows = (now.linksPage || []).map((r) =>
     [esc(r.label), r.total, pct(r.total, linkTotal)]);
@@ -430,6 +442,15 @@ function buildHtml(now, prev, when, sales, audit) {
     <h2 style="font-size:13px;letter-spacing:.05em;text-transform:uppercase;color:#6b6455;margin:0 0 10px">After the call — rolling 90 days</h2>
     ${table(["Source", "Leads", "Showed", "Signed", "Close"], salesRows)}
 
+    <h2 style="font-size:13px;letter-spacing:.05em;text-transform:uppercase;color:#6b6455;margin:0 0 10px">90-day check-ins &mdash; last 90 days</h2>
+    <p style="margin:0 0 10px;font-size:13px;color:#6b6455">
+      ${checkTotal
+        ? `${checkTotal} check-in${checkTotal === 1 ? "" : "s"} sent, <b>${checkReplied}</b> ` +
+          `${checkReplied === 1 ? "has" : "have"} moved off Waiting on Contract since.`
+        : "None sent yet."}
+    </p>
+    ${table(["Who", "Sent", "Where they are now"], checkRows)}
+
     <h2 style="font-size:13px;letter-spacing:.05em;text-transform:uppercase;color:#6b6455;margin:0 0 10px">Links page</h2>
     ${table(["Option", "Clicks", "Share"], linkRows)}
 
@@ -460,6 +481,46 @@ function buildHtml(now, prev, when, sales, audit) {
   </div></body></html>`;
 }
 
+/**
+ * The t+90 check-ins that actually went out, and what happened to them.
+ *
+ * checkin-sender.js emails Fidel the moment it sends, but that email is gone
+ * by the time anyone replies, so there was no place to see who answered. This
+ * is that place: everyone whose check-in has landed, newest first, with the
+ * pipeline stage they are in now. Anyone who has moved off "Waiting on
+ * Contract" since their check-in is a lead that came back.
+ *
+ * Reads the "Checkin Sent" date, so it only knows about sends from 7 September
+ * 2026 onwards. Earlier check-ins have the stage bumped but no date and are
+ * invisible here, which is correct: they are not news.
+ */
+async function checkins(days) {
+  const { AIRTABLE_API_TOKEN: token, AIRTABLE_CORE_BASE_ID: base,
+          AIRTABLE_MENTEE_TABLE_ID: tbl } = process.env;
+  if (!token || !base || !tbl) return { recent: [], replied: [] };
+
+  const fields = ["Name", "Checkin Sent", "Client Pipeline", "Gmail", "Target Industry"];
+  const formula = `AND({Checkin Sent}, IS_AFTER({Checkin Sent}, DATEADD(TODAY(), -${days}, 'days')))`;
+  const url = `https://api.airtable.com/v0/${base}/${tbl}` +
+    `?${fields.map((f) => `fields[]=${encodeURIComponent(f)}`).join("&")}` +
+    `&pageSize=100&filterByFormula=${encodeURIComponent(formula)}`;
+
+  const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+  const data = await res.json();
+  if (data.error) return { recent: [], replied: [] };
+
+  const rows = (data.records || []).map((r) => ({
+    name: r.fields["Name"] || "Unnamed",
+    sent: (r.fields["Checkin Sent"] || "").slice(0, 10),
+    stage: r.fields["Client Pipeline"] || "",
+    industry: r.fields["Target Industry"] || "",
+  })).sort((a, b) => b.sent.localeCompare(a.sent));
+
+  // Still sitting at "Waiting on Contract" means the check-in has not moved
+  // them. Anything else means it did, which is the only number worth reading.
+  return { recent: rows, replied: rows.filter((r) => r.stage !== "Waiting on Contract") };
+}
+
 exports.handler = async (event) => {
   const force = String((event && event.queryStringParameters &&
     event.queryStringParameters.force) || "") === "1";
@@ -482,6 +543,9 @@ exports.handler = async (event) => {
     const prev = await gather(7, 7);
     const quarter = await gather(90);
     const audit = auditNumbers(now, prev, quarter.sales, now.airtableBookings);
+    // 90 days rather than 7: a check-in sent three weeks ago that has just had
+    // a reply is exactly the thing this section exists to surface.
+    const check = await checkins(90);
     const when = `${syd.day} ${syd.month}`;
 
     const res = await fetch("https://api.brevo.com/v3/smtp/email", {
@@ -491,7 +555,7 @@ exports.handler = async (event) => {
         sender: SENDER,
         to: TO,
         subject: `Headstart weekly — week to ${when}`,
-        htmlContent: buildHtml(now, prev, when, quarter.sales, audit),
+        htmlContent: buildHtml(now, prev, when, quarter.sales, audit, check),
       }),
     });
     if (!res.ok) {

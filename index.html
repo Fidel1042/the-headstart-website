@@ -91,6 +91,60 @@
           "audienceType": "International students in Australia (final-year business and tech students seeking internships and graduate jobs)"
         },
         "description": "1-on-1 mentoring covering job search strategy, internships, graduate roles, resume and LinkedIn review, interviews, networking, and life and career adjustment for international students in Australia."
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://theheadstartmentoring.com/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is Headstart Mentoring?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "One-on-one online career mentoring for international students in Australia. You are matched with a mentor working in the industry you are targeting."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Who are the mentors at Headstart Mentoring?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Recent graduates and early-career professionals working in Australia who were international students themselves, so they have been through the same visa, networking and hiring process recently."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does Headstart Mentoring start?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "With a free discovery call. We work out where your job search is stuck and match you with the right mentor. There is no obligation to continue."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What do mentoring sessions cover?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Resumes, LinkedIn, networking, applications, interviews and assessment centres, worked through against the roles you are actually applying for."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Who is Headstart Mentoring for?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "International students in Australia going for their first graduate role or internship, across finance, accounting, tech, marketing, consulting, data and engineering."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does Headstart Mentoring offer job alerts?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. A free weekly job alerts list of graduate roles and internships in Australia that are open to international students, filtered by major and city."
+            }
+          }
+        ]
       }
     ]
   }
@@ -889,17 +943,25 @@
     .hero-split__text {
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;
+      justify-content: center;
       padding: 3.5rem 2rem 3rem 3rem;
       min-width: 0;
     }
     .hero-h1 {
-      font-size: clamp(1.5rem, 2.4vw, 2.1rem);
+      font-size: clamp(1.5rem, 2.4vw, 2.8rem);
       font-weight: 700;
       line-height: 1.25;
       color: #ffffff;
       letter-spacing: -0.01em;
       margin: 0;
+    }
+    /* "Land your first" is the small lead-in line above the big headline. */
+    .hero-h1__lead {
+      display: block;
+      font-size: 0.75em;
+      font-weight: 600;
+      letter-spacing: 0;
+      margin-bottom: 0.15em;
     }
     /* The Gilt Budget: the one deliberate gradient-text element on this page.
        Solid colour first so the word survives if background-clip fails. */
@@ -996,9 +1058,10 @@
       display: flex;
       flex-direction: column;
       flex: 1;
+      justify-content: center;
     }
     .hero-review-strip {
-      flex: 1;
+      flex: 0 0 auto;
       display: flex;
       align-items: center;
       gap: 1.1rem;
@@ -1012,7 +1075,7 @@
       font-size: 0.62rem;
       text-transform: uppercase;
       letter-spacing: 0.12em;
-      color: rgba(255,255,255,0.4);
+      color: #ffffff;
       text-align: center;
       padding: 0.9rem 1.5rem 0.5rem;
       margin: 0;
@@ -1054,15 +1117,35 @@
     }
     .hero-review-strip__name {
       display: block;
-      font-size: 0.75rem;
+      font-size: 0.85rem;
       font-weight: 700;
-      color: rgba(255,255,255,0.75);
-      margin-top: 0.2rem;
+      color: #ffffff;
+      margin: 0;
+      line-height: 1.2;
     }
     .hero-review-strip__tag {
       display: block;
       font-size: 0.68rem;
       color: rgba(255,255,255,0.75);
+    }
+
+    /* Wide screens: the global 1120px page container leaves big empty gutters
+       on 1600px+ displays, so let the homepage use more of the width. */
+    @media (min-width: 1500px) {
+      .home-page main {
+        max-width: 1320px;
+      }
+      .hero-outer {
+        grid-template-columns: 1fr min(35vw, 480px);
+      }
+    }
+    @media (min-width: 1800px) {
+      .home-page main {
+        max-width: 1440px;
+      }
+      .hero-split__text {
+        padding: 3.5rem 3rem 3rem 4rem;
+      }
     }
 
     @media (max-width: 800px) {
@@ -1093,9 +1176,6 @@
         text-align: center;
         white-space: nowrap;
       }
-      .hero-h1__session { display: none; }
-      .hero-trust-list { display: none; }
-      .hero-reviews__label { display: none; }
       .hero-split__image {
         min-height: auto;
         order: 1;
@@ -1126,7 +1206,7 @@
       }
     }
 
-    /* Mobile: show only Raphael and Shreya, hide Mohit (3rd card) */
+    /* Mobile: show the first two mentor strips, hide the 3rd */
     @media (max-width: 800px) {
       .hero-review-strip:last-child {
         display: none;
@@ -1134,6 +1214,11 @@
       .hero-outer {
         min-height: 100svh;
       }
+    }
+
+    /* Phones 414px and under: drop the two trust ticks to keep the hero short */
+    @media (max-width: 414px) {
+      .hero-trust-list { display: none; }
     }
 
     /* 320px phones: smaller h1, smaller logos, smaller CTA */
@@ -1187,9 +1272,9 @@
       animation: logo-slide 40s linear infinite;
     }
     .hero-logo-slider__item {
-      height: 38px;
+      height: 32px;
       width: auto;
-      max-width: 120px;
+      max-width: 104px;
       object-fit: contain;
       flex-shrink: 0;
     }
@@ -1197,8 +1282,57 @@
       filter: brightness(0) invert(1);
     }
     .hero-logo-slider__item--lg {
-      height: 58px;
-      max-width: 150px;
+      height: 49px;
+      max-width: 128px;
+    }
+
+    /* ── FAQ accordion ──
+       Collapsed by default so it stays out of the way visually. The answers are
+       real DOM content, so search engines and LLMs still read them. */
+    .tldr {
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    .tldr__list {
+      max-width: 820px;
+      margin: 0;
+    }
+    .tldr__item {
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .tldr__item > summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      padding: 1.05rem 0;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.88);
+      transition: color 0.18s ease;
+    }
+    .tldr__item > summary::-webkit-details-marker { display: none; }
+    .tldr__item > summary:hover { color: #f5d060; }
+    .tldr__chev {
+      flex: 0 0 auto;
+      width: 11px;
+      height: 11px;
+      border-right: 1.8px solid rgba(199,155,59,0.9);
+      border-bottom: 1.8px solid rgba(199,155,59,0.9);
+      transform: rotate(45deg);
+      transition: transform 0.22s ease;
+      margin-bottom: 3px;
+    }
+    .tldr__item[open] > summary { color: #f5d060; }
+    .tldr__item[open] .tldr__chev { transform: rotate(-135deg); margin-bottom: -3px; }
+    .tldr__a {
+      margin: 0;
+      padding: 0 0 1.1rem;
+      max-width: 68ch;
+      font-size: 0.93rem;
+      line-height: 1.62;
+      color: rgba(255,255,255,0.72);
     }
   </style>
 </head>
@@ -1240,47 +1374,48 @@
         <!-- Left: text -->
         <div class="hero-split__text">
           <h1 class="hero-h1">
-            <span class="hero-gold">Personalised</span> Career Mentorship for International Students in Australia
-            <span class="hero-h1__session">Match with your mentor in your <span class="hero-gold">target industry</span> today.</span>
+            <span class="hero-h1__lead">Land your first</span>
+            <span class="hero-gold">Grad Role / Internship</span>
+            <span class="hero-h1__session">Through 1 v 1 mentoring, for International Students in AU&#127462;&#127482;</span>
           </h1>
           <div class="hero-cta-group">
-            <a href="/discovery-call" class="btn-hero-primary">Apply for free strategy call</a>
+            <a href="/mentors" class="btn-hero-primary">View our mentors</a>
             <ul class="hero-trust-list">
-              <li>Mentor who gets your story</li>
               <li>Mentors were once International Students</li>
+              <li>Mentors are Grads with 2.4 offers on average</li>
             </ul>
           </div>
         </div>
 
-        <!-- Right: 3 review strips, bleeds to viewport edge -->
+        <!-- Right: 3 mentor strips, bleeds to viewport edge -->
         <div class="hero-split__image">
           <div class="hero-reviews">
-            <p class="hero-reviews__label">Reviews from our international student mentees</p>
+            <p class="hero-reviews__label">Mentors who were International Students</p>
 
             <div class="hero-review-strip">
-              <div class="hero-review-strip__face" style="background-image: url('images/Mentee-review/rapheal.jpeg');"></div>
+              <div class="hero-review-strip__face" style="background-image: url('images/Mentors/Palak.png');"></div>
               <div class="hero-review-strip__content">
-                <div class="hero-review-strip__stars">★★★★★</div>
-                <p class="hero-review-strip__headline">2 months, no offers &rarr; Tech role &rarr; Promotion</p>
-                <span class="hero-review-strip__tag">Implementation Consultant, Enable</span>
+                <p class="hero-review-strip__name">Palak</p>
+                <span class="hero-review-strip__tag">Field: Data / AI</span>
+                <p class="hero-review-strip__headline">3 Grad Offers across Analytics / AI</p>
               </div>
             </div>
 
             <div class="hero-review-strip">
-              <div class="hero-review-strip__face" style="background-image: url('images/Mentee-review/Shreya.jpg');"></div>
+              <div class="hero-review-strip__face" style="background-image: url('images/Mentors/Luis.png');"></div>
               <div class="hero-review-strip__content">
-                <div class="hero-review-strip__stars">★★★★★</div>
-                <p class="hero-review-strip__headline">Anxious (100+ rejections) &rarr; Confident &amp; 2 final interviews</p>
-                <span class="hero-review-strip__tag">Economics Major, Macquarie Uni</span>
+                <p class="hero-review-strip__name">Luis</p>
+                <span class="hero-review-strip__tag">Field: Engineering</span>
+                <p class="hero-review-strip__headline">3 Grad Offers in Civil / Sustainability</p>
               </div>
             </div>
 
             <div class="hero-review-strip">
-              <div class="hero-review-strip__face" style="background-image: url('images/Mentee-review/Mohit.jpg');"></div>
+              <div class="hero-review-strip__face" style="background-image: url('images/Mentors/fidel new.jpg');"></div>
               <div class="hero-review-strip__content">
-                <div class="hero-review-strip__stars">★★★★★</div>
-                <p class="hero-review-strip__headline">Stressed from Job Search &rarr; 2 Internship Offers</p>
-                <span class="hero-review-strip__tag">Finance Major, USYD</span>
+                <p class="hero-review-strip__name">Fidel</p>
+                <span class="hero-review-strip__tag">Field: Marketing / Analytics</span>
+                <p class="hero-review-strip__headline">4 Grad Offers in Marketing / Analytics</p>
               </div>
             </div>
 
@@ -1289,7 +1424,7 @@
 
         <!-- ── Company logo slider (spans both columns, pinned to bottom of hero) ── -->
         <div class="hero-logo-slider">
-          <p class="hero-logo-slider__label">Our Mentors, who were once <strong>exactly</strong> in your situation, now work in:</p>
+          <p class="hero-logo-slider__label">Our mentors got offers in:</p>
           <div class="hero-logo-slider__viewport">
           <div class="hero-logo-slider__track">
             <img class="hero-logo-slider__item" src="images/Logos/commbank-beacon-white.webp" alt="Commonwealth Bank" />
@@ -1321,160 +1456,6 @@
           </div>
         </div>
 
-      </section>
-
-      <!-- ── Meet your mentors (preview) ── -->
-      <section class="section home-mentors">
-        <div class="section-inner">
-          <div class="home-mentors__head reveal reveal--up">
-            <p class="mentoring-eyebrow">Your mentors</p>
-            <h2 class="mentoring-title">Mentors who were once in your situation</h2>
-          </div>
-          <div class="home-mentors__grid reveal">
-
-            <div class="home-mentor-card">
-              <img class="home-mentor-card__photo" src="images/Mentors/koko new.jpg" alt="Koko" />
-              <p class="home-mentor-card__name">Koko</p>
-              <p class="home-mentor-card__role">Marketing &amp; Sales Graduate</p>
-              <p class="home-mentor-card__headline">1 of the 2 grads hired out of 450 applications</p>
-              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
-            </div>
-
-            <div class="home-mentor-card">
-              <img class="home-mentor-card__photo" src="images/Mentors/Luis.png" alt="Luis" />
-              <p class="home-mentor-card__name">Luis</p>
-              <p class="home-mentor-card__role">Graduate Civil Engineer</p>
-              <p class="home-mentor-card__headline">3 offers in Sustainability / Civil as an Int Student</p>
-              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
-            </div>
-
-            <div class="home-mentor-card">
-              <img class="home-mentor-card__photo" src="images/Mentors/angel new.jpg" alt="Angelica" />
-              <p class="home-mentor-card__name">Angelica</p>
-              <p class="home-mentor-card__role">Tech Consultant</p>
-              <p class="home-mentor-card__headline">Broke into Tech Consulting as an Int Student</p>
-              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
-            </div>
-
-            <div class="home-mentor-card">
-              <img class="home-mentor-card__photo" src="images/Mentors/koda new.jpg" alt="Koda" />
-              <p class="home-mentor-card__name">Koda</p>
-              <p class="home-mentor-card__role">Software Engineer</p>
-              <p class="home-mentor-card__headline">SWE role with no prior internship experience</p>
-              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
-            </div>
-
-            <div class="home-mentor-card">
-              <img class="home-mentor-card__photo" src="images/Mentors/raun new.jpg" alt="Raunaq" />
-              <p class="home-mentor-card__name">Raunaq</p>
-              <p class="home-mentor-card__role">Finance Analyst</p>
-              <p class="home-mentor-card__headline">Broke into Finance as an Int Student</p>
-              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
-            </div>
-
-            <div class="home-mentor-card">
-              <img class="home-mentor-card__photo" src="images/Mentors/Palak.png" alt="Palak" />
-              <p class="home-mentor-card__name">Palak</p>
-              <p class="home-mentor-card__role">Data &amp; AI Engineer</p>
-              <p class="home-mentor-card__headline">3 offers in Data as an int student</p>
-              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
-            </div>
-
-            <div class="home-mentor-card">
-              <img class="home-mentor-card__photo" src="images/Mentors/aiden new.jpg" alt="Aidan" />
-              <p class="home-mentor-card__name">Aidan</p>
-              <p class="home-mentor-card__role">Demand Planner</p>
-              <p class="home-mentor-card__headline">Landed a full time role from a Networking event</p>
-              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
-            </div>
-
-            <div class="home-mentor-card">
-              <img class="home-mentor-card__photo" src="images/Mentors/fidel new.jpg" alt="Fidel" />
-              <p class="home-mentor-card__name">Fidel</p>
-              <p class="home-mentor-card__role">Category Analyst</p>
-              <p class="home-mentor-card__headline">From Hong Kong student with an accent to 4 Grad offers</p>
-              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
-            </div>
-
-            <div class="home-mentor-card">
-              <img class="home-mentor-card__photo" src="images/Mentors/Brendon .png" alt="Brendon" />
-              <p class="home-mentor-card__name">Brendon</p>
-              <p class="home-mentor-card__role">Early Careers Specialist</p>
-              <p class="home-mentor-card__headline">Built a grad program with 100% retention from scratch</p>
-              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
-            </div>
-
-            <div class="home-mentor-card">
-              <img class="home-mentor-card__photo" src="images/Mentors/wohee.jpg" alt="Wohee" />
-              <p class="home-mentor-card__name">Wohee</p>
-              <p class="home-mentor-card__role">Data Scientist</p>
-              <p class="home-mentor-card__headline">Worked for 2 major banks in Australia</p>
-              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
-            </div>
-
-            <div class="home-mentor-card">
-              <img class="home-mentor-card__photo" src="images/Mentors/khaleel new.jpg" alt="Khaleel" />
-              <p class="home-mentor-card__name">Khaleel</p>
-              <p class="home-mentor-card__role">Finance Graduate</p>
-              <p class="home-mentor-card__headline">Finance Grad + Career Coach</p>
-              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
-            </div>
-
-            <div class="home-mentor-card">
-              <img class="home-mentor-card__photo" src="images/Mentors/Jai .png" alt="Jai" />
-              <p class="home-mentor-card__name">Jai</p>
-              <p class="home-mentor-card__role">Cyber Security Associate</p>
-              <p class="home-mentor-card__headline">Cyber Security for Major Bank</p>
-              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
-            </div>
-
-            <div class="home-mentor-card">
-              <img class="home-mentor-card__photo" src="images/Mentors/deepika new.jpg" alt="Deepika" />
-              <p class="home-mentor-card__name">Deepika</p>
-              <p class="home-mentor-card__role">Finance Officer</p>
-              <p class="home-mentor-card__headline">Finance role within the Government</p>
-              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
-            </div>
-
-            <div class="home-mentor-card">
-              <img class="home-mentor-card__photo" src="images/Mentors/Shriyansh.png" alt="Shriyansh" />
-              <p class="home-mentor-card__name">Shriyansh</p>
-              <p class="home-mentor-card__role">Financial Analyst</p>
-              <p class="home-mentor-card__headline">2 offers in Accounting</p>
-              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
-            </div>
-
-            <div class="home-mentor-card">
-              <img class="home-mentor-card__photo" src="images/Mentors/Shifat.png" alt="Shifat" />
-              <p class="home-mentor-card__name">Shifat</p>
-              <p class="home-mentor-card__role">AI Engineer</p>
-              <p class="home-mentor-card__headline">Turning Internship to Full-time offer</p>
-              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
-            </div>
-
-            <div class="home-mentor-card">
-              <img class="home-mentor-card__photo" src="images/Mentors/Abeshek.png" alt="Abeshek" />
-              <p class="home-mentor-card__name">Abeshek</p>
-              <p class="home-mentor-card__role">Business Development Manager</p>
-              <p class="home-mentor-card__headline">Sales career at a major telco</p>
-              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
-            </div>
-            <div class="home-mentor-card">
-              <img class="home-mentor-card__photo" src="images/Mentors/Vinh.png" alt="Kevin" />
-              <p class="home-mentor-card__name">Kevin</p>
-              <p class="home-mentor-card__role">Program Manager</p>
-              <p class="home-mentor-card__headline">Worked in 2 Big Tech Companies</p>
-              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
-            </div>
-            <div class="home-mentor-card">
-              <img class="home-mentor-card__photo" src="images/Mentors/Abdur.png" alt="Abdur" />
-              <p class="home-mentor-card__name">Abdur</p>
-              <p class="home-mentor-card__role">AI &amp; Electrical Engineer</p>
-              <p class="home-mentor-card__headline">Full-time role before he even graduated</p>
-              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
-            </div>
-                    </div>
-        </div>
       </section>
 
       <!-- ── How Our Mentoring Works ── -->
@@ -1574,7 +1555,6 @@
                 <li>Currently working in Australia</li>
                 <li>Change mentors at no extra cost</li>
               </ul>
-              <a class="pricing-box__cta" href="/discovery-call">Book a free call &rarr;</a>
             </div>
           </div>
 
@@ -1750,6 +1730,193 @@
               <button class="pain-quiz__next-btn" type="button" data-quiz-next>Next &rarr;</button>
             </div>
             <div class="pain-quiz__pips" data-quiz-pips></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Meet your mentors (preview) ── -->
+      <section class="section home-mentors">
+        <div class="section-inner">
+          <div class="home-mentors__head reveal reveal--up">
+            <p class="mentoring-eyebrow">Your mentors</p>
+            <h2 class="mentoring-title">Mentors who were once in your situation</h2>
+          </div>
+          <div class="home-mentors__grid reveal">
+
+            <div class="home-mentor-card">
+              <img class="home-mentor-card__photo" src="images/Mentors/koko new.jpg" alt="Koko" />
+              <p class="home-mentor-card__name">Koko</p>
+              <p class="home-mentor-card__role">Marketing &amp; Sales Graduate</p>
+              <p class="home-mentor-card__headline">1 of the 2 grads hired out of 450 applications</p>
+              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
+            </div>
+
+            <div class="home-mentor-card">
+              <img class="home-mentor-card__photo" src="images/Mentors/Luis.png" alt="Luis" />
+              <p class="home-mentor-card__name">Luis</p>
+              <p class="home-mentor-card__role">Graduate Civil Engineer</p>
+              <p class="home-mentor-card__headline">3 offers in Sustainability / Civil as an Int Student</p>
+              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
+            </div>
+
+            <div class="home-mentor-card">
+              <img class="home-mentor-card__photo" src="images/Mentors/angel new.jpg" alt="Angelica" />
+              <p class="home-mentor-card__name">Angelica</p>
+              <p class="home-mentor-card__role">Tech Consultant</p>
+              <p class="home-mentor-card__headline">Broke into Tech Consulting as an Int Student</p>
+              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
+            </div>
+
+            <div class="home-mentor-card">
+              <img class="home-mentor-card__photo" src="images/Mentors/koda new.jpg" alt="Koda" />
+              <p class="home-mentor-card__name">Koda</p>
+              <p class="home-mentor-card__role">Software Engineer</p>
+              <p class="home-mentor-card__headline">SWE role with no prior internship experience</p>
+              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
+            </div>
+
+            <div class="home-mentor-card">
+              <img class="home-mentor-card__photo" src="images/Mentors/raun new.jpg" alt="Raunaq" />
+              <p class="home-mentor-card__name">Raunaq</p>
+              <p class="home-mentor-card__role">Finance Analyst</p>
+              <p class="home-mentor-card__headline">Broke into Finance as an Int Student</p>
+              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
+            </div>
+
+            <div class="home-mentor-card">
+              <img class="home-mentor-card__photo" src="images/Mentors/Palak.png" alt="Palak" />
+              <p class="home-mentor-card__name">Palak</p>
+              <p class="home-mentor-card__role">Data &amp; AI Engineer</p>
+              <p class="home-mentor-card__headline">3 offers in Data as an int student</p>
+              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
+            </div>
+
+            <div class="home-mentor-card">
+              <img class="home-mentor-card__photo" src="images/Mentors/aiden new.jpg" alt="Aidan" />
+              <p class="home-mentor-card__name">Aidan</p>
+              <p class="home-mentor-card__role">Demand Planner</p>
+              <p class="home-mentor-card__headline">Landed a full time role from a Networking event</p>
+              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
+            </div>
+
+            <div class="home-mentor-card">
+              <img class="home-mentor-card__photo" src="images/Mentors/fidel new.jpg" alt="Fidel" />
+              <p class="home-mentor-card__name">Fidel</p>
+              <p class="home-mentor-card__role">Category Analyst</p>
+              <p class="home-mentor-card__headline">From Hong Kong student with an accent to 4 Grad offers</p>
+              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
+            </div>
+
+            <div class="home-mentor-card">
+              <img class="home-mentor-card__photo" src="images/Mentors/Brendon .png" alt="Brendon" />
+              <p class="home-mentor-card__name">Brendon</p>
+              <p class="home-mentor-card__role">Early Careers Specialist</p>
+              <p class="home-mentor-card__headline">Built a grad program with 100% retention from scratch</p>
+              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
+            </div>
+
+            <div class="home-mentor-card">
+              <img class="home-mentor-card__photo" src="images/Mentors/wohee.jpg" alt="Wohee" />
+              <p class="home-mentor-card__name">Wohee</p>
+              <p class="home-mentor-card__role">Data Scientist</p>
+              <p class="home-mentor-card__headline">Worked for 2 major banks in Australia</p>
+              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
+            </div>
+
+            <div class="home-mentor-card">
+              <img class="home-mentor-card__photo" src="images/Mentors/khaleel new.jpg" alt="Khaleel" />
+              <p class="home-mentor-card__name">Khaleel</p>
+              <p class="home-mentor-card__role">Finance Graduate</p>
+              <p class="home-mentor-card__headline">Finance Grad + Career Coach</p>
+              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
+            </div>
+
+            <div class="home-mentor-card">
+              <img class="home-mentor-card__photo" src="images/Mentors/Jai .png" alt="Jai" />
+              <p class="home-mentor-card__name">Jai</p>
+              <p class="home-mentor-card__role">Cyber Security Associate</p>
+              <p class="home-mentor-card__headline">Cyber Security for Major Bank</p>
+              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
+            </div>
+
+            <div class="home-mentor-card">
+              <img class="home-mentor-card__photo" src="images/Mentors/deepika new.jpg" alt="Deepika" />
+              <p class="home-mentor-card__name">Deepika</p>
+              <p class="home-mentor-card__role">Finance Officer</p>
+              <p class="home-mentor-card__headline">Finance role within the Government</p>
+              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
+            </div>
+
+            <div class="home-mentor-card">
+              <img class="home-mentor-card__photo" src="images/Mentors/Shriyansh.png" alt="Shriyansh" />
+              <p class="home-mentor-card__name">Shriyansh</p>
+              <p class="home-mentor-card__role">Financial Analyst</p>
+              <p class="home-mentor-card__headline">2 offers in Accounting</p>
+              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
+            </div>
+
+            <div class="home-mentor-card">
+              <img class="home-mentor-card__photo" src="images/Mentors/Shifat.png" alt="Shifat" />
+              <p class="home-mentor-card__name">Shifat</p>
+              <p class="home-mentor-card__role">AI Engineer</p>
+              <p class="home-mentor-card__headline">Turning Internship to Full-time offer</p>
+              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
+            </div>
+
+            <div class="home-mentor-card">
+              <img class="home-mentor-card__photo" src="images/Mentors/Abeshek.png" alt="Abeshek" />
+              <p class="home-mentor-card__name">Abeshek</p>
+              <p class="home-mentor-card__role">Business Development Manager</p>
+              <p class="home-mentor-card__headline">Sales career at a major telco</p>
+              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
+            </div>
+            <div class="home-mentor-card">
+              <img class="home-mentor-card__photo" src="images/Mentors/Vinh.png" alt="Kevin" />
+              <p class="home-mentor-card__name">Kevin</p>
+              <p class="home-mentor-card__role">Program Manager</p>
+              <p class="home-mentor-card__headline">Worked in 2 Big Tech Companies</p>
+              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
+            </div>
+            <div class="home-mentor-card">
+              <img class="home-mentor-card__photo" src="images/Mentors/Abdur.png" alt="Abdur" />
+              <p class="home-mentor-card__name">Abdur</p>
+              <p class="home-mentor-card__role">AI &amp; Electrical Engineer</p>
+              <p class="home-mentor-card__headline">Full-time role before he even graduated</p>
+              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
+            </div>
+                    </div>
+        </div>
+      </section>
+
+      <!-- ── FAQ ── -->
+      <section class="section tldr" id="summary">
+        <div class="section-inner">
+          <p class="mentoring-eyebrow">FAQ</p>
+          <div class="tldr__list">
+            <details class="tldr__item">
+              <summary>What is Headstart Mentoring?<span class="tldr__chev" aria-hidden="true"></span></summary>
+              <p class="tldr__a">One-on-one online career mentoring for international students in Australia. You are matched with a mentor working in the industry you are targeting.</p>
+            </details>
+            <details class="tldr__item">
+              <summary>Who are the mentors?<span class="tldr__chev" aria-hidden="true"></span></summary>
+              <p class="tldr__a">Recent graduates and early-career professionals working in Australia who were international students themselves, so they have been through the same visa, networking and hiring process recently.</p>
+            </details>
+            <details class="tldr__item">
+              <summary>How does it start?<span class="tldr__chev" aria-hidden="true"></span></summary>
+              <p class="tldr__a">With a free discovery call. We work out where your job search is stuck and match you with the right mentor. There is no obligation to continue.</p>
+            </details>
+            <details class="tldr__item">
+              <summary>What do sessions cover?<span class="tldr__chev" aria-hidden="true"></span></summary>
+              <p class="tldr__a">Resumes, LinkedIn, networking, applications, interviews and assessment centres, worked through against the roles you are actually applying for.</p>
+            </details>
+            <details class="tldr__item">
+              <summary>Who is it for?<span class="tldr__chev" aria-hidden="true"></span></summary>
+              <p class="tldr__a">International students in Australia going for their first graduate role or internship, across finance, accounting, tech, marketing, consulting, data and engineering.</p>
+            </details>
+            <details class="tldr__item">
+              <summary>What else do you offer?<span class="tldr__chev" aria-hidden="true"></span></summary>
+              <p class="tldr__a">A free weekly job alerts list of graduate roles and internships in Australia that are open to international students, filtered by major and city.</p>
+            </details>
           </div>
         </div>
       </section>

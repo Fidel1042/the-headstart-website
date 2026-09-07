@@ -146,10 +146,18 @@ exports.handler = async (event) => {
 
       // Advance only after the send succeeded, so a failure is retried
       // tomorrow rather than being silently skipped forever.
+      //
+      // "Checkin Sent" is stamped in the same write. The stage number alone
+      // says a check-in happened but not when, so there was no way to report
+      // on the ones that went out last week. A blank date on a lead past the
+      // final stage means the send predates this field, not that it failed.
       await fetch(`https://api.airtable.com/v0/${AIRTABLE_CORE_BASE_ID}/${AIRTABLE_MENTEE_TABLE_ID}/${lead.id}`, {
         method: "PATCH",
         headers: { Authorization: `Bearer ${AIRTABLE_API_TOKEN}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ fields: { "Follow Up Stage": lead.stage + 1 } }),
+        body: JSON.stringify({ fields: {
+          "Follow Up Stage": lead.stage + 1,
+          "Checkin Sent": today,
+        } }),
       }).catch(() => {});
       sent.push(lead);
     }

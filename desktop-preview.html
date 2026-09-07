@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Desktop width preview</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #141416;
+    color: #e9e9ea;
+    font: 13px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  .bar {
+    position: sticky; top: 0; z-index: 5;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    padding: 10px 16px;
+    background: #1c1c1f;
+    border-bottom: 1px solid #2e2e33;
+  }
+  .bar strong { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: #8f8f96; font-weight: 700; }
+  .widths { display: flex; gap: 6px; flex-wrap: wrap; }
+  button {
+    background: #232327; color: #d6d6da;
+    border: 1px solid #35353b; border-radius: 7px;
+    padding: 6px 12px; font: inherit; font-weight: 600; cursor: pointer;
+  }
+  button:hover { border-color: #55555e; }
+  button.on { background: #c79b3b; border-color: #c79b3b; color: #17130a; }
+  label { display: flex; align-items: center; gap: 6px; color: #8f8f96; }
+  input[type=text] { width: 74px; background:#232327; border:1px solid #35353b; border-radius:6px; color:#e9e9ea; padding:6px 8px; font: inherit; }
+  select { background:#232327; border:1px solid #35353b; border-radius:6px; color:#e9e9ea; padding:6px 8px; font: inherit; }
+  .meta { margin-left: auto; color: #8f8f96; font-variant-numeric: tabular-nums; }
+  .stage { padding: 18px; }
+  .frame-outer { position: relative; margin: 0 auto; }
+  iframe {
+    border: 0; display: block; background: #000;
+    transform-origin: top left;
+    box-shadow: 0 18px 60px rgba(0,0,0,.6);
+  }
+</style>
+</head>
+<body>
+  <div class="bar">
+    <strong>Width</strong>
+    <div class="widths" id="widths"></div>
+    <label>Custom <input type="text" id="custom" placeholder="1920" /></label>
+    <label>Page
+      <select id="page">
+        <option value="/">Home</option>
+        <option value="/mentors">Mentors</option>
+        <option value="/job-alerts">Job Alerts</option>
+        <option value="/discovery-call">Discovery Call</option>
+        <option value="/links">Links</option>
+        <option value="/careers">Careers</option>
+        <option value="/reviews">Reviews</option>
+      </select>
+    </label>
+    <button id="reload">Reload</button>
+    <span class="meta" id="meta"></span>
+  </div>
+  <div class="stage">
+    <div class="frame-outer" id="outer">
+      <iframe id="frame" title="preview"></iframe>
+    </div>
+  </div>
+
+<script>
+  var WIDTHS = [1280, 1366, 1440, 1600, 1920, 2560];
+  var height = 1080;
+  var width  = 1920;
+
+  var elWidths = document.getElementById('widths');
+  var frame    = document.getElementById('frame');
+  var outer    = document.getElementById('outer');
+  var meta     = document.getElementById('meta');
+  var pageSel  = document.getElementById('page');
+  var custom   = document.getElementById('custom');
+
+  WIDTHS.forEach(function (w) {
+    var b = document.createElement('button');
+    b.textContent = w;
+    b.dataset.w = w;
+    b.addEventListener('click', function () { setWidth(w); });
+    elWidths.appendChild(b);
+  });
+
+  function setWidth(w) {
+    width = w;
+    // taller viewport for narrow widths keeps the aspect sane
+    height = Math.round(w * 0.5625);
+    Array.prototype.forEach.call(elWidths.children, function (b) {
+      b.classList.toggle('on', Number(b.dataset.w) === w);
+    });
+    layout();
+  }
+
+  function layout() {
+    var avail = document.querySelector('.stage').clientWidth - 36;
+    var scale = Math.min(1, avail / width);
+    frame.style.width  = width + 'px';
+    frame.style.height = height + 'px';
+    frame.style.transform = 'scale(' + scale + ')';
+    outer.style.width  = (width * scale) + 'px';
+    outer.style.height = (height * scale) + 'px';
+    meta.textContent = width + ' x ' + height + '  ·  ' + Math.round(scale * 100) + '% scale';
+  }
+
+  function load() {
+    frame.src = pageSel.value + '?preview=' + Date.now();
+  }
+
+  pageSel.addEventListener('change', load);
+  document.getElementById('reload').addEventListener('click', load);
+  custom.addEventListener('change', function () {
+    var v = parseInt(custom.value, 10);
+    if (v >= 320 && v <= 4000) setWidth(v);
+  });
+  window.addEventListener('resize', layout);
+
+  setWidth(1920);
+  load();
+</script>
+</body>
+</html>

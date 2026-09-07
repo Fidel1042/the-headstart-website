@@ -6,14 +6,21 @@
 
 // Every touch: days after the consultation, how it is sent, and any minimum
 // conversion score it needs to be earned.
+//
+// Cut back on 7 September 2026. The sequence used to run t+0, t+1, t+3 and a
+// t+20 nudge for calls that scored 40% or better. Four WhatsApp messages after
+// a single call reads as a sales sequence, which is what it was. What is left
+// is the first message, one nudge, and the three-month check-in.
 const TOUCHES = [
   { day: 0,  channel: "whatsapp" },
-  { day: 1,  channel: "whatsapp" },
-  { day: 3,  channel: "whatsapp" },
-  { day: 20, channel: "whatsapp", minPct: 40 },
+  { day: 2,  channel: "whatsapp" },
   { day: 90, channel: "email" },
 ];
-const FINAL_TOUCH_MIN_PCT = 40;
+
+// No touch is score-gated any more, so nobody is filtered out of the sequence.
+// Kept at 0 rather than deleted because the follow-ups page still labels leads
+// by it, and a threshold of zero is the honest way to say "everyone".
+const FINAL_TOUCH_MIN_PCT = 0;
 
 const CHECKIN_SUBJECT = "How did the job search go?";
 

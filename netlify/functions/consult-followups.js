@@ -1,21 +1,21 @@
 // consult-followups.js — the post-consultation follow-up sequence.
 //
 // Someone who has had a consultation but not signed sits at "Waiting on
-// Contract". They get four touches, and no more:
+// Contract". They get two touches, and no more:
 //
 //   t+0   straight after the call, while it is still warm
-//   t+1   the next day
-//   t+3   the last of the standard three
-//   t+20  one final nudge, but only if the call scored 40% or better.
-//         Below that they said no in all but words, and chasing them three
-//         weeks later just annoys someone who was never going to sign.
+//   t+2   one nudge, two days later. The mentor is holding a slot.
 //   t+90  a check-in three months on, by email rather than WhatsApp. By then
 //         it is not a sales follow-up, it is asking how the job hunt went, and
-//         email is the right register for that. Everyone gets this one.
+//         email is the right register for that. Sent automatically by
+//         checkin-sender.js, so it never appears on this page.
+//
+// Both WhatsApp touches are worked from this page. The t+1, t+3 and t+20
+// touches were removed on 7 September 2026: four chasing messages after one
+// call is a sales sequence, and it read like one.
 //
 // "Follow Up Stage" counts how many touches have been sent, so the page always
-// knows what is next without storing a date per touch. The plan differs by
-// score, so the stage is an index into that lead's own plan, not a global one.
+// knows what is next without storing a date per touch.
 
 const { draftMessages } = require("../shared/drafts");
 const { requireOwner } = require("../shared/require-owner");
@@ -24,8 +24,11 @@ const {
   scoreOf, nextTouch, ymd, daysBetween,
 } = require("../shared/followups");
 
-// The one touch this page is for.
-const FINAL_TOUCH_DAY = 20;
+// The page works every touch Fidel sends by hand, which is every WhatsApp one.
+// Keyed on channel rather than a day number so adding or removing a touch in
+// followups.js needs no change here. The t+90 check-in is email and goes out on
+// its own, so it never appears.
+const MANUAL_CHANNEL = "whatsapp";
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -105,15 +108,13 @@ exports.handler = async (event) => {
         const stage = Number(f["Follow Up Stage"]) || 0;
         const first = (f["First Name"] || String(f["Name"] || "").trim().split(/\s+/)[0] || "there");
 
-        // The drafted messages cover the first three touches. The last one is
-        // deliberately a single plain line: three weeks on, a long pitch reads
-        // like a sales sequence, which is what it is.
+        // Two drafted messages now: the follow-up and the single nudge. Older
+        // records still carry a third block from when the sequence was longer;
+        // it is simply not read.
         const drafted = draftMessages(f["Drafts"] || "");
         const byDay = {
           0: drafted[0] ? drafted[0].text : "",
-          1: drafted[1] ? drafted[1].text : "",
-          3: drafted[2] ? drafted[2].text : "",
-          20: `Hey ${first}, still looking to get your grad role in Au?`,
+          2: drafted[1] ? drafted[1].text : "",
           90: checkinBody(first, f["Target Industry"]),
         };
 
@@ -143,12 +144,9 @@ exports.handler = async (event) => {
         };
       });
 
-    // Only the t+20 nudge. The first three touches happen in the day or two
-    // after a call, when the lead is still front of mind and the message is
-    // already drafted; they never needed a screen. t+20 is three weeks later,
-    // against someone long forgotten, and only for the calls that scored well
-    // enough to be worth one more try. That is the list worth showing.
-    const atFinal = leads.filter((l) => l.next && l.next.day === FINAL_TOUCH_DAY);
+    // Everyone with a message for Fidel to send, at either touch. Once both
+    // are done the only thing left is the automatic t+90 check-in.
+    const atFinal = leads.filter((l) => l.next && l.next.channel === MANUAL_CHANNEL);
 
     // Due first, most overdue at the top: that is the order to work down.
     const dueNow = atFinal.filter((l) => l.due)
@@ -165,7 +163,6 @@ exports.handler = async (event) => {
       dueNow, waiting, finished, skipped,
       touches: TOUCHES.map((t) => t.day),
       finalMinPct: FINAL_TOUCH_MIN_PCT,
-      finalDay: FINAL_TOUCH_DAY,
     });
   } catch (err) {
     return json(502, { error: err.message || "Could not reach Airtable" });

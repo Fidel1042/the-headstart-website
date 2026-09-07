@@ -82,10 +82,10 @@
 
   <main class="fu-page">
     <div class="fu-head">
-      <h1>The t+20 nudge</h1>
+      <h1>Follow-ups to send</h1>
       <div class="fu-steps">
-        <span>t+0, t+1 and t+3 happen while the call is still warm and the message is
-          already drafted, so they are not listed here.</span>
+        <span>The first message on the day, then one nudge two days later. The
+          t+90 check-in goes out automatically.</span>
       </div>
     </div>
 
@@ -222,21 +222,22 @@
 
       document.getElementById("due-list").innerHTML = DATA.dueNow.length
         ? DATA.dueNow.map(dueCard).join("")
-        : `<p class="fu-quiet">Nobody is due a t+${DATA.finalDay} nudge today.</p>`;
+        : `<p class="fu-quiet">Nothing due today.</p>`;
 
       document.getElementById("wait-list").innerHTML = DATA.waiting.length
         ? DATA.waiting.map((l) => quietCard(l, `due ${fmt(l.dueOn)}`)).join("")
         : `<p class="fu-quiet">Nobody waiting.</p>`;
 
       document.getElementById("done-list").innerHTML = DATA.finished.length
-        ? DATA.finished.map((l) => quietCard(l, "nudged")).join("")
+        ? DATA.finished.map((l) => quietCard(l, "messaged")).join("")
         : `<p class="fu-quiet">None yet.</p>`;
 
-      // Scored under the bar, so no t+20 is coming. Listed so the reason is
-      // visible rather than the person just never appearing.
+      // Nothing is score-gated since the sequence was cut back to two touches,
+      // so this stays empty. Kept rather than removed because a lead skipped by
+      // hand still belongs somewhere visible.
       const skipped = DATA.skipped || [];
       document.getElementById("skip-list").innerHTML = skipped.length
-        ? skipped.map((l) => quietCard(l, `scored under ${DATA.finalMinPct}%, no nudge`)).join("")
+        ? skipped.map((l) => quietCard(l, "skipped")).join("")
         : `<p class="fu-quiet">None.</p>`;
     }
 
