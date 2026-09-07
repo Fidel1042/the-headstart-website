@@ -184,6 +184,22 @@ function channelStats() {
 }
 
 /**
+ * Weekly Instagram-to-LinkedIn tracking, written by
+ * Operations/analytics/track-ig-linkedin.py.
+ *
+ * A file rather than an API because LinkedIn publishes no follower endpoint for
+ * a personal profile; the numbers come out of the analytics export. Re-run the
+ * script after downloading a fresh one and this updates with it.
+ */
+function igToLinkedin() {
+  try {
+    return require("../data/ig-to-linkedin.json");
+  } catch (e) {
+    return { weeks: {}, linkAdded: null, switchDate: null };
+  }
+}
+
+/**
  * How much of a channel GA4 actually catches, graded against Fidel's own
  * labelling in Airtable.
  *
@@ -434,22 +450,32 @@ async function gather(days, offset = 0) {
     });
     out.campaigns = Object.values(camp).sort((a, b) => b.visitors - a.visitors).slice(0, 25);
 
-    // Which of the three /links options gets picked, split by who sent them.
+    // What people pick on /links, split by who sent them.
+    //
+    // The page changed on 8 September 2026: it used to offer three
+    // destinations on our own site and now offers one, Fidel's LinkedIn. The
+    // old labels stay defined so a 28 or 90 day window still explains the
+    // clicks it contains, but only the live option is seeded, so a 7 day
+    // window shows the page as it actually is today rather than listing three
+    // choices nobody is offered any more.
     const LINK_LABELS = {
-      offer_roadmap: "Offer roadmap",
-      mentoring_landing: "Mentoring (main site)",
-      job_alerts: "Job alerts",
+      linkedin_bio: "LinkedIn (Fidel's profile)",
+      offer_roadmap: "Offer roadmap (retired)",
+      mentoring_landing: "Mentoring, main site (retired)",
+      job_alerts: "Job alerts (retired)",
     };
-    // Seed all three so an option nobody picked shows as 0 rather than
-    // vanishing, which would read as "there are only two options".
+    const LIVE_OPTIONS = ["linkedin_bio"];
+    // Seeded so the live option reads 0 rather than vanishing on a quiet week,
+    // which would look like the tracking had broken.
     const links = {};
-    Object.entries(LINK_LABELS).forEach(([id, label]) => {
-      links[id] = { linkId: id, label, total: 0, bySource: {} };
+    LIVE_OPTIONS.forEach((id) => {
+      links[id] = { linkId: id, label: LINK_LABELS[id], total: 0, bySource: {} };
     });
-    // Destination URL -> which of the three options it is. Lets clicks from
-    // before link_id existed be counted instead of discarded.
+    // Destination URL -> which option it is. Lets clicks from before link_id
+    // existed be counted instead of discarded.
     const urlToOption = (url) => {
       const u = String(url || "").toLowerCase();
+      if (u.includes("linkedin.com")) return "linkedin_bio";
       if (u.includes("job-search-audit")) return "offer_roadmap";
       if (u.includes("job-alerts")) return "job_alerts";       // incl. -signup
       if (/theheadstartmentoring\.com\/?$/.test(u.replace(/[?#].*$/, ""))) return "mentoring_landing";
@@ -476,6 +502,19 @@ async function gather(days, offset = 0) {
       l.hasLinkId = true;
     });
     out.linksPage = Object.values(links).sort((a, b) => b.total - a.total);
+
+    // Instagram to LinkedIn, newest twelve weeks. Sent whole so the page can
+    // mark the weeks that predate the link rather than showing them as zero.
+    const ig2li = igToLinkedin();
+    out.igToLinkedin = {
+      linkAdded: ig2li.linkAdded || null,
+      switchDate: ig2li.switchDate || null,
+      updated: ig2li.updated || null,
+      weeks: Object.entries(ig2li.weeks || {})
+        .sort(([a], [b]) => a.localeCompare(b))
+        .slice(-12)
+        .map(([week, w]) => ({ week, ...w })),
+    };
 
     // Same shape as out.channels, so the page can swap between them.
     const sess = {};

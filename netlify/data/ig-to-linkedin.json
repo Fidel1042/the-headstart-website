@@ -1,0 +1,89 @@
+{
+ "linkAdded": "2026-08-28",
+ "note": "See track-ig-linkedin.py. linkedin_followers is entered by hand.",
+ "switchDate": "2026-09-08",
+ "updated": "2026-09-08T07:54:11+10:00",
+ "weeks": {
+  "2026-07-06": {
+   "linkedin_clicks": 0,
+   "linkedin_days": 7,
+   "linkedin_followers": 2364,
+   "linkedin_new": 55,
+   "links_sessions": 200,
+   "partial": false
+  },
+  "2026-07-13": {
+   "linkedin_clicks": 0,
+   "linkedin_days": 7,
+   "linkedin_followers": 2596,
+   "linkedin_new": 232,
+   "links_sessions": 165,
+   "partial": false
+  },
+  "2026-07-20": {
+   "linkedin_clicks": 0,
+   "linkedin_days": 7,
+   "linkedin_followers": 2681,
+   "linkedin_new": 85,
+   "links_sessions": 121,
+   "partial": false
+  },
+  "2026-07-27": {
+   "linkedin_clicks": 0,
+   "linkedin_days": 7,
+   "linkedin_followers": 2706,
+   "linkedin_new": 25,
+   "links_sessions": 72,
+   "partial": false
+  },
+  "2026-08-03": {
+   "linkedin_clicks": 0,
+   "linkedin_days": 7,
+   "linkedin_followers": 2760,
+   "linkedin_new": 54,
+   "links_sessions": 190,
+   "partial": false
+  },
+  "2026-08-10": {
+   "linkedin_clicks": 0,
+   "linkedin_days": 7,
+   "linkedin_followers": 2786,
+   "linkedin_new": 26,
+   "links_sessions": 166,
+   "partial": false
+  },
+  "2026-08-17": {
+   "linkedin_clicks": 0,
+   "linkedin_days": 7,
+   "linkedin_followers": 2971,
+   "linkedin_new": 185,
+   "links_sessions": 130,
+   "partial": false
+  },
+  "2026-08-24": {
+   "linkedin_clicks": 0,
+   "linkedin_days": 7,
+   "linkedin_followers": 3064,
+   "linkedin_new": 93,
+   "links_sessions": 90,
+   "partial": false
+  },
+  "2026-08-31": {
+   "linkedin_clicks": 2,
+   "linkedin_days": 7,
+   "linkedin_followers": 3091,
+   "linkedin_new": 27,
+   "links_sessions": 40,
+   "partial": false
+  },
+  "2026-09-07": {
+   "instagram_followers": 5564,
+   "linkedin_clicks": 4,
+   "linkedin_days": 1,
+   "linkedin_followers": 3112,
+   "linkedin_new": 21,
+   "links_sessions": 17,
+   "partial": true
+  }
+ }
+}

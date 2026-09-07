@@ -51,6 +51,15 @@ const MOCK = {
     { source: "instagram", medium: "bio", visitors: 380, signups: { job_alerts: 26, audit_roadmap: 3, discovery_call: 5 }, callForms: 5, booked: 4 },
     { source: "direct", medium: "none", visitors: 210, signups: { job_alerts: 8, audit_roadmap: 1, discovery_call: 4 }, callForms: 4, booked: 3 },
   ],
+  igToLinkedin: {
+    linkAdded: "2026-08-28", switchDate: "2026-09-08",
+    weeks: [
+      { week: "2026-08-17", linkedin_followers: 2971, linkedin_new: 185, links_sessions: 130, linkedin_clicks: 0 },
+      { week: "2026-08-24", linkedin_followers: 3064, linkedin_new: 93, links_sessions: 90, linkedin_clicks: 0 },
+      { week: "2026-08-31", linkedin_followers: 3091, linkedin_new: 27, links_sessions: 40, linkedin_clicks: 2 },
+      { week: "2026-09-07", linkedin_followers: 3112, linkedin_new: 21, links_sessions: 17, linkedin_clicks: 4 },
+    ],
+  },
   linksPage: [
     { linkId: "job_alerts", label: "Job alerts", total: 88, bySource: { instagram: 71, direct: 17 } },
     { linkId: "offer_roadmap", label: "Offer roadmap", total: 34, bySource: { instagram: 28, direct: 6 } },
@@ -192,6 +201,68 @@ function renderSales(d) {
         <td class="num strong">${num(s.signed)}</td>
         <td class="num ${rateClass(s.closeRate, 0.35, 0.2)}">${s.closeRate != null ? (s.closeRate * 100).toFixed(0) + "%" : "—"}</td>
       </tr>`).join("")}</tbody>`;
+}
+
+/**
+ * Instagram to LinkedIn, week by week.
+ *
+ * The tap column is blank, not zero, for any week that ended before a LinkedIn
+ * link existed on /links. Showing 0 there reads as "nobody tapped" when the
+ * truth is "there was nothing to tap", and averaging those weeks in would drag
+ * the number down with weeks that never had the chance to score.
+ */
+function renderIgToLinkedin(d) {
+  const data = d.igToLinkedin || {};
+  const weeks = data.weeks || [];
+  const el = document.getElementById("ig2li-table");
+  const note = document.getElementById("ig2li-note");
+  if (!el) return;
+  if (!weeks.length) {
+    el.innerHTML = `<tbody><tr><td class="dim">No weekly data yet. Run track-ig-linkedin.py.</td></tr></tbody>`;
+    if (note) note.textContent = "";
+    return;
+  }
+
+  const added = data.linkAdded ? new Date(data.linkAdded) : null;
+  const switched = data.switchDate ? new Date(data.switchDate) : null;
+  const endOf = (w) => new Date(new Date(w).getTime() + 6 * 86400000);
+  const hadLink = (w) => !added || endOf(w) >= added;
+
+  el.innerHTML = `
+    <thead><tr>
+      <th>Week</th>
+      <th class="num">LinkedIn followers</th>
+      <th class="num">New</th>
+      <th class="num">/links visits</th>
+      <th class="num">Taps to LinkedIn</th>
+    </tr></thead>
+    <tbody>${weeks.map((w) => {
+      const live = hadLink(w.week);
+      const post = switched && new Date(w.week) >= switched;
+      return `
+      <tr>
+        <td class="src">${esc(w.week)}${post ? "" : ` <span class="dim">${live ? "pre-switch" : "no link yet"}</span>`}</td>
+        <td class="num strong">${w.linkedin_followers == null ? "&mdash;" : num(w.linkedin_followers)}</td>
+        <td class="num">${w.linkedin_new == null ? "&mdash;" : "+" + num(w.linkedin_new)}</td>
+        <td class="num">${w.links_sessions == null ? "&mdash;" : num(w.links_sessions)}</td>
+        <td class="num ${live ? "strong" : "dim"}">${live ? num(w.linkedin_clicks || 0) : "n/a"}</td>
+      </tr>`;
+    }).join("")}</tbody>`;
+
+  // Only weeks under the LinkedIn-only page are comparable, so the summary
+  // counts those and says how many more are needed before it means anything.
+  const clean = weeks.filter((w) => switched && new Date(w.week) >= switched
+                                    && w.linkedin_clicks != null && w.linkedin_new != null);
+  if (!note) return;
+  if (clean.length < 3) {
+    note.textContent = `${clean.length} full week${clean.length === 1 ? "" : "s"} since the bio link ` +
+      `became LinkedIn only. Three are needed before a pattern is worth reading.`;
+  } else {
+    const taps = clean.reduce((s, w) => s + w.linkedin_clicks, 0);
+    const gained = clean.reduce((s, w) => s + w.linkedin_new, 0);
+    note.textContent = `${taps} taps and ${gained} new followers across ${clean.length} weeks. ` +
+      `LinkedIn posting also grows followers, so this is a pattern to watch, not attribution.`;
+  }
 }
 
 function renderLinks(d) {
@@ -484,6 +555,7 @@ async function load() {
   renderNotice(data);
   renderChannels(data);
   renderSales(data);
+  renderIgToLinkedin(data);
   renderLinks(data);
   renderReach(data);
   renderPosts(data);

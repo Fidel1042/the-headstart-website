@@ -99,11 +99,30 @@ const DESTINATIONS = [
 ];
 const SIGNUP_EVENTS = ["generate_lead", "discovery_form_submit", "invitee_meeting_scheduled"];
 
+// Dated changes to the funnel itself, so a step that moved because we changed
+// something is never read as performance falling over.
+//
+// A window that spans one of these is not comparable end to end: the stages
+// before the date and after it were measuring different journeys. The page says
+// so rather than leaving the reader to guess.
+const CHANGE_POINTS = [
+  { date: "2026-09-08",
+    note: "8 Sep: /links now sends people to LinkedIn instead of the site, " +
+          "so Traffic and Sign-up count fewer of them from this date. Compare " +
+          "either side of it, not across it." },
+];
+
 // The reminder emails, matched by shape because the subject carries a date.
+//
+// "Morning of" was removed on 8 September 2026 when the day-of email itself was
+// retired in Make; a row that can only ever read zero is noise on the page.
+//
+// The last reminder has gone out under two different subjects, "See you in 2
+// hours!" and "See you in 90 minutes!", so both have to be matched. Matching
+// only the first undercounted it: 3 of 8 sends in the week to 8 September.
 const EMAILS = [
   ["Booking confirmation", /^(subject:\s*)?locked in: your headstart consultation/i],
-  ["Morning of", /^initial consultation: see you today/i],
-  ["2 hours before", /^initial consultation: see you in 2 hours/i],
+  ["2 hours before", /^initial consultation: see you in (2 hours|90 minutes)/i],
 ];
 
 async function fetchAll(baseId, tableId, fields, token) {
@@ -332,9 +351,15 @@ exports.handler = async (event) => {
       continuity(byMentee, `${TARGET_GAP_DAYS} days`, from, to),
     ];
 
+    // Only the changes the chosen window actually straddles. A window entirely
+    // after a change needs no warning: everything in it is on the same basis.
+    const changes = CHANGE_POINTS
+      .filter((c) => c.date > from && c.date <= to)
+      .map((c) => c.note);
+
     return json(200, {
       stages, links: midpoints(email),
-      notes, windowDays, windows: WINDOWS, from, to,
+      notes, changes, windowDays, windows: WINDOWS, from, to,
       previousPeriod: Boolean(payload.previousPeriod),
       generatedAt: new Date().toISOString(),
     });

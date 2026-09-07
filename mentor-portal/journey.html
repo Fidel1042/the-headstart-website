@@ -182,6 +182,18 @@
     .state { font-size: 0.9rem; color: var(--text-muted); padding: 2rem 0; text-align: center; }
     .jr-foot { font-size: 0.72rem; color: var(--text-muted); margin-top: 1.6rem; text-align: center; }
 
+    /* A dated change to the funnel that this window straddles. Sits above the
+       stages, because it changes how every number under it should be read. */
+    .jr-change {
+      border-left: 3px solid #c79b3b;
+      background: rgba(199, 155, 59, 0.08);
+      border-radius: 0 6px 6px 0;
+      padding: 0.7rem 0.95rem;
+      margin: 0 0 1.4rem;
+    }
+    .jr-change__line { margin: 0; font-size: 0.82rem; line-height: 1.5; }
+    .jr-change__line + .jr-change__line { margin-top: 0.5rem; }
+
     @media (max-width: 700px) {
       .node { width: 7.5rem; }
       .node__dot { width: 5.5rem; height: 5.5rem; }
@@ -211,6 +223,7 @@
     <p class="state" id="error" hidden></p>
 
     <div id="content" hidden>
+      <div class="jr-change" id="changes" hidden></div>
       <div class="flow" id="flow"></div>
       <div id="panel"></div>
       <p class="jr-foot" id="foot"></p>

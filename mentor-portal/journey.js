@@ -91,6 +91,19 @@ async function load() {
     b.classList.toggle("is-on", Number(b.dataset.w) === WINDOW_DAYS));
   renderCompareBar();
 
+  // A funnel change the window straddles, called out above the footnote rather
+  // than inside it. Someone reading a dip needs this before they read the
+  // numbers, not in the small print underneath them.
+  const changeBox = document.getElementById("changes");
+  const changes = DATA.changes || [];
+  if (changes.length) {
+    changeBox.innerHTML = changes
+      .map((c) => `<p class="jr-change__line">${esc(c)}</p>`).join("");
+    changeBox.hidden = false;
+  } else {
+    changeBox.hidden = true;
+  }
+
   const foot = document.getElementById("foot");
   const when = new Date(DATA.generatedAt).toLocaleString("en-AU",
     { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
