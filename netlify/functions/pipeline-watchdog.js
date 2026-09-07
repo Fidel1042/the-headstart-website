@@ -41,7 +41,17 @@ const TO = [{ email: "fidelhon@gmail.com", name: "Fidel" }];
 
 // Scenarios that are meant to be switched off. Anything else found inactive is
 // a problem worth an email.
-const KNOWN_INACTIVE = new Set(["Integration Netlify, Gmail", "Integration Webhooks"]);
+//
+// Retiring a scenario means adding it here in the same change. A watchdog that
+// cries about a decision you made on purpose is one you stop reading, and then
+// it is no use for the outage it exists to catch.
+const KNOWN_INACTIVE = new Set([
+  "Integration Netlify, Gmail",
+  "Integration Webhooks",
+  // The 11:30am day-of reminder, retired 7 September 2026 after the discussion
+  // with Koko. Its three prep questions moved into the confirmation email.
+  "Send Invitee Reminder - Day Of",
+]);
 
 // How far back reconciliation looks. Longer than the gap between runs so a
 // problem is not missed if one run fails.

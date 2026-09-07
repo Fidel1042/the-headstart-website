@@ -17,6 +17,21 @@ const HEADING = /^\s*#*\s*(whatsapp|gmail|email)\s+(follow-?up|nudge)\s*:?\s*$/i
 // line is not mistaken for a heading.
 const BANNER = /^\s*={2,}\s*([^=\s].*?)\s*=*\s*$/;
 
+// A divider with no label at all, just "===" on its own line.
+//
+// The model is supposed to write "=== NUDGE 1 ===" and usually does, but it
+// drifts, and on 7 September 2026 it started emitting a bare "===" instead.
+// BANNER deliberately refuses to match that, because older records use a run of
+// equals signs as decoration INSIDE a message, and splitting on those would cut
+// a message in half.
+//
+// So a bare rule is only treated as a divider when the field contains no
+// labelled banner anywhere. If there is a real banner, decoration stays
+// decoration. If there is not, the bare rule is the only thing separating two
+// messages and has to be honoured, otherwise both messages come out as one
+// block and get copied into WhatsApp together.
+const BARE_RULE = /^\s*={2,}\s*$/;
+
 // "FOLLOW-UP (send now)" → { label: "Follow-up", when: "send now" }, so the
 // buttons can be short and the timing still shown.
 function splitLabel(raw) {
@@ -31,6 +46,10 @@ function draftMessages(drafts) {
   if (!drafts) return [];
   const lines = drafts.split(/\r?\n/);
 
+  // Decided once, up front, so the same line cannot be decoration on one pass
+  // and a divider on the next.
+  const hasLabelledBanner = lines.some((l) => BANNER.test(l));
+
   const out = [];
   let current = null;
   const push = () => {
@@ -43,6 +62,14 @@ function draftMessages(drafts) {
   lines.forEach((l) => {
     const banner = l.match(BANNER);
     if (banner) { push(); current = { ...splitLabel(banner[1]), lines: [] }; return; }
+    if (!hasLabelledBanner && BARE_RULE.test(l)) {
+      // Unlabelled, so name it by position: the first block is the follow-up,
+      // everything after it is a nudge. That matches the order the model writes
+      // them in and keeps the buttons readable.
+      push();
+      current = { label: out.length === 0 ? "Follow-up" : "Nudge", when: "", lines: [] };
+      return;
+    }
     const heading = l.match(HEADING);
     if (heading) {
       push();

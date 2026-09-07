@@ -1129,23 +1129,29 @@
       color: rgba(255,255,255,0.75);
     }
 
-    /* Wide screens: the global 1120px page container leaves big empty gutters
-       on 1600px+ displays, so let the homepage use more of the width. */
+    /* Wide screens: the global 1120px container plus clamp() caps leave the hero
+       small and floating in empty space on large displays. Scale the whole hero
+       up rather than just widening the box. */
     @media (min-width: 1500px) {
-      .home-page main {
-        max-width: 1320px;
-      }
-      .hero-outer {
-        grid-template-columns: 1fr min(35vw, 480px);
-      }
+      .home-page main { max-width: 1360px; }
+      .hero-outer { grid-template-columns: 1fr min(38vw, 530px); }
+      .hero-h1 { font-size: 3.15rem; }
+      .hero-trust-list li { font-size: 1.08rem; }
+      .hero-trust-list { gap: 0.75rem; }
+      .hero-cta-group .btn-hero-primary { font-size: 1.3rem; padding: 1.25rem 2.9rem; }
+      .hero-reviews__label { font-size: 0.72rem; }
+      .hero-review-strip__face { width: 105px; height: 105px; }
+      .hero-review-strip__name { font-size: 1.08rem; font-weight: 700; }
+      .hero-review-strip__headline { font-size: 1rem; line-height: 1.4; }
+      .hero-review-strip__tag { font-size: 0.84rem; opacity: 0.85; }
+      .hero-review-strip { padding: 1.8rem 2.2rem 1.8rem 2rem; gap: 1.4rem; }
+      .hero-logo-slider__item { height: 38px; max-width: 124px; }
+      .hero-logo-slider__item--lg { height: 58px; max-width: 152px; }
+      .hero-logo-slider__label { font-size: 0.78rem; }
     }
     @media (min-width: 1800px) {
-      .home-page main {
-        max-width: 1440px;
-      }
-      .hero-split__text {
-        padding: 3.5rem 3rem 3rem 4rem;
-      }
+      .home-page main { max-width: 1500px; }
+      .hero-split__text { padding: 3.5rem 3rem 3rem 4rem; }
     }
 
     @media (max-width: 800px) {
@@ -1852,6 +1858,14 @@
               <p class="home-mentor-card__name">Shriyansh</p>
               <p class="home-mentor-card__role">Financial Analyst</p>
               <p class="home-mentor-card__headline">2 offers in Accounting</p>
+              <a href="/mentors" class="home-mentor-card__cta">View profile</a>
+            </div>
+
+            <div class="home-mentor-card">
+              <img class="home-mentor-card__photo" src="images/Mentors/Tarush.png" alt="Tarush" />
+              <p class="home-mentor-card__name">Tarush</p>
+              <p class="home-mentor-card__role">Big 4 Tax Consultant</p>
+              <p class="home-mentor-card__headline">Skipped the Grad Program as a Grad</p>
               <a href="/mentors" class="home-mentor-card__cta">View profile</a>
             </div>
 
