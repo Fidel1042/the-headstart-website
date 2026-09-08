@@ -116,6 +116,19 @@
             Field
             <input type="text" name="applicant_field" placeholder="e.g. Finance, Marketing, Software Engineering" required />
           </label>
+          <label>
+            How did you hear about us?
+            <select name="applicant_referral_source" required>
+              <option value="" disabled selected>Select an option</option>
+              <option value="LinkedIn">LinkedIn</option>
+              <option value="Instagram">Instagram</option>
+              <option value="Referred by a mentor">Referred by a mentor</option>
+              <option value="Referred by Fidel or Koko">Referred by Fidel or Koko</option>
+              <option value="University or society event">University or society event</option>
+              <option value="Job posting">Job posting</option>
+              <option value="Others">Others</option>
+            </select>
+          </label>
           <button type="submit" class="btn btn-dark-solid">Submit</button>
         </form>
       </div>

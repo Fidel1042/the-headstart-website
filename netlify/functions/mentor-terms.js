@@ -100,7 +100,7 @@ async function listMentors(env) {
         // Already signed the old paper version. They are done, and listing
         // them as outstanding would make this page a to-do list of 14 things
         // nobody needs to do.
-        legacy: Boolean(r.fields["Legacy Agreement", "Contract Sent"]),
+        legacy: Boolean(r.fields["Legacy Agreement"]),
         // Signed at one rate, being paid at another. Worth seeing, because it
         // means somebody changed the rate after the agreement went out.
         rateChanged: Boolean(signed && agreed && agreed !== rate),

@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>DEMO · Mentor Agreement | Headstart Mentoring</title>
+  <style>
+    /* Everything in this agreement is identical for every mentor except the
+       rate, which is read from Airtable when the page loads. Changing someone's
+       pay is an edit in Airtable, not a deploy. */
+    :root {
+      --bg: #f6f6f4; --card: #ffffff; --line: rgba(0,0,0,0.14);
+      --text: #17170f; --muted: #55534d;
+      --gold: #8a6210; --gold-bright: #c79b3b; --gold-soft: #fbf5e6;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg); color: var(--text); line-height: 1.65;
+      padding: 1.6rem 1rem 4rem;
+      -webkit-text-size-adjust: 100%;
+    }
+    .wrap { max-width: 680px; margin: 0 auto; }
+    h1 { font-size: 1.55rem; font-weight: 800; color: var(--gold); margin-bottom: 0.4rem; }
+    .sub { color: var(--muted); font-size: 0.95rem; margin-bottom: 1.6rem; }
+
+    .terms { border: 1px solid var(--line); border-radius: 14px; background: var(--card);
+      padding: 1.2rem 1.3rem; margin-bottom: 1.5rem; }
+    .terms h2 { font-size: 1rem; font-weight: 800; margin: 1.3rem 0 0.4rem; }
+    .terms h2:first-child { margin-top: 0; }
+    .terms p, .terms li { font-size: 0.95rem; color: var(--muted); }
+    .terms ul { margin: 0.3rem 0 0 1.1rem; }
+    .terms li { margin-bottom: 0.2rem; }
+    .terms strong { color: var(--text); }
+    .terms__meta {
+      font-size: 0.7rem; font-weight: 800; letter-spacing: 0.09em;
+      text-transform: uppercase; color: var(--gold); margin-bottom: 0.9rem;
+    }
+    /* A long legal document needs its own scroll, or the sign button sits
+       three thousand pixels below the fold. Sized off the viewport so a short
+       laptop and a tall monitor both get a usable window. */
+    .terms { max-height: clamp(340px, 58vh, 620px); overflow-y: auto; overscroll-behavior: contain; }
+
+    .pay { border: 1px solid var(--gold-bright); background: var(--gold-soft);
+      border-radius: 14px; padding: 1.1rem 1.2rem; margin-bottom: 1.5rem; }
+    .pay__label { font-size: 0.7rem; font-weight: 800; letter-spacing: 0.09em;
+      text-transform: uppercase; color: var(--gold); }
+    .pay__rate { font-size: clamp(1.4rem, 5vw, 1.8rem); font-weight: 800; margin: 0.25rem 0 0.2rem; }
+    .pay__note { font-size: 0.88rem; color: var(--muted); }
+
+    form { display: grid; gap: 1rem; }
+    label { display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.3rem; }
+    input[type="text"], input[type="email"], input[type="date"] {
+      width: 100%; min-height: 48px; padding: 0 0.9rem;
+      border: 1px solid var(--line); border-radius: 10px;
+      background: #fff; color: var(--text);
+      /* 16px stops iOS Safari zooming the whole page on focus. */
+      font: inherit; font-size: 1rem;
+    }
+    input::placeholder { color: #7a776f; }
+    input:focus { outline: 2px solid var(--gold-bright); outline-offset: 1px; border-color: var(--gold-bright); }
+    .check { display: flex; gap: 0.6rem; align-items: flex-start; font-size: 0.92rem; }
+    .check input { width: 1.15rem; height: 1.15rem; margin-top: 0.28rem; accent-color: var(--gold-bright); flex: none; }
+    .submit {
+      min-height: 52px; border: none; border-radius: 999px;
+      background: linear-gradient(135deg, #fdf5c4, #f7d37d 45%, #c08a2d);
+      color: #2b1b09; font: inherit; font-weight: 800; font-size: 1rem; cursor: pointer;
+    }
+    .submit:disabled { opacity: 0.45; cursor: not-allowed; }
+    .err { color: #c0392b; font-size: 0.88rem; }
+    .bank {
+      display: grid; gap: 1rem;
+      border: 1px solid var(--line); border-radius: 14px;
+      background: var(--card); padding: 1.1rem 1.2rem;
+    }
+    .bank__title { font-size: 0.95rem; font-weight: 800; }
+    .honeypot { position: absolute; left: -9999px; }
+    .state { color: var(--muted); font-size: 0.95rem; padding: 2rem 0; text-align: center; }
+
+    /* Small phones: reclaim the side padding rather than squeezing the text. */
+    @media (max-width: 420px) {
+      body { padding: 1.2rem 0.75rem 3rem; }
+      .terms { padding: 1rem 0.95rem; }
+      .bank, .pay { padding: 1rem; }
+    }
+    /* Room to breathe once there is any. BSB and account number sit side by
+       side rather than as two nearly empty full-width rows. */
+    @media (min-width: 560px) {
+      .bank__row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    }
+    @media (min-width: 900px) {
+      body { padding-top: 2.6rem; }
+      .wrap { max-width: 720px; }
+      h1 { font-size: 1.75rem; }
+    }
+  </style>
+</head>
+<body>
+  <p style="margin:0;padding:11px 16px;background:#8a6210;color:#fff;font:600 14px/1.45
+     -apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;text-align:center;">
+    Demonstration copy. Jordan Reyes is not a real mentor and nothing on this page is saved.
+  </p>
+  <div class="wrap">
+    <h1>Mentor Agreement</h1>
+    <p class="sub" id="sub">Loading&hellip;</p>
+
+    <p class="state" id="gate"></p>
+
+    <div id="content" hidden>
+      <div class="pay">
+        <div class="pay__label">Your rate</div>
+        <div class="pay__rate" id="rate"></div>
+        <div class="pay__note">Paid weekly in arrears. See clause 6.</div>
+      </div>
+
+      <div class="terms">
+        <p class="terms__meta">The Headstart &middot; Mentor Contractor Agreement &middot; Confidential</p>
+
+        <h2>1. Background</h2>
+        <p>A. We consider you qualified to mentor for The Headstart.</p>
+        <p>B. You agree to provide them on these terms.</p>
+        <p>C. This Agreement supersedes any prior understanding on its subject matter.</p>
+        <p>D. Any unenforceable provision is severed and the rest continues.</p>
+
+        <h2>2. Capacity / independent contractor</h2>
+        <p>2.1 You act as an independent contractor, not an employee, partner, or agent.</p>
+        <p>2.2 Nothing here creates employment or partnership.</p>
+        <p>2.3 You are responsible for your own tax, superannuation, and insurance.</p>
+        <p>2.4 You may not bind or represent us unless authorised in writing.</p>
+
+        <h2>3. Position</h2>
+        <p>3.1 You are engaged as a Mentor, or another role agreed in writing.</p>
+        <p>3.2 You work independently and, where required, with our representatives.</p>
+
+        <h2>4. Commencement</h2>
+        <p>This Agreement commences on the date in Item 1 of the Schedule.</p>
+
+        <h2>5. Responsibilities</h2>
+        <p>5.1 Your responsibilities are in Item 2 and may be varied by us.</p>
+        <p>5.2 You must:</p>
+        <ul>
+          <li>(a) promote our interests;</li>
+          <li>(b) protect our reputation;</li>
+          <li>(c) avoid conflicts with our interests;</li>
+          <li>(d) act honestly, diligently, and professionally; and</li>
+          <li>(e) work to the best of your ability.</li>
+        </ul>
+        <p>5.3 We may direct you to perform, or stop performing, any duty at any time.</p>
+
+        <h2>6. Method and frequency of payment</h2>
+        <p>6.1 You are paid at the rate in Item 3.</p>
+        <p>6.2 You must invoice through our process. We may provide a template.</p>
+        <p>6.3 Payment is weekly in arrears.</p>
+        <p>6.4 Nothing is owed for services not delivered or not approved by us.</p>
+
+        <h2>7. Expenses</h2>
+        <p>7.1 You bear all expenses of providing the services.</p>
+        <p>7.2 Nothing is reimbursed unless approved by us in writing beforehand.</p>
+
+        <h2>8. Term and termination</h2>
+        <p>8.1 This Agreement continues until terminated.</p>
+        <p>8.2 Either party may terminate on 14 days&rsquo; written notice.</p>
+        <p>8.3 We may terminate immediately if you:</p>
+        <ul>
+          <li>(a) breach a material provision;</li>
+          <li>(b) breach confidentiality;</li>
+          <li>(c) engage in misconduct or damage our reputation;</li>
+          <li>(d) solicit our clients or students; or</li>
+          <li>(e) otherwise act against our interests.</li>
+        </ul>
+        <p>8.4 Confidentiality, intellectual property, Resource Packs, and non-solicitation survive termination.</p>
+
+        <h2>9. Our property</h2>
+        <p>9.1 Our property remains ours at all times.</p>
+        <p>9.2 It includes Confidential Information, Intellectual Property, Resource Packs, records, and data in any form.</p>
+        <p>9.3 On request or termination, you must return or delete it.</p>
+
+        <h2>10. Confidential information</h2>
+        <p>10.1 You must keep confidential all information about us, our students, mentors, systems, pricing, and business affairs (&ldquo;Confidential Information&rdquo;).</p>
+        <p>10.2 You may use or disclose it only to perform the services, or where required by law.</p>
+        <p>10.3 Breach is serious misconduct and grounds for immediate termination.</p>
+        <p>10.4 This clause continues indefinitely after termination.</p>
+
+        <h2>11. Intellectual property</h2>
+        <p>11.1 All Intellectual Property you create in the course of your services is ours.</p>
+        <p>11.2 This applies whether created alone or jointly, in or out of hours.</p>
+        <p>11.3 You must disclose it to us immediately.</p>
+        <p>11.4 You assign all rights in it to us and must do what is needed to perfect ownership.</p>
+        <p>11.5 You must not use or distribute it without our written consent.</p>
+        <p>11.6 This clause continues after termination.</p>
+
+        <h2>12. Resource Packs and materials</h2>
+        <p>12.1 &ldquo;Resource Packs&rdquo; means any guides, templates, decks, worksheets, session plans, video, audio, or other resources produced, curated, or branded by us for the mentoring services, in any format, complete or in development.</p>
+        <p>12.2 We may make Resource Packs available for your sessions, and you must use them as we direct.</p>
+        <p>12.3 Resource Packs are Confidential Information and remain ours. Clauses 10 and 11 apply in full.</p>
+        <p>12.4 You must not:</p>
+        <ul>
+          <li>(a) copy, share, publish, sell, or sublicense a Resource Pack to anyone other than students engaged through us;</li>
+          <li>(b) use one outside this Agreement; or</li>
+          <li>(c) rebrand or present one as your own work.</li>
+        </ul>
+        <p>12.5 Anything you contribute to a Resource Pack forms part of it and is ours under Clause 11.</p>
+        <p>12.6 On request or termination, you must return or delete all Resource Packs and any copies or extracts.</p>
+        <p>12.7 This clause continues indefinitely after termination.</p>
+
+        <h2>13. Non-solicitation</h2>
+        <p>13.1 During this Agreement and for 12 months after termination, you must not directly or indirectly:</p>
+        <ul>
+          <li>(a) solicit any student or client of ours;</li>
+          <li>(b) provide services outside this Agreement to anyone introduced to you through us; or</li>
+          <li>(c) induce any contractor or mentor of ours to leave.</li>
+        </ul>
+
+        <h2>14. Non-competition</h2>
+        <p>14.1 During this Agreement and for 6 months after termination, you must not, within Australia, provide career mentoring, coaching, resume, interview, or job application services that compete with us, on your own account or for anyone else.</p>
+        <p>14.2 Clause 14.1 does not restrict your primary occupation or employment outside career mentoring.</p>
+        <p>14.3 The restraint is reasonable and necessary to protect our Confidential Information, Resource Packs, and student relationships.</p>
+        <p>14.4 If clause 14.1 is unenforceable, it is read down as far as needed, and if it cannot be, it is severed without affecting the rest.</p>
+
+        <h2>15. General</h2>
+        <p>15.1 This Agreement may only be amended in writing signed by both parties.</p>
+        <p>15.2 You may not transfer your obligations without our written consent.</p>
+        <p>15.3 This Agreement is governed by the laws of Australia and, where applicable, New South Wales.</p>
+        <p>15.4 Each party will do what is needed to give effect to this Agreement.</p>
+
+        <h2>16. Marketing &amp; publicity consent</h2>
+        <p>16.1 You consent to us using your name, photo, professional background, and career information for marketing, including on our website and social media.</p>
+        <p>16.2 Such use is limited to representing you as a Mentor and will not disclose sensitive personal information.</p>
+        <p>16.3 You may withdraw consent in writing. It applies to future publications only.</p>
+
+        <h2>Schedule</h2>
+        <p><strong>Item 1 &ndash; Commencement date.</strong> The date you sign below.</p>
+        <p><strong>Item 2 &ndash; Role description.</strong> Mentor, providing 1:1 sessions to our students using our Resource Packs as directed, and contributing to Resource Packs where requested.</p>
+        <p><strong>Item 3 &ndash; Rate.</strong> <span id="schedule-rate"></span></p></div>
+
+      <form class="agreement-form" id="form" name="mentor-agreement"
+           >
+        
+        <input type="hidden" name="agreement_version" value="Mentor Contractor Agreement v1.2 (26/08/2026)" />
+        <input type="hidden" name="mentor_id" id="f-id" />
+        <!-- The rate is submitted too, so the record shows what was actually
+             agreed to rather than whatever Airtable says months later. -->
+        <input type="hidden" name="rate_agreed" id="f-rate" />
+
+        <p class="honeypot"><label>Don't fill this out if you're human: <input name="bot-field" /></label></p>
+
+        <div>
+          <label for="f-name">Full name</label>
+          <input type="text" id="f-name" name="full_name" required autocomplete="name" />
+        </div>
+        <div>
+          <label for="f-email">Email</label>
+          <input type="email" id="f-email" name="email" required autocomplete="email" />
+        </div>
+        <div>
+          <label for="f-sign">Signature (type your full name)</label>
+          <input type="text" id="f-sign" name="signature" required />
+        </div>
+        <div>
+          <label for="f-date">Date</label>
+          <input type="date" id="f-date" name="date" required />
+        </div>
+
+        <div class="bank">
+          <p class="bank__title">Where we pay you</p>
+          <div>
+            <label for="f-acct-name">Account name</label>
+            <input type="text" id="f-acct-name" name="account_name" required
+                   autocomplete="off" />
+          </div>
+          <div class="bank__row">
+          <div>
+            <label for="f-bsb">BSB</label>
+            <input type="text" id="f-bsb" name="bsb" required inputmode="numeric"
+                   autocomplete="off" placeholder="123-456" maxlength="7" />
+          </div>
+          <div>
+            <label for="f-acct">Account number</label>
+            <input type="text" id="f-acct" name="account_number" required inputmode="numeric"
+                   autocomplete="off" placeholder="12345678" maxlength="10" />
+          </div>
+        </div>
+          </div>
+
+        <label class="check">
+          <input type="checkbox" id="f-contractor" name="contractor_ack" value="yes" required />
+          <span>I understand I am engaged as an independent contractor, not an employee,
+            and I am responsible for my own tax.</span>
+        </label>
+
+        <label class="check">
+          <input type="checkbox" id="f-agree" name="agreed" value="yes" required />
+          <span>I acknowledge that I have read and understood this Agreement, have had the
+            opportunity to obtain independent legal advice, and accept its terms, including
+            the rate shown.</span>
+        </label>
+
+        <p class="err" id="err" aria-live="polite"></p>
+        <button type="submit" class="submit" id="f-submit">Sign agreement</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // DEMO PAGE. Nothing here is real and nothing is saved.
+    //
+    // The live agreement at /mentor-agreement reads the mentor's name and rate
+    // from Airtable using the ?m= code in their link, and refuses to render
+    // without one. That is the right behaviour for a legal document and the
+    // wrong behaviour for showing somebody what the agreement looks like, so
+    // this copy hard-codes a fictional mentor instead and submits nowhere.
+    //
+    // Keep the clause text below in step with mentor-agreement.html. If the
+    // real terms change and this file does not, the demo starts lying.
+    var DEMO = {
+      name: "Jordan Reyes",
+      email: "jordan.reyes@example.com",
+      rate: 22,
+      mentorId: "recDEMO0000000000"
+    };
+    var money = function (n) { return "$" + Number(n).toFixed(0); };
+
+    document.getElementById("sub").textContent =
+      DEMO.name + ", this is your agreement with Headstart Mentoring. " +
+      "Read it, then sign at the bottom.";
+    document.getElementById("rate").textContent = money(DEMO.rate) + " per 40 minute session";
+    document.getElementById("schedule-rate").textContent =
+      money(DEMO.rate) + " per 40 minute session.";
+    document.getElementById("f-id").value = DEMO.mentorId;
+    document.getElementById("f-rate").value = DEMO.rate;
+    document.getElementById("f-name").value = DEMO.name;
+    document.getElementById("f-email").value = DEMO.email;
+    document.getElementById("f-date").value = new Date().toISOString().slice(0, 10);
+    document.getElementById("gate").textContent = "";
+    document.getElementById("content").hidden = false;
+
+    // Format the BSB as they type: everyone writes it 123-456, and a stored
+    // value that sometimes has the dash and sometimes does not is a nuisance
+    // at pay time.
+    document.getElementById("f-bsb").addEventListener("input", function (e) {
+      var v = e.target.value.replace(/\D/g, "").slice(0, 6);
+      e.target.value = v.length > 3 ? v.slice(0, 3) + "-" + v.slice(3) : v;
+    });
+    document.getElementById("f-acct").addEventListener("input", function (e) {
+      e.target.value = e.target.value.replace(/\D/g, "").slice(0, 10);
+    });
+
+    // A typed signature has to match the name, or it is not a signature.
+    document.getElementById("form").addEventListener("submit", function (e) {
+      var name = document.getElementById("f-name").value.trim().toLowerCase();
+      var sign = document.getElementById("f-sign").value.trim().toLowerCase();
+      var err = document.getElementById("err");
+      if (!sign) { e.preventDefault(); err.textContent = "Please type your signature."; return; }
+      if (name && sign !== name) {
+        e.preventDefault();
+        err.textContent = "Your signature needs to match your full name exactly.";
+        return;
+      }
+      // A wrong digit here is a failed transfer and a chase, so it is checked
+      // rather than accepted and discovered on Monday.
+      var bsb = document.getElementById("f-bsb").value.replace(/\D/g, "");
+      if (bsb.length !== 6) {
+        e.preventDefault();
+        err.textContent = "A BSB is 6 digits, like 123-456.";
+        document.getElementById("f-bsb").focus();
+        return;
+      }
+      var acct = document.getElementById("f-acct").value.replace(/\D/g, "");
+      if (acct.length < 5 || acct.length > 10) {
+        e.preventDefault();
+        err.textContent = "An account number is between 5 and 10 digits.";
+        document.getElementById("f-acct").focus();
+        return;
+      }
+      // The real page posts to Netlify Forms here. This one stops.
+      e.preventDefault();
+      err.textContent = "";
+      document.getElementById("f-submit").disabled = true;
+      document.getElementById("f-submit").textContent = "Demo only, nothing was sent";
+    });
+  </script>
+</body>
+</html>
