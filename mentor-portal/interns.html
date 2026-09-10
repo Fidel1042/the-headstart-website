@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <title>Intern Applicants – The Headstart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+  <style id="auth-gate">
+    html:not(.auth-ok) body { visibility: hidden; }
+    html:not(.auth-ok) { background: #fff; }
+  </style>
+  <link rel="stylesheet" href="portal.css" />
+  <link rel="stylesheet" href="portal-nav.css" />
+  <link rel="stylesheet" href="/mentor-portal/polish.css" />
+  <style>
+    .in-page { max-width: 880px; margin: 0 auto; padding: 1.6rem 1.2rem 4rem; }
+    .in-head h1 { font-size: 1.4rem; font-weight: 800; margin: 0 0 0.3rem; }
+    .in-sub { font-size: 0.82rem; color: var(--text-muted); margin: 0 0 1.4rem; }
+
+    .sec__title {
+      font-size: 0.66rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--accent); margin: 1.6rem 0 0.7rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .sec__count { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+    .a {
+      border: 1px solid var(--line); border-radius: 14px; background: var(--bg-card);
+      padding: 0.9rem 1.05rem; margin-bottom: 0.6rem;
+    }
+    .a__top { display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
+    .a__name { font-weight: 700; font-size: 0.98rem; }
+    .a__meta { font-size: 0.76rem; color: var(--text-muted); }
+    .a__links { display: flex; gap: 0.75rem; flex-wrap: wrap; margin: 0.45rem 0 0; }
+    .a__links a { font-size: 0.78rem; color: var(--accent); text-decoration: underline; }
+    .a__links span.none { font-size: 0.78rem; color: var(--text-muted); }
+
+    .pill {
+      font-size: 0.64rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 0.16rem 0.5rem; border-radius: 999px; border: 1px solid var(--line);
+      color: var(--text-muted); white-space: nowrap;
+    }
+    .pill--new { background: rgba(199,155,59,.14); border-color: rgba(199,155,59,.4); color: #8a6210; }
+    .pill--invited { background: rgba(46,125,82,.12); border-color: rgba(46,125,82,.35); color: #2e7d52; }
+
+    .a__act { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; margin-top: 0.7rem; }
+    .a__act input[type="datetime-local"] {
+      font: inherit; font-size: 0.82rem; padding: 0.42rem 0.55rem;
+      border: 1px solid var(--line); border-radius: 9px; background: var(--bg); color: var(--text);
+    }
+    .btn-i {
+      font: inherit; font-size: 0.82rem; font-weight: 700; cursor: pointer;
+      padding: 0.45rem 0.9rem; border-radius: 999px; border: 0;
+      background: var(--accent); color: #17170f; min-height: 36px;
+    }
+    .btn-i[disabled] { opacity: .55; cursor: default; }
+    .btn-i--ghost { background: transparent; border: 1px solid var(--line); color: var(--text-muted); }
+
+    .a__note { font-size: 0.78rem; color: var(--text-muted); margin: 0.5rem 0 0; }
+    .a__err { font-size: 0.78rem; color: #b3541e; margin: 0.4rem 0 0; }
+    .quiet { font-size: 0.82rem; color: var(--text-muted); }
+    .state { font-size: 0.85rem; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+  <div id="portal-nav"></div>
+
+  <main class="in-page">
+    <div class="in-head">
+      <h1>Intern applicants</h1>
+      <p class="in-sub">From the internship application form. Pick a time and the interview
+        invite goes out, and the applicant moves to Invited.</p>
+    </div>
+
+    <p class="state" id="loading">Loading&hellip;</p>
+    <p class="state" id="error" hidden></p>
+
+    <div id="content" hidden>
+      <p class="sec__title">To review <span class="sec__count" id="new-count"></span></p>
+      <div id="new-list"></div>
+
+      <p class="sec__title">Invited <span class="sec__count" id="inv-count"></span></p>
+      <div id="inv-list"></div>
+
+      <p class="sec__title">Closed <span class="sec__count" id="done-count"></span></p>
+      <div id="done-list"></div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { requireAuth } from "./auth.js";
+    import { mountPortalNav, initTheme } from "./portal-ui.js";
+
+    initTheme();
+
+    let ADMIN_EMAIL = "";
+    let DATA = null;
+
+    const esc = (v) => String(v == null ? "" : v)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    const day = (d) => d
+      ? new Date(d + "T00:00:00").toLocaleDateString("en-AU", { day: "numeric", month: "short" })
+      : "";
+    const slot = (iso) => iso
+      ? new Date(iso).toLocaleString("en-AU", { timeZone: "Australia/Sydney",
+          weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })
+      : "";
+
+    // Default the picker to 5pm tomorrow, Sydney. Almost every interview is an
+    // evening one, so the common case is two clicks rather than eight.
+    function defaultSlot() {
+      const d = new Date(Date.now() + 86400000);
+      const syd = new Date(d.toLocaleString("en-US", { timeZone: "Australia/Sydney" }));
+      syd.setHours(17, 0, 0, 0);
+      const pad = (n) => String(n).padStart(2, "0");
+      return `${syd.getFullYear()}-${pad(syd.getMonth() + 1)}-${pad(syd.getDate())}T17:00`;
+    }
+
+    requireAuth((session) => {
+      const email = session?.user?.email || "";
+      const OWNERS = ["fidelhon@gmail.com", "kokoro.araki1015@gmail.com"];
+      if (!OWNERS.includes(email) && email !== "dev@localhost") {
+        window.location.replace("/mentor-portal/index.html");
+        return;
+      }
+      ADMIN_EMAIL = email;
+      mountPortalNav({ email, isOwner: true, active: "interns" });
+      load();
+    });
+
+    async function call(payload) {
+      const res = await fetch("/.netlify/functions/intern-pipeline", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...payload, adminEmail: ADMIN_EMAIL }),
+      });
+      const body = await res.text();
+      if (body.trim().startsWith("<")) {
+        throw new Error("This page needs the live site. Preview mode cannot run the " +
+          "data function, so there is nothing to show until it is pushed.");
+      }
+      const out = JSON.parse(body);
+      if (!res.ok) throw new Error(out.error || "Something went wrong");
+      return out;
+    }
+
+    async function load() {
+      const loading = document.getElementById("loading");
+      const errorEl = document.getElementById("error");
+      loading.hidden = false; errorEl.hidden = true;
+      try {
+        DATA = await call({ action: "list" });
+        render();
+        document.getElementById("content").hidden = false;
+      } catch (err) {
+        errorEl.textContent = err.message;
+        errorEl.hidden = false;
+      } finally {
+        loading.hidden = true;
+      }
+    }
+
+    function links(a) {
+      const bits = [];
+      if (a.resume) bits.push(`<a href="${esc(a.resume)}" target="_blank" rel="noopener">Resume</a>`);
+      if (a.linkedin) bits.push(`<a href="${esc(a.linkedin)}" target="_blank" rel="noopener">LinkedIn</a>`);
+      if (a.portfolio) bits.push(`<a href="${esc(a.portfolio)}" target="_blank" rel="noopener">Portfolio</a>`);
+      if (a.email) bits.push(`<a href="mailto:${esc(a.email)}">${esc(a.email)}</a>`);
+      if (a.phone) bits.push(`<a href="tel:${esc(a.phone)}">${esc(a.phone)}</a>`);
+      return bits.length ? bits.join("") : `<span class="none">No links on the application.</span>`;
+    }
+
+    function card(a, mode) {
+      const pill = a.status === "New" ? "pill--new" : a.status === "Invited" ? "pill--invited" : "";
+      return `
+        <div class="a" data-id="${a.id}">
+          <div class="a__top">
+            <span class="a__name">${esc(a.name)}</span>
+            <span class="pill ${pill}">${esc(a.status)}</span>
+            <span class="a__meta">${esc(a.role || "Role not captured")} &middot; applied ${day(a.applied)}</span>
+          </div>
+          <div class="a__links">${links(a)}</div>
+          ${mode === "new" ? `
+          <div class="a__act">
+            <input type="datetime-local" data-when value="${defaultSlot()}" />
+            <button type="button" class="btn-i" data-invite>Send interview invite</button>
+            <button type="button" class="btn-i btn-i--ghost" data-reject>Reject</button>
+          </div>` : ""}
+          ${mode === "invited" ? `
+          <p class="a__note">Invited ${day(a.inviteSent)}${a.interviewAt ? `, interview ${esc(slot(a.interviewAt))}` : ""}.
+            ${a.response ? esc(a.response) + "." : "No reply recorded yet."}</p>
+          <div class="a__act">
+            <button type="button" class="btn-i btn-i--ghost" data-status="Interviewed">Mark interviewed</button>
+            <button type="button" class="btn-i btn-i--ghost" data-reject>Reject</button>
+          </div>` : ""}
+          <p class="a__err" data-err hidden></p>
+        </div>`;
+    }
+
+    function render() {
+      const all = DATA.applicants || [];
+      const fresh = all.filter((a) => a.status === "New");
+      const invited = all.filter((a) => a.status === "Invited");
+      const closed = all.filter((a) => !["New", "Invited"].includes(a.status));
+
+      document.getElementById("new-count").textContent = fresh.length;
+      document.getElementById("inv-count").textContent = invited.length;
+      document.getElementById("done-count").textContent = closed.length;
+
+      document.getElementById("new-list").innerHTML = fresh.length
+        ? fresh.map((a) => card(a, "new")).join("")
+        : `<p class="quiet">Nobody waiting.</p>`;
+      document.getElementById("inv-list").innerHTML = invited.length
+        ? invited.map((a) => card(a, "invited")).join("")
+        : `<p class="quiet">Nobody invited yet.</p>`;
+      document.getElementById("done-list").innerHTML = closed.length
+        ? closed.map((a) => card(a, "closed")).join("")
+        : `<p class="quiet">None.</p>`;
+    }
+
+    document.addEventListener("click", async (e) => {
+      const btn = e.target.closest("[data-invite], [data-reject], [data-status]");
+      if (!btn) return;
+      const cardEl = btn.closest(".a");
+      const id = cardEl.dataset.id;
+      const errEl = cardEl.querySelector("[data-err]");
+      errEl.hidden = true;
+      const original = btn.textContent;
+      btn.disabled = true;
+
+      try {
+        if (btn.hasAttribute("data-invite")) {
+          const when = cardEl.querySelector("[data-when]").value;
+          if (!when) throw new Error("Pick a date and time first.");
+          btn.textContent = "Sending…";
+          // The picker is a wall clock with no zone, and the times are always
+          // Sydney. Sent as a plain local string plus the Sydney offset so the
+          // server stores the instant Fidel actually meant.
+          const off = new Intl.DateTimeFormat("en-US", { timeZone: "Australia/Sydney",
+            timeZoneName: "longOffset" }).formatToParts(new Date(when))
+            .find((p) => p.type === "timeZoneName").value.replace("GMT", "") || "+10:00";
+          await call({ action: "invite", id, when: `${when}:00${off}` });
+        } else if (btn.hasAttribute("data-reject")) {
+          btn.textContent = "Saving…";
+          await call({ action: "set", id, fields: { Status: "Rejected" } });
+        } else {
+          btn.textContent = "Saving…";
+          await call({ action: "set", id, fields: { Status: btn.dataset.status } });
+        }
+        await load();
+      } catch (err) {
+        errEl.textContent = err.message;
+        errEl.hidden = false;
+        btn.disabled = false;
+        btn.textContent = original;
+      }
+    });
+  </script>
+</body>
+</html>

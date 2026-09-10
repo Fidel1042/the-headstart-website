@@ -66,6 +66,7 @@ export const NAV_AREAS = [
       { href: "/mentor-portal/second-interviews.html", label: "Second interviews", page: "second-interviews", group: "Hiring" },
       { href: "/mentor-portal/agreements.html", label: "Agreements", page: "agreements", group: "Hiring" },
       { href: "/mentor-portal/drafts.html", label: "Profiles", page: "drafts", group: "Hiring" },
+      { href: "/mentor-portal/interns.html", label: "Intern applicants", page: "interns", group: "Hiring" },
       { href: "/mentor-portal/onboarding-plan.html", label: "Plan", page: "onboarding-plan", group: "Onboarding" },
       { href: "/mentor-portal/onboarding-call.html", label: "Call", page: "onboarding-call", group: "Onboarding" },
       { href: "/mentor-portal/delivery-checks.html", label: "Delivery check-in", page: "delivery-checks", group: "Onboarding" },
