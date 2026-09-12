@@ -89,6 +89,19 @@ exports.handler = async (event) => {
       charged, fee, payout,
     };
 
+    // A refund of unused prepaid sessions. Cash going back out, and nothing
+    // else: those sessions were never delivered, so their value was never
+    // recognised as revenue and there is nothing here to reverse. It must not
+    // count as a session either, or the month shows a delivery that never
+    // happened. Shown as its own line so the cash is visible rather than silent.
+    //
+    // Amount Charged is stored negative so the ledger still adds up to the cash
+    // actually held. Must match monthly-pl.js.
+    if (status === "Refunded") {
+      if (inMonth) lines.push({ ...line, revenue: 0, payout: 0, margin: charged, kind: "refund" });
+      continue;
+    }
+
     // Package PURCHASE row (the one-off up-front charge): cash-in only. Revenue
     // is recognised across the delivered sessions instead, so it is not counted
     // as revenue or as a session, but it did incur a real Stripe fee.

@@ -72,6 +72,16 @@ exports.handler = async () => {
     const viaStripe = Boolean(s.fields["Stripe Payment ID"]);
     const fee       = (charged > 0 && viaStripe) ? charged * 0.0325 + 0.30 : 0;
 
+    // A refund of unused prepaid sessions. Cash going back out, and nothing
+    // else: those sessions were never delivered, so their value was never
+    // recognised as revenue and there is nothing here to reverse. It must not
+    // count as a session either, or the month shows a delivery that never
+    // happened and the margin per session goes wrong.
+    //
+    // Amount Charged is stored negative so the ledger still adds up to the cash
+    // actually held. Must match the other P&L file.
+    if (status === "Refunded") continue;
+
     // Package PURCHASE row (one-off up-front charge): cash-in only, no revenue
     // or session recognised here (recognised per delivered session), but it did
     // incur a real Stripe fee when it went through Stripe.
