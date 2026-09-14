@@ -1,13 +1,13 @@
 // ROI calculator: pure arithmetic on the mentee's own numbers.
-// Investment uses live pricing: a $55 trial session, then $70 for every
-// session after it. The five-session prepay was retired in August 2026.
+// Investment uses live pricing: a flat $55 a session. The five-session prepay
+// was retired in August 2026, and the $70 ongoing rate was reverted on
+// 14 Sep 2026, so there is one rate again.
 //
 // The gain is the difference between what they'd take home in the graduate
 // role and what they take home in their current part-time job, so the number
 // survives a prospect asking "but I'm already earning something".
 
-const TRIAL_RATE = 55;
-const ONGOING_RATE = 70;
+const SESSION_RATE = 55;
 const WEEKS_PER_YEAR = 52;
 
 // Australian resident income tax, 2025-26 rates. No Medicare levy, no offsets.
@@ -23,16 +23,13 @@ function taxOn(income) {
 const takeHome = (income) => income - taxOn(income);
 const money = (n) => "$" + Math.round(n).toLocaleString("en-AU");
 
-// Trial is charged once, on the first session only.
 function investmentFor(sessions) {
-  if (sessions <= 0) return 0;
-  return TRIAL_RATE + (sessions - 1) * ONGOING_RATE;
+  return sessions > 0 ? sessions * SESSION_RATE : 0;
 }
 
 function investmentBreakdown(sessions) {
   if (sessions <= 0) return "";
-  if (sessions === 1) return `${money(TRIAL_RATE)} trial`;
-  return `${money(TRIAL_RATE)} trial + ${sessions - 1} x ${money(ONGOING_RATE)}`;
+  return `${sessions} x ${money(SESSION_RATE)}`;
 }
 
 function fillRange(el) {

@@ -116,7 +116,6 @@
       const menteeSelect     = document.getElementById("mentee-select");
       const dateInput        = document.getElementById("session-date");
       const nextDateInput    = document.getElementById("next-session-date");
-      const notesField       = document.getElementById("session-notes");
       const countSelect      = document.getElementById("session-count");
       const submitBtn     = document.getElementById("session-submit-btn");
       const errorEl       = document.getElementById("form-error");
@@ -204,7 +203,6 @@
         const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
         dateInput.value        = local.toISOString().split("T")[0];
         nextDateInput.value    = "";
-        notesField.value       = "";
         submitBtn.disabled     = false;
         submitBtn.textContent  = "Log Session →";
         errorEl.textContent    = "";
@@ -240,7 +238,6 @@
                 mentorEmail,
                 sessionDate,
                 nextSessionDate: nextDateInput.value || "",
-                notes: notesField.value.trim(),
                 // Back-to-back sessions on one date. Each becomes its own row.
                 count: parseInt(countSelect.value, 10) || 1,
                 confirmDuplicate,
@@ -970,10 +967,6 @@
                 <option value="4">4</option>
               </select>
             </div>
-          </div>
-          <div class="form-field">
-            <label for="session-notes">Notes</label>
-            <textarea id="session-notes"></textarea>
           </div>
           <button type="submit" class="session-submit" id="session-submit-btn">Log session &rarr;</button>
           <p class="form-error" id="form-error" aria-live="polite"></p>

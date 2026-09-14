@@ -471,32 +471,27 @@
 
     <div class="card-box">
       <h2>Your resources</h2>
-      <p>Everything you need sits in the mentor portal under <strong>Resources</strong>. Have a read of all three before your first session.</p>
+      <p>Have a read of all 3 before your first session.</p>
 
       <div class="res-item">
       <h3>01 &middot; Mentor Resource Hub</h3>
-      <p>The reference library. Resume and LinkedIn feedback, cover letters, where to find roles, the networking playbook, coffee chat etiquette, interview questions, screening calls, psychometric tests, assessment centres and case studies.</p>
-      <p>Use it when you are not sure how to advise on a specific part of the job search. Pull the section you need and adapt it, it is a reference and not a script.</p>
       <p><a class="res-out" data-doc="hub" href="tutor-resources.html" target="_blank" rel="noopener">Open the Resource Hub &rarr;</a></p>
       </div>
 
       <div class="res-item">
-      <h3>02 &middot; Accountability shared document</h3>
-      <p>A shared tracker you copy once per mentee. Use it to keep you and the mentee's progress on the same page, so nobody is guessing what was agreed last session or what is still outstanding.</p>
+      <h3>02 &middot; Suggested tracker</h3>
+      <p>Totally optional.</p>
       <p><a class="res-out" data-doc="tracker" href="https://docs.google.com/document/d/1D_OHsA1uESXiiDrlh8nydSpFhxg8RlTP17M97_UWejM/edit?usp=sharing" target="_blank" rel="noopener">Open the tracker &rarr;</a></p>
       </div>
 
       <div class="res-item">
-      <h3>03 &middot; Recommended Structure Flow for Weekly Sessions</h3>
-      <p>A recommended <strong>12 to 15 session structure</strong>, so you never run out of ideas on what to cover next. It runs from goal setting and materials, through outreach and coffee chats, into screening calls, story banks and mock interviews, and finishes on live interview prep.</p>
-      <p>You do not have to follow it strictly. We are more than happy if you run your own weekly structure, and if a mentee has an ad hoc request that takes priority.</p>
+      <h3>03 &middot; Recommended 12 to 15 session structure</h3>
+      <p>It’s a guide, not a rule. Run your own if you prefer.</p>
       <p><a class="res-out" data-doc="schedule" href="session-schedule.html" target="_blank" rel="noopener">Open the structure flow &rarr;</a></p>
       </div>
 
       <div class="res-item">
       <h3>04 &middot; Difficult Mentees?</h3>
-      <p>How to deal with mentees, at a high level. The two broad types you will meet, the specific personalities that need a different approach, and when to flag something to Fidel.</p>
-      <p>Worth reading early. Most of the difficulty in mentoring is not the job search advice, it is working out what this particular person actually needs from you.</p>
       <p><a class="res-out" data-doc="types" href="mentee-types.html" target="_blank" rel="noopener">Open Difficult Mentees &rarr;</a></p>
       </div>
 
@@ -504,54 +499,17 @@
     </div>
 
     <div class="card-box">
-      <h2>At the end of each session, please tick all of the following</h2>
-      <ol class="end-check">
-        <li>Set at least 1 take home task</li>
-        <li>Mention what will be in the next session</li>
-        <li>Confirm a next session date in the call</li>
-      </ol>
-      <ul>
-        <li>If the mentee has more important requests, always listen and be flexible on the plan.</li>
-        <li>If a mentee consistently fails to do their tasks, <a class="res-out" data-doc="types" href="mentee-types.html" target="_blank" rel="noopener">check Difficult Mentees</a> for how to deal with it.</li>
-      </ul>
+      <h2>At the end of every session</h2>
+      <p>Confirm the next session date before the call ends. That’s the only thing we ask.</p>
     </div>
 
-    <div class="card-box">
-      <h2>Module Checklist</h2>
-      <ul class="checklist" id="checklist">
-        <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I have read the Mentor Resource Hub and know what is in it</li>
-        <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I have read the recommended structure flow and understand the 12 to 15 session shape</li>
-        <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I have read Difficult Mentees and know how to handle the different personalities</li>
-        <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I understand how mentees are matched with their mentor</li>
-        <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I know that Fidel manages the WhatsApp group and is the main point of contact</li>
-        <li onclick="toggle(this)"><span class="check-box">&#10003;</span> I will set a task, flag what is next, and confirm the next session date at the end of every session</li>
-      </ul>
-      <div class="congrats" id="congrats">
-        <div class="congrats__text">
-          <div class="congrats__title">Module 2 complete</div>
-          <div class="congrats__sub">Nice work. Move on to Session Logs &amp; Payment when ready.</div>
-        </div>
-        <a class="btn-congrats next-gate" href="mentor-onboarding-teachworks-payment.html">Next Module &rarr;</a>
-      </div>
-    </div>
+    <p class="intro" style="text-align:center;">That’s module 2. Last one is how you get paid.</p>
 
     <div class="controls">
       <a class="btn" href="mentor-onboarding-professional-standards.html">&larr; Previous Module</a>
       <a class="btn btn-gold next-gate" href="mentor-onboarding-teachworks-payment.html">Next Module &rarr;</a>
     </div>
 
-    <script>
-      function toggle(li) {
-        li.classList.toggle('checked');
-        var all = document.querySelectorAll('#checklist li');
-        var done = document.querySelectorAll('#checklist li.checked');
-        if (done.length === all.length) {
-          document.getElementById('congrats').classList.add('visible');
-        } else {
-          document.getElementById('congrats').classList.remove('visible');
-        }
-      }
-    </script>
 
   </main>
     <script>
@@ -581,8 +539,8 @@
           var status = document.getElementById('docs-status');
           if (status) {
             status.textContent = all
-              ? 'All three opened. You can move on.'
-              : 'Opened ' + done.length + ' of 3. Open all three to continue.';
+              ? 'All 3 opened. You\u2019re good to move on.'
+              : 'Opened ' + done.length + ' of 3. Have a read of all 3 to continue.';
           }
         }
 
@@ -597,7 +555,7 @@
           var gate = e.target.closest('.next-gate');
           if (gate && gate.classList.contains('locked')) {
             e.preventDefault();
-            alert('Please open all three resources first. They are the ones you will lean on every session.');
+            alert('Have a quick read of all 3 first. They\u2019re the ones you\u2019ll lean on every session.');
           }
         });
 
