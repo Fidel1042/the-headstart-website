@@ -54,7 +54,7 @@ export const NAV_AREAS = [
     links: [
       { href: "/mentor-portal/contacts.html", label: "Contacts to add", page: "contacts", group: "Before a mentor" },
       { href: "/mentor-portal/assign.html", label: "Assign mentees", page: "assign", group: "Before a mentor" },
-      { href: "/mentor-portal/followups.html", label: "Follow-ups", page: "followups", group: "Before a mentor" },
+      { href: "/mentor-portal/followups.html", label: "Check-ins (t+90)", page: "followups", group: "Before a mentor" },
       { href: "/mentor-portal/admin.html?view=mentees", label: "Mentee status", page: "mentee-status", group: "Once mentoring" },
     ],
   },

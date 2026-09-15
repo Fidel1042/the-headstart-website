@@ -7,13 +7,18 @@
 // Every touch: days after the consultation, how it is sent, and any minimum
 // conversion score it needs to be earned.
 //
-// Cut back on 7 September 2026. The sequence used to run t+0, t+1, t+3 and a
-// t+20 nudge for calls that scored 40% or better. Four WhatsApp messages after
-// a single call reads as a sales sequence, which is what it was. What is left
-// is the first message, one nudge, and the three-month check-in.
+// Two messages after the call, then a check-in three months on.
+//
+// t+0 and t+1 are both sent by hand from the Contacts page, where the drafted
+// text already sits next to the person's phone number. They are labelled
+// Follow up 1 and Follow up 2 there.
+//
+// The sequence has been cut twice: t+1, t+3 and t+20 went on 7 September 2026,
+// then t+2 was moved back to t+1 on 15 September so both messages land while
+// the call is still fresh. Chasing someone three weeks later never converted.
 const TOUCHES = [
   { day: 0,  channel: "whatsapp" },
-  { day: 2,  channel: "whatsapp" },
+  { day: 1,  channel: "whatsapp" },
   { day: 90, channel: "email" },
 ];
 

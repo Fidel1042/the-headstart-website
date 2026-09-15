@@ -82,11 +82,11 @@
 
   <main class="fu-page">
     <div class="fu-head">
-      <h1>Nudges to send</h1>
+      <h1>Three month check-in</h1>
       <div class="fu-steps">
-        <span>The two day nudge, for people who have not signed yet. The first
-          message is sent live on the call, and the t+90 check-in goes out
-          automatically, so neither is listed here.</span>
+        <span>People who had a consultation, never signed, and are due the t+90
+          email. It sends itself every Monday at 2pm, so this is a view, not a
+          to-do. Follow up 1 and 2 are on the Contacts page.</span>
       </div>
     </div>
 
@@ -95,7 +95,7 @@
 
     <div id="content" hidden>
       <section class="fu-sec">
-        <p class="fu-sec__title">Due now <span class="fu-sec__count" id="due-count"></span></p>
+        <p class="fu-sec__title">Due at the next send <span class="fu-sec__count" id="due-count"></span></p>
         <div id="due-list"></div>
       </section>
 
@@ -105,7 +105,7 @@
       </section>
 
       <section class="fu-sec">
-        <p class="fu-sec__title">Nudge sent <span class="fu-sec__count" id="done-count"></span></p>
+        <p class="fu-sec__title">Check-in sent <span class="fu-sec__count" id="done-count"></span></p>
         <div id="done-list"></div>
       </section>
 
@@ -169,35 +169,26 @@
     // A lead ready to be contacted: the message is shown in full, because it
     // gets read before it is sent, not after.
     function dueCard(l) {
-      // t+90 goes by email: three months on it is a check-in, not a pitch, and
-      // a WhatsApp out of nowhere reads worse than an email.
-      const send = l.channel === "email"
-        ? (l.email
-            ? `<a class="act act--wa" href="mailto:${encodeURIComponent(l.email)}?subject=${encodeURIComponent(l.subject)}&body=${encodeURIComponent(l.message)}">Send email</a>`
-            : `<span class="act act--wa is-off" title="No email in Airtable">No email</span>`)
-        : (l.phone
-            ? `<a class="act act--wa" href="https://wa.me/${l.phone}?text=${encodeURIComponent(l.message)}" target="_blank" rel="noopener">Send on WhatsApp</a>`
-            : `<span class="act act--wa is-off" title="No phone number in Airtable">No number</span>`);
+      // Read-only. checkin-sender.js sends this automatically on Mondays, so a
+      // send button here would be a second route to the same email and the
+      // obvious way to send one twice. Copy stays, for pasting into a reply.
       return `
         <div class="lead" data-id="${l.id}">
           <div class="lead__top">
             <span class="lead__name">${esc(l.name)}</span>
             <span class="pill pill--touch">${l.nextLabel}</span>
-            ${l.overdueBy > 0 ? `<span class="pill pill--late">${l.overdueBy}d late</span>` : ""}
+            ${l.overdueBy > 0 ? `<span class="pill pill--late">${l.overdueBy}d waiting</span>` : ""}
             ${l.score !== null ? `<span class="pill pill--score">${l.score}%</span>` : ""}
-            ${l.channel === "email" ? `<span class="pill pill--score">email</span>` : ""}
             <span class="lead__spacer"></span>
             <span class="lead__meta">consult ${fmt(l.consultedOn)}</span>
           </div>
-          ${l.subject ? `<p class="lead__subject">Subject: ${esc(l.subject)}</p>` : ""}
-          ${l.message
-            ? `<p class="lead__msg">${esc(l.message)}</p>`
-            : `<p class="lead__none">No drafted message for this touch. Write one, or skip.</p>`}
+          ${l.email
+            ? `<p class="lead__subject">To ${esc(l.email)} &middot; ${esc(l.subject)}</p>`
+            : `<p class="lead__none">No email on the record, so this one cannot send.</p>`}
+          ${l.message ? `<p class="lead__msg">${esc(l.message)}</p>` : ""}
           <div class="lead__actions">
-            ${send}
             <button type="button" class="act act--ghost" data-copy="${l.id}">Copy</button>
-            <button type="button" class="act act--ghost" data-sent="${l.id}" data-stage="${l.stage + 1}">Mark sent</button>
-            <button type="button" class="act act--ghost" data-skip="${l.id}" data-stage="${l.planLength}">Skip rest</button>
+            <button type="button" class="act act--ghost" data-skip="${l.id}" data-stage="${l.planLength}">Skip</button>
             <button type="button" class="act act--ghost" data-drop="${l.id}" data-name="${esc(l.name)}">Drop</button>
           </div>
         </div>`;
@@ -223,14 +214,14 @@
 
       document.getElementById("due-list").innerHTML = DATA.dueNow.length
         ? DATA.dueNow.map(dueCard).join("")
-        : `<p class="fu-quiet">Nothing due today.</p>`;
+        : `<p class="fu-quiet">Nobody is due a check-in.</p>`;
 
       document.getElementById("wait-list").innerHTML = DATA.waiting.length
         ? DATA.waiting.map((l) => quietCard(l, `due ${fmt(l.dueOn)}`)).join("")
         : `<p class="fu-quiet">Nobody waiting.</p>`;
 
       document.getElementById("done-list").innerHTML = DATA.finished.length
-        ? DATA.finished.map((l) => quietCard(l, "messaged")).join("")
+        ? DATA.finished.map((l) => quietCard(l, "checked in")).join("")
         : `<p class="fu-quiet">None yet.</p>`;
 
       // Nothing is score-gated since the sequence was cut back to two touches,

@@ -41,7 +41,16 @@ function splitLabel(raw) {
   return { label: nice, when: m ? m[2].trim() : "" };
 }
 
-/** Every draft message in the field, in order, each with its own label. */
+/**
+ * Every draft message in the field, in order.
+ *
+ * Labelled by POSITION, not by whatever the model wrote on the divider line.
+ * That text has drifted through "FOLLOW-UP (send now)", "FOLLOW-UP MESSAGE",
+ * "NUDGE 1" and a bare "===" inside three months, and each variant produced a
+ * differently worded button for the same message. The first block is always
+ * Follow up 1 and the second is always Follow up 2, which is what they are
+ * called everywhere else.
+ */
 function draftMessages(drafts) {
   if (!drafts) return [];
   const lines = drafts.split(/\r?\n/);
@@ -55,7 +64,9 @@ function draftMessages(drafts) {
   const push = () => {
     if (!current) return;
     const text = current.lines.join("\n").trim();
-    if (text) out.push({ label: current.label, when: current.when, text });
+    if (text) {
+      out.push({ label: `Follow up ${out.length + 1}`, when: current.when, text });
+    }
     current = null;
   };
 

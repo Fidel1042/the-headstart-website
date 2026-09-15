@@ -1,22 +1,25 @@
-// consult-followups.js — the post-consultation follow-up sequence.
+// consult-followups.js — who is due the three month check-in.
 //
-// Someone who has had a consultation but not signed sits at "Waiting on
-// Contract". They get two touches, and no more:
+// Someone who had a consultation but never signed sits at "Waiting on
+// Contract". They get three touches:
 //
-//   t+0   straight after the call, while it is still warm. Sent live, off this
-//         page, so it is never queued here.
-//   t+2   one nudge, two days later. The mentor is holding a slot. THIS is
-//         what the page is for.
-//   t+90  a check-in three months on, by email rather than WhatsApp. By then
-//         it is not a sales follow-up, it is asking how the job hunt went, and
-//         email is the right register for that. Sent automatically by
-//         checkin-sender.js, so it never appears here either.
+//   t+0   straight after the call, sent by hand from the Contacts page
+//   t+1   the next day, same place, labelled Follow up 2
+//   t+90  a check-in three months on, by email. By then it is not a sales
+//         follow-up, it is asking how the job hunt went.
 //
-// The t+1, t+3 and t+20 touches were removed on 7 September 2026: four chasing
-// messages after one call is a sales sequence, and it read like one.
+// This page is ONLY the t+90 list, and it is read-only on purpose. The email
+// is sent by checkin-sender.js every Monday at 2pm Sydney, so a send button
+// here would be a second way to do the same thing and a way to send twice.
+// What the page is for is knowing who is about to be contacted, and who
+// already was.
 //
-// "Follow Up Stage" counts how many touches have been sent, so the page always
-// knows what is next without storing a date per touch.
+// It used to be the queue for the WhatsApp touches. That never worked: those
+// two are sent in the moment, so by the time anything appeared here Fidel had
+// already sent it and the list read as 24 messages weeks overdue.
+//
+// "Follow Up Stage" counts how many touches have been sent, so the page knows
+// what is next without storing a date per touch.
 
 const { draftMessages } = require("../shared/drafts");
 const { requireOwner } = require("../shared/require-owner");
@@ -25,19 +28,9 @@ const {
   scoreOf, nextTouch, ymd, daysBetween,
 } = require("../shared/followups");
 
-// This page is the nudge queue, and nothing else.
-//
-// t+0 is sent in the moment, straight after the call, while Fidel still has the
-// person in front of him. It was briefly listed here on 7 September 2026 and
-// that was wrong: he had already sent those messages by hand without advancing
-// the stage, so the page filled with 24 t+0s marked 26 days late that nobody
-// needed to send. A queue full of work already done is a queue people stop
-// opening.
-//
-// So: WhatsApp touches after day 0. Keyed on the shape of the touch rather than
-// a day number, so changing the nudge from t+2 to t+20 needs no edit here.
-const MANUAL_CHANNEL = "whatsapp";
-const isNudge = (t) => t && t.channel === MANUAL_CHANNEL && t.day > 0;
+// The one touch this page reports on. Matched by channel rather than by day
+// number, so moving the check-in from 90 days to 60 needs no edit here.
+const CHECKIN_CHANNEL = "email";
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -153,10 +146,9 @@ exports.handler = async (event) => {
         };
       });
 
-    // Everyone whose next touch is the nudge. Anyone still sitting on t+0 is
-    // not shown: that one is sent live, and if it never was, the place to catch
-    // it is the call itself rather than a list three weeks later.
-    const atFinal = leads.filter((l) => isNudge(l.next));
+    // Everyone whose next touch is the check-in. Anyone still on a WhatsApp
+    // touch is working through the Contacts page and does not belong here.
+    const atFinal = leads.filter((l) => l.next && l.next.channel === CHECKIN_CHANNEL);
 
     // Due first, most overdue at the top: that is the order to work down.
     const dueNow = atFinal.filter((l) => l.due)
