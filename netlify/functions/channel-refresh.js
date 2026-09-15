@@ -211,8 +211,13 @@ exports.handler = async () => {
   }
 
   // --- LinkedIn staleness ---
+  // Measured weeks only. A projected week filling the gap would otherwise look
+  // like fresh data and silence this, which is exactly backwards: the whole
+  // point of projecting is to keep the chart readable WHILE the export is
+  // late, not to stop asking for it.
   const li = existing
-    .filter((r) => r.fields["Channel"] === "linkedin" && r.fields["Week"])
+    .filter((r) => r.fields["Channel"] === "linkedin" && r.fields["Week"]
+                && !r.fields["Estimated"])
     .map((r) => r.fields["Week"]).sort();
   const newest = li[li.length - 1] || null;
   const ageDays = newest
@@ -221,7 +226,8 @@ exports.handler = async () => {
   if (ageDays === null) {
     notes.push("There is no LinkedIn data at all. Export it from LinkedIn and run the importer.");
   } else if (ageDays > LINKEDIN_STALE_DAYS) {
-    notes.push(`LinkedIn reach has not moved since the week of ${newest}, ${ageDays} days ago. ` +
+    notes.push(`The last measured LinkedIn week is ${newest}, ${ageDays} days ago. ` +
+      `Anything since is projected from the KPI doc and is roughly 11% out. ` +
       `LinkedIn has no API for a personal profile, so this one needs the export: ` +
       `Profile, Analytics, Export, then drop the file into "LinkedIn post execution" ` +
       `and say it is there.`);
