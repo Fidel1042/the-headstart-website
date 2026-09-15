@@ -40,6 +40,14 @@ const { isPrepaid } = require("../shared/charge-engine");
  */
 const PRICE_SCHEDULE = [
   { from: "2026-08-28", trial: 55, ongoing: 70 },
+  // Back to a flat 55, trial and ongoing the same. Dated the day after the row
+  // above on purpose: only two people were ever quoted 55 then 70, Shivkumar
+  // and Ravong, and both carry an explicit "Price Tier From" of 2026-08-28.
+  // Dating this row to the day the decision was actually made would have handed
+  // 55/70 to the twenty people who consulted in between and have not signed
+  // yet. The schedule decides who pays what, so it is dated by who it should
+  // catch rather than by when the call was made.
+  { from: "2026-08-29", trial: 55, ongoing: 55 },
 ];
 
 /** The schedule row in force on a given YYYY-MM-DD join date, or null. */
