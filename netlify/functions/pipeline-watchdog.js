@@ -137,13 +137,26 @@ async function checkWebhooks() {
 
   return formHooks
     .filter((h) => (h.disabled || h.success === false) && !healthy.has(key(h)))
-    .map((h) => ({
-      title: `Form webhook dead: ${h.form_name || h.form_id || "all forms"}`,
-      detail: `Netlify ${h.disabled ? "disabled" : "is failing to deliver"} this hook` +
-              `${h.updated_at ? ` (since ${h.updated_at.slice(0, 16).replace("T", " ")} UTC)` : ""}. ` +
-              `Submissions to this form are not reaching ${h.data && h.data.url ? h.data.url : "its destination"}. ` +
-              `Fix: delete the hook and recreate it, a disabled hook cannot be re-enabled.`,
-    }));
+    .map((h) => {
+      const where = h.data && h.data.url ? h.data.url : "its destination";
+      const when = h.updated_at ? ` (since ${h.updated_at.slice(0, 16).replace("T", " ")} UTC)` : "";
+      // Two different problems wearing the same hat, and only one of them is
+      // fixed by recreating the hook. Telling Fidel to delete and recreate a
+      // hook that is still enabled sends him to rebuild working plumbing while
+      // the actual cause, usually one submission the endpoint rejected, stays
+      // where it is.
+      return h.disabled
+        ? { title: `Form webhook disabled: ${h.form_name || h.form_id || "all forms"}`,
+            detail: `Netlify switched this hook off${when} after repeated failures, and ` +
+                    `nothing submitted to this form is reaching ${where}. ` +
+                    `Fix: delete the hook and recreate it. A disabled hook cannot be re-enabled.` }
+        : { title: `Form webhook failing: ${h.form_name || h.form_id || "all forms"}`,
+            detail: `The last delivery to ${where} did not succeed${when}. The hook is still ` +
+                    `enabled, so this is usually one submission the endpoint rejected rather ` +
+                    `than broken wiring, and it clears on the next good one. ` +
+                    `Check the function log before recreating anything. If it keeps failing ` +
+                    `Netlify will disable the hook, and then it does need recreating.` };
+    });
 }
 
 /**

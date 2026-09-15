@@ -11,6 +11,44 @@
 
 const headers = { "Content-Type": "application/json" };
 
+
+/**
+ * Tell Fidel, rather than telling Netlify.
+ *
+ * Netlify reads a non-2xx as "this webhook is broken", marks the hook failing,
+ * and eventually disables it. That is right for a crash and wrong for the
+ * commonest case here: somebody signs using a different email from the one on
+ * their CRM record, which is a five second human fix and not a fault in the
+ * plumbing. One of those used to be enough to put the whole form at risk for
+ * everyone behind it.
+ *
+ * So an unmatchable signature now returns 200 with a flag, and this email is
+ * what makes sure it is not silently dropped instead.
+ */
+async function alertUnmatched(data, reason) {
+  const key = process.env.BREVO_API_KEY;
+  if (!key) return;
+  const row = (k, v) => `<p style="margin:0 0 4px"><b>${k}:</b> ${String(v || "&mdash;")}</p>`;
+  await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: { "api-key": key, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      sender: { name: "The Headstart", email: "fidel@theheadstartmentoring.com" },
+      to: [{ email: "fidelhon@gmail.com", name: "Fidel" }],
+      subject: `Signed agreement could not be matched: ${data.full_name || data.email || "unknown"}`,
+      htmlContent:
+        `<p>Somebody signed the mentee agreement and it could not be attached to a CRM record.</p>` +
+        `<p><b>${reason}</b></p>` +
+        row("Name", data.full_name) + row("Email on the agreement", data.email) +
+        row("Phone", data.phone) + row("Stripe customer", data.stripe_customer_id) +
+        row("Payment option", data.payment_option) + row("Signed", data.date_signed) +
+        `<p style="margin-top:14px">The signature itself is safe in Netlify Forms. ` +
+        `Find them in the Client table, put this email on the record or paste the ` +
+        `Stripe customer id in by hand, and nothing is lost.</p>`,
+    }),
+  }).catch(() => {});
+}
+
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, headers, body: JSON.stringify({ error: "Method not allowed" }) };
@@ -28,11 +66,15 @@ exports.handler = async (event) => {
   const stripeCustomerId  = (data.stripe_customer_id || "").trim();
   const menteeRecordId    = (data.mentee_record_id || "").trim();
 
+  // Both of these are a signature that arrived without enough to place it, and
+  // both are worth a human look rather than a failed delivery.
   if (!stripeCustomerId) {
-    return { statusCode: 400, headers, body: JSON.stringify({ error: "No stripe_customer_id in submission" }) };
+    await alertUnmatched(data, "The submission carried no Stripe customer id, so there is no card to attach.");
+    return { statusCode: 200, headers, body: JSON.stringify({ ok: false, unmatched: true, reason: "no stripe_customer_id" }) };
   }
   if (!menteeRecordId && !email) {
-    return { statusCode: 400, headers, body: JSON.stringify({ error: "Need mentee_record_id or email" }) };
+    await alertUnmatched(data, "The submission carried neither a record id nor an email.");
+    return { statusCode: 200, headers, body: JSON.stringify({ ok: false, unmatched: true, reason: "nothing to match on" }) };
   }
 
   const { AIRTABLE_API_TOKEN, AIRTABLE_CORE_BASE_ID, AIRTABLE_MENTEE_TABLE_ID } = process.env;
@@ -56,7 +98,11 @@ exports.handler = async (event) => {
       const searchData = await searchRes.json();
 
       if (!searchData.records || searchData.records.length === 0) {
-        return { statusCode: 404, headers, body: JSON.stringify({ error: `No mentee record found for ${email}` }) };
+        // 200 on purpose. See alertUnmatched above: this is a person to chase,
+        // not a broken webhook, and a 404 here costs everyone behind them.
+        await alertUnmatched(data, `No client record has the email ${email}.`);
+        return { statusCode: 200, headers,
+          body: JSON.stringify({ ok: false, unmatched: true, email, reason: "no record for that email" }) };
       }
 
       recordId = searchData.records[0].id;
