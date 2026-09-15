@@ -12,10 +12,7 @@ const {
 } = require("../shared/journey-stages");
 const { signupFunnel } = require("../shared/signup-funnel");
 
-function channelStats() {
-  try { return require("../data/channel-stats.json"); }
-  catch (e) { return { linkedin: {}, instagram: {} }; }
-}
+const { channelStats } = require("../shared/channel-stats");
 
 /**
  * Instagram reach, live from the Graph API, keyed by the Monday of each week so
@@ -327,7 +324,7 @@ exports.handler = async (event) => {
     const from = ymd(Date.now() - (offsetDays + windowDays) * 86400000);
 
     // Live Instagram where the API can answer, the stored file where it cannot.
-    const stats = channelStats();
+    const stats = await channelStats(process.env);
     const [igLive, search] = await Promise.all([
       instagramWeeks(from, to),
       // Search impressions are reach in the same sense as a LinkedIn view:

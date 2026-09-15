@@ -95,3 +95,10 @@
 # email, which makes a double send impossible.
 [functions."interview-chase"]
   schedule = "7 * * * *"
+
+# Keeps reach current so nobody has to remember to. Daily at 19:10 UTC, which is
+# early morning Sydney, so a nag about the LinkedIn export lands before the day
+# starts. It refreshes the Instagram token every run, which is what stops that
+# token quietly expiring after 60 days and taking Instagram reach with it.
+[functions."channel-refresh"]
+  schedule = "10 19 * * *"

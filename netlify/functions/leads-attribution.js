@@ -1,5 +1,6 @@
 const { searchStats } = require("../shared/search-console");
 const { requireOwner } = require("../shared/require-owner");
+const { channelStats } = require("../shared/channel-stats");
 // leads-attribution.js
 // Owner-only feed for the portal's Leads page. Joins two sources:
 //   GA4      - where traffic comes from and what it does on the site
@@ -156,7 +157,7 @@ function topPosts(days) {
       profileVisits: p.profile_visits || 0, saves: p.saved || 0, shares: p.shares || 0,
     }));
 
-  const stats = channelStats();
+  const stats = channelStatsFile();
   const li = Object.values(stats.posts_linkedin || {})
     .filter((p) => p.date && p.date >= since)
     .sort((a, b) => (b.impressions || 0) - (a.impressions || 0))
@@ -175,7 +176,9 @@ function topPosts(days) {
   return { instagram: ig, linkedin: li };
 }
 
-function channelStats() {
+// Only for the parts the table does not hold, such as posts_linkedin. Weekly
+// reach comes from the shared reader below, which prefers the live table.
+function channelStatsFile() {
   try {
     return require("../data/channel-stats.json");
   } catch (e) {
@@ -547,7 +550,7 @@ async function gather(days, offset = 0) {
     // Reach -> visits, per week. The impressions come from the platform
     // export; the visits from GA4. Click rate is the honest measure of
     // whether content moved anyone, separate from how many saw it.
-    const stats = channelStats();
+    const stats = await channelStats(process.env);
     out.statsUpdated = stats.updated || null;
     out.topPosts = topPosts(days);
     const byMonday = {};
