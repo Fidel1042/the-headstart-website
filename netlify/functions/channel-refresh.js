@@ -98,12 +98,30 @@ async function refreshToken(token, netlifyToken, notes) {
       "which works until the old one expires.");
     return fresh;
   }
+  // PUT, not PATCH. PATCH writes one value for ONE named context and Netlify
+  // rejects "all" there outright ("context can't be set to all"), which is what
+  // this was doing and why the token stopped saving on 15 September 2026. PUT
+  // replaces the whole variable, which is the only way to write an "all" value.
+  //
+  // The variable is read back first so its scopes and secrecy survive the
+  // write. PUT replaces everything it is given, so anything left out of the
+  // body is silently dropped, and a token with no "functions" scope is a token
+  // the functions cannot see.
+  const envUrl =
+    `https://api.netlify.com/api/v1/accounts/${ACCOUNT}/env/IG_TOKEN?site_id=${SITE_ID}`;
+  const authHeaders = {
+    Authorization: `Bearer ${netlifyToken}`, "Content-Type": "application/json" };
   try {
-    await jsonFetch(
-      `https://api.netlify.com/api/v1/accounts/${ACCOUNT}/env/IG_TOKEN?site_id=${SITE_ID}`,
-      { method: "PATCH",
-        headers: { Authorization: `Bearer ${netlifyToken}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ context: "all", value: fresh }) });
+    const current = await jsonFetch(envUrl, { headers: authHeaders });
+    await jsonFetch(envUrl, {
+      method: "PUT",
+      headers: authHeaders,
+      body: JSON.stringify({
+        key: "IG_TOKEN",
+        scopes: current.scopes || ["builds", "functions", "post_processing", "runtime"],
+        is_secret: Boolean(current.is_secret),
+        values: [{ value: fresh, context: "all" }],
+      }) });
   } catch (e) {
     notes.push(`The Instagram token was refreshed but could not be saved back: ${e.message}`);
   }
