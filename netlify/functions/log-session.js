@@ -32,6 +32,11 @@ const { isPrepaid } = require("../shared/charge-engine");
  * A mentee who joined before the earliest row has no row at all and keeps their
  * own `Session Price`, which the consultation scenario wrote from the rate
  * actually quoted to them. That is how all 37 existing mentees stay untouched.
+ *
+ * The join date can be overridden per mentee with "Price Tier From" on their
+ * client record, for somebody who consulted under one deal and signed weeks
+ * later under another. Without it a late signer falls before every row and is
+ * charged their flat Session Price for life.
  */
 const PRICE_SCHEDULE = [
   { from: "2026-08-28", trial: 55, ongoing: 70 },
@@ -226,9 +231,20 @@ exports.handler = async (event) => {
     // weekly run only charges "Pending" rows), it just lets the P&L value each
     // package session instead of showing $0.
     sessionPriceAUD = parseFloat(menteeRecord.fields["Session Price"]) || 30;
-    // When they came in. Immutable, always present, and the thing the price
-    // schedule is keyed on.
-    menteeJoined    = String(menteeRecord.fields["Created"] || "").slice(0, 10);
+    // Which schedule row they belong to.
+    //
+    // Created is the default and is right for almost everyone: it is immutable,
+    // always there, and someone who consults and signs in the same week was
+    // quoted the price in force then.
+    //
+    // It breaks for a late signer. Shivkumar's record was created 25 August,
+    // three days before the 55/70 schedule starts, but he signed on 15
+    // September under that deal. Keyed on Created he falls before every row,
+    // gets no tier, and is charged a flat Session Price of 55 for life, never
+    // the 70. "Price Tier From" is the override for exactly that: set it to the
+    // start date of the row they were actually quoted.
+    menteeJoined    = String(menteeRecord.fields["Price Tier From"]
+                          || menteeRecord.fields["Created"] || "").slice(0, 10);
 
     // How many sessions this mentee has already had, so the schedule can tell
     // whether the one being logged is their trial. Package mentees are skipped:
