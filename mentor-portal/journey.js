@@ -224,11 +224,28 @@ function delta(stat) {
   const match = other.find((x) => x.label === stat.label);
   if (!match) return "";
   const now = num(stat.value), then = num(match.value);
-  if (now === null || then === null || !then) return "";
-  const pc = Math.round(((now - then) / Math.abs(then)) * 100);
-  if (!pc) return `<span class="cell__d">no change</span>`;
+  if (now === null || then === null) return "";
+  const diff = now - then;
+  if (!diff) return `<span class="cell__d">no change</span>`;
+
   const cls = direction(stat, now, then);
-  return `<span class="cell__d ${cls}">${pc > 0 ? "+" : "&minus;"}${Math.abs(pc)}%</span>`;
+  // Colour alone cannot carry this. Calls booked falling and no-shows falling
+  // are both "&minus;something" and sit side by side, so the only thing telling
+  // them apart was red against green. Anyone colourblind, or just reading
+  // quickly, had to work out per tile which direction was the good one. The
+  // word says it outright.
+  const word = cls === "is-up" ? "better" : cls === "is-down" ? "worse" : "";
+
+  // A percentage of a small count is noise dressed as precision: 12 no-shows
+  // down to 9 is "3 fewer", not "&minus;25%". Rates and durations keep the
+  // relative form, because a change in a percentage is only meaningful
+  // relative to itself.
+  const isRate = /%|day/i.test(String(stat.value));
+  const size = isRate
+    ? `${diff > 0 ? "+" : "&minus;"}${Math.abs(Math.round(diff * 10) / 10)}${/%/.test(String(stat.value)) ? " pts" : ""}`
+    : `${Math.abs(diff)} ${diff > 0 ? "more" : "fewer"}`;
+
+  return `<span class="cell__d ${cls}">${size}${word ? ` &middot; ${word}` : ""}</span>`;
 }
 
 function compareLine(stat) {
@@ -243,9 +260,11 @@ function compareLine(stat) {
     const other = (panelFor(CACHE.get(cacheKey(sp))) || {}).stats || [];
     const match = other.find((x) => x.label === stat.label);
     if (!match) return `<span class="cmp"><b>${sp.label}</b> —</span>`;
-    const then = num(match.value);
-    const cls = colourable(stat, key) ? " " + direction(stat, now, then) : "";
-    return `<span class="cmp${cls}"><b>${sp.label}</b> ${esc(match.value)}</span>`;
+    // Deliberately uncoloured. This is what the number WAS, and a past fact is
+    // neither good nor bad; the judgement belongs on the change above it.
+    // Colouring it meant three "prev" values in three different colours on one
+    // row, which read as if 39 bookings had itself been a problem.
+    return `<span class="cmp"><b>${sp.label}</b> ${esc(match.value)}</span>`;
   }).join("");
 }
 
