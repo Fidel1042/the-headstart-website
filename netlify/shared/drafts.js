@@ -41,6 +41,33 @@ function splitLabel(raw) {
   return { label: nice, when: m ? m[2].trim() : "" };
 }
 
+// The agreement link, as the Make.com prompt writes it: bare, with no token.
+//
+// html/mentee-agreement.html accepts ?mentee=recABC123 and agreement-sync.js
+// prefers it over the email, precisely so that signing under a different
+// address still lands on the right record. Nothing was ever putting the token
+// INTO the link, so every mentee got the bare URL and the mechanism sat unused.
+// On 15 September 2026 Shivkumar signed as shivkumarmundhe08@gmail.com, which
+// matches no record, and the webhook went red for everyone behind him.
+//
+// The record id is stamped here rather than in the Make.com prompt on purpose.
+// The prompt is written by a language model, and a model that has mangled
+// mentor names will eventually mangle a record id, silently and into the wrong
+// person's agreement. The portal already knows whose draft it is rendering, so
+// it is the one place the id cannot be wrong.
+const AGREEMENT_URL = /https:\/\/(?:www\.)?theheadstartmentoring\.com\/mentee-agreement(\?[^\s]*)?/g;
+const RECORD_ID = /^rec[A-Za-z0-9]{10,20}$/;
+
+/** Add ?mentee=rec… to any agreement link in the text. */
+function tagAgreementLink(text, recordId) {
+  if (!recordId || !RECORD_ID.test(recordId)) return text;
+  return String(text).replace(AGREEMENT_URL, (url, query) => {
+    // A link that already carries a token is left exactly as it is.
+    if (query && /[?&]mentee=/.test(query)) return url;
+    return url + (query ? "&" : "?") + `mentee=${recordId}`;
+  });
+}
+
 /**
  * Every draft message in the field, in order.
  *
@@ -51,7 +78,7 @@ function splitLabel(raw) {
  * Follow up 1 and the second is always Follow up 2, which is what they are
  * called everywhere else.
  */
-function draftMessages(drafts) {
+function draftMessages(drafts, recordId) {
   if (!drafts) return [];
   const lines = drafts.split(/\r?\n/);
 
@@ -65,7 +92,8 @@ function draftMessages(drafts) {
     if (!current) return;
     const text = current.lines.join("\n").trim();
     if (text) {
-      out.push({ label: `Follow up ${out.length + 1}`, when: current.when, text });
+      out.push({ label: `Follow up ${out.length + 1}`, when: current.when,
+                 text: tagAgreementLink(text, recordId) });
     }
     current = null;
   };
@@ -101,4 +129,4 @@ function draftMessages(drafts) {
   return out;
 }
 
-module.exports = { draftMessages };
+module.exports = { draftMessages, tagAgreementLink };

@@ -113,7 +113,7 @@ exports.handler = async (event) => {
         // Two drafted messages now: the follow-up and the single nudge. Older
         // records still carry a third block from when the sequence was longer;
         // it is simply not read.
-        const drafted = draftMessages(f["Drafts"] || "");
+        const drafted = draftMessages(f["Drafts"] || "", r.id);
         const byDay = {
           0: drafted[0] ? drafted[0].text : "",
           2: drafted[1] ? drafted[1].text : "",

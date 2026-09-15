@@ -109,7 +109,7 @@ exports.handler = async (event) => {
         stage:    f["Client Pipeline"] || "",
         mentor:   mentorEmail ? (mentorName.get(mentorEmail) || mentorEmail) : "Not matched yet",
         modified: f["Last Modified"] || "",
-        messages: draftMessages(f["Drafts"] || ""),
+        messages: draftMessages(f["Drafts"] || "", r.id),
         industry: shortIndustry(f["Target Industry"] || ""),
         mentorId: mentorEmail ? (mentorId.get(mentorEmail) || "") : "",
       };
