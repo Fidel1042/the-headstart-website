@@ -55,9 +55,33 @@
       "partial": false
     },
     "2026-08-17": {
-      "days": 3,
+      "days": 7,
       "engagements": 0,
-      "impressions": 42306,
+      "impressions": 75495,
+      "partial": false
+    },
+    "2026-08-24": {
+      "days": 7,
+      "engagements": 0,
+      "impressions": 70901,
+      "partial": false
+    },
+    "2026-08-31": {
+      "days": 6,
+      "engagements": 0,
+      "impressions": 107904,
+      "partial": true
+    },
+    "2026-09-07": {
+      "days": 7,
+      "engagements": 0,
+      "impressions": 102340,
+      "partial": false
+    },
+    "2026-09-14": {
+      "days": 1,
+      "engagements": 0,
+      "impressions": 4869,
       "partial": true
     }
   },
@@ -940,8 +964,8 @@
     }
   },
   "source": {
-    "instagram": "Meta Graph API (grad_headstart (135 posts))",
+    "instagram": "Meta Graph API (grad_headstart (160 posts))",
     "linkedin": "AggregateAnalytics_Fidel Hon_2026-07-01_2026-08-31.xlsx"
   },
-  "updated": "2026-09-01T21:40:57.581588+00:00"
+  "updated": "2026-09-15T01:36:36.398318+00:00"
 }

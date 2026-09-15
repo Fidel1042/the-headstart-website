@@ -1,8 +1,16 @@
 const { requireOwner } = require("../shared/require-owner");
+const { TOUCHES } = require("../shared/followups");
+
+// How many of the touches are sent by hand from the Contacts page. Counted from
+// the sequence rather than hardcoded, so adding or removing a WhatsApp touch
+// does not silently leave this behind.
+const HAND_SENT_TOUCHES = TOUCHES.filter((t) => t.channel === "whatsapp").length;
 // admin-update.js
 // Owner-only writes from the admin portal:
-//   kind "mentee-followup" → sets "Last Followed Up" (date) on a Client record
-//   kind "mentor-notes"    → sets "Admin Notes" (text) on a Mentor record
+//   kind "mentee-followup"      → sets "Last Followed Up" (date) on a Client
+//   kind "mentor-notes"         → sets "Admin Notes" (text) on a Mentor
+//   kind "mentee-consult-saved" → marks the consult card done AND advances
+//                                 "Follow Up Stage" past the hand-sent touches
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -89,8 +97,17 @@ exports.handler = async (event) => {
     tableId = AIRTABLE_MENTEE_TABLE_ID;
     fields = { "WhatsApp Added": payload.added !== false };
   } else if (kind === "mentee-consult-saved") {
+    // Marking the card done IS marking the messages sent. Both follow-ups sit
+    // on that card and get sent in the same sitting, so asking for a second
+    // click to say so only created a way to forget: the stage stayed at 0, the
+    // person never progressed, and they showed up weeks later looking overdue.
+    //
+    // Undoing it winds the stage back the same way, so the two stay in step.
     tableId = AIRTABLE_MENTEE_TABLE_ID;
-    fields = { "Consult Contact Saved": payload.added !== false };
+    fields = {
+      "Consult Contact Saved": payload.added !== false,
+      "Follow Up Stage": payload.added !== false ? HAND_SENT_TOUCHES : 0,
+    };
   } else {
     return { statusCode: 400, headers, body: JSON.stringify({ error: "Unknown kind" }) };
   }
