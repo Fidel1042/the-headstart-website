@@ -3,16 +3,17 @@
 // Someone who has had a consultation but not signed sits at "Waiting on
 // Contract". They get two touches, and no more:
 //
-//   t+0   straight after the call, while it is still warm
-//   t+2   one nudge, two days later. The mentor is holding a slot.
+//   t+0   straight after the call, while it is still warm. Sent live, off this
+//         page, so it is never queued here.
+//   t+2   one nudge, two days later. The mentor is holding a slot. THIS is
+//         what the page is for.
 //   t+90  a check-in three months on, by email rather than WhatsApp. By then
 //         it is not a sales follow-up, it is asking how the job hunt went, and
 //         email is the right register for that. Sent automatically by
-//         checkin-sender.js, so it never appears on this page.
+//         checkin-sender.js, so it never appears here either.
 //
-// Both WhatsApp touches are worked from this page. The t+1, t+3 and t+20
-// touches were removed on 7 September 2026: four chasing messages after one
-// call is a sales sequence, and it read like one.
+// The t+1, t+3 and t+20 touches were removed on 7 September 2026: four chasing
+// messages after one call is a sales sequence, and it read like one.
 //
 // "Follow Up Stage" counts how many touches have been sent, so the page always
 // knows what is next without storing a date per touch.
@@ -24,11 +25,19 @@ const {
   scoreOf, nextTouch, ymd, daysBetween,
 } = require("../shared/followups");
 
-// The page works every touch Fidel sends by hand, which is every WhatsApp one.
-// Keyed on channel rather than a day number so adding or removing a touch in
-// followups.js needs no change here. The t+90 check-in is email and goes out on
-// its own, so it never appears.
+// This page is the nudge queue, and nothing else.
+//
+// t+0 is sent in the moment, straight after the call, while Fidel still has the
+// person in front of him. It was briefly listed here on 7 September 2026 and
+// that was wrong: he had already sent those messages by hand without advancing
+// the stage, so the page filled with 24 t+0s marked 26 days late that nobody
+// needed to send. A queue full of work already done is a queue people stop
+// opening.
+//
+// So: WhatsApp touches after day 0. Keyed on the shape of the touch rather than
+// a day number, so changing the nudge from t+2 to t+20 needs no edit here.
 const MANUAL_CHANNEL = "whatsapp";
+const isNudge = (t) => t && t.channel === MANUAL_CHANNEL && t.day > 0;
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -144,9 +153,10 @@ exports.handler = async (event) => {
         };
       });
 
-    // Everyone with a message for Fidel to send, at either touch. Once both
-    // are done the only thing left is the automatic t+90 check-in.
-    const atFinal = leads.filter((l) => l.next && l.next.channel === MANUAL_CHANNEL);
+    // Everyone whose next touch is the nudge. Anyone still sitting on t+0 is
+    // not shown: that one is sent live, and if it never was, the place to catch
+    // it is the call itself rather than a list three weeks later.
+    const atFinal = leads.filter((l) => isNudge(l.next));
 
     // Due first, most overdue at the top: that is the order to work down.
     const dueNow = atFinal.filter((l) => l.due)

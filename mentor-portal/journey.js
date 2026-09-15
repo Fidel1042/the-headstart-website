@@ -226,26 +226,50 @@ function delta(stat) {
   const now = num(stat.value), then = num(match.value);
   if (now === null || then === null) return "";
   const diff = now - then;
-  if (!diff) return `<span class="cell__d">no change</span>`;
 
+  // The convention every analytics tool uses, and the reason it works: the
+  // arrow and the colour answer two different questions. The arrow says which
+  // way the number moved, the colour says whether that is good. Calls booked
+  // and no-shows can both fall and show the same arrow in different colours,
+  // and neither has to be decoded, because nobody reads an arrow as a verdict.
+  //
+  // Before this, a bare "&minus;25%" carried both jobs at once and did neither
+  // clearly.
+  if (!diff) {
+    return `<span class="cell__d is-flat" title="No change from ${esc(match.value)}">` +
+           `<span class="cell__arrow">&ndash;</span>0%</span>`;
+  }
   const cls = direction(stat, now, then);
-  // Colour alone cannot carry this. Calls booked falling and no-shows falling
-  // are both "&minus;something" and sit side by side, so the only thing telling
-  // them apart was red against green. Anyone colourblind, or just reading
-  // quickly, had to work out per tile which direction was the good one. The
-  // word says it outright.
-  const word = cls === "is-up" ? "better" : cls === "is-down" ? "worse" : "";
+  const arrow = diff > 0 ? "&#9650;" : "&#9660;";
 
-  // A percentage of a small count is noise dressed as precision: 12 no-shows
-  // down to 9 is "3 fewer", not "&minus;25%". Rates and durations keep the
-  // relative form, because a change in a percentage is only meaningful
-  // relative to itself.
-  const isRate = /%|day/i.test(String(stat.value));
-  const size = isRate
-    ? `${diff > 0 ? "+" : "&minus;"}${Math.abs(Math.round(diff * 10) / 10)}${/%/.test(String(stat.value)) ? " pts" : ""}`
-    : `${Math.abs(diff)} ${diff > 0 ? "more" : "fewer"}`;
+  // Rates move in percentage points, not percent. A show rate going 70% to 75%
+  // rose 5 points; calling that "7.1%" is a different statement about a
+  // different quantity, and mixing the two is how dashboards mislead.
+  const isPct = /%/.test(String(stat.value));
+  let size;
+  if (isPct) {
+    size = `${round1(Math.abs(diff))} pts`;
+  } else if (!then) {
+    size = "new";                       // dividing by a zero baseline says nothing
+  } else {
+    const pc = Math.abs((diff / Math.abs(then)) * 100);
+    size = `${pc >= 10 ? Math.round(pc) : round1(pc)}%`;
+  }
 
-  return `<span class="cell__d ${cls}">${size}${word ? ` &middot; ${word}` : ""}</span>`;
+  // The absolute change lives in the tooltip rather than the tile. On a count
+  // of 36 the percentage is the headline everyone expects, but "3 fewer" is the
+  // fact that actually means something, so it stays one hover away.
+  const tip = isPct
+    ? `${esc(match.value)} to ${esc(stat.value)}`
+    : `${Math.abs(diff)} ${diff > 0 ? "more" : "fewer"} than ${esc(match.value)}`;
+
+  return `<span class="cell__d ${cls}" title="${tip}">` +
+         `<span class="cell__arrow">${arrow}</span>${size}</span>`;
+}
+
+/** One decimal, without the trailing ".0" that makes a tile look unfinished. */
+function round1(n) {
+  return String(Math.round(n * 10) / 10);
 }
 
 function compareLine(stat) {
@@ -259,12 +283,14 @@ function compareLine(stat) {
     const sp = spec(key);
     const other = (panelFor(CACHE.get(cacheKey(sp))) || {}).stats || [];
     const match = other.find((x) => x.label === stat.label);
-    if (!match) return `<span class="cmp"><b>${sp.label}</b> —</span>`;
+    if (!match) return `<span class="cmp"><b>vs ${sp.label}</b> &mdash;</span>`;
     // Deliberately uncoloured. This is what the number WAS, and a past fact is
     // neither good nor bad; the judgement belongs on the change above it.
     // Colouring it meant three "prev" values in three different colours on one
     // row, which read as if 39 bookings had itself been a problem.
-    return `<span class="cmp"><b>${sp.label}</b> ${esc(match.value)}</span>`;
+    // "vs 39" rather than "prev 39": it reads as a baseline being compared
+    // against, which is what it is, instead of a second number of its own.
+    return `<span class="cmp"><b>vs ${sp.label}</b> ${esc(match.value)}</span>`;
   }).join("");
 }
 

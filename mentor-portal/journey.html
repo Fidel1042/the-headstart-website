@@ -149,17 +149,20 @@
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
       gap: 0.7rem; margin-bottom: 1.2rem; }
     .cell { border: 1px solid var(--line); border-radius: 12px; padding: 0.75rem 0.9rem; }
-    /* The change sits beside the number, smaller than it. It used to match the
-       number's size, which worked while it read "&minus;8%" and stopped working
-       once it read "3 fewer &middot; worse": two headlines of equal weight in
-       one tile, and the longer one wrapping under the number it belonged to.
-       The count is the fact, the change is the annotation. */
+    /* The number is the fact, the change is the annotation, so the change is
+       smaller. Standard KPI-tile proportions: the eye lands on the value and
+       picks the delta up second. */
     .cell__top { display: flex; align-items: baseline; gap: 0.45rem; flex-wrap: wrap; }
     .cell__v { font-size: 1.3rem; font-weight: 800; font-variant-numeric: tabular-nums; }
     .cell__d {
-      font-size: 0.78rem; font-weight: 700; font-variant-numeric: tabular-nums;
+      font-size: 0.8rem; font-weight: 700; font-variant-numeric: tabular-nums;
       color: var(--text-muted); white-space: nowrap;
+      display: inline-flex; align-items: center; gap: 0.18rem;
     }
+    /* Smaller than the figure beside it. A triangle at text size reads as a
+       shape competing with the number; at this size it reads as punctuation. */
+    .cell__arrow { font-size: 0.62em; line-height: 1; }
+    .cell__d.is-flat { opacity: 0.65; }
     .cell__d.is-up { color: #2e7d52; }
     .cell__d.is-down { color: #c33; }
     [data-theme="dark"] .cell__d.is-up { color: #6fd39b; }
