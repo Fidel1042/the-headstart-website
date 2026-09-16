@@ -37,8 +37,26 @@ exports.handler = async (event) => {
   // outgoing webhooks; if wrapped in `payload.data`, support that too.
   const data = netlifyPayload.payload?.data || netlifyPayload.data || netlifyPayload;
   const email = (data.email || "").trim().toLowerCase();
-  if (!email) {
-    return { statusCode: 400, headers, body: JSON.stringify({ error: "No email in submission" }) };
+
+  // A junk submission is not a broken webhook, and must never be answered with
+  // an error. Netlify counts non-2xx replies against the hook and switches it
+  // off after a few, which is exactly what happened on 16 September 2026: an
+  // automated scanner posted four submissions with no email address, this
+  // returned 400 to each, and Netlify disabled the hook. Every real signup
+  // after that reached nobody.
+  //
+  // So anything unusable is acknowledged with 200 and dropped. The only things
+  // worth a failure code are our own outages, where a retry genuinely helps.
+  if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+    return { statusCode: 200, headers,
+      body: JSON.stringify({ ok: false, skipped: true, reason: "no usable email" }) };
+  }
+
+  // The form's honeypot. A human never sees this field, so anything in it is a
+  // bot. Accepted and discarded, for the same reason as above.
+  if (String(data["bot-field"] || "").trim()) {
+    return { statusCode: 200, headers,
+      body: JSON.stringify({ ok: false, skipped: true, reason: "honeypot" }) };
   }
 
   const body = {
