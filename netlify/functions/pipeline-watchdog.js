@@ -261,7 +261,26 @@ async function checkScenarios() {
   return out;
 }
 
-/** D: runs that errored in the last day. */
+/**
+ * D: runs that errored in the last day AND have not been dealt with since.
+ *
+ * "In the last 24 hours" on its own is not a problem report, it is a memory of
+ * one. On 16 September 2026 a junk form submission failed this scenario at
+ * 08:02, it was fixed and switched back on within the hour, and the watchdog
+ * kept emailing about that same dead failure every two hours for the rest of
+ * the day. An alert that stays red after the fix teaches you to ignore alerts.
+ *
+ * So a failure only counts while nothing has happened since to address it.
+ * Two things close it out:
+ *
+ *   a clean run afterwards  - it works now, whatever went wrong is behind it
+ *   an edit afterwards      - somebody changed the scenario in response
+ *
+ * The edit half matters more than it looks. A scenario that fails and is then
+ * repaired may not run again for days, because nothing has triggered it. With
+ * only the clean-run rule, that fix would go unnoticed and the alert would keep
+ * firing for a full day after the work was done.
+ */
 async function checkErrors() {
   const data = await make(`/scenarios?teamId=${MAKE_TEAM_ID}&pg%5Blimit%5D=100`);
   const active = (data.scenarios || []).filter((s) => s.isActive);
@@ -271,9 +290,20 @@ async function checkErrors() {
   const results = await Promise.allSettled(
     active.map(async (s) => {
       const logs = await make(`/scenarios/${s.id}/logs?pg%5Blimit%5D=20`);
+      const entries = logs.scenarioLogs || [];
+      const at = (l) => Date.parse(l.timestamp) || 0;
+
+      // The moment the scenario was last known good, or last touched by hand.
+      // Anything that failed before this has already been answered.
+      const resolvedAt = Math.max(
+        0,
+        ...entries.filter((l) => l.status === 1).map(at),
+        ...entries.filter((l) => l.type === "modify").map(at));
+
       // status 1 is a clean run. Anything else ran and went wrong.
-      const bad = (logs.scenarioLogs || []).filter(
-        (l) => l.status != null && l.status !== 1 && Date.parse(l.timestamp) >= since);
+      const bad = entries.filter(
+        (l) => l.status != null && l.status !== 1 &&
+               at(l) >= since && at(l) > resolvedAt);
       return { name: s.name, bad };
     }));
 
