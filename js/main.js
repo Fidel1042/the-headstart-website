@@ -17,6 +17,7 @@ import { init as initMultiStepForm }      from "./modules/multi-step-form.js";
 import { init as initServiceCheckboxTriggers } from "./modules/service-checkbox-triggers.js";
 import { init as initMentorApplicationForm }   from "./modules/mentor-application-form.js";
 import { init as initSearchSelect }       from "./modules/search-select.js";
+import { init as initReferralLink }      from "./modules/referral-link.js";
 import { init as initMonthYearPicker }    from "./modules/month-year-picker.js";
 import { init as initScrollTo }           from "./modules/scroll-to.js";
 import { init as initOurStoryFlow }       from "./modules/our-story-flow.js";
@@ -41,6 +42,7 @@ const bootstrap = () => {
   initServiceCheckboxTriggers();
   initMentorApplicationForm();
   initSearchSelect();
+  initReferralLink();
   initMonthYearPicker();
   initScrollTo();
   // CSS-driven flow effect would fight GSAP's transforms on the home page.

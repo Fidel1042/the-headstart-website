@@ -169,6 +169,13 @@
 
     .why { margin-top: 0.35rem; }
 
+    /* Each KPI is a titled block with its own reasons underneath, rather than
+       one bullet carrying a paragraph of justification inside it. */
+    .kpi + .kpi { margin-top: 1.1rem; }
+    .kpi__title { font-weight: 700; margin: 0 0 0.35rem; }
+    .kpi .why { margin: 0 0 0.3rem; }
+    .kpi ul { margin: 0; }
+
     li + li { margin-top: 0.4rem; }
 
     /* Highlight row for contact info */
@@ -392,14 +399,22 @@
     <div class="card-box">
       <h2>2 KPIs: Continuity</h2>
       <p style="margin-bottom:0.9rem;">Since mentees go on a pay-as-you-go basis, continuity is key to actually secure them a role.</p>
-      <ul>
-        <li><strong>Total of at least 8 sessions done for each mentee.</strong>
-          <div class="why">Why? We found most successful mentees did on average 8+ sessions. Mentees usually only pick things up (motivation and understanding of job search) after the 5th or 6th session.</div>
-        </li>
-        <li><strong>Weekly occurrence with the mentees, on a fixed schedule.</strong>
-          <div class="why">Why? Regular occurrence creates habits, keeping accountability high.</div>
-        </li>
-      </ul>
+      <div class="kpi">
+        <p class="kpi__title">KPI 1: Total of at least 8 sessions done for each mentee.</p>
+        <p class="why">Why?</p>
+        <ul>
+          <li>Most successful mentees did on average 8+ sessions</li>
+          <li>Mentees usually only pick things up (motivation and understanding of job search) after the 5th or 6th session</li>
+        </ul>
+      </div>
+
+      <div class="kpi">
+        <p class="kpi__title">KPI 2: Weekly occurrence with mentee, fixed schedule every week</p>
+        <p class="why">Why?</p>
+        <ul>
+          <li>Regular occurrence creates habits, keeping accountability high.</li>
+        </ul>
+      </div>
     </div>
 
     <div class="card-box">

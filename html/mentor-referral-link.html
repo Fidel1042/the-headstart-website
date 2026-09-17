@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<title>Headstart Mentoring: Your Referral Link</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<style>
+  :root {
+    --bg: #000000;
+    --bg-card: rgba(255,255,255,0.04);
+    --text: #ffffff;
+    --line: rgba(255,255,255,0.1);
+    --line-soft: rgba(255,255,255,0.07);
+    --muted: rgba(255,255,255,0.62);
+    --gold-bright: #f0c75c;
+    --accent: #c79b3b;
+    --accent-soft: rgba(199,155,59,0.22);
+    --accent-line: rgba(199,155,59,0.4);
+  }
+  [data-theme="light"] {
+    --bg: #ffffff;
+    --bg-card: rgba(0,0,0,0.025);
+    --text: #14110c;
+    --line: rgba(0,0,0,0.12);
+    --line-soft: rgba(0,0,0,0.07);
+    --muted: rgba(0,0,0,0.58);
+    --gold-bright: #7d5a10;
+    --accent: #9b6f16;
+    --accent-soft: rgba(155,111,22,0.12);
+    --accent-line: rgba(155,111,22,0.32);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .site-header {
+    position: sticky; top: 0; z-index: 50;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+    padding: 0.9rem 1.6rem;
+    display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+  }
+  .logo { height: 30px; width: auto; display: block; }
+  .header-text h1 { font-size: 1.05rem; margin: 0; font-weight: 800; letter-spacing: -0.01em; }
+  .header-text .sub { font-size: 0.72rem; color: var(--muted); }
+  .header-actions { margin-left: auto; display: flex; align-items: center; gap: 0.6rem; }
+  .back-link, .theme-toggle {
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+    color: var(--accent); text-decoration: none;
+    border: 1px solid var(--line); border-radius: 999px;
+    padding: 0.45rem 0.9rem; background: transparent; cursor: pointer; font-family: inherit;
+  }
+  .back-link:hover, .theme-toggle:hover { border-color: var(--accent-line); color: var(--gold-bright); }
+
+  main { max-width: 760px; margin: 0 auto; padding: 2rem 1.6rem 5rem; }
+
+  h2.block {
+    font-size: 0.72rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--accent); margin: 2.6rem 0 1rem; padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--line);
+  }
+  h2.block.first { margin-top: 0.4rem; }
+
+  /* One type, one card. The number is the anchor a mentor scans for. */
+  .type {
+    border: 1px solid var(--line); border-radius: 14px;
+    padding: 1.3rem 1.5rem; margin-bottom: 1rem; background: var(--bg-card);
+  }
+  .type__head { display: flex; align-items: baseline; gap: 0.8rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
+  .type__num {
+    font-size: 0.68rem; font-weight: 800; letter-spacing: 0.08em;
+    color: var(--accent); background: var(--accent-soft);
+    border-radius: 6px; padding: 0.2rem 0.5rem; white-space: nowrap;
+  }
+  .type__title { font-size: 1.05rem; font-weight: 800; margin: 0; letter-spacing: -0.01em; }
+  /* Fixed height, auto width: the two figures read as the same size despite
+     slightly different source aspect ratios. Pixelated keeps the art crisp. */
+  .type--figure { display: flex; gap: 1.3rem; align-items: flex-start; }
+  .type__fig { flex: 0 0 auto; height: 140px; width: auto; image-rendering: pixelated; }
+  .type__body { flex: 1; min-width: 0; }
+  .type ul { margin: 0.6rem 0 0; padding-left: 1.15rem; }
+  .type li { margin-bottom: 0.35rem; font-size: 0.92rem; }
+  .type li:last-child { margin-bottom: 0; }
+
+  .row { margin-bottom: 0.8rem; }
+  .row:last-child { margin-bottom: 0; }
+  .row .k {
+    display: block; margin-bottom: 0.1rem;
+    font-size: 0.62rem; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase;
+    color: var(--accent);
+  }
+  .row .v { display: block; font-size: 0.92rem; }
+  .row .v a { color: var(--gold-bright); text-decoration: underline; text-underline-offset: 2px; }
+
+  .note {
+    border-top: 1px solid var(--line-soft); margin-top: 0.85rem; padding-top: 0.75rem;
+    font-size: 0.87rem; color: var(--muted);
+  }
+  .note strong { color: var(--gold-bright); }
+
+  .rules { border: 1px solid var(--line); border-radius: 14px; padding: 1.2rem 1.4rem; margin-top: 1rem; }
+  .rules h3 { margin: 0 0 0.7rem; font-size: 0.95rem; }
+  .rules ul { margin: 0; padding-left: 1.15rem; }
+  .rules li { margin-bottom: 0.45rem; font-size: 0.92rem; }
+  .rules p { font-size: 0.9rem; color: var(--muted); margin: 0.9rem 0 0; }
+
+  @media (max-width: 700px) {
+    main { padding: 1.4rem 1.1rem 4rem; }
+    .site-header { padding: 0.8rem 1.1rem; }
+    .type--figure { gap: 0.9rem; }
+    .type__fig { height: 104px; }
+  }
+
+  /* Referral link page. Kept to the same card language as the other resource
+     pages so nothing here needs its own design vocabulary. */
+  .pick { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0 0 1.6rem; }
+  .pick button {
+    font-family: inherit; font-size: 0.85rem; font-weight: 600;
+    color: var(--text); background: var(--bg-card);
+    border: 1px solid var(--line); border-radius: 999px;
+    padding: 0.5rem 1rem; cursor: pointer; min-height: 44px;
+  }
+  .pick button:hover { border-color: var(--accent-line); }
+  .pick button[aria-pressed="true"] {
+    background: var(--accent-soft); border-color: var(--accent-line); color: var(--gold-bright);
+  }
+  .linkbox {
+    border: 1px solid var(--line); border-radius: 14px;
+    padding: 1.3rem 1.5rem; background: var(--bg-card);
+  }
+  .linkbox code {
+    display: block; word-break: break-all; font-size: 0.95rem;
+    color: var(--text); margin-bottom: 1rem;
+  }
+  .linkbox button {
+    font-family: inherit; font-size: 0.8rem; font-weight: 700;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    color: var(--accent); background: transparent;
+    border: 1px solid var(--line); border-radius: 999px;
+    padding: 0.6rem 1.2rem; cursor: pointer; min-height: 44px;
+  }
+  .linkbox button:hover { border-color: var(--accent-line); color: var(--gold-bright); }
+  .note { color: var(--muted); font-size: 0.9rem; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="../mentor-portal/" class="logo-home" aria-label="Mentor portal home">
+    <img class="logo" src="../images/headstart-italic-logo.png" alt="The Headstart logo" />
+  </a>
+  <div class="header-text">
+    <h1>Your Referral Link</h1>
+    <span class="sub">Internal &middot; Mentees who use it arrive with you as the referrer</span>
+  </div>
+  <div class="header-actions">
+    <a class="back-link" href="../mentor-portal/">&larr; Mentor Portal</a>
+    <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle light/dark mode" title="Toggle light/dark mode">
+      <span id="theme-icon">&#9788;</span>
+    </button>
+  </div>
+</header>
+
+<main>
+
+  <h2 class="block first">Pick your name</h2>
+  <div class="pick" id="pick"></div>
+
+  <div class="linkbox">
+    <code id="link">Pick your name above.</code>
+    <button id="copy" type="button" disabled>Copy link</button>
+  </div>
+
+  <p class="note">The discovery call form opens with you already filled in as the referrer. It is remembered for 90 days, so it still counts if they sign up days later.</p>
+
+</main>
+
+<script type="module">
+  // The mentor list is imported, never retyped, so a new mentor appears here
+  // the moment they are added to the site's own list.
+  import { searchSources } from "../js/data/search-sources.js";
+
+  const ORIGIN = "https://theheadstartmentoring.com";
+  const pick = document.getElementById("pick");
+  const out = document.getElementById("link");
+  const copy = document.getElementById("copy");
+  const SAVED = "headstart_referral_name";
+
+  // Remembered so this is a one-time choice. A mentor coming back for their
+  // link should land on it, not on the picker again.
+  let current = "";
+  try { current = localStorage.getItem(SAVED) || ""; } catch (e) {}
+
+  function urlFor(name) {
+    return ORIGIN + "/discovery-call?ref=" + encodeURIComponent(name.toLowerCase());
+  }
+
+  function choose(name) {
+    current = name;
+    try { localStorage.setItem(SAVED, name); } catch (e) {}
+    out.textContent = urlFor(name);
+    copy.disabled = false;
+    copy.textContent = "Copy link";
+    pick.querySelectorAll("button").forEach((b) => {
+      b.setAttribute("aria-pressed", b.textContent === name ? "true" : "false");
+    });
+  }
+
+  (searchSources.mentors || []).forEach((name) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = name;
+    b.setAttribute("aria-pressed", "false");
+    b.addEventListener("click", () => choose(name));
+    pick.appendChild(b);
+  });
+
+  if (current) choose(current);
+
+  copy.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(out.textContent);
+      copy.textContent = "Copied";
+    } catch (e) {
+      // Clipboard is blocked in some in-app browsers. Selecting the text is
+      // the fallback that always works.
+      const r = document.createRange();
+      r.selectNodeContents(out);
+      const s = window.getSelection();
+      s.removeAllRanges();
+      s.addRange(r);
+      copy.textContent = "Press copy";
+    }
+  });
+</script>
+
+<script>
+  const root = document.documentElement;
+  const btn = document.getElementById('theme-toggle');
+  const icon = document.getElementById('theme-icon');
+  // Same key as the rest of the portal, so one toggle carries everywhere.
+  // Light is the default; only a stored choice overrides it.
+  const saved = localStorage.getItem('headstart_theme');
+  if (saved) { root.setAttribute('data-theme', saved); }
+  const sync = () => {
+    icon.innerHTML = root.getAttribute('data-theme') === 'light' ? '&#9789;' : '&#9788;';
+  };
+  sync();
+  btn.addEventListener('click', () => {
+    const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('headstart_theme', next);
+    sync();
+  });
+</script>
+
+</body>
+</html>
